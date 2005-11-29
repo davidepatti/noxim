@@ -1,5 +1,4 @@
 TARGET_ARCH = linux
-
 CC     = g++
 OPT    = -O3
 DEBUG  = -g
