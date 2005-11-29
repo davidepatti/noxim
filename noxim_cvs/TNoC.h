@@ -4,7 +4,11 @@
 
  *****************************************************************************/
 
-prova
+#ifndef __TNOC_H__
+#define __TNOC_H__
+
+//---------------------------------------------------------------------------
+
 #include <systemc.h>
 #include "TTile.h"
 
@@ -41,79 +45,16 @@ SC_MODULE(TNoC)
 
   SC_CTOR(TNoC)
   {
-    // Create the mesh as a matrix of tiles
-    for(int i=0; i<MESH_DIM_X; i++)
-    {
-      for(int j=0; j<MESH_DIM_Y; j++)
-      {
-        // Create the single Tile with a proper name
-        char tile_name[20];
-        sprintf(tile_name, "Tile[%02d][%02d]", i, j);
-        t[i][j] = new TTile(tile_name);
-
-        // Tell to the router its coordinates
-        t[i][j]->r->setId(j * MESH_DIM_X + i);
-
-        // Tell to the PE its coordinates
-        t[i][j]->pe->id = j * MESH_DIM_X + i;
-
-        // Map clock and reset
-        t[i][j]->clock(clock);
-        t[i][j]->reset(reset);
-
-        // Map Rx signals
-        t[i][j]->req_rx[DIRECTION_NORTH](req_to_south[i][j]);
-        t[i][j]->flit_rx[DIRECTION_NORTH](flit_to_south[i][j]);
-        t[i][j]->ack_rx[DIRECTION_NORTH](ack_to_north[i][j]);
-
-        t[i][j]->req_rx[DIRECTION_EAST](req_to_west[i+1][j]);
-        t[i][j]->flit_rx[DIRECTION_EAST](flit_to_west[i+1][j]);
-        t[i][j]->ack_rx[DIRECTION_EAST](ack_to_east[i+1][j]);
-
-        t[i][j]->req_rx[DIRECTION_SOUTH](req_to_north[i][j+1]);
-        t[i][j]->flit_rx[DIRECTION_SOUTH](flit_to_north[i][j+1]);
-        t[i][j]->ack_rx[DIRECTION_SOUTH](ack_to_south[i][j+1]);
-
-        t[i][j]->req_rx[DIRECTION_WEST](req_to_east[i][j]);
-        t[i][j]->flit_rx[DIRECTION_WEST](flit_to_east[i][j]);
-        t[i][j]->ack_rx[DIRECTION_WEST](ack_to_west[i][j]);
-
-        // Map Tx signals
-        t[i][j]->req_tx[DIRECTION_NORTH](req_to_north[i][j]);
-        t[i][j]->flit_tx[DIRECTION_NORTH](flit_to_north[i][j]);
-        t[i][j]->ack_tx[DIRECTION_NORTH](ack_to_south[i][j]);
-
-        t[i][j]->req_tx[DIRECTION_EAST](req_to_east[i+1][j]);
-        t[i][j]->flit_tx[DIRECTION_EAST](flit_to_east[i+1][j]);
-        t[i][j]->ack_tx[DIRECTION_EAST](ack_to_west[i+1][j]);
-
-        t[i][j]->req_tx[DIRECTION_SOUTH](req_to_south[i][j+1]);
-        t[i][j]->flit_tx[DIRECTION_SOUTH](flit_to_south[i][j+1]);
-        t[i][j]->ack_tx[DIRECTION_SOUTH](ack_to_north[i][j+1]);
-
-        t[i][j]->req_tx[DIRECTION_WEST](req_to_west[i][j]);
-        t[i][j]->flit_tx[DIRECTION_WEST](flit_to_west[i][j]);
-        t[i][j]->ack_tx[DIRECTION_WEST](ack_to_east[i][j]);
-
-      }
-    }
-
-    // Clear the inputs on the borders
-    for(int i=0; i<MESH_DIM_Y; i++)
-    {
-      req_to_east[i][0] = 0;
-      ack_to_east[i][0] = 0;
-      req_to_west[i][MESH_DIM_Y] = 0;
-      ack_to_west[i][MESH_DIM_Y] = 0;
-    }
-    for(int j=0; j<MESH_DIM_Y; j++)
-    {
-      req_to_east[0][j] = 0;
-      ack_to_east[0][j] = 0;
-      req_to_west[MESH_DIM_X][j] = 0;
-      ack_to_west[MESH_DIM_X][j] = 0;
-    }
-
+    buildMesh();
   }
+
+  // Support methods
+  TTile* searchNode(const int id) const;
+
+ private:
+  void buildMesh();
 };
 
+//---------------------------------------------------------------------------
+
+#endif

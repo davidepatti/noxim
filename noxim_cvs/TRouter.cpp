@@ -4,8 +4,6 @@
 
 *****************************************************************************/
 
-#define DEBUG
-
 #include "TRouter.h"
 
 void TRouter::rxProcess()

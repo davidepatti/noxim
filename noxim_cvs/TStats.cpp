@@ -30,7 +30,7 @@ void TStats::receivedFlit(const double arrival_time,
 
 //---------------------------------------------------------------------------
 
-double TStats::getAverageDelay(int src_id)
+double TStats::getAverageDelay(const int src_id)
 {
   double sum = 0.0;
   

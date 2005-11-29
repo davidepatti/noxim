@@ -4,7 +4,9 @@
 
  *****************************************************************************/
 
-// ciao
+#ifndef __TTILE_H__
+#define __TTILE_H__
+
 #include <systemc.h>
 #include "TRouter.h"
 #include "TProcessingElement.h"
@@ -84,3 +86,4 @@ SC_MODULE(TTile)
 
 };
 
+#endif

@@ -29,7 +29,7 @@ public:
   void receivedFlit(const double arrival_time,
 		    const TFlit& flit);
 
-  double getAverageDelay(int src_id);
+  double getAverageDelay(const int src_id);
 
   double getAverageDelay();
 
