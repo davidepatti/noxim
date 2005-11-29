@@ -24,7 +24,6 @@ class TBuffer
 						 // size (in flits)
 
   bool IsFull(); // Returns true if buffer is full
-
   bool IsEmpty(); // Returns true if buffer is empty
 
   virtual void Drop(const TFlit& flit); // Called by Push() when
