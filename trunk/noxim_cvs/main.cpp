@@ -6,6 +6,7 @@
 
 #include <systemc.h>
 #include "TNoC.h"
+#include "TGlobalStats.h"
 
 int sc_main(int arg_num, char* arg_vet[])
 {
@@ -89,11 +90,17 @@ int sc_main(int arg_num, char* arg_vet[])
   sc_close_vcd_trace_file(tf);
   printf("Simulation completed successfully!\n");
 
+
+  TGlobalStats gs(n);
+
+  gs.showStats();
+
+  /*
   for (int y=0; y<MESH_DIM_Y; y++)
     for (int x=0; x<MESH_DIM_X; x++)
       n->t[x][y]->r->stats.showStats();
+  */
   
-
   return 0;
 }
 
