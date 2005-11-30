@@ -20,10 +20,17 @@
 #define DIRECTION_LOCAL 4
 
 // Types of routing algorithm
-#define ROUTING_TYPE_XY         0
-#define ROUTING_TYPE_ODDEVEN    1
-#define ROUTING_TYPE_DYAD       2
-#define ROUTING_TYPE_LOOKAHEAD  3
+#define XY              0
+#define WEST_FIRST      1
+#define NORTH_LAST      2
+#define NEGATIVE_FIRST  3
+#define ODD_EVEN        4
+#define DYAD            5
+#define LOOK_AHEAD      6
+#define NOPCAR          7
+#define FULLY_ADAPTIVE  8
+        
+//---------------------------------------------------------------------------
 
 // These ones will be passed as command-line arguments in future versions
 #define MESH_DIM_X       4

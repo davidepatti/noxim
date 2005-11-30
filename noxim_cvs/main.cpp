@@ -84,7 +84,7 @@ int sc_main(int arg_num, char* arg_vet[])
   sc_start(1000, SC_NS);                                 // 1000 ns reset time
   reset.write(0);
   printf("Reset deasserted... Fiat Lux!!!\n");
-  sc_start(9000, SC_NS);                                 // 10'000 ns total simulation time
+  sc_start(10000, SC_NS);                                // 10'000 ns total simulation time
 
   // Close the simulation and exit
   sc_close_vcd_trace_file(tf);
