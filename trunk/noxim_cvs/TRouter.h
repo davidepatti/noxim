@@ -9,6 +9,8 @@
 #include "TBuffer.h"
 #include "TStats.h"
 
+//---------------------------------------------------------------------------
+
 SC_MODULE(TRouter)
 {
 
@@ -45,8 +47,8 @@ SC_MODULE(TRouter)
 
   void               rxProcess();        // The receiving process
   void               txProcess();        // The transmitting process
-  int                routing(int);       // The routing algorithm
-  void               setId(int);
+  void               configure(int _id, int _routing_type);
+
 
   // Constructor
 
@@ -59,6 +61,23 @@ SC_MODULE(TRouter)
     SC_METHOD(txProcess);
     sensitive(reset);
     sensitive_pos(clock);
-  }    
+  }
 
+ private:
+
+  void setId(int _id);
+
+  int routing(int src_id, int dst_id);
+
+  int selectionFunction(const vector<int>& directions);
+
+  vector<int> routingXY(const TCoord& current, const TCoord& destination);
+  vector<int> routingWestFirst(const TCoord& current, const TCoord& destination);
+  vector<int> routingNorthLast(const TCoord& current, const TCoord& destination);
+  vector<int> routingNegativeFirst(const TCoord& current, const TCoord& destination);
+  vector<int> routingOddEven(const TCoord& current, const TCoord& source, const TCoord& destination);
+  vector<int> routingDyAD(const TCoord& current, const TCoord& destination);
+  vector<int> routingLookAhead(const TCoord& current, const TCoord& destination);
+  vector<int> routingNoPCAR(const TCoord& current, const TCoord& destination);
+  vector<int> routingFullyAdaptive(const TCoord& current, const TCoord& destination);
 };

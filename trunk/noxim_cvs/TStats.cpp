@@ -1,5 +1,7 @@
 #include "TStats.h"
 
+// TODO: nan in averageDelay
+
 //---------------------------------------------------------------------------
 
 void TStats::setId(int node_id)

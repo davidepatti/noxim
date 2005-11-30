@@ -91,44 +91,49 @@ TFlit TProcessingElement::nextFlit()
 
 int TProcessingElement::probabilityShot()
 {
-  if ((double)rand()/RAND_MAX <= 0.01)
+  if ((double)rand()/RAND_MAX <= 0.1)
     return true;
 
   return false;
-
-
-  static int s1 = 0;
-  static int s2 = 0;
-
-  TCoord position = id2Coord(id);
-
-  if (s1 != 0 && s2 != 0) return false;
-
-  if ( (position.x == 0 && position.y == 0) && s1 == 0)
-    {
-      s1 = 1;
-      return true;
-    }
-
-  if ( (position.x == 1 && position.y == 0) && s2 == 0)
-    {
-      s2 = 1;
-      return true;
-    }
   
-  return false;
+
+  
+  /*---------------- wormhole test ---------------*/
+//   static int s1 = 0;
+//   static int s2 = 0;
+
+//   TCoord position = id2Coord(id);
+
+//   if (s1 != 0 && s2 != 0) return false;
+
+//   if ( (position.x == 0 && position.y == 0) && s1 == 0)
+//     {
+//       s1++;
+//       return true;
+//     }
+
+//   if ( (position.x == 1 && position.y == 0) && s2 == 0)
+//     {
+//       s2++;
+//       return true;
+//     }
+  
+//   return false;
+  /*----------------------------------------*/
 }
 
 
 TPacket TProcessingElement::randomPacket()
 {
+  // TODO: non deve autoimpupettarsi!
+
   TPacket p;
 
   p.src_id = id;
 
   p.dst_id = rand() % (MESH_DIM_X * MESH_DIM_X);
   
-  p.timestamp   = sc_simulation_time();
+  p.timestamp = sc_simulation_time();
 
   p.size = p.flit_left = 2 + (rand() % MAX_PACKET_SIZE);
 

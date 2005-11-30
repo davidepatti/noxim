@@ -6,6 +6,8 @@
 
 #include "TRouter.h"
 
+//---------------------------------------------------------------------------
+
 void TRouter::rxProcess()
 {
   if(reset.read())
@@ -52,6 +54,8 @@ void TRouter::rxProcess()
     }
 }
 
+//---------------------------------------------------------------------------
+
 void TRouter::txProcess()
 {
     if(reset.read())
@@ -88,7 +92,7 @@ void TRouter::txProcess()
 
 		if (flit.flit_type==FLIT_TYPE_HEAD) 
 		{
-		    dest = routing(flit.dst_id);
+		    dest = routing(flit.src_id, flit.dst_id);
 		    if (reservation_table[dest] == CHANNEL_NOT_RESERVED) 
 		    {
 			short_circuit[i] = dest;     // crossbar: link input i to output dest 
@@ -123,44 +127,292 @@ void TRouter::txProcess()
     } // else
 }
 
-int TRouter::routing(int dst_id)
+//---------------------------------------------------------------------------
+
+int TRouter::routing(int src_id, int dst_id)
 {
+  if (dst_id == id)
+    return DIRECTION_LOCAL;
+
   TCoord position  = id2Coord(id);
+  TCoord src_coord = id2Coord(src_id);
   TCoord dst_coord = id2Coord(dst_id);
 
-  // Compare destination coordinates with the current ones
-  if(dst_coord==position)
+  switch (routing_type)
     {
-      return DIRECTION_LOCAL;
-    }
-  else if(routing_type==ROUTING_TYPE_XY)
-    {
-      if(dst_coord.x>position.x)
-	{
-	  return DIRECTION_EAST;
-	}
-      else if(dst_coord.x<position.x)
-	{
-	  return DIRECTION_WEST;
-	}
-      else if(dst_coord.y>position.y)                            // (dst_coord.x==position.x)
-	{
-	  return DIRECTION_SOUTH;
-	}
-      else                            // (dst_coord.x==position.x) && (dst_coord.y<position.y)
-	{
-	  return DIRECTION_NORTH;
-	}
-    }
-  else
-    {
-      return 0;
+    case XY:
+      return selectionFunction(routingXY(position, dst_coord));
+
+    case WEST_FIRST:
+      return selectionFunction(routingWestFirst(position, dst_coord));
+
+    case NORTH_LAST:
+      return selectionFunction(routingNorthLast(position, dst_coord));
+
+    case NEGATIVE_FIRST:
+      return selectionFunction(routingNegativeFirst(position, dst_coord));
+
+    case ODD_EVEN:
+      return selectionFunction(routingOddEven(position, src_coord, dst_coord));
+
+    case DYAD:
+      return selectionFunction(routingDyAD(position, dst_coord));
+
+    case LOOK_AHEAD:
+      return selectionFunction(routingLookAhead(position, dst_coord));
+
+    case NOPCAR:
+      return selectionFunction(routingNoPCAR(position, dst_coord));
+      
+    case FULLY_ADAPTIVE:
+      return selectionFunction(routingFullyAdaptive(position, dst_coord));
+
+    default:
+      assert(false);
     }
 }
 
+//---------------------------------------------------------------------------
+
+int TRouter::selectionFunction(const vector<int>& directions)
+{
+  return directions[rand() % directions.size()]; 
+}
+
+//---------------------------------------------------------------------------
+
+vector<int> TRouter::routingXY(const TCoord& current, const TCoord& destination)
+{
+  vector<int> directions;
+  
+  if (destination.x > current.x)
+    directions.push_back(DIRECTION_EAST);
+  else if (destination.x < current.x)
+    directions.push_back(DIRECTION_WEST);
+  else if (destination.y > current.y)
+    directions.push_back(DIRECTION_SOUTH);
+  else
+    directions.push_back(DIRECTION_NORTH);
+
+  return directions;
+}
+
+//---------------------------------------------------------------------------
+
+vector<int> TRouter::routingWestFirst(const TCoord& current, const TCoord& destination)
+{
+  vector<int> directions;
+
+  if (destination.x <= current.x ||
+      destination.y == current.y)
+    return routingXY(current, destination);
+
+  if (destination.y < current.y)
+    {
+      directions.push_back(DIRECTION_NORTH);
+      directions.push_back(DIRECTION_EAST);
+    }
+  else
+    {
+      directions.push_back(DIRECTION_SOUTH);
+      directions.push_back(DIRECTION_EAST);
+    }
+
+  return directions;
+}
+
+//---------------------------------------------------------------------------
+
+vector<int> TRouter::routingNorthLast(const TCoord& current, const TCoord& destination)
+{
+  vector<int> directions;
+
+  if (destination.x == current.x ||
+      destination.y <= current.y)
+    return routingXY(current, destination);
+
+  if (destination.x < current.x)
+    {
+      directions.push_back(DIRECTION_SOUTH);
+      directions.push_back(DIRECTION_WEST);
+    }
+  else
+    {
+      directions.push_back(DIRECTION_SOUTH);
+      directions.push_back(DIRECTION_EAST);
+    }
+
+  return directions;
+}
+
+//---------------------------------------------------------------------------
+
+vector<int> TRouter::routingNegativeFirst(const TCoord& current, const TCoord& destination)
+{
+  vector<int> directions;
+
+  if ( (destination.x <= current.x && destination.y <= current.y) ||
+       (destination.x >= current.x && destination.y >= current.y) )
+    return routingXY(current, destination);
+
+  if (destination.x > current.x && 
+      destination.y < current.y)
+    {
+      directions.push_back(DIRECTION_NORTH);
+      directions.push_back(DIRECTION_EAST);
+    }
+  else
+    {
+      directions.push_back(DIRECTION_SOUTH);
+      directions.push_back(DIRECTION_WEST);
+    }
+
+  return directions;
+}
+
+//---------------------------------------------------------------------------
+
+vector<int> TRouter::routingOddEven(const TCoord& current, 
+				    const TCoord& source, const TCoord& destination)
+{
+  vector<int> directions;
+
+  int c0 = current.x;
+  int c1 = current.y;
+  int s0 = source.x;
+  int s1 = source.y;
+  int d0 = destination.x;
+  int d1 = destination.y;
+  int e0, e1;
+
+  e0 = d0 - c0;
+  e1 = -(d1 - c1);
+
+  if (e0 == 0)
+    {
+      if (e1 > 0)
+	directions.push_back(DIRECTION_NORTH);
+      else
+	directions.push_back(DIRECTION_SOUTH);
+    }
+  else
+    {
+      if (e0 > 0)
+	{
+	  if (e1 == 0)
+	    directions.push_back(DIRECTION_EAST);
+	  else
+	    {
+	      if ( (c0 % 2 == 1) || (c0 == s0) )
+		{
+		  if (e1 > 0)
+		    directions.push_back(DIRECTION_NORTH);
+		  else
+		    directions.push_back(DIRECTION_SOUTH);
+		}
+	      if ( (d0 % 2 == 1) || (e0 != 1) )
+		directions.push_back(DIRECTION_EAST);
+	    }
+	}
+      else
+	{
+	  directions.push_back(DIRECTION_WEST);
+	  if (c0 % 2 == 0)
+	    {
+	      if (e1 > 0)
+		directions.push_back(DIRECTION_NORTH);
+	      else
+		directions.push_back(DIRECTION_SOUTH);
+	    }
+	}
+    }
+  
+  assert(directions.size() > 0 && directions.size() <= 2);
+  
+  return directions;
+}
+
+//---------------------------------------------------------------------------
+
+vector<int> TRouter::routingDyAD(const TCoord& current, const TCoord& destination)
+{
+  vector<int> directions;
+
+  assert(false);
+  return directions;
+}
+
+//---------------------------------------------------------------------------
+
+vector<int> TRouter::routingLookAhead(const TCoord& current, const TCoord& destination)
+{
+  vector<int> directions;
+
+  assert(false);
+  return directions;
+}
+
+//---------------------------------------------------------------------------
+
+vector<int> TRouter::routingNoPCAR(const TCoord& current, const TCoord& destination)
+{
+  vector<int> directions;
+
+  assert(false);
+  return directions;
+}
+
+//---------------------------------------------------------------------------
+
+vector<int> TRouter::routingFullyAdaptive(const TCoord& current, const TCoord& destination)
+{
+  vector<int> directions;
+
+  if (destination.x == current.x ||
+      destination.y == current.y)
+    return routingXY(current, destination);
+
+  if (destination.x > current.x &&
+      destination.y < current.y)
+    {
+      directions.push_back(DIRECTION_NORTH);
+      directions.push_back(DIRECTION_EAST);
+    }
+  else if (destination.x > current.x &&
+	   destination.y > current.y)
+    {
+      directions.push_back(DIRECTION_SOUTH);
+      directions.push_back(DIRECTION_EAST);
+    }
+  else if (destination.x < current.x &&
+	   destination.y > current.y)
+    {
+      directions.push_back(DIRECTION_SOUTH);
+      directions.push_back(DIRECTION_WEST);
+    }
+  else
+    {
+      directions.push_back(DIRECTION_NORTH);
+      directions.push_back(DIRECTION_WEST);
+    }
+  
+  return directions;
+}
+
+//---------------------------------------------------------------------------
+
+void TRouter::configure(int _id, int _routing_type)
+{
+  setId(_id);
+  routing_type = _routing_type;
+}
+
+//---------------------------------------------------------------------------
 
 void TRouter::setId(int _id)
 {
   id = _id;
   stats.setId(_id);
 }
+
+//---------------------------------------------------------------------------
