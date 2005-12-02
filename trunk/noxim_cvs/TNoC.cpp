@@ -64,19 +64,19 @@ void TNoC::buildMesh()
     }
 
   // Clear the inputs on the borders
-  for(int i=0; i<MESH_DIM_Y; i++)
+  for(int i=0; i<=MESH_DIM_X; i++)
     {
-      req_to_east[i][0] = 0;
-      ack_to_east[i][0] = 0;
-      req_to_west[i][MESH_DIM_Y] = 0;
-      ack_to_west[i][MESH_DIM_Y] = 0;
+      req_to_south[i][0] = 0;
+      ack_to_north[i][0] = 0;
+      req_to_north[i][MESH_DIM_Y] = 0;
+      ack_to_south[i][MESH_DIM_Y] = 0;
     }
-  for(int j=0; j<MESH_DIM_Y; j++)
+  for(int j=0; j<=MESH_DIM_Y; j++)
     {
       req_to_east[0][j] = 0;
-      ack_to_east[0][j] = 0;
+      ack_to_west[0][j] = 0;
       req_to_west[MESH_DIM_X][j] = 0;
-      ack_to_west[MESH_DIM_X][j] = 0;
+      ack_to_east[MESH_DIM_X][j] = 0;
     }
 }
 
