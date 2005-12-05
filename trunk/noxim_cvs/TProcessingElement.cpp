@@ -91,7 +91,7 @@ TFlit TProcessingElement::nextFlit()
 
 int TProcessingElement::probabilityShot()
 {
-  if ((double)rand()/RAND_MAX <= 0.1)
+  if ((double)rand()/RAND_MAX <= DEFAULT_PIR)
     return true;
 
   return false;
