@@ -19,6 +19,12 @@
 #define DIRECTION_WEST  3
 #define DIRECTION_LOCAL 4
 
+// Channel states for queues
+#define STATE_CHANNEL_EMPTY    0
+#define STATE_CHANNEL_HAS_HEAD 1
+#define STATE_CHANNEL_HAS_TAIL 2
+#define CHANNEL_NOT_RESERVED -1
+
 // Types of routing algorithm
 #define XY              0
 #define WEST_FIRST      1
@@ -34,9 +40,6 @@
 #define SELECTION_RANDOM 0
 #define SELECTION_BUFFER_LEVEL 1
 #define SELECTION_NOPCAR 2
-
-#define DEFAULT_SELECTION SELECTION_RANDOM
-
         
 //---------------------------------------------------------------------------
 
@@ -46,11 +49,11 @@
 #define BUFFER_DEPTH     4
 #define MAX_PACKET_SIZE 10
 
-// Channel states for queues
-#define STATE_CHANNEL_EMPTY    0
-#define STATE_CHANNEL_HAS_HEAD 1
-#define STATE_CHANNEL_HAS_TAIL 2
-#define CHANNEL_NOT_RESERVED -1
+#define DEFAULT_ROUTING XY
+#define DEFAULT_SELECTION SELECTION_RANDOM
+#define DEFAULT_PIR 0.01
+
+
 
 // TCoord -- XY coordinates type of the Tile inside the Mesh
 struct TCoord
