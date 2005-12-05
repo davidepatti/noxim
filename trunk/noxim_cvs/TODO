@@ -5,6 +5,7 @@ TODO
 - noc parameters from command line
 - power/energy model
 - a really working Makefile
+- web interface to choose arguments and run simulation
 
 
 DONE
