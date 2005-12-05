@@ -1,0 +1,11 @@
+TODO
+---------------------------------------
+- add selection strategies based on buffer level
+- processing element traffic generation
+- noc parameters from command line
+- power model
+
+
+DONE
+---------------------------------------
+- create a todo file (5/12/2005)
