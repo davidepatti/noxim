@@ -4,10 +4,10 @@ TODO
 - processing element traffic generation
 - noc parameters from command line
 - power/energy model
-- a really working Makefile
 - web interface to choose arguments and run simulation
 
 
 DONE
 ---------------------------------------
 - create a todo file (5/12/2005)
+- a really working Makefile

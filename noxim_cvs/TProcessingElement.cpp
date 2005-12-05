@@ -132,6 +132,8 @@ TPacket TProcessingElement::randomPacket()
   p.src_id = id;
 
   p.dst_id = rand() % (MESH_DIM_X * MESH_DIM_X);
+
+  if (p.src_id == p.dst_id) cout << "PE " << id << " AUTOIMPUPPETTATO " << endl;
   
   p.timestamp = sc_simulation_time();
 

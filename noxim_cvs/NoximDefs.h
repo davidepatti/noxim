@@ -46,11 +46,11 @@
 // These ones will be passed as command-line arguments in future versions
 #define MESH_DIM_X       4
 #define MESH_DIM_Y       4
-#define BUFFER_DEPTH     4
+#define DEFAULT_BUFFER_DEPTH     4
 #define MAX_PACKET_SIZE 10
 
-#define DEFAULT_ROUTING XY
-#define DEFAULT_SELECTION SELECTION_RANDOM
+#define DEFAULT_ROUTING ODD_EVEN
+#define DEFAULT_SELECTION SELECTION_BUFFER_LEVEL
 #define DEFAULT_PIR 0.01
 
 
@@ -140,8 +140,8 @@ inline ostream& operator << (ostream& os, const TFlit& flit)
   os << "flit " << flit.sequence_no << " (" << flit.src_coord.x << "," << flit.src_coord.y << ") --> (" 
      << flit.dst_coord.x << "," << flit.dst_coord.y << ")"; 
   */
-  os << "flit: seqno " << flit.sequence_no << ", (" << flit.src_id << " --> " 
-     << flit.dst_id << ")"; 
+  os << "[flit seq=" << flit.sequence_no << ", " << flit.src_id << "-->" 
+     << flit.dst_id << "]"; 
 
   return os;
 }

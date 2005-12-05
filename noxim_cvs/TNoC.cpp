@@ -17,7 +17,9 @@ void TNoC::buildMesh()
 
 	  // Tell to the router its coordinates
 	  t[i][j]->r->configure(j * MESH_DIM_X + i,
-				DEFAULT_ROUTING,DEFAULT_SELECTION);
+				DEFAULT_ROUTING,
+				DEFAULT_SELECTION,
+				DEFAULT_BUFFER_DEPTH);
 
 	  // Tell to the PE its coordinates
 	  t[i][j]->pe->id = j * MESH_DIM_X + i;
