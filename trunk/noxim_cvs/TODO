@@ -3,7 +3,8 @@ TODO
 - add selection strategies based on buffer level
 - processing element traffic generation
 - noc parameters from command line
-- power model
+- power/energy model
+- a really working Makefile
 
 
 DONE

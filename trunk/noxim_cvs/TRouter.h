@@ -37,6 +37,7 @@ SC_MODULE(TRouter)
   */
   int                id;
   int                routing_type;                    // Type of routing algorithm
+  int                selection_type;
   TBuffer            buffer[DIRECTIONS+1];            // Buffer for each input channel 
   int                channel_state[DIRECTIONS+1];     // Current state for each channel (is empty, has head, has tail)
   bool               current_level_rx[DIRECTIONS+1];  // Current level for Alternating Bit Protocol (ABP)
@@ -51,7 +52,7 @@ SC_MODULE(TRouter)
   void               rxProcess();        // The receiving process
   void               txProcess();        // The transmitting process
   void               bufferMonitor();
-  void               configure(int _id, int _routing_type);
+  void               configure(int _id, int _routing_type, int _selection_type);
 
 
   // Constructor
@@ -78,6 +79,9 @@ SC_MODULE(TRouter)
   int routing(int src_id, int dst_id);
 
   int selectionFunction(const vector<int>& directions);
+  int selectionRandom(const vector<int>& directions);
+  int selectionBufferLevel(const vector<int>& directions);
+  int selectionNoPCAR(const vector<int>& directions);
 
   vector<int> routingXY(const TCoord& current, const TCoord& destination);
   vector<int> routingWestFirst(const TCoord& current, const TCoord& destination);

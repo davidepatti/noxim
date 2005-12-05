@@ -1,7 +1,7 @@
 TARGET_ARCH = linux
 CC     = g++
 OPT    = -O2 # -O3
-DEBUG  = # -g
+DEBUG  = -DDEBUG# -g
 OTHER  = -Wall -Wno-deprecated
 # CFLAGS = $(OPT) $(OTHER)
 CFLAGS = $(DEBUG) $(OTHER)

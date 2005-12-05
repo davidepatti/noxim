@@ -1,0 +1,13 @@
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+TNoC.o: NoximDefs.h TNoC.h TTile.h TRouter.h TBuffer.h TStats.h
+TNoC.o: TProcessingElement.h
+TRouter.o: TRouter.h NoximDefs.h TBuffer.h TStats.h
+TProcessingElement.o: TProcessingElement.h NoximDefs.h
+TBuffer.o: TBuffer.h NoximDefs.h
+TStats.o: TStats.h NoximDefs.h
+TGlobalStats.o: TGlobalStats.h TNoC.h TTile.h TRouter.h NoximDefs.h TBuffer.h
+TGlobalStats.o: TStats.h TProcessingElement.h
+main.o: TNoC.h TTile.h TRouter.h NoximDefs.h TBuffer.h TStats.h
+main.o: TProcessingElement.h TGlobalStats.h
