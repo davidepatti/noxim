@@ -37,6 +37,11 @@ SC_MODULE(TNoC)
   sc_signal<TFlit>   flit_to_south[MESH_DIM_X+1][MESH_DIM_Y+1];
   sc_signal<TFlit>   flit_to_north[MESH_DIM_X+1][MESH_DIM_Y+1];
 
+  sc_signal<uint>    buffer_level_to_east[MESH_DIM_X+1][MESH_DIM_Y+1];
+  sc_signal<uint>    buffer_level_to_west[MESH_DIM_X+1][MESH_DIM_Y+1];
+  sc_signal<uint>    buffer_level_to_south[MESH_DIM_X+1][MESH_DIM_Y+1];
+  sc_signal<uint>    buffer_level_to_north[MESH_DIM_X+1][MESH_DIM_Y+1];
+
   // Matrix of tiles
 
   TTile*             t[MESH_DIM_X][MESH_DIM_Y];

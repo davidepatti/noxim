@@ -24,6 +24,9 @@ SC_MODULE(TProcessingElement)
   sc_out<bool>        req_tx;       // The request associated with the output channel
   sc_in<bool>         ack_tx;       // The outgoing ack signal associated with the output channel
 
+  sc_out<uint>        buffer_level;
+  sc_in<uint>         buffer_level_neighbor;
+
   // Registers
   int                 id;
   bool                current_level_rx;       // Current level for Alternating Bit Protocol (ABP)

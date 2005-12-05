@@ -27,6 +27,10 @@ SC_MODULE(TTile)
   sc_out<bool>        req_tx[DIRECTIONS];    // The requests associated with the output channels
   sc_in<bool>         ack_tx[DIRECTIONS];    // The outgoing ack signals associated with the output channels
 
+  sc_out<uint>        buffer_level[DIRECTIONS];
+  sc_in<uint>         buffer_level_neighbor[DIRECTIONS];
+
+
   // Signals
 
   sc_signal<TFlit>    flit_rx_local;   // The input channels
@@ -36,6 +40,11 @@ SC_MODULE(TTile)
   sc_signal<TFlit>    flit_tx_local;   // The output channels
   sc_signal<bool>     req_tx_local;    // The requests associated with the output channels
   sc_signal<bool>     ack_tx_local;    // The outgoing ack signals associated with the output channels
+  
+  sc_signal<uint>     buffer_level_local;
+  sc_signal<uint>     buffer_level_neighbor_local;
+
+
 
   // Instances
   TRouter*            r;               // Router instance
@@ -59,6 +68,9 @@ SC_MODULE(TTile)
       r->flit_tx[i](flit_tx[i]);
       r->req_tx[i](req_tx[i]);
       r->ack_tx[i](ack_tx[i]);
+
+      r->buffer_level[i](buffer_level[i]);
+      r->buffer_level_neighbor[i](buffer_level_neighbor[i]);
     }
 
     r->flit_rx[DIRECTION_LOCAL](flit_tx_local);
@@ -68,6 +80,9 @@ SC_MODULE(TTile)
     r->flit_tx[DIRECTION_LOCAL](flit_rx_local);
     r->req_tx[DIRECTION_LOCAL](req_rx_local);
     r->ack_tx[DIRECTION_LOCAL](ack_rx_local);
+
+    r->buffer_level[DIRECTION_LOCAL](buffer_level_local);
+    r->buffer_level_neighbor[DIRECTION_LOCAL](buffer_level_neighbor_local);
 
     // Processing Element pin assignments
     pe = new TProcessingElement("ProcessingElement");
@@ -81,6 +96,9 @@ SC_MODULE(TTile)
     pe->flit_tx(flit_tx_local);
     pe->req_tx(req_tx_local);
     pe->ack_tx(ack_tx_local);
+
+    pe->buffer_level(buffer_level_local);
+    pe->buffer_level_neighbor(buffer_level_neighbor_local);
 
   }
 
