@@ -35,12 +35,11 @@ void TRouter::rxProcess()
 	  //
 	  // Actually since the Processing Element runs a Tx process a time (no multi-threading)
 	  // there's no need to check for conditions 3 and 4.
-	  if ( (req_rx[i].read()==1-current_level_rx[i]) &&
-	       !buffer[i].IsFull() )
+	  if ( (req_rx[i].read()==1-current_level_rx[i]) && !buffer[i].IsFull() )
 	    {
 #ifdef DEBUG
 	      TFlit f = flit_rx[i].read();
-	      cout << sc_simulation_time() << ": Router " << id << ", Buffer " << i << ", " << f << endl;
+	      cout << sc_simulation_time() << ": Router[" << id <<"], Buffer["<< i << "], RECEIVED " << f << endl;
 #endif
 
 	      // Store the incoming flit in the circular buffer
@@ -85,7 +84,7 @@ void TRouter::txProcess()
 		int dest; // temporary to store current 
 
 #ifdef DEBUG
-		cout << sc_simulation_time() << ": Router " << id << ", Buffer " << i << " (" << buffer[i].Size() << ")" << endl;
+		cout << sc_simulation_time() << ": Router[" << id << "], Buffer[" << i << "](" << buffer[i].Size() << " flits)" << endl;
 #endif
 
 		TFlit flit = buffer[i].Front();
@@ -106,7 +105,7 @@ void TRouter::txProcess()
 		    if ( current_level_tx[dest] == ack_tx[dest].read() )
 		    {
 #ifdef DEBUG
-			cout << sc_simulation_time() << ": Router " << id << " SENDING " << flit << " towards port " << dest << endl;
+			cout << sc_simulation_time() << ": Router[" << id << "] SENDING " << flit << " towards port " << dest << endl;
 #endif
 
 			flit_tx[dest].write(flit);
@@ -197,31 +196,27 @@ int TRouter::selectionNoPCAR(const vector<int>& directions)
 int TRouter::selectionBufferLevel(const vector<int>& directions)
 {
     // TODO: currently unfair if multiple directions have same buffer level
-    int max_buffer_level = 0;
+    unsigned int max_free_positions = 0;
     int direction_choosen = -1;
 
-    for (int i=0;i<directions.size();i++)
+    for (unsigned int i=0;i<directions.size();i++)
     {
-	if (buffer_level_neighbor[directions[i]] > max_buffer_level)
+	unsigned int free_positions = buffer_depth - buffer_level_neighbor[directions[i]];
+	if (free_positions >= max_free_positions)
 	{
 	    direction_choosen = directions[i];
-	    max_buffer_level = buffer_level_neighbor[directions[i]];
+	    max_free_positions = free_positions;
 	}
     }
-    
-#ifdef DEBUG // should be moved to selectionFunction ?
-    if (directions.size()>1)
-    {
-	cout << sc_simulation_time() << ": Router " << id << ", SELECTION between directions: ";
-	for (int i=0;i<directions.size();i++) cout << directions[i] << " ";
-	cout << "\n , Direction choosen : " << direction_choosen << endl;
-    }
+
+#ifdef DEBUG
+    cout << sc_simulation_time() << ": Router[" << id << "], SELECTION between: ";
+    for (unsigned int i=0;i<directions.size();i++)
+	cout << directions[i] << "(" << buffer_level_neighbor[directions[i]] << " flits),";
+    cout << " direction choosen: " << direction_choosen << endl;
 #endif
-
-    // there should be at least one output direction with a free
-    // buffer!
-    assert(direction_choosen!=-1);
-
+    
+    assert(direction_choosen>=0);
     return direction_choosen;
 }
 //---------------------------------------------------------------------------
@@ -235,6 +230,9 @@ int TRouter::selectionRandom(const vector<int>& directions)
 
 int TRouter::selectionFunction(const vector<int>& directions)
 {
+    // TODO: vedere che dice mau
+    if (directions.size()==1) return directions[0];
+
     switch (selection_type)
     {
 	case SELECTION_RANDOM:
@@ -246,7 +244,6 @@ int TRouter::selectionFunction(const vector<int>& directions)
 	default:
 	    assert(false);
     }
-
 }
 
 //---------------------------------------------------------------------------
@@ -471,11 +468,13 @@ vector<int> TRouter::routingFullyAdaptive(const TCoord& current, const TCoord& d
 
 //---------------------------------------------------------------------------
 
-void TRouter::configure(int _id, int _routing_type, int _selection_type)
+void TRouter::configure(int _id, int _routing_type, int _selection_type,int _buffer_depth)
 {
   setId(_id);
   routing_type = _routing_type;
   selection_type = _selection_type;
+  buffer_depth = _buffer_depth;
+
 }
 
 //---------------------------------------------------------------------------

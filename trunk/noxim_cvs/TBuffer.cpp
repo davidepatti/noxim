@@ -11,7 +11,7 @@
 
 TBuffer::TBuffer()
 {
-  SetMaxBufferSize(BUFFER_DEPTH);
+  SetMaxBufferSize(DEFAULT_BUFFER_DEPTH);
 }
 
 //---------------------------------------------------------------------------
