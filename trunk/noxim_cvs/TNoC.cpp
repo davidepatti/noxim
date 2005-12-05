@@ -60,6 +60,17 @@ void TNoC::buildMesh()
 	  t[i][j]->flit_tx[DIRECTION_WEST](flit_to_west[i][j]);
 	  t[i][j]->ack_tx[DIRECTION_WEST](ack_to_east[i][j]);
 
+	  // Map buffer level signals (analogy with req_tx/rx port mapping)
+	  t[i][j]->buffer_level[DIRECTION_NORTH](buffer_level_to_north[i][j]);
+	  t[i][j]->buffer_level[DIRECTION_EAST](buffer_level_to_east[i+1][j]);
+	  t[i][j]->buffer_level[DIRECTION_SOUTH](buffer_level_to_south[i][j+1]);
+	  t[i][j]->buffer_level[DIRECTION_WEST](buffer_level_to_west[i][j]);
+
+	  t[i][j]->buffer_level_neighbor[DIRECTION_NORTH](buffer_level_to_south[i][j]);
+	  t[i][j]->buffer_level_neighbor[DIRECTION_EAST](buffer_level_to_west[i+1][j]);
+	  t[i][j]->buffer_level_neighbor[DIRECTION_SOUTH](buffer_level_to_north[i][j+1]);
+	  t[i][j]->buffer_level_neighbor[DIRECTION_WEST](buffer_level_to_east[i][j]);
+
 	}
     }
 
@@ -70,6 +81,9 @@ void TNoC::buildMesh()
       ack_to_north[i][0] = 0;
       req_to_north[i][MESH_DIM_Y] = 0;
       ack_to_south[i][MESH_DIM_Y] = 0;
+
+      buffer_level_to_south[i][0] = 0;
+      buffer_level_to_north[i][MESH_DIM_Y] = 0;
     }
   for(int j=0; j<=MESH_DIM_Y; j++)
     {
@@ -77,6 +91,9 @@ void TNoC::buildMesh()
       ack_to_west[0][j] = 0;
       req_to_west[MESH_DIM_X][j] = 0;
       ack_to_east[MESH_DIM_X][j] = 0;
+
+      buffer_level_to_east[0][j] = 0;
+      buffer_level_to_west[MESH_DIM_X][j] = 0;
     }
 }
 

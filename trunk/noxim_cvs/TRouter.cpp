@@ -129,6 +129,20 @@ void TRouter::txProcess()
 
 //---------------------------------------------------------------------------
 
+void TRouter::bufferMonitor()
+{
+  if (reset.read())
+    {
+      for (int i=0; i<DIRECTIONS+1; i++) buffer_level[i] = 0;
+    }
+  else
+  {
+      for (int i=0; i<DIRECTIONS+1; i++) buffer_level[i].write(buffer[i].Size());
+  }
+}
+
+//---------------------------------------------------------------------------
+
 int TRouter::routing(int src_id, int dst_id)
 {
   if (dst_id == id)
