@@ -29,6 +29,14 @@
 #define LOOK_AHEAD      6
 #define NOPCAR          7
 #define FULLY_ADAPTIVE  8
+
+// Selection strategies
+#define SELECTION_RANDOM 0
+#define SELECTION_BUFFER_LEVEL 1
+#define SELECTION_NOPCAR 2
+
+#define DEFAULT_SELECTION SELECTION_RANDOM
+
         
 //---------------------------------------------------------------------------
 

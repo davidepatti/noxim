@@ -188,9 +188,65 @@ int TRouter::routing(int src_id, int dst_id)
 
 //---------------------------------------------------------------------------
 
-int TRouter::selectionFunction(const vector<int>& directions)
+int TRouter::selectionNoPCAR(const vector<int>& directions)
+{
+    assert(false);
+}
+//---------------------------------------------------------------------------
+
+int TRouter::selectionBufferLevel(const vector<int>& directions)
+{
+    // TODO: currently unfair if multiple directions have same buffer level
+    int max_buffer_level = 0;
+    int direction_choosen = -1;
+
+    for (int i=0;i<directions.size();i++)
+    {
+	if (buffer_level_neighbor[directions[i]] > max_buffer_level)
+	{
+	    direction_choosen = directions[i];
+	    max_buffer_level = buffer_level_neighbor[directions[i]];
+	}
+    }
+    
+#ifdef DEBUG // should be moved to selectionFunction ?
+    if (directions.size()>1)
+    {
+	cout << sc_simulation_time() << ": Router " << id << ", SELECTION between directions: ";
+	for (int i=0;i<directions.size();i++) cout << directions[i] << " ";
+	cout << "\n , Direction choosen : " << direction_choosen << endl;
+    }
+#endif
+
+    // there should be at least one output direction with a free
+    // buffer!
+    assert(direction_choosen!=-1);
+
+    return direction_choosen;
+}
+//---------------------------------------------------------------------------
+
+int TRouter::selectionRandom(const vector<int>& directions)
 {
   return directions[rand() % directions.size()]; 
+}
+
+//---------------------------------------------------------------------------
+
+int TRouter::selectionFunction(const vector<int>& directions)
+{
+    switch (selection_type)
+    {
+	case SELECTION_RANDOM:
+	    return selectionRandom(directions);
+	case SELECTION_BUFFER_LEVEL:
+	    return selectionBufferLevel(directions);
+	case SELECTION_NOPCAR:
+	    return selectionNoPCAR(directions);
+	default:
+	    assert(false);
+    }
+
 }
 
 //---------------------------------------------------------------------------
@@ -415,10 +471,11 @@ vector<int> TRouter::routingFullyAdaptive(const TCoord& current, const TCoord& d
 
 //---------------------------------------------------------------------------
 
-void TRouter::configure(int _id, int _routing_type)
+void TRouter::configure(int _id, int _routing_type, int _selection_type)
 {
   setId(_id);
   routing_type = _routing_type;
+  selection_type = _selection_type;
 }
 
 //---------------------------------------------------------------------------

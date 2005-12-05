@@ -32,7 +32,7 @@ tar: clean
 	rm noxim.tar.gz
 	tar zcvf noxim.tar.gz Makefile* *.h *.cpp
 
-Makefile.deps:
-#	$(CC) $(CFLAGS) $(INCDIR) -M $(SRCS) >> Makefile.deps
+depend:
+	makedepend $(SRCS) -f Makefile.deps
 
-#include Makefile.deps
+include ./Makefile.deps
