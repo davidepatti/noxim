@@ -4,6 +4,11 @@
 
  *****************************************************************************/
 
+#ifndef __TPROCESSING_ELEMENT_H__
+#define __TPROCESSING_ELEMENT_H__
+
+//---------------------------------------------------------------------------
+
 #include <queue>
 #include <systemc.h>
 #include "NoximDefs.h"
@@ -35,11 +40,11 @@ SC_MODULE(TProcessingElement)
 
   // Functions
 
-  void               rxProcess();          // The receiving process
-  void               txProcess();          // The transmitting process
-  int                probabilityShot();    // The probability to send a new flit
-  TFlit              nextFlit();
-  TPacket            randomPacket(); // Create a new random flit
+  void                rxProcess();          // The receiving process
+  void                txProcess();          // The transmitting process
+  int                 probabilityShot();    // The probability to send a new flit
+  TFlit               nextFlit();           // Take next flit
+  TPacket             randomPacket();       // Create a new random flit
 
 
   // Constructor
@@ -57,3 +62,4 @@ SC_MODULE(TProcessingElement)
 
 };
 
+#endif

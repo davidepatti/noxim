@@ -16,7 +16,7 @@ void TRouter::rxProcess()
       for(int i=0; i<DIRECTIONS+1; i++)
 	{
 	  ack_rx[i].write(0);
-	  channel_state[i] = STATE_CHANNEL_EMPTY;
+	  channel_state[i] = CHANNEL_EMPTY;
 	  current_level_rx[i] = 0;
 	  reservation_table[i] = CHANNEL_NOT_RESERVED;
 	}
@@ -37,10 +37,11 @@ void TRouter::rxProcess()
 	  // there's no need to check for conditions 3 and 4.
 	  if ( (req_rx[i].read()==1-current_level_rx[i]) && !buffer[i].IsFull() )
 	    {
-#ifdef DEBUG
-	      TFlit f = flit_rx[i].read();
-	      cout << sc_simulation_time() << ": Router[" << id <<"], Buffer["<< i << "], RECEIVED " << f << endl;
-#endif
+              if(TGlobalParams::verbose_mode)
+              {
+                TFlit f = flit_rx[i].read();
+	        cout << sc_simulation_time() << ": Router[" << id <<"], Buffer["<< i << "], RECEIVED " << f << endl;
+              }
 
 	      // Store the incoming flit in the circular buffer
 	      buffer[i].Push(flit_rx[i].read());            
@@ -81,11 +82,12 @@ void TRouter::txProcess()
 	    // 3) if the destination completed the last packet, then can accept a new one (TO BE ADDED)
 	    if ( !buffer[i].IsEmpty() )
 	    {
-		int dest; // temporary to store current 
+		int dest; // temporary to store current
 
-#ifdef DEBUG
-		cout << sc_simulation_time() << ": Router[" << id << "], Buffer[" << i << "](" << buffer[i].Size() << " flits)" << endl;
-#endif
+                if(TGlobalParams::verbose_mode)
+                {
+                  cout << sc_simulation_time() << ": Router[" << id << "], Buffer[" << i << "](" << buffer[i].Size() << " flits)" << endl;
+                }
 
 		TFlit flit = buffer[i].Front();
 
@@ -104,9 +106,10 @@ void TRouter::txProcess()
 		{
 		    if ( current_level_tx[dest] == ack_tx[dest].read() )
 		    {
-#ifdef DEBUG
+                      if(TGlobalParams::verbose_mode)
+                      {
 			cout << sc_simulation_time() << ": Router[" << id << "] SENDING " << flit << " towards port " << dest << endl;
-#endif
+                      }
 
 			flit_tx[dest].write(flit);
 			current_level_tx[dest] = 1 - current_level_tx[dest];
@@ -151,7 +154,7 @@ int TRouter::routing(int src_id, int dst_id)
   TCoord src_coord = id2Coord(src_id);
   TCoord dst_coord = id2Coord(dst_id);
 
-  switch (routing_type)
+  switch (TGlobalParams::routing_algorithm)
     {
     case XY:
       return selectionFunction(routingXY(position, dst_coord));
@@ -191,6 +194,7 @@ int TRouter::selectionNoPCAR(const vector<int>& directions)
 {
     assert(false);
 }
+
 //---------------------------------------------------------------------------
 
 int TRouter::selectionBufferLevel(const vector<int>& directions)
@@ -209,12 +213,13 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
 	}
     }
 
-#ifdef DEBUG
-    cout << sc_simulation_time() << ": Router[" << id << "], SELECTION between: ";
-    for (unsigned int i=0;i<directions.size();i++)
+    if(TGlobalParams::verbose_mode)
+    {
+      cout << sc_simulation_time() << ": Router[" << id << "], SELECTION between: ";
+      for (unsigned int i=0;i<directions.size();i++)
 	cout << directions[i] << "(" << buffer_level_neighbor[directions[i]] << " flits),";
-    cout << " direction choosen: " << direction_choosen << endl;
-#endif
+      cout << " direction choosen: " << direction_choosen << endl;
+    }
     
     assert(direction_choosen>=0);
     return direction_choosen;
@@ -233,13 +238,13 @@ int TRouter::selectionFunction(const vector<int>& directions)
     // TODO: vedere che dice mau
     if (directions.size()==1) return directions[0];
 
-    switch (selection_type)
+    switch (TGlobalParams::selection_strategy)
     {
-	case SELECTION_RANDOM:
+	case SEL_RANDOM:
 	    return selectionRandom(directions);
-	case SELECTION_BUFFER_LEVEL:
+	case SEL_BUFFER_LEVEL:
 	    return selectionBufferLevel(directions);
-	case SELECTION_NOPCAR:
+	case SEL_NOPCAR:
 	    return selectionNoPCAR(directions);
 	default:
 	    assert(false);
@@ -347,7 +352,7 @@ vector<int> TRouter::routingOddEven(const TCoord& current,
   int c0 = current.x;
   int c1 = current.y;
   int s0 = source.x;
-  int s1 = source.y;
+  //  int s1 = source.y;
   int d0 = destination.x;
   int d1 = destination.y;
   int e0, e1;
@@ -464,17 +469,6 @@ vector<int> TRouter::routingFullyAdaptive(const TCoord& current, const TCoord& d
     }
   
   return directions;
-}
-
-//---------------------------------------------------------------------------
-
-void TRouter::configure(int _id, int _routing_type, int _selection_type,int _buffer_depth)
-{
-  setId(_id);
-  routing_type = _routing_type;
-  selection_type = _selection_type;
-  buffer_depth = _buffer_depth;
-
 }
 
 //---------------------------------------------------------------------------

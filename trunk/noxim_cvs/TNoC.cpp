@@ -1,14 +1,20 @@
-#include "NoximDefs.h"
+/*****************************************************************************
+
+  TNoC.cpp -- Network-on-Chip (NoC) implementation
+
+ *****************************************************************************/
+
 #include "TNoC.h"
 
 //---------------------------------------------------------------------------
 
+
 void TNoC::buildMesh()
 {
   // Create the mesh as a matrix of tiles
-  for(int i=0; i<MESH_DIM_X; i++)
+  for(int i=0; i<TGlobalParams::mesh_dim_x; i++)
     {
-      for(int j=0; j<MESH_DIM_Y; j++)
+      for(int j=0; j<TGlobalParams::mesh_dim_y; j++)
 	{
 	  // Create the single Tile with a proper name
 	  char tile_name[20];
@@ -16,13 +22,10 @@ void TNoC::buildMesh()
 	  t[i][j] = new TTile(tile_name);
 
 	  // Tell to the router its coordinates
-	  t[i][j]->r->configure(j * MESH_DIM_X + i,
-				DEFAULT_ROUTING,
-				DEFAULT_SELECTION,
-				DEFAULT_BUFFER_DEPTH);
+	  t[i][j]->r->setId(j * TGlobalParams::mesh_dim_x + i);
 
 	  // Tell to the PE its coordinates
-	  t[i][j]->pe->id = j * MESH_DIM_X + i;
+	  t[i][j]->pe->id = j * TGlobalParams::mesh_dim_x + i;
 
 	  // Map clock and reset
 	  t[i][j]->clock(clock);
@@ -77,25 +80,25 @@ void TNoC::buildMesh()
     }
 
   // Clear the inputs on the borders
-  for(int i=0; i<=MESH_DIM_X; i++)
+  for(int i=0; i<=TGlobalParams::mesh_dim_x; i++)
     {
       req_to_south[i][0] = 0;
       ack_to_north[i][0] = 0;
-      req_to_north[i][MESH_DIM_Y] = 0;
-      ack_to_south[i][MESH_DIM_Y] = 0;
+      req_to_north[i][TGlobalParams::mesh_dim_y] = 0;
+      ack_to_south[i][TGlobalParams::mesh_dim_y] = 0;
 
       buffer_level_to_south[i][0] = 0;
-      buffer_level_to_north[i][MESH_DIM_Y] = 0;
+      buffer_level_to_north[i][TGlobalParams::mesh_dim_y] = 0;
     }
-  for(int j=0; j<=MESH_DIM_Y; j++)
+  for(int j=0; j<=TGlobalParams::mesh_dim_y; j++)
     {
       req_to_east[0][j] = 0;
       ack_to_west[0][j] = 0;
-      req_to_west[MESH_DIM_X][j] = 0;
-      ack_to_east[MESH_DIM_X][j] = 0;
+      req_to_west[TGlobalParams::mesh_dim_x][j] = 0;
+      ack_to_east[TGlobalParams::mesh_dim_x][j] = 0;
 
       buffer_level_to_east[0][j] = 0;
-      buffer_level_to_west[MESH_DIM_X][j] = 0;
+      buffer_level_to_west[TGlobalParams::mesh_dim_x][j] = 0;
     }
 }
 
@@ -103,8 +106,8 @@ void TNoC::buildMesh()
 
 TTile* TNoC::searchNode(const int id) const
 {
-  for (int i=0; i<MESH_DIM_X; i++)
-    for (int j=0; j<MESH_DIM_Y; j++)
+  for (int i=0; i<TGlobalParams::mesh_dim_x; i++)
+    for (int j=0; j<TGlobalParams::mesh_dim_y; j++)
       if (t[i][j]->r->id == id)
 	return t[i][j];
 

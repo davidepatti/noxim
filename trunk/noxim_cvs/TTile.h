@@ -7,6 +7,8 @@
 #ifndef __TTILE_H__
 #define __TTILE_H__
 
+//---------------------------------------------------------------------------
+
 #include <systemc.h>
 #include "TRouter.h"
 #include "TProcessingElement.h"
@@ -30,7 +32,6 @@ SC_MODULE(TTile)
   sc_out<uint>        buffer_level[DIRECTIONS];
   sc_in<uint>         buffer_level_neighbor[DIRECTIONS];
 
-
   // Signals
 
   sc_signal<TFlit>    flit_rx_local;   // The input channels
@@ -43,8 +44,6 @@ SC_MODULE(TTile)
   
   sc_signal<uint>     buffer_level_local;
   sc_signal<uint>     buffer_level_neighbor_local;
-
-
 
   // Instances
   TRouter*            r;               // Router instance

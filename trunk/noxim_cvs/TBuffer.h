@@ -7,10 +7,15 @@
 #ifndef __TBUFFER_H__
 #define __TBUFFER_H__
 
+//---------------------------------------------------------------------------
+
+#include <cassert>
 #include <queue>
 #include "NoximDefs.h"
 
 using namespace std;
+
+//---------------------------------------------------------------------------
 
 class TBuffer
 {
