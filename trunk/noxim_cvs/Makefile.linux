@@ -4,8 +4,8 @@ CC     = g++
 OPT    = -O3
 DEBUG  = -g
 OTHER  = -Wall -Wno-deprecated
-# CFLAGS = $(OPT) $(OTHER)
-CFLAGS = $(DEBUG) $(OTHER)
+# CFLAGS = $(DEBUG) $(OTHER)
+CFLAGS = $(OPT) $(OTHER)
 
 MODULE = run
 SRCS = TRouter.cpp TProcessingElement.cpp main.cpp

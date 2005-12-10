@@ -1,10 +1,10 @@
 TARGET_ARCH = linux
 CC     = g++
 OPT    = -O2 # -O3
-DEBUG  = -DDEBUG# -g
+DEBUG  = -g
 OTHER  = -Wall -Wno-deprecated
-# CFLAGS = $(OPT) $(OTHER)
-CFLAGS = $(DEBUG) $(OTHER)
+CFLAGS = $(OPT) $(OTHER)
+# CFLAGS = $(DEBUG) $(OTHER)
 
 MODULE = run
 SRCS = TNoC.cpp TRouter.cpp TProcessingElement.cpp TBuffer.cpp TStats.cpp \
