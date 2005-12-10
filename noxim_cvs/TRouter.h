@@ -4,12 +4,15 @@
 
  *****************************************************************************/
 
+#ifndef __TROUTER_H__
+#define __TROUTER_H__
+
+//---------------------------------------------------------------------------
+
 #include <systemc.h>
 #include "NoximDefs.h"
 #include "TBuffer.h"
 #include "TStats.h"
-
-//---------------------------------------------------------------------------
 
 SC_MODULE(TRouter)
 {
@@ -35,7 +38,7 @@ SC_MODULE(TRouter)
   /*
   TCoord             position;                        // Router position inside the mesh
   */
-  int                id;
+  int                id;                              // Unique ID
   int                routing_type;                    // Type of routing algorithm
   int                selection_type;
   int                buffer_depth;
@@ -45,16 +48,14 @@ SC_MODULE(TRouter)
   bool               current_level_tx[DIRECTIONS+1];  // Current level for Alternating Bit Protocol (ABP)
   int                reservation_table[DIRECTIONS+1]; // Output channels reservations
   int                short_circuit[DIRECTIONS+1];     // Crossbar I/O connections
-
-  TStats             stats;
+  TStats             stats;                           // Statistics
 
   // Functions
 
   void               rxProcess();        // The receiving process
   void               txProcess();        // The transmitting process
   void               bufferMonitor();
-  void               configure(int _id, int _routing_type, int _selection_type,int _buffer_depth);
-
+  void               setId(int _id);     // Set unique ID
 
   // Constructor
 
@@ -75,8 +76,6 @@ SC_MODULE(TRouter)
 
  private:
 
-  void setId(int _id);
-
   int routing(int src_id, int dst_id);
 
   int selectionFunction(const vector<int>& directions);
@@ -94,3 +93,5 @@ SC_MODULE(TRouter)
   vector<int> routingNoPCAR(const TCoord& current, const TCoord& destination);
   vector<int> routingFullyAdaptive(const TCoord& current, const TCoord& destination);
 };
+
+#endif

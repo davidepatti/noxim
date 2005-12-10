@@ -4,12 +4,13 @@
 
  *****************************************************************************/
 
-#ifndef NOXIMDEFS_H
-#define NOXIMDEFS_H
+#ifndef __NOXIM_DEFS_H__
+#define __NOXIM_DEFS_H__
+
+//---------------------------------------------------------------------------
 
 #include <cassert>
 #include <systemc.h>
-
 
 // Define the directions as numbers
 #define DIRECTIONS      4
@@ -20,40 +21,58 @@
 #define DIRECTION_LOCAL 4
 
 // Channel states for queues
-#define STATE_CHANNEL_EMPTY    0
-#define STATE_CHANNEL_HAS_HEAD 1
-#define STATE_CHANNEL_HAS_TAIL 2
+#define CHANNEL_EMPTY         0
+#define CHANNEL_HAS_HEAD      1
+#define CHANNEL_HAS_TAIL      2
 #define CHANNEL_NOT_RESERVED -1
 
-// Types of routing algorithm
-#define XY              0
-#define WEST_FIRST      1
-#define NORTH_LAST      2
-#define NEGATIVE_FIRST  3
-#define ODD_EVEN        4
-#define DYAD            5
-#define LOOK_AHEAD      6
-#define NOPCAR          7
-#define FULLY_ADAPTIVE  8
+// Routing algorithms
+#define XY                    0
+#define WEST_FIRST            1
+#define NORTH_LAST            2
+#define NEGATIVE_FIRST        3
+#define ODD_EVEN              4
+#define DYAD                  5
+#define LOOK_AHEAD            6
+#define NOPCAR                7
+#define FULLY_ADAPTIVE        8
 
 // Selection strategies
-#define SELECTION_RANDOM 0
-#define SELECTION_BUFFER_LEVEL 1
-#define SELECTION_NOPCAR 2
-        
+#define SEL_RANDOM            0
+#define SEL_BUFFER_LEVEL      1
+#define SEL_NOPCAR            2
+
 //---------------------------------------------------------------------------
 
-// These ones will be passed as command-line arguments in future versions
-#define MESH_DIM_X       4
-#define MESH_DIM_Y       4
-#define DEFAULT_BUFFER_DEPTH     4
-#define MAX_PACKET_SIZE 10
+// Default configuration can be overridden with command-line arguments
+#define DEFAULT_VERBOSE_MODE               false
+#define DEFAULT_MESH_DIM_X                     4
+#define DEFAULT_MESH_DIM_Y                     4
+#define DEFAULT_BUFFER_DEPTH                   4
+#define DEFAULT_MAX_PACKET_SIZE               10
+#define DEFAULT_ROUTING_ALGORITHM             XY
+#define DEFAULT_SELECTION_STRATEGY    SEL_RANDOM
+#define DEFAULT_PACKET_INJECTION_RATE       0.01
+#define DEFAULT_SIMULATION_TIME            10000
 
-#define DEFAULT_ROUTING ODD_EVEN
-#define DEFAULT_SELECTION SELECTION_BUFFER_LEVEL
-#define DEFAULT_PIR 0.01
+// TGlobalParams -- used to forward configuration to every sub-block
+class TGlobalParams
+{
+public:
+  static int verbose_mode;
+  static int mesh_dim_x;
+  static int mesh_dim_y;
+  static int buffer_depth;
+  static int max_packet_size;
+  static int routing_algorithm;
+  static int selection_strategy;
+  static float packet_injection_rate;
+  static int simulation_time;
+};
 
 
+// TODO by Fafa - this MUST be removed!!!
+#define MAX_STATIC_DIM 20
 
 // TCoord -- XY coordinates type of the Tile inside the Mesh
 struct TCoord
@@ -165,10 +184,10 @@ inline TCoord id2Coord(int id)
 {
   TCoord coord;
 
-  coord.x = id % MESH_DIM_X;
-  coord.y = id / MESH_DIM_X;
+  coord.x = id % TGlobalParams::mesh_dim_x;
+  coord.y = id / TGlobalParams::mesh_dim_x;
 
-  assert(coord.y < MESH_DIM_X);
+  assert(coord.y < TGlobalParams::mesh_dim_y);
 
   return coord;
 }

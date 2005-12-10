@@ -1,3 +1,9 @@
+/*****************************************************************************
+
+  TStats.cpp -- Statistics implementation
+
+ *****************************************************************************/
+
 #include "TStats.h"
 
 // TODO: nan in averageDelay
@@ -94,7 +100,7 @@ void TStats::showStats(std::ostream& out)
 	  << endl;
     }
 
-  out << "% Agregated average delay " << getAverageDelay() << endl;
+  out << "% Aggregated average delay " << getAverageDelay() << endl;
 }
 
 //---------------------------------------------------------------------------

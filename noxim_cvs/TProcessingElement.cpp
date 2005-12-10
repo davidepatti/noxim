@@ -6,6 +6,8 @@
 
 #include "TProcessingElement.h"
 
+//---------------------------------------------------------------------------
+
 void TProcessingElement::rxProcess()
 {
   // This function is a simplified version of the corresponding method of the TRouter class
@@ -91,7 +93,7 @@ TFlit TProcessingElement::nextFlit()
 
 int TProcessingElement::probabilityShot()
 {
-  if ((double)rand()/RAND_MAX <= DEFAULT_PIR)
+  if ((double)rand()/RAND_MAX <= TGlobalParams::packet_injection_rate)
     return true;
 
   return false;
@@ -131,13 +133,16 @@ TPacket TProcessingElement::randomPacket()
 
   p.src_id = id;
 
-  p.dst_id = rand() % (MESH_DIM_X * MESH_DIM_X);
+  p.dst_id = rand() % (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y);
 
-  if (p.src_id == p.dst_id) cout << "PE " << id << " AUTOIMPUPPETTATO " << endl;
+  if(TGlobalParams::verbose_mode)
+  {
+    if (p.src_id == p.dst_id) cout << "PE " << id << " AUTOIMPUPPETTATO " << endl;
+  }
   
   p.timestamp = sc_simulation_time();
 
-  p.size = p.flit_left = 2 + (rand() % MAX_PACKET_SIZE);
+  p.size = p.flit_left = 2 + (rand() % TGlobalParams::max_packet_size);
 
 /*
   TCoord             src_coord;    // The XY coordinates of the source tile
