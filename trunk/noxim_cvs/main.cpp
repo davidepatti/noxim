@@ -30,7 +30,7 @@ void showHelp(char selfname[])
   cout << "Usage: " << selfname << " [options]\nwhere [options] is one or more of the following ones:" << endl;
   cout << "\t-help\t\tShow this help and exit" << endl;
   cout << "\t-verbose\tVerbose output (default off)" << endl;
-  cout << "\t-trace\tTrace signals to VCD file named 'trace.vcd' (default off)" << endl;
+  cout << "\t-trace\t\tTrace signals to VCD file named 'trace.vcd' (default off)" << endl;
   cout << "\t-dimx N\t\tSet the mesh X dimension to the specified integer value (default " << DEFAULT_MESH_DIM_X << ")" << endl;
   cout << "\t-dimy N\t\tSet the mesh Y dimension to the specified integer value (default " << DEFAULT_MESH_DIM_Y << ")" << endl;
   cout << "\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value [flits] (default " << DEFAULT_BUFFER_DEPTH << ")" << endl;
