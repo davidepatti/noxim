@@ -103,7 +103,7 @@ int sc_main(int arg_num, char* arg_vet[])
     int i=1;
     do
     {
-      if(!strcmp(arg_vet[i],"-help")) showHelp(arg_vet[i]);
+      if(!strcmp(arg_vet[i],"-help")) showHelp(arg_vet[0]);
       else if(!strcmp(arg_vet[i],"-verbose"))
       {
         TGlobalParams::verbose_mode = true;

@@ -2,12 +2,12 @@ TODO
 ---------------------------------------
 - add selection strategies based on buffer level
 - processing element traffic generation
-- noc parameters from command line
 - power/energy model
 - web interface to choose arguments and run simulation
 
 
 DONE
 ---------------------------------------
+- noc parameters from command line (2005.12.12)
 - create a todo file (5/12/2005)
 - a really working Makefile
