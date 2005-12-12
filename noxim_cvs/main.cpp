@@ -27,12 +27,16 @@ int TGlobalParams::simulation_time         = DEFAULT_SIMULATION_TIME;
 void showHelp(char selfname[])
 {
   cout << "Usage: " << selfname << " [options]\nwhere [options] is one or more of the following ones:" << endl;
-  cout << "\t\t-help\t\tShow this help and exit" << endl;
-  cout << "\t\t-verbose\tVerbose output (default off)" << endl;
-  cout << "\t\t-dimx N\t\tSet the mesh X dimension to the specified integer value (default " << DEFAULT_MESH_DIM_X << ")" << endl;
-  cout << "\t\t-dimy N\t\tSet the mesh Y dimension to the specified integer value (default " << DEFAULT_MESH_DIM_Y << ")" << endl;
-  cout << "\t\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value (default " << DEFAULT_BUFFER_DEPTH << ")" << endl;
-  cout << "\t\t-size N\t\tSet the maximum packet size to the specified integer value (default " << DEFAULT_MAX_PACKET_SIZE << ")" << endl;
+  cout << "\t-help\t\tShow this help and exit" << endl;
+  cout << "\t-verbose\tVerbose output (default off)" << endl;
+  cout << "\t-dimx N\t\tSet the mesh X dimension to the specified integer value (default " << DEFAULT_MESH_DIM_X << ")" << endl;
+  cout << "\t-dimy N\t\tSet the mesh Y dimension to the specified integer value (default " << DEFAULT_MESH_DIM_Y << ")" << endl;
+  cout << "\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value (default " << DEFAULT_BUFFER_DEPTH << ")" << endl;
+  cout << "\t-size N\t\tSet the maximum packet size to the specified integer value (default " << DEFAULT_MAX_PACKET_SIZE << ")" << endl;
+  cout << "\t-routing {xy|westfirst|northlast|negativefirst|oddeven|dyad|lookahead|nopcar|fullyadaptive}\tSet routing algorithm (default " << DEFAULT_ROUTING_ALGORITHM << ")" << endl;
+  cout << "\t-sel {random|bufferlevel|nopcar}\tSet selection strategy (default " << DEFAULT_SELECTION_STRATEGY << ")" << endl;
+  cout << "\t-pir R\t\tSet the packet injection rate to the specified real value (default " << DEFAULT_PACKET_INJECTION_RATE << ")" << endl;
+  cout << "\t-run N\t\tRun the simulation for the specified integer number of nanoseconds (default " << DEFAULT_SIMULATION_TIME << ")" << endl;
   exit(0);
 }
 
@@ -135,6 +139,48 @@ int sc_main(int arg_num, char* arg_vet[])
         if(new_size>1)
 	{
           TGlobalParams::max_packet_size = new_size;
+          i+=2;
+        }
+        else badArgument(arg_vet[i+1], arg_vet[i]);
+      }
+      else if(!strcmp(arg_vet[i],"-routing"))
+      {
+        if(!strcmp(arg_vet[i+1],"xy")) TGlobalParams::routing_algorithm = XY;
+        else if(!strcmp(arg_vet[i+1],"westfirst")) TGlobalParams::routing_algorithm = WEST_FIRST;
+        else if(!strcmp(arg_vet[i+1],"northlast")) TGlobalParams::routing_algorithm = NORTH_LAST;
+        else if(!strcmp(arg_vet[i+1],"negativefirst")) TGlobalParams::routing_algorithm = NEGATIVE_FIRST;
+        else if(!strcmp(arg_vet[i+1],"oddeven")) TGlobalParams::routing_algorithm = ODD_EVEN;
+        else if(!strcmp(arg_vet[i+1],"dyad")) TGlobalParams::routing_algorithm = DYAD;
+        else if(!strcmp(arg_vet[i+1],"lookahead")) TGlobalParams::routing_algorithm = LOOK_AHEAD;
+        else if(!strcmp(arg_vet[i+1],"nopcar")) TGlobalParams::routing_algorithm = NOPCAR;
+        else if(!strcmp(arg_vet[i+1],"fullyadaptive")) TGlobalParams::routing_algorithm = FULLY_ADAPTIVE;
+        else badArgument(arg_vet[i+1], arg_vet[i]);
+        i+=2;
+      }
+      else if(!strcmp(arg_vet[i],"-sel"))
+      {
+        if(!strcmp(arg_vet[i+1],"random")) TGlobalParams::selection_strategy = SEL_RANDOM;
+        else if(!strcmp(arg_vet[i+1],"bufferlevel")) TGlobalParams::selection_strategy = SEL_BUFFER_LEVEL;
+        else if(!strcmp(arg_vet[i+1],"nopcar")) TGlobalParams::selection_strategy = SEL_NOPCAR;
+        else badArgument(arg_vet[i+1], arg_vet[i]);
+        i+=2;
+      }
+      else if(!strcmp(arg_vet[i],"-pir"))
+      {
+        float new_pir = atof(arg_vet[i+1]);
+        if(new_pir>0)
+	{
+          TGlobalParams::packet_injection_rate = new_pir;
+          i+=2;
+        }
+        else badArgument(arg_vet[i+1], arg_vet[i]);
+      }
+      else if(!strcmp(arg_vet[i],"-sim"))
+      {
+        int new_sim = atoi(arg_vet[i+1]);
+        if(new_sim>1)
+	{
+          TGlobalParams::simulation_time = new_sim;
           i+=2;
         }
         else badArgument(arg_vet[i+1], arg_vet[i]);
