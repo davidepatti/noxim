@@ -46,6 +46,7 @@
 
 // Default configuration can be overridden with command-line arguments
 #define DEFAULT_VERBOSE_MODE               false
+#define DEFAULT_TRACE_MODE                 false
 #define DEFAULT_MESH_DIM_X                     4
 #define DEFAULT_MESH_DIM_Y                     4
 #define DEFAULT_BUFFER_DEPTH                   4
@@ -60,6 +61,7 @@ class TGlobalParams
 {
 public:
   static int verbose_mode;
+  static int trace_mode;
   static int mesh_dim_x;
   static int mesh_dim_y;
   static int buffer_depth;
