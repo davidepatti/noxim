@@ -29,10 +29,27 @@ void showHelp(char selfname[])
   cout << "Usage: " << selfname << " [options]\nwhere [options] is one or more of the following ones:" << endl;
   cout << "\t\t-help\t\tShow this help and exit" << endl;
   cout << "\t\t-verbose\tVerbose output (default off)" << endl;
-  cout << "\t\t-dimx N\t\tSet the mesh X dimension to the specified integer (default " << DEFAULT_MESH_DIM_X << ")" << endl;
-  cout << "\t\t-dimy N\t\tSet the mesh Y dimension to the specified integer (default " << DEFAULT_MESH_DIM_Y << ")" << endl;
-  cout << "\t\t-buffer N\t\tSet the buffer depth of each channel of the router to the specified integer (default " << DEFAULT_BUFFER_DEPTH << ")" << endl;
+  cout << "\t\t-dimx N\t\tSet the mesh X dimension to the specified integer value (default " << DEFAULT_MESH_DIM_X << ")" << endl;
+  cout << "\t\t-dimy N\t\tSet the mesh Y dimension to the specified integer value (default " << DEFAULT_MESH_DIM_Y << ")" << endl;
+  cout << "\t\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value (default " << DEFAULT_BUFFER_DEPTH << ")" << endl;
+  cout << "\t\t-size N\t\tSet the maximum packet size to the specified integer value (default " << DEFAULT_MAX_PACKET_SIZE << ")" << endl;
   exit(0);
+}
+
+//---------------------------------------------------------------------------
+
+void showConfig()
+{
+  cout << "Using the following configuration: " << endl;
+  cout << "verbose = " << TGlobalParams::verbose_mode << endl;
+  cout << "mesh_dim_x = " << TGlobalParams::mesh_dim_x << endl;
+  cout << "mesh_dim_y = " << TGlobalParams::mesh_dim_y << endl;
+  cout << "buffer_depth = " << TGlobalParams::buffer_depth << endl;
+  cout << "max_packet_size = " << TGlobalParams::max_packet_size << endl;
+  cout << "routing_algorithm = " << TGlobalParams::routing_algorithm << endl;
+  cout << "selection_strategy = " << TGlobalParams::selection_strategy << endl;
+  cout << "packet_injection_rate = " << TGlobalParams::packet_injection_rate << endl;
+  cout << "simulation_time = " << TGlobalParams::simulation_time << endl;
 }
 
 //---------------------------------------------------------------------------
@@ -112,19 +129,20 @@ int sc_main(int arg_num, char* arg_vet[])
         }
         else badArgument(arg_vet[i+1], arg_vet[i]);
       }
+      else if(!strcmp(arg_vet[i],"-size"))
+      {
+        int new_size = atoi(arg_vet[i+1]);
+        if(new_size>1)
+	{
+          TGlobalParams::max_packet_size = new_size;
+          i+=2;
+        }
+        else badArgument(arg_vet[i+1], arg_vet[i]);
+      }
       else badOption(arg_vet[i]);
     } while (i<arg_num);
   }
-  cout << "Using the following configuration: " << endl;
-  cout << "verbose = " << TGlobalParams::verbose_mode << endl;
-  cout << "mesh_dim_x = " << TGlobalParams::mesh_dim_x << endl;
-  cout << "mesh_dim_y = " << TGlobalParams::mesh_dim_y << endl;
-  cout << "buffer_depth = " << TGlobalParams::buffer_depth << endl;
-  cout << "max_packet_size = " << TGlobalParams::max_packet_size << endl;
-  cout << "routing_algorithm = " << TGlobalParams::routing_algorithm << endl;
-  cout << "selection_strategy = " << TGlobalParams::selection_strategy << endl;
-  cout << "packet_injection_rate = " << TGlobalParams::packet_injection_rate << endl;
-  cout << "simulation_time = " << TGlobalParams::simulation_time << endl;
+  showConfig();
 
   // Trace signals
   sc_trace_file* tf = sc_create_vcd_trace_file("trace");
