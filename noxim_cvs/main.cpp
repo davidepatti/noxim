@@ -13,6 +13,7 @@
 
 // Initialize global configuration parameters (can be overridden with command-line arguments)
 int TGlobalParams::verbose_mode            = DEFAULT_VERBOSE_MODE;
+int TGlobalParams::trace_mode              = DEFAULT_TRACE_MODE;
 int TGlobalParams::mesh_dim_x              = DEFAULT_MESH_DIM_X;
 int TGlobalParams::mesh_dim_y              = DEFAULT_MESH_DIM_Y;
 int TGlobalParams::buffer_depth            = DEFAULT_BUFFER_DEPTH;
@@ -29,14 +30,18 @@ void showHelp(char selfname[])
   cout << "Usage: " << selfname << " [options]\nwhere [options] is one or more of the following ones:" << endl;
   cout << "\t-help\t\tShow this help and exit" << endl;
   cout << "\t-verbose\tVerbose output (default off)" << endl;
+  cout << "\t-trace\tTrace signals to VCD file named 'trace.vcd' (default off)" << endl;
   cout << "\t-dimx N\t\tSet the mesh X dimension to the specified integer value (default " << DEFAULT_MESH_DIM_X << ")" << endl;
   cout << "\t-dimy N\t\tSet the mesh Y dimension to the specified integer value (default " << DEFAULT_MESH_DIM_Y << ")" << endl;
-  cout << "\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value (default " << DEFAULT_BUFFER_DEPTH << ")" << endl;
-  cout << "\t-size N\t\tSet the maximum packet size to the specified integer value (default " << DEFAULT_MAX_PACKET_SIZE << ")" << endl;
+  cout << "\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value [flits] (default " << DEFAULT_BUFFER_DEPTH << ")" << endl;
+  cout << "\t-size N\t\tSet the maximum packet size to the specified integer value [flits] (default " << DEFAULT_MAX_PACKET_SIZE << ")" << endl;
   cout << "\t-routing {xy|westfirst|northlast|negativefirst|oddeven|dyad|lookahead|nopcar|fullyadaptive}\tSet routing algorithm (default " << DEFAULT_ROUTING_ALGORITHM << ")" << endl;
   cout << "\t-sel {random|bufferlevel|nopcar}\tSet selection strategy (default " << DEFAULT_SELECTION_STRATEGY << ")" << endl;
-  cout << "\t-pir R\t\tSet the packet injection rate to the specified real value (default " << DEFAULT_PACKET_INJECTION_RATE << ")" << endl;
-  cout << "\t-run N\t\tRun the simulation for the specified integer number of nanoseconds (default " << DEFAULT_SIMULATION_TIME << ")" << endl;
+  cout << "\t-pir R\t\tSet the packet injection rate to the specified real value [%] (default " << DEFAULT_PACKET_INJECTION_RATE << ")" << endl;
+  cout << "\t-run N\t\tRun the simulation for the specified time [ns] (default " << DEFAULT_SIMULATION_TIME << ")" << endl << endl;
+  cout << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <mpalesi@diit.unict.it>" << endl;
+  cout << "If you find this program useless please feel free to complain with Davide Patti <dpatti@diit.unict.it>" << endl;
+  cout << "And if you want to send money please feel free to PayPal to Fabrizio Fazzino <fabrizio@fazzino.it>" << endl;
   exit(0);
 }
 
@@ -45,7 +50,8 @@ void showHelp(char selfname[])
 void showConfig()
 {
   cout << "Using the following configuration: " << endl;
-  cout << "verbose = " << TGlobalParams::verbose_mode << endl;
+  cout << "verbose_mode = " << TGlobalParams::verbose_mode << endl;
+  cout << "trace_mode = " << TGlobalParams::trace_mode << endl;
   cout << "mesh_dim_x = " << TGlobalParams::mesh_dim_x << endl;
   cout << "mesh_dim_y = " << TGlobalParams::mesh_dim_y << endl;
   cout << "buffer_depth = " << TGlobalParams::buffer_depth << endl;
@@ -87,7 +93,7 @@ int sc_main(int arg_num, char* arg_vet[])
 
   // Handle command-line arguments
   cout << endl << "\t\tNoxim - the NoC Simulator" << endl;
-  cout << "\t\t(C) University of Catania" << endl;
+  cout << "\t\t(C) University of Catania" << endl << endl;
   if(arg_num==1)
   {
     cout << "Running with default parameters (use '-help' option to see how to override them)" << endl;
@@ -101,6 +107,11 @@ int sc_main(int arg_num, char* arg_vet[])
       else if(!strcmp(arg_vet[i],"-verbose"))
       {
         TGlobalParams::verbose_mode = true;
+        i++;
+      }
+      else if(!strcmp(arg_vet[i],"-trace"))
+      {
+        TGlobalParams::trace_mode = true;
         i++;
       }
       else if(!strcmp(arg_vet[i],"-dimx"))
@@ -191,43 +202,47 @@ int sc_main(int arg_num, char* arg_vet[])
   showConfig();
 
   // Trace signals
-  sc_trace_file* tf = sc_create_vcd_trace_file("trace");
-  sc_trace(tf, reset, "reset");
-  sc_trace(tf, clock, "clock");
-
-  for(int i=0; i<TGlobalParams::mesh_dim_x; i++)
+  sc_trace_file* tf;
+  if(TGlobalParams::trace_mode)
   {
-    for(int j=0; j<TGlobalParams::mesh_dim_y; j++)
+    tf = sc_create_vcd_trace_file("trace");
+    sc_trace(tf, reset, "reset");
+    sc_trace(tf, clock, "clock");
+
+    for(int i=0; i<TGlobalParams::mesh_dim_x; i++)
     {
-      char label[30];
+      for(int j=0; j<TGlobalParams::mesh_dim_y; j++)
+      {
+        char label[30];
 
-      sprintf(label, "req_to_east(%02d)(%02d)", i, j);
-      sc_trace(tf, n->req_to_east[i][j], label);
-      sprintf(label, "req_to_west(%02d)(%02d)", i, j);
-      sc_trace(tf, n->req_to_west[i][j], label);
-      sprintf(label, "req_to_south(%02d)(%02d)", i, j);
-      sc_trace(tf, n->req_to_south[i][j], label);
-      sprintf(label, "req_to_north(%02d)(%02d)", i, j);
-      sc_trace(tf, n->req_to_north[i][j], label);
+        sprintf(label, "req_to_east(%02d)(%02d)", i, j);
+        sc_trace(tf, n->req_to_east[i][j], label);
+        sprintf(label, "req_to_west(%02d)(%02d)", i, j);
+        sc_trace(tf, n->req_to_west[i][j], label);
+        sprintf(label, "req_to_south(%02d)(%02d)", i, j);
+        sc_trace(tf, n->req_to_south[i][j], label);
+        sprintf(label, "req_to_north(%02d)(%02d)", i, j);
+        sc_trace(tf, n->req_to_north[i][j], label);
 
-      sprintf(label, "ack_to_east(%02d)(%02d)", i, j);
-      sc_trace(tf, n->ack_to_east[i][j], label);
-      sprintf(label, "ack_to_west(%02d)(%02d)", i, j);
-      sc_trace(tf, n->ack_to_west[i][j], label);
-      sprintf(label, "ack_to_south(%02d)(%02d)", i, j);
-      sc_trace(tf, n->ack_to_south[i][j], label);
-      sprintf(label, "ack_to_north(%02d)(%02d)", i, j);
-      sc_trace(tf, n->ack_to_north[i][j], label);
+        sprintf(label, "ack_to_east(%02d)(%02d)", i, j);
+        sc_trace(tf, n->ack_to_east[i][j], label);
+        sprintf(label, "ack_to_west(%02d)(%02d)", i, j);
+        sc_trace(tf, n->ack_to_west[i][j], label);
+        sprintf(label, "ack_to_south(%02d)(%02d)", i, j);
+        sc_trace(tf, n->ack_to_south[i][j], label);
+        sprintf(label, "ack_to_north(%02d)(%02d)", i, j);
+        sc_trace(tf, n->ack_to_north[i][j], label);
 /*
-      sprintf(label, "flit_to_east(%02d)(%02d)", i, j);
-      sc_trace(tf, n->flit_to_east[i][j], label);
-      sprintf(label, "flit_to_west(%02d)(%02d)", i, j);
-      sc_trace(tf, n->flit_to_west[i][j], label);
-      sprintf(label, "flit_to_south(%02d)(%02d)", i, j);
-      sc_trace(tf, n->flit_to_south[i][j], label);
-      sprintf(label, "flit_to_north(%02d)(%02d)", i, j);
-      sc_trace(tf, n->flit_to_north[i][j], label);
+        sprintf(label, "flit_to_east(%02d)(%02d)", i, j);
+        sc_trace(tf, n->flit_to_east[i][j], label);
+        sprintf(label, "flit_to_west(%02d)(%02d)", i, j);
+        sc_trace(tf, n->flit_to_west[i][j], label);
+        sprintf(label, "flit_to_south(%02d)(%02d)", i, j);
+        sc_trace(tf, n->flit_to_south[i][j], label);
+        sprintf(label, "flit_to_north(%02d)(%02d)", i, j);
+        sc_trace(tf, n->flit_to_north[i][j], label);
 */
+      }
     }
   }
 
@@ -241,7 +256,7 @@ int sc_main(int arg_num, char* arg_vet[])
   sc_start(TGlobalParams::simulation_time, SC_NS);       // Run simulation
 
   // Close the simulation
-  sc_close_vcd_trace_file(tf);
+  if(TGlobalParams::trace_mode) sc_close_vcd_trace_file(tf);
   cout << "Simulation completed successfully!" << endl;
 
   // Show statistics
