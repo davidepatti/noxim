@@ -24,6 +24,35 @@ int TGlobalParams::simulation_time         = DEFAULT_SIMULATION_TIME;
 
 //---------------------------------------------------------------------------
 
+void showHelp(char selfname[])
+{
+  cout << "Usage: " << selfname << " [options]\nwhere [options] is one or more of the following ones:" << endl;
+  cout << "\t\t-help\t\tShow this help and exit" << endl;
+  cout << "\t\t-verbose\tVerbose output (default off)" << endl;
+  cout << "\t\t-dimx N\t\tSet the mesh X dimension to the specified integer (default " << DEFAULT_MESH_DIM_X << ")" << endl;
+  cout << "\t\t-dimy N\t\tSet the mesh Y dimension to the specified integer (default " << DEFAULT_MESH_DIM_Y << ")" << endl;
+  cout << "\t\t-buffer N\t\tSet the buffer depth of each channel of the router to the specified integer (default " << DEFAULT_BUFFER_DEPTH << ")" << endl;
+  exit(0);
+}
+
+//---------------------------------------------------------------------------
+
+void badOption(char option[])
+{
+  fprintf(stderr, "Error: Unknown option %s (use '-help' to see available options)\n", option);
+  exit(1);
+}
+
+//---------------------------------------------------------------------------
+
+void badArgument(char argument[], char option[])
+{
+  fprintf(stderr, "Error: Unknown argument %s for option %s (use '-help' to see available options and arguments)\n", argument, option);
+  exit(1);
+}
+
+//---------------------------------------------------------------------------
+
 int sc_main(int arg_num, char* arg_vet[])
 {
   // Signals
@@ -47,23 +76,43 @@ int sc_main(int arg_num, char* arg_vet[])
     int i=1;
     do
     {
-      if(!strcmp(arg_vet[i],"-help"))
-      {
-        cout << "Usage: " << arg_vet[0] << " [options]\nwhere [options] is one or more of the following ones:" << endl;
-        cout << "\t\t-help\tShow this help and exit" << endl;
-        cout << "\t\t-verbose\tVerbose output" << endl;
-        exit(0);
-      }
+      if(!strcmp(arg_vet[i],"-help")) showHelp(arg_vet[i]);
       else if(!strcmp(arg_vet[i],"-verbose"))
       {
         TGlobalParams::verbose_mode = true;
         i++;
       }
-      else
+      else if(!strcmp(arg_vet[i],"-dimx"))
       {
-        fprintf(stderr, "Error: Unknown option %s (use '-help' to see available options)\n", arg_vet[i]);
-        exit(1);
+        int new_x = atoi(arg_vet[i+1]);
+        if(new_x>1)
+	{
+          TGlobalParams::mesh_dim_x = new_x;
+          i+=2;
+        }
+        else badArgument(arg_vet[i+1], arg_vet[i]);
       }
+      else if(!strcmp(arg_vet[i],"-dimy"))
+      {
+        int new_y = atoi(arg_vet[i+1]);
+        if(new_y>1)
+	{
+          TGlobalParams::mesh_dim_y = new_y;
+          i+=2;
+        }
+        else badArgument(arg_vet[i+1], arg_vet[i]);
+      }
+      else if(!strcmp(arg_vet[i],"-buffer"))
+      {
+        int new_buffer = atoi(arg_vet[i+1]);
+        if(new_buffer>1)
+	{
+          TGlobalParams::buffer_depth = new_buffer;
+          i+=2;
+        }
+        else badArgument(arg_vet[i+1], arg_vet[i]);
+      }
+      else badOption(arg_vet[i]);
     } while (i<arg_num);
   }
   cout << "Using the following configuration: " << endl;
