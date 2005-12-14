@@ -17,7 +17,7 @@
   $delay = $all_values[count($all_values)-1];
   if($delay>0) {
     print("<p>Executed command <tt>$command</tt> and obtained:</p>\n");
-    print("<table border='1'><tr><td>Global average delay</td><th>$delay</th></tr></table>\n");
+    print("<table border='1'><tr><th>Global average delay</th><td>$delay</td></tr></table>\n");
   } else {
     print("<p>Command <tt>$command</tt> exited with errors:</p>\n");
     print("<pre>$output</pre>\n");
