@@ -7,7 +7,7 @@
 
 <form name="data" action="noxim.php" method="POST">
 <table border="1">
-<tr><td>Mesh X Dimension</td><td><select name="dimx">
+<tr><th>Mesh X Dimension</th><td><select name="dimx">
 <?php
   for($i=2; $i<=20; $i++) {
     if($i==4) print("<option value='$i' selected>$i (Default)</option>\n");
@@ -15,7 +15,7 @@
   }
 ?>
 </select></td></tr>
-<tr><td>Mesh Y Dimension</td><td><select name="dimy">
+<tr><th>Mesh Y Dimension</th><td><select name="dimy">
 <?php
   for($i=2; $i<=20; $i++) {
     if($i==4) print("<option value='$i' selected>$i (Default)</option>\n");
@@ -23,7 +23,7 @@
   }
 ?>
 </select></td></tr>
-<tr><td>Buffer Depth</td><td><select name="buffer">
+<tr><th>Buffer Depth</th><td><select name="buffer">
 <?php
   for($i=1; $i<=20; $i++) {
     if($i==4) print("<option value='$i' selected>$i flits (Default)</option>\n");
@@ -31,7 +31,7 @@
   }
 ?>
 </select></td></tr>
-<tr><td>Maximum Packet Size</td><td><select name="size">
+<tr><th>Maximum Packet Size</th><td><select name="size">
 <?php
   for($i=2; $i<=20; $i++) {
     if($i==10) print("<option value='$i' selected>$i flits (Default)</option>\n");
@@ -39,7 +39,7 @@
   }
 ?>
 </select></td></tr>
-<tr><td>Routing Algorithm</td><td><select name="routing">
+<tr><th>Routing Algorithm</th><td><select name="routing">
   <option value="xy" selected>X-Y (Default)</option>
   <option value="westfirst">West First</option>
   <option value="northlast">North Last</option>
@@ -50,12 +50,12 @@
   <option value="nopcar">Nopcar</option>
   <option value="fullyadaptive">Fully Adaptive</option>
 </select></td></tr>
-<tr><td>Selection Strategy</td><td><select name="sel">
+<tr><th>Selection Strategy</th><td><select name="sel">
   <option value="random" selected>Random (Default)</option>
   <option value="bufferlevel">Buffer-level</option>
   <option value="nopcar">Nopcar</option>
 </select></td></tr>
-<tr><td>Packet Injection Rate</td><td><select name="pir">
+<tr><th>Packet Injection Rate</th><td><select name="pir">
 <?php
   for($i=0.01; $i<=1; $i+=0.1) {
     if($i==0.01) print("<option value='$i' selected>$i (Default)</option>\n");
@@ -63,7 +63,7 @@
   }
 ?>
 </select></td></tr>
-<tr><td>Simulation Time</td><td><select name="sim">
+<tr><th>Simulation Time</th><td><select name="sim">
   <option value="5000">5'000 cycles</option>
   <option value="10000" selected>10'000 cycles (Default)</option>
   <option value="20000">20'000 cycles</option>
@@ -71,9 +71,9 @@
   <option value="40000">40'000 cycles</option>
   <option value="50000">50'000 cycles</option>
   <option value="75000">75'000 cycles</option>
-  <option value="100000">100-000 cycles</option>
+  <option value="100000">100'000 cycles</option>
 </select></td></tr>
-<tr><td colspan="2"><input type="submit" value="Run the simulation &gt;&gt;"></td></tr>
+<tr><th colspan="2"><input type="submit" value="Run the simulation &gt;&gt;"></th></tr>
 </table>
 </form>
 
