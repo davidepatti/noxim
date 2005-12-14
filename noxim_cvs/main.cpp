@@ -186,12 +186,12 @@ int sc_main(int arg_num, char* arg_vet[])
         }
         else badArgument(arg_vet[i+1], arg_vet[i]);
       }
-      else if(!strcmp(arg_vet[i],"-sim"))
+      else if(!strcmp(arg_vet[i],"-run"))
       {
-        int new_sim = atoi(arg_vet[i+1]);
-        if(new_sim>1)
+        int new_run = atoi(arg_vet[i+1]);
+        if(new_run>1)
 	{
-          TGlobalParams::simulation_time = new_sim;
+          TGlobalParams::simulation_time = new_run;
           i+=2;
         }
         else badArgument(arg_vet[i+1], arg_vet[i]);
