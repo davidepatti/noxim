@@ -63,15 +63,15 @@
   }
 ?>
 </select></td></tr>
-<tr><td>Simulation Time</td><td><select name="run">
-  <option value="5000">5 &micro;s</option>
-  <option value="10000" selected>10 &micro;s (Default)</option>
-  <option value="20000">20 &micro;s</option>
-  <option value="30000">30 &micro;s</option>
-  <option value="40000">40 &micro;s</option>
-  <option value="50000">50 &micro;s</option>
-  <option value="75000">75 &micro;s</option>
-  <option value="100000">100 &micro;s</option>
+<tr><td>Simulation Time</td><td><select name="sim">
+  <option value="5000">5'000 cycles</option>
+  <option value="10000" selected>10'000 cycles (Default)</option>
+  <option value="20000">20'000 cycles</option>
+  <option value="30000">30'000 cycles</option>
+  <option value="40000">40'000 cycles</option>
+  <option value="50000">50'000 cycles</option>
+  <option value="75000">75'000 cycles</option>
+  <option value="100000">100-000 cycles</option>
 </select></td></tr>
 <tr><td colspan="2"><input type="submit" value="Run the simulation &gt;&gt;"></td></tr>
 </table>
