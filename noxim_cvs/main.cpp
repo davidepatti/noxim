@@ -38,7 +38,7 @@ void showHelp(char selfname[])
   cout << "\t-routing {xy|westfirst|northlast|negativefirst|oddeven|dyad|lookahead|nopcar|fullyadaptive}\tSet routing algorithm (default " << DEFAULT_ROUTING_ALGORITHM << ")" << endl;
   cout << "\t-sel {random|bufferlevel|nopcar}\tSet selection strategy (default " << DEFAULT_SELECTION_STRATEGY << ")" << endl;
   cout << "\t-pir R\t\tSet the packet injection rate to the specified real value [%] (default " << DEFAULT_PACKET_INJECTION_RATE << ")" << endl;
-  cout << "\t-run N\t\tRun the simulation for the specified time [ns] (default " << DEFAULT_SIMULATION_TIME << ")" << endl << endl;
+  cout << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << DEFAULT_SIMULATION_TIME << ")" << endl << endl;
   cout << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <mpalesi@diit.unict.it>" << endl;
   cout << "If you find this program useless please feel free to complain with Davide Patti <dpatti@diit.unict.it>" << endl;
   cout << "And if you want to send money please feel free to PayPal to Fabrizio Fazzino <fabrizio@fazzino.it>" << endl;
@@ -186,12 +186,12 @@ int sc_main(int arg_num, char* arg_vet[])
         }
         else badArgument(arg_vet[i+1], arg_vet[i]);
       }
-      else if(!strcmp(arg_vet[i],"-run"))
+      else if(!strcmp(arg_vet[i],"-sim"))
       {
-        int new_run = atoi(arg_vet[i+1]);
-        if(new_run>1)
+        int new_sim = atoi(arg_vet[i+1]);
+        if(new_sim>1)
 	{
-          TGlobalParams::simulation_time = new_run;
+          TGlobalParams::simulation_time = new_sim;
           i+=2;
         }
         else badArgument(arg_vet[i+1], arg_vet[i]);
