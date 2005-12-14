@@ -1,5 +1,6 @@
 TODO
 ---------------------------------------
+- solve mesh dimension related bugs
 - add selection strategies based on buffer level
 - processing element traffic generation
 - power/energy model

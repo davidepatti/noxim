@@ -33,6 +33,10 @@ SC_MODULE(TRouter)
   sc_out<uint>       buffer_level[DIRECTIONS+1];
   sc_in<uint>        buffer_level_neighbor[DIRECTIONS+1];
 
+  // Neighbor-on-Path related I/O
+  sc_out<TNOP_data>       NOP_data_out[DIRECTIONS];
+  sc_in<TNOP_data>        NOP_data_in[DIRECTIONS];
+
   // Registers
 
   /*
@@ -92,6 +96,8 @@ SC_MODULE(TRouter)
   vector<int> routingLookAhead(const TCoord& current, const TCoord& destination);
   vector<int> routingNoPCAR(const TCoord& current, const TCoord& destination);
   vector<int> routingFullyAdaptive(const TCoord& current, const TCoord& destination);
+  TNOP_data getCurrentNOPData() const;
+  void NoPCAR_report() const;
 };
 
 #endif
