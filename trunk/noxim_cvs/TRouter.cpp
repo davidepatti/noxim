@@ -131,6 +131,20 @@ void TRouter::txProcess()
 
 //---------------------------------------------------------------------------
 
+TNOP_data TRouter::getCurrentNOPData() const 
+{
+    TNOP_data NOP_data;
+
+    for (int j=0; j<DIRECTIONS; j++)
+	NOP_data.buffer_level_neighbor[j] = buffer_level_neighbor[j];
+
+    NOP_data.sender_id = id;
+
+    return NOP_data;
+}
+
+//---------------------------------------------------------------------------
+
 void TRouter::bufferMonitor()
 {
   if (reset.read())
@@ -139,7 +153,19 @@ void TRouter::bufferMonitor()
     }
   else
   {
-      for (int i=0; i<DIRECTIONS+1; i++) buffer_level[i].write(buffer[i].Size());
+      for (int i=0; i<DIRECTIONS+1; i++) 
+	  buffer_level[i].write(buffer[i].Size());
+
+      // NOPCAR 
+      // send neighbor info to each direction 'i'
+      TNOP_data current_NOP_data = getCurrentNOPData();
+
+      for (int i=0; i<DIRECTIONS; i++)
+	  NOP_data_out[i].write(current_NOP_data);
+
+#if 0
+      NoPCAR_report();
+#endif
   }
 }
 
@@ -190,9 +216,28 @@ int TRouter::routing(int src_id, int dst_id)
 
 //---------------------------------------------------------------------------
 
+void TRouter::NoPCAR_report() const
+{
+    TNOP_data NOP_tmp;
+      cout << sc_simulation_time() << ": Router[" << id << "], NOPCAR report: " << endl;
+
+      for (int i=0;i<DIRECTIONS; i++) 
+      {
+	  NOP_tmp = NOP_data_in[i].read();
+	  cout << "   NoP data from [" << NOP_tmp.sender_id << "] ( ";
+	  for (int j=0; j<DIRECTIONS; j++)
+	      cout << NOP_tmp.buffer_level_neighbor[j] << " ";
+	  cout << ")" << endl;
+      }
+}
+//---------------------------------------------------------------------------
+
 int TRouter::selectionNoPCAR(const vector<int>& directions)
 {
     assert(false);
+
+    // TODO: selection not implemented 
+    return directions[rand() % directions.size()]; 
 }
 
 //---------------------------------------------------------------------------

@@ -76,10 +76,30 @@ void TNoC::buildMesh()
 	  t[i][j]->buffer_level_neighbor[DIRECTION_SOUTH](buffer_level_to_north[i][j+1]);
 	  t[i][j]->buffer_level_neighbor[DIRECTION_WEST](buffer_level_to_east[i][j]);
 
+	  // NOPCAR 
+
+	  t[i][j]->NOP_data_out[DIRECTION_NORTH](NOP_data_to_north[i][j]);
+	  t[i][j]->NOP_data_out[DIRECTION_EAST](NOP_data_to_east[i+1][j]);
+	  t[i][j]->NOP_data_out[DIRECTION_SOUTH](NOP_data_to_south[i][j+1]);
+	  t[i][j]->NOP_data_out[DIRECTION_WEST](NOP_data_to_west[i][j]);
+
+	  t[i][j]->NOP_data_in[DIRECTION_NORTH](NOP_data_to_south[i][j]);
+	  t[i][j]->NOP_data_in[DIRECTION_EAST](NOP_data_to_west[i+1][j]);
+	  t[i][j]->NOP_data_in[DIRECTION_SOUTH](NOP_data_to_north[i][j+1]);
+	  t[i][j]->NOP_data_in[DIRECTION_WEST](NOP_data_to_east[i][j]);
 	}
     }
 
   // Clear the inputs on the borders
+
+  // dummy empty TNOP_data structure
+  TNOP_data NOP_tmp;
+  for (int i=0; i<DIRECTIONS; i++)
+  {
+      NOP_tmp.sender_id = INVALID_ID;
+      NOP_tmp.buffer_level_neighbor[i] = 0;
+  }
+
   for(int i=0; i<=TGlobalParams::mesh_dim_x; i++)
     {
       req_to_south[i][0] = 0;
@@ -89,6 +109,20 @@ void TNoC::buildMesh()
 
       buffer_level_to_south[i][0] = 0;
       buffer_level_to_north[i][TGlobalParams::mesh_dim_y] = 0;
+
+      /*
+      // NOPCAR
+      NOP_data_to_south[i][0].sender_id = INVALID_ID; 
+      NOP_data_to_north[i][TGlobalParams::mesh_dim_y].sender_id = INVALID_ID;
+
+      for(int k=0; k<DIRECTIONS; k++)
+      {
+	  NOP_data_to_south[i][0].buffer_level_neighbor[k] = 0;
+	  NOP_data_to_north[i][TGlobalParams::mesh_dim_y].buffer_level_neighbor[k] = 0;
+      }
+      */
+      NOP_data_to_south[i][0] = NOP_tmp;
+      NOP_data_to_north[i][TGlobalParams::mesh_dim_y] = NOP_tmp;
     }
   for(int j=0; j<=TGlobalParams::mesh_dim_y; j++)
     {
@@ -99,6 +133,20 @@ void TNoC::buildMesh()
 
       buffer_level_to_east[0][j] = 0;
       buffer_level_to_west[TGlobalParams::mesh_dim_x][j] = 0;
+
+      // NOPCAR
+      /*
+      NOP_data_to_east[0][j].sender_id = INVALID_ID;
+      NOP_data_to_west[TGlobalParams::mesh_dim_x][j].sender_id = INVALID_ID;
+      for(int k=0; k<DIRECTIONS; k++)
+      {
+	  NOP_data_to_east[0][j].buffer_level_neighbor[k] = 0;
+	  NOP_data_to_west[TGlobalParams::mesh_dim_x][j].buffer_level_neighbor[k] = 0;
+      }
+      */
+      NOP_data_to_east[0][j] = NOP_tmp;
+      NOP_data_to_west[TGlobalParams::mesh_dim_x][j] = NOP_tmp;
+
     }
 }
 

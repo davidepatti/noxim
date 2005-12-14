@@ -26,6 +26,9 @@
 #define CHANNEL_HAS_TAIL      2
 #define CHANNEL_NOT_RESERVED -1
 
+// To mark invalid/non exhistent nodes
+#define INVALID_ID           -1
+
 // Routing algorithms
 #define XY                    0
 #define WEST_FIRST            1
@@ -119,6 +122,21 @@ struct TPacket
   int                flit_left;    // Number of remaining flits inside the packet
 };
 
+struct TNOP_data
+{
+    int sender_id;
+    uint buffer_level_neighbor[DIRECTIONS];
+
+    inline bool operator == (const TNOP_data& nop_data) const
+    {
+	return ( sender_id!=nop_data.sender_id &&
+	         nop_data.buffer_level_neighbor[0]!=buffer_level_neighbor[0] &&
+	         nop_data.buffer_level_neighbor[1]!=buffer_level_neighbor[1] &&
+	         nop_data.buffer_level_neighbor[2]!=buffer_level_neighbor[2] &&
+	         nop_data.buffer_level_neighbor[3]!=buffer_level_neighbor[3]);
+    };
+};
+
 // TFlit -- Flit definition
 struct TFlit
 {
@@ -161,12 +179,17 @@ inline ostream& operator << (ostream& os, const TFlit& flit)
   os << "flit " << flit.sequence_no << " (" << flit.src_coord.x << "," << flit.src_coord.y << ") --> (" 
      << flit.dst_coord.x << "," << flit.dst_coord.y << ")"; 
   */
-  os << "[flit seq=" << flit.sequence_no << ", " << flit.src_id << "-->" 
-     << flit.dst_id << "]"; 
+  os << "[flit seq=" << flit.sequence_no << ", " << flit.src_id << "-->" << flit.dst_id << "]"; 
 
   return os;
 }
 
+inline ostream& operator << (ostream& os, const TNOP_data& NOP_data)
+{
+    // TODO: complete this
+  os << "[sender_id =" << NOP_data.sender_id << "]"; 
+  return os;
+}
 inline void sc_trace(sc_trace_file*& tf, const TFlit& flit, std::string& name)
 {
   /*
@@ -180,6 +203,12 @@ inline void sc_trace(sc_trace_file*& tf, const TFlit& flit, std::string& name)
   sc_trace(tf, flit.sequence_no, name+".sequence_no");
   sc_trace(tf, flit.timestamp, name+".timestamp");
   sc_trace(tf, flit.hop_no, name+".hop_no");
+}
+
+inline void sc_trace(sc_trace_file*& tf, const TNOP_data& NOP_data, std::string& name)
+{
+    // TODO: really need to trace all fields ?
+  sc_trace(tf, NOP_data.sender_id, name+".sender_id");
 }
 
 inline TCoord id2Coord(int id) 
