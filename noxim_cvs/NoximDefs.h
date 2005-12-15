@@ -39,6 +39,7 @@
 #define LOOK_AHEAD            6
 #define NOPCAR                7
 #define FULLY_ADAPTIVE        8
+#define RTABLE_BASED          9
 
 // Selection strategies
 #define SEL_RANDOM            0
@@ -190,6 +191,7 @@ inline ostream& operator << (ostream& os, const TNOP_data& NOP_data)
   os << "[sender_id =" << NOP_data.sender_id << "]"; 
   return os;
 }
+
 inline void sc_trace(sc_trace_file*& tf, const TFlit& flit, std::string& name)
 {
   /*
@@ -221,6 +223,15 @@ inline TCoord id2Coord(int id)
   assert(coord.y < TGlobalParams::mesh_dim_y);
 
   return coord;
+}
+
+inline int coord2Id(const TCoord& coord) 
+{
+  int id = (coord.y * TGlobalParams::mesh_dim_x) + coord.x;
+
+  assert(id < TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y);
+
+  return id;
 }
 
 #endif  // NOXIMDEFS_H
