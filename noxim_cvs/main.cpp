@@ -9,16 +9,20 @@
 #include "TNoC.h"
 #include "TGlobalStats.h"
 
+using namespace std;
+
 //---------------------------------------------------------------------------
 
 // Initialize global configuration parameters (can be overridden with command-line arguments)
 int TGlobalParams::verbose_mode            = DEFAULT_VERBOSE_MODE;
 int TGlobalParams::trace_mode              = DEFAULT_TRACE_MODE;
+char TGlobalParams::trace_filename[50]     = DEFAULT_TRACE_FILENAME;
 int TGlobalParams::mesh_dim_x              = DEFAULT_MESH_DIM_X;
 int TGlobalParams::mesh_dim_y              = DEFAULT_MESH_DIM_Y;
 int TGlobalParams::buffer_depth            = DEFAULT_BUFFER_DEPTH;
 int TGlobalParams::max_packet_size         = DEFAULT_MAX_PACKET_SIZE;
 int TGlobalParams::routing_algorithm       = DEFAULT_ROUTING_ALGORITHM;
+char TGlobalParams::rtable_filename[50]    = DEFAULT_RTABLE_FILENAME;
 int TGlobalParams::selection_strategy      = DEFAULT_SELECTION_STRATEGY;
 float TGlobalParams::packet_injection_rate = DEFAULT_PACKET_INJECTION_RATE;
 int TGlobalParams::simulation_time         = DEFAULT_SIMULATION_TIME;
@@ -30,14 +34,27 @@ void showHelp(char selfname[])
   cout << "Usage: " << selfname << " [options]\nwhere [options] is one or more of the following ones:" << endl;
   cout << "\t-help\t\tShow this help and exit" << endl;
   cout << "\t-verbose\tVerbose output (default off)" << endl;
-  cout << "\t-trace\t\tTrace signals to VCD file named 'trace.vcd' (default off)" << endl;
+  cout << "\t-trace FILENAME\tTrace signals to a VCD file named 'FILENAME.vcd' (default off, filename is mandatory)" << endl;
   cout << "\t-dimx N\t\tSet the mesh X dimension to the specified integer value (default " << DEFAULT_MESH_DIM_X << ")" << endl;
   cout << "\t-dimy N\t\tSet the mesh Y dimension to the specified integer value (default " << DEFAULT_MESH_DIM_Y << ")" << endl;
   cout << "\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value [flits] (default " << DEFAULT_BUFFER_DEPTH << ")" << endl;
   cout << "\t-size N\t\tSet the maximum packet size to the specified integer value [flits] (default " << DEFAULT_MAX_PACKET_SIZE << ")" << endl;
-  cout << "\t-routing {xy|westfirst|northlast|negativefirst|oddeven|dyad|lookahead|nopcar|fullyadaptive}\tSet routing algorithm (default " << DEFAULT_ROUTING_ALGORITHM << ")" << endl;
-  cout << "\t-sel {random|bufferlevel|nopcar}\tSet selection strategy (default " << DEFAULT_SELECTION_STRATEGY << ")" << endl;
-  cout << "\t-pir R\t\tSet the packet injection rate to the specified real value [%] (default " << DEFAULT_PACKET_INJECTION_RATE << ")" << endl;
+  cout << "\t-routing TYPE\tSet the routing algorithm to TYPE where TYPE is one of the following (default " << DEFAULT_ROUTING_ALGORITHM+1 << "'):" << endl;
+  cout << "\t\txy\t\tXY routing algorithm" << endl;
+  cout << "\t\twestfirst\tWest-First routing algorithm" << endl;
+  cout << "\t\tnorthlast\tNorth-Last routing algorithm" << endl;
+  cout << "\t\tnegativefirst\tNegative-First routing algorithm" << endl;
+  cout << "\t\toddeven\t\tOdd-Even routing algorithm" << endl;
+  cout << "\t\tdyad\t\tDyad routing algorithm" << endl;
+  cout << "\t\tlookahead\tLook-Ahead routing algorithm" << endl;
+  cout << "\t\tnopcar\t\tNopcar routing algorithm" << endl;
+  cout << "\t\tfullyadaptive\tFully-Adaptive routing algorithm" << endl;
+  cout << "\t\trtable FILENAME\tRouting Table Based routing algorithm with table in the specified file (mandatory)" << endl;
+  cout << "\t-sel TYPE\tSet the selection strategy to TYPE where TYPE is one of the following (default " << DEFAULT_SELECTION_STRATEGY+1 << "'):" << endl;
+  cout << "\t\trandom\t\tRandom selection strategy" << endl;
+  cout << "\t\tbufferlevel\tBuffer-Level Based selection strategy" << endl;
+  cout << "\t\tnopcar\t\tNopcar selection strategy" << endl;
+  cout << "\t-pir R\t\tSet the packet injection rate to the specified real value [0..1] (default " << DEFAULT_PACKET_INJECTION_RATE << ")" << endl;
   cout << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << DEFAULT_SIMULATION_TIME << ")" << endl << endl;
   cout << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <mpalesi@diit.unict.it>" << endl;
   cout << "If you find this program useless please feel free to complain with Davide Patti <dpatti@diit.unict.it>" << endl;
@@ -52,11 +69,13 @@ void showConfig()
   cout << "Using the following configuration: " << endl;
   cout << "verbose_mode = " << TGlobalParams::verbose_mode << endl;
   cout << "trace_mode = " << TGlobalParams::trace_mode << endl;
+  //  cout << "trace_filename = " << TGlobalParams::trace_filename << endl;
   cout << "mesh_dim_x = " << TGlobalParams::mesh_dim_x << endl;
   cout << "mesh_dim_y = " << TGlobalParams::mesh_dim_y << endl;
   cout << "buffer_depth = " << TGlobalParams::buffer_depth << endl;
   cout << "max_packet_size = " << TGlobalParams::max_packet_size << endl;
   cout << "routing_algorithm = " << TGlobalParams::routing_algorithm << endl;
+  //  cout << "rtable_filename = " << TGlobalParams::rtable_filename << endl;
   cout << "selection_strategy = " << TGlobalParams::selection_strategy << endl;
   cout << "packet_injection_rate = " << TGlobalParams::packet_injection_rate << endl;
   cout << "simulation_time = " << TGlobalParams::simulation_time << endl;
@@ -112,7 +131,8 @@ int sc_main(int arg_num, char* arg_vet[])
       else if(!strcmp(arg_vet[i],"-trace"))
       {
         TGlobalParams::trace_mode = true;
-        i++;
+        strcpy(TGlobalParams::trace_filename, arg_vet[i+1]);
+        i+=2;
       }
       else if(!strcmp(arg_vet[i],"-dimx"))
       {
@@ -165,6 +185,12 @@ int sc_main(int arg_num, char* arg_vet[])
         else if(!strcmp(arg_vet[i+1],"lookahead")) TGlobalParams::routing_algorithm = LOOK_AHEAD;
         else if(!strcmp(arg_vet[i+1],"nopcar")) TGlobalParams::routing_algorithm = NOPCAR;
         else if(!strcmp(arg_vet[i+1],"fullyadaptive")) TGlobalParams::routing_algorithm = FULLY_ADAPTIVE;
+        else if(!strcmp(arg_vet[i+1],"rtable"))
+	{
+          TGlobalParams::routing_algorithm = RTABLE_BASED;
+          strcpy(TGlobalParams::rtable_filename, arg_vet[i+2]);
+          i++;
+        }
         else badArgument(arg_vet[i+1], arg_vet[i]);
         i+=2;
       }
@@ -202,10 +228,10 @@ int sc_main(int arg_num, char* arg_vet[])
   showConfig();
 
   // Trace signals
-  sc_trace_file* tf;
+  sc_trace_file* tf = NULL;
   if(TGlobalParams::trace_mode)
   {
-    tf = sc_create_vcd_trace_file("trace");
+    tf = sc_create_vcd_trace_file(TGlobalParams::trace_filename);
     sc_trace(tf, reset, "reset");
     sc_trace(tf, clock, "clock");
 

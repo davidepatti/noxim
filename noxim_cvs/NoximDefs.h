@@ -12,6 +12,8 @@
 #include <cassert>
 #include <systemc.h>
 
+using namespace std;
+
 // Define the directions as numbers
 #define DIRECTIONS      4
 #define DIRECTION_NORTH 0
@@ -51,11 +53,13 @@
 // Default configuration can be overridden with command-line arguments
 #define DEFAULT_VERBOSE_MODE               false
 #define DEFAULT_TRACE_MODE                 false
+#define DEFAULT_TRACE_FILENAME                ""
 #define DEFAULT_MESH_DIM_X                     4
 #define DEFAULT_MESH_DIM_Y                     4
 #define DEFAULT_BUFFER_DEPTH                   4
 #define DEFAULT_MAX_PACKET_SIZE               10
 #define DEFAULT_ROUTING_ALGORITHM             XY
+#define DEFAULT_RTABLE_FILENAME               ""
 #define DEFAULT_SELECTION_STRATEGY    SEL_RANDOM
 #define DEFAULT_PACKET_INJECTION_RATE       0.01
 #define DEFAULT_SIMULATION_TIME            10000
@@ -66,11 +70,13 @@ class TGlobalParams
 public:
   static int verbose_mode;
   static int trace_mode;
+  static char trace_filename[50];
   static int mesh_dim_x;
   static int mesh_dim_y;
   static int buffer_depth;
   static int max_packet_size;
   static int routing_algorithm;
+  static char rtable_filename[50];
   static int selection_strategy;
   static float packet_injection_rate;
   static int simulation_time;
@@ -192,7 +198,7 @@ inline ostream& operator << (ostream& os, const TNOP_data& NOP_data)
   return os;
 }
 
-inline void sc_trace(sc_trace_file*& tf, const TFlit& flit, std::string& name)
+inline void sc_trace(sc_trace_file*& tf, const TFlit& flit, string& name)
 {
   /*
   sc_trace(tf, flit.src_coord.x, name+".src_coord.x");
@@ -207,7 +213,7 @@ inline void sc_trace(sc_trace_file*& tf, const TFlit& flit, std::string& name)
   sc_trace(tf, flit.hop_no, name+".hop_no");
 }
 
-inline void sc_trace(sc_trace_file*& tf, const TNOP_data& NOP_data, std::string& name)
+inline void sc_trace(sc_trace_file*& tf, const TNOP_data& NOP_data, string& name)
 {
     // TODO: really need to trace all fields ?
   sc_trace(tf, NOP_data.sender_id, name+".sender_id");
