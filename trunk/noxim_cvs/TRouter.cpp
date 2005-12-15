@@ -93,7 +93,7 @@ void TRouter::txProcess()
 
 		if (flit.flit_type==FLIT_TYPE_HEAD) 
 		{
-		    dest = routing(flit.src_id, flit.dst_id);
+		    dest = routing(i, flit.src_id, flit.dst_id);
 		    if (reservation_table[dest] == CHANNEL_NOT_RESERVED) 
 		    {
 			short_circuit[i] = dest;     // crossbar: link input i to output dest 
@@ -171,7 +171,7 @@ void TRouter::bufferMonitor()
 
 //---------------------------------------------------------------------------
 
-int TRouter::routing(int src_id, int dst_id)
+int TRouter::routing(int dir_in, int src_id, int dst_id)
 {
   if (dst_id == id)
     return DIRECTION_LOCAL;
@@ -208,6 +208,9 @@ int TRouter::routing(int src_id, int dst_id)
       
     case FULLY_ADAPTIVE:
       return selectionFunction(routingFullyAdaptive(position, dst_coord));
+
+    case RTABLE_BASED:
+      return selectionFunction(routingRTableBased(dir_in, position, dst_coord));
 
     default:
       assert(false);
@@ -518,10 +521,24 @@ vector<int> TRouter::routingFullyAdaptive(const TCoord& current, const TCoord& d
 
 //---------------------------------------------------------------------------
 
-void TRouter::setId(int _id)
+vector<int> TRouter::routingRTableBased(const int dir_in, const TCoord& current, const TCoord& destination)
+{
+  TAdmissibleOutputs ao = rtable.getAdmissibleOutputs(dir_in, coord2Id(destination));
+
+  assert(ao.size() > 0);
+  
+  return admissibleOutputsSet2Vector(ao);
+}
+
+//---------------------------------------------------------------------------
+
+void TRouter::configure(int _id, TGlobalRoutingTable& grt)
 {
   id = _id;
   stats.setId(_id);
+  
+  if (grt.isValid())
+    grt.getNodeRoutingTable(_id);
 }
 
 //---------------------------------------------------------------------------

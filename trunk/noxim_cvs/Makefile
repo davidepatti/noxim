@@ -8,7 +8,7 @@ CFLAGS = $(OPT) $(OTHER)
 
 MODULE = run
 SRCS = TNoC.cpp TRouter.cpp TProcessingElement.cpp TBuffer.cpp TStats.cpp \
-	TGlobalStats.cpp main.cpp
+	TGlobalStats.cpp TGlobalRoutingTable.cpp TLocalRoutingTable.cpp main.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 include ./Makefile.defs

@@ -5,12 +5,19 @@
  *****************************************************************************/
 
 #include "TNoC.h"
+#include "TGlobalRoutingTable.h"
 
 //---------------------------------------------------------------------------
 
 
 void TNoC::buildMesh()
 {
+  // Check for routing table availability
+  TGlobalRoutingTable grtable;
+  
+  if (TGlobalParams::routing_algorithm == RTABLE_BASED)
+    assert(grtable.load("filename"));
+
   // Create the mesh as a matrix of tiles
   for(int i=0; i<TGlobalParams::mesh_dim_x; i++)
     {
@@ -22,7 +29,8 @@ void TNoC::buildMesh()
 	  t[i][j] = new TTile(tile_name);
 
 	  // Tell to the router its coordinates
-	  t[i][j]->r->setId(j * TGlobalParams::mesh_dim_x + i);
+	  t[i][j]->r->configure(j * TGlobalParams::mesh_dim_x + i,
+				grtable);
 
 	  // Tell to the PE its coordinates
 	  t[i][j]->pe->id = j * TGlobalParams::mesh_dim_x + i;

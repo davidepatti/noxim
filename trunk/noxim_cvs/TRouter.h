@@ -13,6 +13,8 @@
 #include "NoximDefs.h"
 #include "TBuffer.h"
 #include "TStats.h"
+#include "TGlobalRoutingTable.h"
+#include "TLocalRoutingTable.h"
 
 SC_MODULE(TRouter)
 {
@@ -53,13 +55,15 @@ SC_MODULE(TRouter)
   int                reservation_table[DIRECTIONS+1]; // Output channels reservations
   int                short_circuit[DIRECTIONS+1];     // Crossbar I/O connections
   TStats             stats;                           // Statistics
+  TLocalRoutingTable rtable;                          // Routing table
+
 
   // Functions
 
   void               rxProcess();        // The receiving process
   void               txProcess();        // The transmitting process
   void               bufferMonitor();
-  void               setId(int _id);     // Set unique ID
+  void               configure(int _id, TGlobalRoutingTable& grt);
 
   // Constructor
 
@@ -80,7 +84,7 @@ SC_MODULE(TRouter)
 
  private:
 
-  int routing(int src_id, int dst_id);
+  int routing(int dir_in, int src_id, int dst_id);
 
   int selectionFunction(const vector<int>& directions);
   int selectionRandom(const vector<int>& directions);
@@ -96,6 +100,7 @@ SC_MODULE(TRouter)
   vector<int> routingLookAhead(const TCoord& current, const TCoord& destination);
   vector<int> routingNoPCAR(const TCoord& current, const TCoord& destination);
   vector<int> routingFullyAdaptive(const TCoord& current, const TCoord& destination);
+  vector<int> routingRTableBased(const int dir_in, const TCoord& current, const TCoord& destination);
   TNOP_data getCurrentNOPData() const;
   void NoPCAR_report() const;
 };
