@@ -118,6 +118,7 @@ TPacket TProcessingElement::nextPacket()
 {
   TPacket p;
   p.src_id = id;
+  TCoord src,dst;
 
   switch(TGlobalParams::traffic_distribution)
   {
@@ -126,6 +127,39 @@ TPacket TProcessingElement::nextPacket()
         p.dst_id = rand() % (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y);
       } while(p.dst_id==p.src_id);
       break;
+
+    case TRAFFIC_TRANSPOSE1:
+      src.x = id2Coord(p.src_id).x;
+      src.y = id2Coord(p.src_id).y;
+      dst.x = TGlobalParams::mesh_dim_x-1-src.y;
+      dst.y = TGlobalParams::mesh_dim_y-1-src.x;
+
+      // Fix ranges
+      if(dst.x<0) dst.x=0;
+      if(dst.y<0) dst.y=0;
+      if(dst.x>=TGlobalParams::mesh_dim_x) dst.x=TGlobalParams::mesh_dim_x-1;
+      if(dst.y>=TGlobalParams::mesh_dim_y) dst.y=TGlobalParams::mesh_dim_y-1;
+
+      p.dst_id = coord2Id(dst);
+      break;
+
+    case TRAFFIC_TRANSPOSE2:
+      src.x = id2Coord(p.src_id).x;
+      src.y = id2Coord(p.src_id).y;
+      dst.x = src.y;
+      dst.y = src.x;
+
+      // Fix ranges
+      if(dst.x<0) dst.x=0;
+      if(dst.y<0) dst.y=0;
+      if(dst.x>=TGlobalParams::mesh_dim_x) dst.x=TGlobalParams::mesh_dim_x-1;
+      if(dst.y>=TGlobalParams::mesh_dim_y) dst.y=TGlobalParams::mesh_dim_y-1;
+
+      p.dst_id = coord2Id(dst);
+      break;
+
+    default:
+      assert(false);
   }
 
   p.timestamp = sc_simulation_time();
