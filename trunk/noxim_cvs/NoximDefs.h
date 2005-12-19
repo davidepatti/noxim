@@ -48,6 +48,11 @@ using namespace std;
 #define SEL_BUFFER_LEVEL      1
 #define SEL_NOPCAR            2
 
+// Traffic distribution
+#define TRAFFIC_UNIFORM       0
+#define TRAFFIC_TRANSPOSE1    1
+#define TRAFFIC_TRANSPOSE2    2
+
 //---------------------------------------------------------------------------
 
 // Default configuration can be overridden with command-line arguments
@@ -62,6 +67,7 @@ using namespace std;
 #define DEFAULT_RTABLE_FILENAME               ""
 #define DEFAULT_SELECTION_STRATEGY    SEL_RANDOM
 #define DEFAULT_PACKET_INJECTION_RATE       0.01
+#define DEFAULT_TRAFFIC_DISTRIBUTION TRAFFIC_UNIFORM
 #define DEFAULT_SIMULATION_TIME            10000
 
 // TGlobalParams -- used to forward configuration to every sub-block
@@ -79,6 +85,7 @@ public:
   static char rtable_filename[50];
   static int selection_strategy;
   static float packet_injection_rate;
+  static int traffic_distribution;
   static int simulation_time;
 };
 

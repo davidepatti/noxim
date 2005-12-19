@@ -25,6 +25,7 @@ int TGlobalParams::routing_algorithm       = DEFAULT_ROUTING_ALGORITHM;
 char TGlobalParams::rtable_filename[50]    = DEFAULT_RTABLE_FILENAME;
 int TGlobalParams::selection_strategy      = DEFAULT_SELECTION_STRATEGY;
 float TGlobalParams::packet_injection_rate = DEFAULT_PACKET_INJECTION_RATE;
+int TGlobalParams::traffic_distribution    = DEFAULT_TRAFFIC_DISTRIBUTION;
 int TGlobalParams::simulation_time         = DEFAULT_SIMULATION_TIME;
 
 //---------------------------------------------------------------------------
@@ -274,16 +275,16 @@ int sc_main(int arg_num, char* arg_vet[])
 
   // Reset the chip and run the simulation
   reset.write(1);
-  cout << "Reset asserted... cleaning up registers" << endl;
+  cout << "Reset...";
   srand(time(NULL));
   sc_start(1000, SC_NS);                                 // 1000 ns reset time
   reset.write(0);
-  cout << "Reset deasserted... Fiat Lux!!!" << endl;
+  cout << " done! Now running..." << endl;
   sc_start(TGlobalParams::simulation_time, SC_NS);       // Run simulation
 
   // Close the simulation
   if(TGlobalParams::trace_mode) sc_close_vcd_trace_file(tf);
-  cout << "Simulation completed successfully!" << endl;
+  cout << "Noxim simulation completed." << endl;
 
   // Show statistics
   TGlobalStats gs(n);

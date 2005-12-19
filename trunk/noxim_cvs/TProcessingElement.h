@@ -43,9 +43,8 @@ SC_MODULE(TProcessingElement)
   void                rxProcess();          // The receiving process
   void                txProcess();          // The transmitting process
   int                 probabilityShot();    // The probability to send a new flit
-  TFlit               nextFlit();           // Take next flit
-  TPacket             randomPacket();       // Create a new random flit
-
+  TPacket             nextPacket();         // Create a new packet
+  TFlit               nextFlit();           // Take the next flit of the current packet
 
   // Constructor
 

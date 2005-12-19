@@ -49,9 +49,10 @@ double TGlobalStats::getAverageDelay(const int src_id, const int dst_id)
 
 void TGlobalStats::showStats(std::ostream& out)
 {
-  for (int y=0; y<TGlobalParams::mesh_dim_y; y++)
-    for (int x=0; x<TGlobalParams::mesh_dim_x; x++)
-      noc->t[x][y]->r->stats.showStats(out);
+  if(TGlobalParams::verbose_mode)
+    for (int y=0; y<TGlobalParams::mesh_dim_y; y++)
+      for (int x=0; x<TGlobalParams::mesh_dim_x; x++)
+        noc->t[x][y]->r->stats.showStats(out);
 
   out << "% Global average delay: " << getAverageDelay() << endl;
 }
