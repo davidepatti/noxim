@@ -39,35 +39,26 @@ void TProcessingElement::txProcess()
   else
   {
     if (probabilityShot())
-      packet_queue.push(randomPacket());
+      packet_queue.push(nextPacket());
     
     if (ack_tx.read() == current_level_tx)
       {
 	if (!packet_queue.empty())
 	  {
-	    TFlit flit = nextFlit();
-
-	    flit_tx->write(flit);                     // Send the random flit
-	    current_level_tx = 1-current_level_tx;         // Negate the old value for Alternating Bit Protocol (ABP)
+	    TFlit flit = nextFlit();                  // Generate a new flit
+	    flit_tx->write(flit);                     // Send the generated flit
+	    current_level_tx = 1-current_level_tx;    // Negate the old value for Alternating Bit Protocol (ABP)
 	    req_tx.write(current_level_tx);
 	  }    
 	    
       }
 	
-      /*
-      TFlit* flit_tmp = randomFlit();                // Calculate a new random flit
-
-      flit_tx->write(*flit_tmp);                     // Send the random flit
-      current_level_tx = 1-current_level_tx;         // Negate the old value for Alternating Bit Protocol (ABP)
-      req_tx.write(current_level_tx);
-      */
   }
 }
 
 TFlit TProcessingElement::nextFlit()
 {
   TFlit   flit;
-
   TPacket packet = packet_queue.front();
 
   flit.src_id      = packet.src_id;
@@ -98,8 +89,6 @@ int TProcessingElement::probabilityShot()
 
   return false;
   
-
-  
   /*---------------- wormhole test ---------------*/
 //   static int s1 = 0;
 //   static int s2 = 0;
@@ -125,34 +114,22 @@ int TProcessingElement::probabilityShot()
 }
 
 
-TPacket TProcessingElement::randomPacket()
+TPacket TProcessingElement::nextPacket()
 {
-  // TODO: non deve autoimpupettarsi!
-
   TPacket p;
-
   p.src_id = id;
 
-  p.dst_id = rand() % (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y);
-
-  if(TGlobalParams::verbose_mode)
+  switch(TGlobalParams::traffic_distribution)
   {
-    if (p.src_id == p.dst_id) cout << "PE " << id << " AUTOIMPUPPETTATO " << endl;
+    case TRAFFIC_UNIFORM:
+      do {
+        p.dst_id = rand() % (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y);
+      } while(p.dst_id==p.src_id);
+      break;
   }
-  
+
   p.timestamp = sc_simulation_time();
-
   p.size = p.flit_left = 2 + (rand() % TGlobalParams::max_packet_size);
-
-/*
-  TCoord             src_coord;    // The XY coordinates of the source tile
-  TCoord             dst_coord;    // The XY coordinates of the destination tile
-  TFlitType          flit_type;    // The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
-  int                sequence_no;  // The sequence number of the flit inside the packet
-  TPayload           payload;      // Optional payload
-  int                timestamp;    // Unix timestamp at packet generation
-  int                hop_no;       // Current number of hops from source to destination
-*/
   return p;
 }
 
