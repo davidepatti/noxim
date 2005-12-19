@@ -40,11 +40,12 @@ SC_MODULE(TProcessingElement)
 
   // Functions
 
-  void                rxProcess();          // The receiving process
-  void                txProcess();          // The transmitting process
-  int                 probabilityShot();    // The probability to send a new flit
-  TPacket             nextPacket();         // Create a new packet
-  TFlit               nextFlit();           // Take the next flit of the current packet
+  void                rxProcess();                       // The receiving process
+  void                txProcess();                       // The transmitting process
+  int                 probabilityShot();                 // The probability to send a new packet
+  TFlit               nextFlit();                        // Take the next flit of the current packet
+  TPacket             nextPacket();                      // Create a new packet
+  void                fixRanges(const TCoord, TCoord&);  // Fix the ranges of the destination
 
   // Constructor
 
