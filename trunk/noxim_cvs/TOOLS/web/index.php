@@ -63,6 +63,11 @@
   }
 ?>
 </select></td></tr>
+<tr><th>Traffic Distribution</th><td><select name="traffic">
+  <option value="uniform" selected>Uniform (Default)</option>
+  <option value="transpose1">Transpose 1</option>
+  <option value="transpose2">Transpose 2</option>
+</select></td></tr>
 <tr><th>Simulation Time</th><td><select name="sim">
   <option value="5000">5'000 cycles</option>
   <option value="10000" selected>10'000 cycles (Default)</option>
