@@ -2,7 +2,7 @@
   require_once("shared/functions.php");  
   print_header();
 
-  $command = "noxim";
+  $command = "/usr/local/bin/noxim";
   if($_POST["dimx"]>1 && $_POST["dimx"]<=20) $command.=(" -dimx ".$_POST["dimx"]);
   if($_POST["dimy"]>1 && $_POST["dimy"]<=20) $command.=(" -dimy ".$_POST["dimy"]);
   if($_POST["buffer"]>=1 && $_POST["buffer"]<=20) $command.=(" -buffer ".$_POST["buffer"]);
