@@ -32,16 +32,16 @@ using namespace std;
 #define INVALID_ID           -1
 
 // Routing algorithms
-#define XY                    0
-#define WEST_FIRST            1
-#define NORTH_LAST            2
-#define NEGATIVE_FIRST        3
-#define ODD_EVEN              4
-#define DYAD                  5
-#define LOOK_AHEAD            6
-#define NOPCAR                7
-#define FULLY_ADAPTIVE        8
-#define RTABLE_BASED          9
+#define ROUTING_XY             0
+#define ROUTING_WEST_FIRST     1
+#define ROUTING_NORTH_LAST     2
+#define ROUTING_NEGATIVE_FIRST 3
+#define ROUTING_ODD_EVEN       4
+#define ROUTING_DYAD           5
+#define ROUTING_LOOK_AHEAD     6
+#define ROUTING_NOPCAR         7
+#define ROUTING_FULLY_ADAPTIVE 8
+#define ROUTING_RTABLE_BASED   9
 
 // Selection strategies
 #define SEL_RANDOM            0
@@ -56,19 +56,19 @@ using namespace std;
 //---------------------------------------------------------------------------
 
 // Default configuration can be overridden with command-line arguments
-#define DEFAULT_VERBOSE_MODE               false
-#define DEFAULT_TRACE_MODE                 false
-#define DEFAULT_TRACE_FILENAME                ""
-#define DEFAULT_MESH_DIM_X                     4
-#define DEFAULT_MESH_DIM_Y                     4
-#define DEFAULT_BUFFER_DEPTH                   4
-#define DEFAULT_MAX_PACKET_SIZE               10
-#define DEFAULT_ROUTING_ALGORITHM             XY
-#define DEFAULT_RTABLE_FILENAME               ""
-#define DEFAULT_SELECTION_STRATEGY    SEL_RANDOM
-#define DEFAULT_PACKET_INJECTION_RATE       0.01
+#define DEFAULT_VERBOSE_MODE                   false
+#define DEFAULT_TRACE_MODE                     false
+#define DEFAULT_TRACE_FILENAME                    ""
+#define DEFAULT_MESH_DIM_X                         4
+#define DEFAULT_MESH_DIM_Y                         4
+#define DEFAULT_BUFFER_DEPTH                       4
+#define DEFAULT_MAX_PACKET_SIZE                   10
+#define DEFAULT_ROUTING_ALGORITHM         ROUTING_XY
+#define DEFAULT_RTABLE_FILENAME                   ""
+#define DEFAULT_SELECTION_STRATEGY        SEL_RANDOM
+#define DEFAULT_PACKET_INJECTION_RATE           0.01
 #define DEFAULT_TRAFFIC_DISTRIBUTION TRAFFIC_UNIFORM
-#define DEFAULT_SIMULATION_TIME            10000
+#define DEFAULT_SIMULATION_TIME                10000
 
 // TGlobalParams -- used to forward configuration to every sub-block
 class TGlobalParams

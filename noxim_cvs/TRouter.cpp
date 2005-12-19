@@ -182,34 +182,34 @@ int TRouter::routing(int dir_in, int src_id, int dst_id)
 
   switch (TGlobalParams::routing_algorithm)
     {
-    case XY:
+    case ROUTING_XY:
       return selectionFunction(routingXY(position, dst_coord));
 
-    case WEST_FIRST:
+    case ROUTING_WEST_FIRST:
       return selectionFunction(routingWestFirst(position, dst_coord));
 
-    case NORTH_LAST:
+    case ROUTING_NORTH_LAST:
       return selectionFunction(routingNorthLast(position, dst_coord));
 
-    case NEGATIVE_FIRST:
+    case ROUTING_NEGATIVE_FIRST:
       return selectionFunction(routingNegativeFirst(position, dst_coord));
 
-    case ODD_EVEN:
+    case ROUTING_ODD_EVEN:
       return selectionFunction(routingOddEven(position, src_coord, dst_coord));
 
-    case DYAD:
+    case ROUTING_DYAD:
       return selectionFunction(routingDyAD(position, dst_coord));
 
-    case LOOK_AHEAD:
+    case ROUTING_LOOK_AHEAD:
       return selectionFunction(routingLookAhead(position, dst_coord));
 
-    case NOPCAR:
+    case ROUTING_NOPCAR:
       return selectionFunction(routingNoPCAR(position, dst_coord));
       
-    case FULLY_ADAPTIVE:
+    case ROUTING_FULLY_ADAPTIVE:
       return selectionFunction(routingFullyAdaptive(position, dst_coord));
 
-    case RTABLE_BASED:
+    case ROUTING_RTABLE_BASED:
       return selectionFunction(routingRTableBased(dir_in, position, dst_coord));
 
     default:

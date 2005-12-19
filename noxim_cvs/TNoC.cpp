@@ -15,7 +15,7 @@ void TNoC::buildMesh()
   // Check for routing table availability
   TGlobalRoutingTable grtable;
   
-  if (TGlobalParams::routing_algorithm == RTABLE_BASED)
+  if (TGlobalParams::routing_algorithm == ROUTING_RTABLE_BASED)
     assert(grtable.load(TGlobalParams::rtable_filename));
 
   // Create the mesh as a matrix of tiles

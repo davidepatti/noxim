@@ -40,7 +40,7 @@ void showHelp(char selfname[])
   cout << "\t-dimy N\t\tSet the mesh Y dimension to the specified integer value (default " << DEFAULT_MESH_DIM_Y << ")" << endl;
   cout << "\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value [flits] (default " << DEFAULT_BUFFER_DEPTH << ")" << endl;
   cout << "\t-size N\t\tSet the maximum packet size to the specified integer value [flits] (default " << DEFAULT_MAX_PACKET_SIZE << ")" << endl;
-  cout << "\t-routing TYPE\tSet the routing algorithm to TYPE where TYPE is one of the following (default " << DEFAULT_ROUTING_ALGORITHM+1 << "'):" << endl;
+  cout << "\t-routing TYPE\tSet the routing algorithm to TYPE where TYPE is one of the following (default " << DEFAULT_ROUTING_ALGORITHM << "):" << endl;
   cout << "\t\txy\t\tXY routing algorithm" << endl;
   cout << "\t\twestfirst\tWest-First routing algorithm" << endl;
   cout << "\t\tnorthlast\tNorth-Last routing algorithm" << endl;
@@ -51,11 +51,15 @@ void showHelp(char selfname[])
   cout << "\t\tnopcar\t\tNopcar routing algorithm" << endl;
   cout << "\t\tfullyadaptive\tFully-Adaptive routing algorithm" << endl;
   cout << "\t\trtable FILENAME\tRouting Table Based routing algorithm with table in the specified file (mandatory)" << endl;
-  cout << "\t-sel TYPE\tSet the selection strategy to TYPE where TYPE is one of the following (default " << DEFAULT_SELECTION_STRATEGY+1 << "'):" << endl;
+  cout << "\t-sel TYPE\tSet the selection strategy to TYPE where TYPE is one of the following (default " << DEFAULT_SELECTION_STRATEGY << "):" << endl;
   cout << "\t\trandom\t\tRandom selection strategy" << endl;
   cout << "\t\tbufferlevel\tBuffer-Level Based selection strategy" << endl;
   cout << "\t\tnopcar\t\tNopcar selection strategy" << endl;
   cout << "\t-pir R\t\tSet the packet injection rate to the specified real value [0..1] (default " << DEFAULT_PACKET_INJECTION_RATE << ")" << endl;
+  cout << "\t-traffic TYPE\tSet the traffic distribution to TYPE where TYPE is one of the following (default " << DEFAULT_TRAFFIC_DISTRIBUTION << "'):" << endl;
+  cout << "\t\tuniform\t\tUniform traffic distribution" << endl;
+  cout << "\t\ttranspose1\tTranspose matrix 1 traffic distribution" << endl;
+  cout << "\t\ttranspose2\tTranspose matrix 2 traffic distribution" << endl;
   cout << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << DEFAULT_SIMULATION_TIME << ")" << endl << endl;
   cout << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <mpalesi@diit.unict.it>" << endl;
   cout << "If you find this program useless please feel free to complain with Davide Patti <dpatti@diit.unict.it>" << endl;
@@ -79,6 +83,7 @@ void showConfig()
   //  cout << "rtable_filename = " << TGlobalParams::rtable_filename << endl;
   cout << "selection_strategy = " << TGlobalParams::selection_strategy << endl;
   cout << "packet_injection_rate = " << TGlobalParams::packet_injection_rate << endl;
+  cout << "traffic_distribution = " << TGlobalParams::traffic_distribution << endl;
   cout << "simulation_time = " << TGlobalParams::simulation_time << endl;
 }
 
@@ -177,18 +182,18 @@ int sc_main(int arg_num, char* arg_vet[])
       }
       else if(!strcmp(arg_vet[i],"-routing"))
       {
-        if(!strcmp(arg_vet[i+1],"xy")) TGlobalParams::routing_algorithm = XY;
-        else if(!strcmp(arg_vet[i+1],"westfirst")) TGlobalParams::routing_algorithm = WEST_FIRST;
-        else if(!strcmp(arg_vet[i+1],"northlast")) TGlobalParams::routing_algorithm = NORTH_LAST;
-        else if(!strcmp(arg_vet[i+1],"negativefirst")) TGlobalParams::routing_algorithm = NEGATIVE_FIRST;
-        else if(!strcmp(arg_vet[i+1],"oddeven")) TGlobalParams::routing_algorithm = ODD_EVEN;
-        else if(!strcmp(arg_vet[i+1],"dyad")) TGlobalParams::routing_algorithm = DYAD;
-        else if(!strcmp(arg_vet[i+1],"lookahead")) TGlobalParams::routing_algorithm = LOOK_AHEAD;
-        else if(!strcmp(arg_vet[i+1],"nopcar")) TGlobalParams::routing_algorithm = NOPCAR;
-        else if(!strcmp(arg_vet[i+1],"fullyadaptive")) TGlobalParams::routing_algorithm = FULLY_ADAPTIVE;
+        if(!strcmp(arg_vet[i+1],"xy")) TGlobalParams::routing_algorithm = ROUTING_XY;
+        else if(!strcmp(arg_vet[i+1],"westfirst")) TGlobalParams::routing_algorithm = ROUTING_WEST_FIRST;
+        else if(!strcmp(arg_vet[i+1],"northlast")) TGlobalParams::routing_algorithm = ROUTING_NORTH_LAST;
+        else if(!strcmp(arg_vet[i+1],"negativefirst")) TGlobalParams::routing_algorithm = ROUTING_NEGATIVE_FIRST;
+        else if(!strcmp(arg_vet[i+1],"oddeven")) TGlobalParams::routing_algorithm = ROUTING_ODD_EVEN;
+        else if(!strcmp(arg_vet[i+1],"dyad")) TGlobalParams::routing_algorithm = ROUTING_DYAD;
+        else if(!strcmp(arg_vet[i+1],"lookahead")) TGlobalParams::routing_algorithm = ROUTING_LOOK_AHEAD;
+        else if(!strcmp(arg_vet[i+1],"nopcar")) TGlobalParams::routing_algorithm = ROUTING_NOPCAR;
+        else if(!strcmp(arg_vet[i+1],"fullyadaptive")) TGlobalParams::routing_algorithm = ROUTING_FULLY_ADAPTIVE;
         else if(!strcmp(arg_vet[i+1],"rtable"))
 	{
-          TGlobalParams::routing_algorithm = RTABLE_BASED;
+          TGlobalParams::routing_algorithm = ROUTING_RTABLE_BASED;
           strcpy(TGlobalParams::rtable_filename, arg_vet[i+2]);
           i++;
         }
@@ -213,6 +218,14 @@ int sc_main(int arg_num, char* arg_vet[])
         }
         else badArgument(arg_vet[i+1], arg_vet[i]);
       }
+      else if(!strcmp(arg_vet[i],"-traffic"))
+      {
+        if(!strcmp(arg_vet[i+1],"uniform")) TGlobalParams::traffic_distribution = TRAFFIC_UNIFORM;
+        else if(!strcmp(arg_vet[i+1],"transpose1")) TGlobalParams::traffic_distribution = TRAFFIC_TRANSPOSE1;
+        else if(!strcmp(arg_vet[i+1],"transpose2")) TGlobalParams::traffic_distribution = TRAFFIC_TRANSPOSE2;
+        else badArgument(arg_vet[i+1], arg_vet[i]);
+        i+=2;
+      }
       else if(!strcmp(arg_vet[i],"-sim"))
       {
         int new_sim = atoi(arg_vet[i+1]);
@@ -226,7 +239,7 @@ int sc_main(int arg_num, char* arg_vet[])
       else badOption(arg_vet[i]);
     } while (i<arg_num);
   }
-  showConfig();
+  if(TGlobalParams::verbose_mode) showConfig();
 
   // Trace signals
   sc_trace_file* tf = NULL;
@@ -279,7 +292,7 @@ int sc_main(int arg_num, char* arg_vet[])
   srand(time(NULL));
   sc_start(1000, SC_NS);                                 // 1000 ns reset time
   reset.write(0);
-  cout << " done! Now running..." << endl;
+  cout << " done! Now running for " << TGlobalParams::simulation_time << " cycles..." << endl;
   sc_start(TGlobalParams::simulation_time, SC_NS);       // Run simulation
 
   // Close the simulation
