@@ -69,6 +69,7 @@ using namespace std;
 #define DEFAULT_PACKET_INJECTION_RATE           0.01
 #define DEFAULT_TRAFFIC_DISTRIBUTION TRAFFIC_UNIFORM
 #define DEFAULT_SIMULATION_TIME                10000
+#define DEFAULT_STATS_WARM_UP_TIME                 0
 
 // TGlobalParams -- used to forward configuration to every sub-block
 class TGlobalParams
@@ -76,17 +77,18 @@ class TGlobalParams
 public:
   static int verbose_mode;
   static int trace_mode;
-  static char trace_filename[50];
+  static char trace_filename[128];
   static int mesh_dim_x;
   static int mesh_dim_y;
   static int buffer_depth;
   static int max_packet_size;
   static int routing_algorithm;
-  static char rtable_filename[50];
+  static char rtable_filename[128];
   static int selection_strategy;
   static float packet_injection_rate;
   static int traffic_distribution;
   static int simulation_time;
+  static int stats_warm_up_time;
 };
 
 

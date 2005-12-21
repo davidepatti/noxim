@@ -63,7 +63,9 @@ SC_MODULE(TRouter)
   void               rxProcess();        // The receiving process
   void               txProcess();        // The transmitting process
   void               bufferMonitor();
-  void               configure(int _id, TGlobalRoutingTable& grt);
+  void               configure(const int _id, const double _warm_up_time,
+			       TGlobalRoutingTable& grt);
+
 
   // Constructor
 

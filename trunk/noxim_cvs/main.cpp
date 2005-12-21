@@ -16,17 +16,18 @@ using namespace std;
 // Initialize global configuration parameters (can be overridden with command-line arguments)
 int TGlobalParams::verbose_mode            = DEFAULT_VERBOSE_MODE;
 int TGlobalParams::trace_mode              = DEFAULT_TRACE_MODE;
-char TGlobalParams::trace_filename[50]     = DEFAULT_TRACE_FILENAME;
+char TGlobalParams::trace_filename[128]    = DEFAULT_TRACE_FILENAME;
 int TGlobalParams::mesh_dim_x              = DEFAULT_MESH_DIM_X;
 int TGlobalParams::mesh_dim_y              = DEFAULT_MESH_DIM_Y;
 int TGlobalParams::buffer_depth            = DEFAULT_BUFFER_DEPTH;
 int TGlobalParams::max_packet_size         = DEFAULT_MAX_PACKET_SIZE;
 int TGlobalParams::routing_algorithm       = DEFAULT_ROUTING_ALGORITHM;
-char TGlobalParams::rtable_filename[50]    = DEFAULT_RTABLE_FILENAME;
+char TGlobalParams::rtable_filename[128]   = DEFAULT_RTABLE_FILENAME;
 int TGlobalParams::selection_strategy      = DEFAULT_SELECTION_STRATEGY;
 float TGlobalParams::packet_injection_rate = DEFAULT_PACKET_INJECTION_RATE;
 int TGlobalParams::traffic_distribution    = DEFAULT_TRAFFIC_DISTRIBUTION;
 int TGlobalParams::simulation_time         = DEFAULT_SIMULATION_TIME;
+int TGlobalParams::stats_warm_up_time      = DEFAULT_STATS_WARM_UP_TIME;
 
 //---------------------------------------------------------------------------
 
@@ -60,6 +61,7 @@ void showHelp(char selfname[])
   cout << "\t\tuniform\t\tUniform traffic distribution" << endl;
   cout << "\t\ttranspose1\tTranspose matrix 1 traffic distribution" << endl;
   cout << "\t\ttranspose2\tTranspose matrix 2 traffic distribution" << endl;
+  cout << "\t-warmup N\tStart to collect statistics after N cycles (default " << DEFAULT_STATS_WARM_UP_TIME << ")" << endl;
   cout << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << DEFAULT_SIMULATION_TIME << ")" << endl << endl;
   cout << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <mpalesi@diit.unict.it>" << endl;
   cout << "If you find this program useless please feel free to complain with Davide Patti <dpatti@diit.unict.it>" << endl;
@@ -107,15 +109,6 @@ void badArgument(char argument[], char option[])
 
 int sc_main(int arg_num, char* arg_vet[])
 {
-  // Signals
-  sc_clock        clock("clock", 1);
-  sc_signal<bool> reset;
-
-  // NoC instance
-  TNoC* n = new TNoC("NoC");
-  n->clock(clock);
-  n->reset(reset);
-
   // Handle command-line arguments
   cout << endl << "\t\tNoxim - the NoC Simulator" << endl;
   cout << "\t\t(C) University of Catania" << endl << endl;
@@ -226,6 +219,16 @@ int sc_main(int arg_num, char* arg_vet[])
         else badArgument(arg_vet[i+1], arg_vet[i]);
         i+=2;
       }
+      else if(!strcmp(arg_vet[i],"-warmup"))
+      {
+        int new_warmup = atoi(arg_vet[i+1]);
+        if(new_warmup>=0)
+	{
+          TGlobalParams::stats_warm_up_time = new_warmup;
+          i+=2;
+        }
+        else badArgument(arg_vet[i+1], arg_vet[i]);
+      }
       else if(!strcmp(arg_vet[i],"-sim"))
       {
         int new_sim = atoi(arg_vet[i+1]);
@@ -240,6 +243,15 @@ int sc_main(int arg_num, char* arg_vet[])
     } while (i<arg_num);
   }
   if(TGlobalParams::verbose_mode) showConfig();
+
+  // Signals
+  sc_clock        clock("clock", 1);
+  sc_signal<bool> reset;
+
+  // NoC instance
+  TNoC* n = new TNoC("NoC");
+  n->clock(clock);
+  n->reset(reset);
 
   // Trace signals
   sc_trace_file* tf = NULL;
@@ -285,6 +297,7 @@ int sc_main(int arg_num, char* arg_vet[])
       }
     }
   }
+
 
   // Reset the chip and run the simulation
   reset.write(1);

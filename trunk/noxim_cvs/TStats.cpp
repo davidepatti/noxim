@@ -8,11 +8,13 @@
 
 // TODO: nan in averageDelay
 
+
 //---------------------------------------------------------------------------
 
-void TStats::setId(int node_id)
+void TStats::configure(const int node_id, const double _warm_up_time)
 {
   id = node_id;
+  warm_up_time = _warm_up_time;
 }
 
 //---------------------------------------------------------------------------
@@ -20,20 +22,29 @@ void TStats::setId(int node_id)
 void TStats::receivedFlit(const double arrival_time,
 			  const TFlit& flit)
 {
-  if (flit.flit_type != FLIT_TYPE_HEAD) 
+  if (arrival_time < warm_up_time)
     return;
 
   int i = searchCommHistory(flit.src_id);
+  
   if (i == -1)
     {
+      // first flit received from a given source
+      // initialize CommHist structure
       CommHistory ch;
 
       ch.src_id = flit.src_id;
-      ch.delays.push_back(arrival_time - flit.timestamp);
+      ch.total_received_flits = 0;
       chist.push_back(ch);
+
+      i = chist.size() - 1;
     }
-  else
+
+  if (flit.flit_type == FLIT_TYPE_HEAD) 
     chist[i].delays.push_back(arrival_time - flit.timestamp);
+
+  chist[i].total_received_flits++;
+  chist[i].last_received_flit_time = arrival_time - warm_up_time;
 }
 
 //---------------------------------------------------------------------------
@@ -66,6 +77,29 @@ double TStats::getAverageDelay()
 
 //---------------------------------------------------------------------------
 
+double TStats::getAverageThroughput(const int src_id)
+{
+  int i = searchCommHistory(src_id);
+
+  assert(i >= 0);
+
+  return (double)chist[i].total_received_flits/(double)chist[i].last_received_flit_time;
+}
+
+//---------------------------------------------------------------------------
+
+double TStats::getAverageThroughput()
+{
+  double avg = 0.0;
+
+  for (unsigned int k=0; k<chist.size(); k++)
+    avg += getAverageThroughput(chist[k].src_id);
+  
+  return avg/(double)chist.size();
+}
+
+//---------------------------------------------------------------------------
+
 unsigned int TStats::getReceivedPackets()
 {
   int n = 0;
@@ -74,6 +108,25 @@ unsigned int TStats::getReceivedPackets()
     n += chist[i].delays.size();
 
   return n;
+}
+
+//---------------------------------------------------------------------------
+
+unsigned int TStats::getReceivedFlits()
+{
+  int n = 0;
+
+  for (unsigned int i=0; i<chist.size(); i++)
+    n += chist[i].total_received_flits;
+
+  return n;
+}
+
+//---------------------------------------------------------------------------
+
+unsigned int TStats::getTotalCommunications()
+{
+  return chist.size();
 }
 
 //---------------------------------------------------------------------------
@@ -95,12 +148,14 @@ void TStats::showStats(std::ostream& out)
   for (unsigned int i=0; i<chist.size(); i++)
     {
       out << "% source id: " << chist[i].src_id 
-	  << ", received " << chist[i].delays.size() << " packets"
-	  << ", avg delay " << getAverageDelay(chist[i].src_id) 
+	  << ", received " << chist[i].delays.size() << " packets" << " (" << chist[i].total_received_flits << " flits)"
+	  << ", avg delay " << getAverageDelay(chist[i].src_id) << " cycles"
+	  << ", avg throughput " << getAverageThroughput(chist[i].src_id) << " flits/cycle"
 	  << endl;
     }
 
-  out << "% Aggregated average delay " << getAverageDelay() << endl;
+  out << "% Aggregated average delay (cycles): " << getAverageDelay() << endl;
+  out << "% Aggregated average throughput (flits/cycle): " << getAverageThroughput() << endl;
 }
 
 //---------------------------------------------------------------------------

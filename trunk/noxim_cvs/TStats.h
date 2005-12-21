@@ -20,6 +20,9 @@ struct CommHistory
 {
   int            src_id;
   vector<double> delays;
+  unsigned int   total_received_flits;
+  double         last_received_flit_time;
+
 };
 
 //---------------------------------------------------------------------------
@@ -30,23 +33,44 @@ public:
 
   TStats() {}
 
-  void setId(int node_id);
+  void configure(const int node_id, const double _warm_up_time);
 
+  // Access point for stats update
   void receivedFlit(const double arrival_time,
 		    const TFlit& flit);
 
+  // Returns the average delay (cycles) for the current node as
+  // regards to the communication whose source is src_id
   double getAverageDelay(const int src_id);
 
+  // Returns the average delay (cycles) for the current node
   double getAverageDelay();
 
+  // Returns the average throughput (flits/cycle) for the current node
+  // and for the communication whose source is src_id
+  double getAverageThroughput(const int src_id);
+
+  // Returns the average throughput (flits/cycle) for the current node
+  double getAverageThroughput();
+
+  // Returns the number of received packets from current node
   unsigned int getReceivedPackets();
 
+  // Returns the number of received flits from current node
+  unsigned int getReceivedFlits();
+
+  // Returns the number of communications whose destination is the
+  // current node
+  unsigned int getTotalCommunications();
+
+  // Shows statistics for the current node
   void showStats(std::ostream& out = std::cout);
 
 private:
 
   int                 id;
-  vector<CommHistory> chist;
+  vector<CommHistory> chist;  
+  double              warm_up_time;
 
   int searchCommHistory(int src_id);
 };
