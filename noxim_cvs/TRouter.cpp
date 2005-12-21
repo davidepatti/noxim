@@ -532,10 +532,12 @@ vector<int> TRouter::routingRTableBased(const int dir_in, const TCoord& current,
 
 //---------------------------------------------------------------------------
 
-void TRouter::configure(int _id, TGlobalRoutingTable& grt)
+void TRouter::configure(const int _id, 
+			const double _warm_up_time,
+			TGlobalRoutingTable& grt)
 {
   id = _id;
-  stats.setId(_id);
+  stats.configure(_id, _warm_up_time);
   
   if (grt.isValid())
     grt.getNodeRoutingTable(_id);
