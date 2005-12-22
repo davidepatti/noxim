@@ -42,7 +42,7 @@ SC_MODULE(TNoC)
 
   // TODO by Fafa - ...instead of this one
   // TODO:Fabrizio quando sostituirai questo codice ricordati anche le
-  // strutture per NOPCAR !
+  // strutture per NoP !
   sc_signal<bool>    req_to_east[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
   sc_signal<bool>    req_to_west[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
   sc_signal<bool>    req_to_south[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
@@ -63,11 +63,11 @@ SC_MODULE(TNoC)
   sc_signal<uint>    buffer_level_to_south[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
   sc_signal<uint>    buffer_level_to_north[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
 
-  // NOPCAR
-  sc_signal<TNOP_data>    NOP_data_to_east[MAX_STATIC_DIM][MAX_STATIC_DIM];
-  sc_signal<TNOP_data>    NOP_data_to_west[MAX_STATIC_DIM][MAX_STATIC_DIM];
-  sc_signal<TNOP_data>    NOP_data_to_south[MAX_STATIC_DIM][MAX_STATIC_DIM];
-  sc_signal<TNOP_data>    NOP_data_to_north[MAX_STATIC_DIM][MAX_STATIC_DIM];
+  // NoP
+  sc_signal<TNoP_data>    NoP_data_to_east[MAX_STATIC_DIM][MAX_STATIC_DIM];
+  sc_signal<TNoP_data>    NoP_data_to_west[MAX_STATIC_DIM][MAX_STATIC_DIM];
+  sc_signal<TNoP_data>    NoP_data_to_south[MAX_STATIC_DIM][MAX_STATIC_DIM];
+  sc_signal<TNoP_data>    NoP_data_to_north[MAX_STATIC_DIM][MAX_STATIC_DIM];
 
   // Matrix of tiles
 

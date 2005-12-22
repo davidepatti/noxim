@@ -39,14 +39,13 @@ using namespace std;
 #define ROUTING_ODD_EVEN       4
 #define ROUTING_DYAD           5
 #define ROUTING_LOOK_AHEAD     6
-#define ROUTING_NOPCAR         7
 #define ROUTING_FULLY_ADAPTIVE 8
 #define ROUTING_RTABLE_BASED   9
 
 // Selection strategies
 #define SEL_RANDOM            0
 #define SEL_BUFFER_LEVEL      1
-#define SEL_NOPCAR            2
+#define SEL_NOP               2
 
 // Traffic distribution
 #define TRAFFIC_UNIFORM       0
@@ -138,12 +137,12 @@ struct TPacket
   int                flit_left;    // Number of remaining flits inside the packet
 };
 
-struct TNOP_data
+struct TNoP_data
 {
     int sender_id;
     uint buffer_level_neighbor[DIRECTIONS];
 
-    inline bool operator == (const TNOP_data& nop_data) const
+    inline bool operator == (const TNoP_data& nop_data) const
     {
 	return ( sender_id!=nop_data.sender_id &&
 	         nop_data.buffer_level_neighbor[0]!=buffer_level_neighbor[0] &&
@@ -200,10 +199,10 @@ inline ostream& operator << (ostream& os, const TFlit& flit)
   return os;
 }
 
-inline ostream& operator << (ostream& os, const TNOP_data& NOP_data)
+inline ostream& operator << (ostream& os, const TNoP_data& NoP_data)
 {
     // TODO: complete this
-  os << "[sender_id =" << NOP_data.sender_id << "]"; 
+  os << "[sender_id =" << NoP_data.sender_id << "]"; 
   return os;
 }
 
@@ -222,10 +221,10 @@ inline void sc_trace(sc_trace_file*& tf, const TFlit& flit, string& name)
   sc_trace(tf, flit.hop_no, name+".hop_no");
 }
 
-inline void sc_trace(sc_trace_file*& tf, const TNOP_data& NOP_data, string& name)
+inline void sc_trace(sc_trace_file*& tf, const TNoP_data& NoP_data, string& name)
 {
     // TODO: really need to trace all fields ?
-  sc_trace(tf, NOP_data.sender_id, name+".sender_id");
+  sc_trace(tf, NoP_data.sender_id, name+".sender_id");
 }
 
 inline TCoord id2Coord(int id) 

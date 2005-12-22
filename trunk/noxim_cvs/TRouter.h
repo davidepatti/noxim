@@ -36,8 +36,8 @@ SC_MODULE(TRouter)
   sc_in<uint>        buffer_level_neighbor[DIRECTIONS+1];
 
   // Neighbor-on-Path related I/O
-  sc_out<TNOP_data>       NOP_data_out[DIRECTIONS];
-  sc_in<TNOP_data>        NOP_data_in[DIRECTIONS];
+  sc_out<TNoP_data>       NoP_data_out[DIRECTIONS];
+  sc_in<TNoP_data>        NoP_data_in[DIRECTIONS];
 
   // Registers
 
@@ -91,7 +91,7 @@ SC_MODULE(TRouter)
   int selectionFunction(const vector<int>& directions);
   int selectionRandom(const vector<int>& directions);
   int selectionBufferLevel(const vector<int>& directions);
-  int selectionNoPCAR(const vector<int>& directions);
+  int selectionNoP(const vector<int>& directions);
 
   vector<int> routingXY(const TCoord& current, const TCoord& destination);
   vector<int> routingWestFirst(const TCoord& current, const TCoord& destination);
@@ -100,11 +100,10 @@ SC_MODULE(TRouter)
   vector<int> routingOddEven(const TCoord& current, const TCoord& source, const TCoord& destination);
   vector<int> routingDyAD(const TCoord& current, const TCoord& destination);
   vector<int> routingLookAhead(const TCoord& current, const TCoord& destination);
-  vector<int> routingNoPCAR(const TCoord& current, const TCoord& destination);
   vector<int> routingFullyAdaptive(const TCoord& current, const TCoord& destination);
   vector<int> routingRTableBased(const int dir_in, const TCoord& current, const TCoord& destination);
-  TNOP_data getCurrentNOPData() const;
-  void NoPCAR_report() const;
+  TNoP_data getCurrentNoPData() const;
+  void NoP_report() const;
 };
 
 #endif

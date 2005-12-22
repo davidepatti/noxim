@@ -49,13 +49,12 @@ void showHelp(char selfname[])
   cout << "\t\toddeven\t\tOdd-Even routing algorithm" << endl;
   cout << "\t\tdyad\t\tDyad routing algorithm" << endl;
   cout << "\t\tlookahead\tLook-Ahead routing algorithm" << endl;
-  cout << "\t\tnopcar\t\tNopcar routing algorithm" << endl;
   cout << "\t\tfullyadaptive\tFully-Adaptive routing algorithm" << endl;
   cout << "\t\trtable FILENAME\tRouting Table Based routing algorithm with table in the specified file (mandatory)" << endl;
   cout << "\t-sel TYPE\tSet the selection strategy to TYPE where TYPE is one of the following (default " << DEFAULT_SELECTION_STRATEGY << "):" << endl;
   cout << "\t\trandom\t\tRandom selection strategy" << endl;
   cout << "\t\tbufferlevel\tBuffer-Level Based selection strategy" << endl;
-  cout << "\t\tnopcar\t\tNopcar selection strategy" << endl;
+  cout << "\t\tnop\t\tNeigbors-on-Path selection strategy" << endl;
   cout << "\t-pir R\t\tSet the packet injection rate to the specified real value [0..1] (default " << DEFAULT_PACKET_INJECTION_RATE << ")" << endl;
   cout << "\t-traffic TYPE\tSet the traffic distribution to TYPE where TYPE is one of the following (default " << DEFAULT_TRAFFIC_DISTRIBUTION << "'):" << endl;
   cout << "\t\tuniform\t\tUniform traffic distribution" << endl;
@@ -182,7 +181,6 @@ int sc_main(int arg_num, char* arg_vet[])
         else if(!strcmp(arg_vet[i+1],"oddeven")) TGlobalParams::routing_algorithm = ROUTING_ODD_EVEN;
         else if(!strcmp(arg_vet[i+1],"dyad")) TGlobalParams::routing_algorithm = ROUTING_DYAD;
         else if(!strcmp(arg_vet[i+1],"lookahead")) TGlobalParams::routing_algorithm = ROUTING_LOOK_AHEAD;
-        else if(!strcmp(arg_vet[i+1],"nopcar")) TGlobalParams::routing_algorithm = ROUTING_NOPCAR;
         else if(!strcmp(arg_vet[i+1],"fullyadaptive")) TGlobalParams::routing_algorithm = ROUTING_FULLY_ADAPTIVE;
         else if(!strcmp(arg_vet[i+1],"rtable"))
 	{
@@ -197,7 +195,7 @@ int sc_main(int arg_num, char* arg_vet[])
       {
         if(!strcmp(arg_vet[i+1],"random")) TGlobalParams::selection_strategy = SEL_RANDOM;
         else if(!strcmp(arg_vet[i+1],"bufferlevel")) TGlobalParams::selection_strategy = SEL_BUFFER_LEVEL;
-        else if(!strcmp(arg_vet[i+1],"nopcar")) TGlobalParams::selection_strategy = SEL_NOPCAR;
+        else if(!strcmp(arg_vet[i+1],"nop")) TGlobalParams::selection_strategy = SEL_NOP;
         else badArgument(arg_vet[i+1], arg_vet[i]);
         i+=2;
       }
