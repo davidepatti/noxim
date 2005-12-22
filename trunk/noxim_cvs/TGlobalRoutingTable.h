@@ -59,7 +59,7 @@ private:
   bool             valid;
 
   // Search label rt_label through the file
-  bool seek(const char* fname, const char* rt_label, ifstream& fin);
+  //  bool seek(const char* fname, const char* rt_label, ifstream& fin);
 
 };
 
