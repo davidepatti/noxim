@@ -32,9 +32,9 @@ SC_MODULE(TTile)
   sc_out<uint>        buffer_level[DIRECTIONS];
   sc_in<uint>         buffer_level_neighbor[DIRECTIONS];
 
-  // NOPCAR related I/O
-  sc_out<TNOP_data>        NOP_data_out[DIRECTIONS];
-  sc_in<TNOP_data>         NOP_data_in[DIRECTIONS];
+  // NoP related I/O
+  sc_out<TNoP_data>        NoP_data_out[DIRECTIONS];
+  sc_in<TNoP_data>         NoP_data_in[DIRECTIONS];
 
   // Signals
 
@@ -76,9 +76,9 @@ SC_MODULE(TTile)
       r->buffer_level[i](buffer_level[i]);
       r->buffer_level_neighbor[i](buffer_level_neighbor[i]);
 
-      // NOPCAR 
-      r->NOP_data_out[i](NOP_data_out[i]);
-      r->NOP_data_in[i](NOP_data_in[i]);
+      // NoP 
+      r->NoP_data_out[i](NoP_data_out[i]);
+      r->NoP_data_in[i](NoP_data_in[i]);
     }
 
     r->flit_rx[DIRECTION_LOCAL](flit_tx_local);
