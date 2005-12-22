@@ -92,9 +92,9 @@ TGlobalRoutingTable::TGlobalRoutingTable()
 
 bool TGlobalRoutingTable::load(const char* fname)
 {
-  ifstream fin;
+  ifstream fin(fname, ios::in);
 
-  if (!seek(fname, "rtsize_1", fin))
+  if (!fin)
     return false;
   
   rt_noc.clear();
@@ -109,20 +109,23 @@ bool TGlobalRoutingTable::load(const char* fname)
 	stop = true;
       else
 	{
-	  int node_id, in_src, in_dst, dst_id, out_src, out_dst;
-	  
-	  if (sscanf(line+1, "%d %d->%d %d", &node_id, &in_src, &in_dst, &dst_id) == 4)
+	  if (line[0] != '%')
 	    {
-	      TLinkId lin(in_src, in_dst);
-
-	      char *pstr = line+COLUMN_AOC;
-	      while (sscanf(pstr, "%d->%d", &out_src, &out_dst) == 2)
+	      int node_id, in_src, in_dst, dst_id, out_src, out_dst;
+	  
+	      if (sscanf(line+1, "%d %d->%d %d", &node_id, &in_src, &in_dst, &dst_id) == 4)
 		{
-		  TLinkId lout(out_src, out_dst);
-		  rt_noc[node_id][lin][dst_id].insert(lout);
-
-		  pstr = strstr(pstr, ",");
-		  pstr++;
+		  TLinkId lin(in_src, in_dst);
+		  
+		  char *pstr = line+COLUMN_AOC;
+		  while (sscanf(pstr, "%d->%d", &out_src, &out_dst) == 2)
+		    {
+		      TLinkId lout(out_src, out_dst);
+		      rt_noc[node_id][lin][dst_id].insert(lout);
+		      
+		      pstr = strstr(pstr, ",");
+		      pstr++;
+		    }
 		}
 	    }
 	}
@@ -135,25 +138,25 @@ bool TGlobalRoutingTable::load(const char* fname)
 
 //---------------------------------------------------------------------------
 
-bool TGlobalRoutingTable::seek(const char* fname, const char* rt_label, ifstream& fin)
-{
-  fin.open(fname, ifstream::in);
+// bool TGlobalRoutingTable::seek(const char* fname, const char* rt_label, ifstream& fin)
+// {
+//   fin.open(fname, ifstream::in);
 
-  if (!fin.is_open())
-    return false;
+//   if (!fin.is_open())
+//     return false;
 
-  bool found = false;
-  while (!fin.eof() && !found)
-    {
-      char line[128];
-      fin.getline(line, sizeof(line)-1);
+//   bool found = false;
+//   while (!fin.eof() && !found)
+//     {
+//       char line[128];
+//       fin.getline(line, sizeof(line)-1);
 
-      if (strstr(line, rt_label) != NULL)
-	found = true;
-    }
+//       if (strstr(line, rt_label) != NULL)
+// 	found = true;
+//     }
   
-  return found;
-}
+//   return found;
+// }
 
 //---------------------------------------------------------------------------
 
