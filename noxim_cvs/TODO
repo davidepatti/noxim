@@ -1,13 +1,13 @@
 TODO
 ---------------------------------------
-- solve mesh dimension related bugs
-- add selection strategies based on buffer level
+- add selection strategies based on buffer level (SEEMS ALREADY DONE?)
 - processing element traffic generation
 - power/energy model
 
 
 DONE
 ---------------------------------------
+- solve mesh dimension related bugs
 - web interface to choose arguments and run simulation (2005.12.14)
 - noc parameters from command line (2005.12.12)
 - create a todo file (5/12/2005)
