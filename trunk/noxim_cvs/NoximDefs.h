@@ -51,6 +51,8 @@ using namespace std;
 #define TRAFFIC_UNIFORM       0
 #define TRAFFIC_TRANSPOSE1    1
 #define TRAFFIC_TRANSPOSE2    2
+#define TRAFFIC_HOTSPOT       3
+#define TRAFFIC_TTABLE_BASED  4
 
 //---------------------------------------------------------------------------
 
@@ -67,6 +69,7 @@ using namespace std;
 #define DEFAULT_SELECTION_STRATEGY        SEL_RANDOM
 #define DEFAULT_PACKET_INJECTION_RATE           0.01
 #define DEFAULT_TRAFFIC_DISTRIBUTION TRAFFIC_UNIFORM
+#define DEFAULT_TTABLE_FILENAME                   ""
 #define DEFAULT_SIMULATION_TIME                10000
 #define DEFAULT_STATS_WARM_UP_TIME                 0
 
@@ -86,6 +89,7 @@ public:
   static int selection_strategy;
   static float packet_injection_rate;
   static int traffic_distribution;
+  static char ttable_filename[128];
   static int simulation_time;
   static int stats_warm_up_time;
 };

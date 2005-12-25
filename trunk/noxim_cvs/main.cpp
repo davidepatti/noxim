@@ -26,6 +26,7 @@ char TGlobalParams::rtable_filename[128]   = DEFAULT_RTABLE_FILENAME;
 int TGlobalParams::selection_strategy      = DEFAULT_SELECTION_STRATEGY;
 float TGlobalParams::packet_injection_rate = DEFAULT_PACKET_INJECTION_RATE;
 int TGlobalParams::traffic_distribution    = DEFAULT_TRAFFIC_DISTRIBUTION;
+char TGlobalParams::ttable_filename[128]   = DEFAULT_TTABLE_FILENAME;
 int TGlobalParams::simulation_time         = DEFAULT_SIMULATION_TIME;
 int TGlobalParams::stats_warm_up_time      = DEFAULT_STATS_WARM_UP_TIME;
 
@@ -47,10 +48,10 @@ void showHelp(char selfname[])
   cout << "\t\tnorthlast\tNorth-Last routing algorithm" << endl;
   cout << "\t\tnegativefirst\tNegative-First routing algorithm" << endl;
   cout << "\t\toddeven\t\tOdd-Even routing algorithm" << endl;
-  cout << "\t\tdyad\t\tDyad routing algorithm" << endl;
+  cout << "\t\tdyad\t\tDyAD routing algorithm" << endl;
   cout << "\t\tlookahead\tLook-Ahead routing algorithm" << endl;
   cout << "\t\tfullyadaptive\tFully-Adaptive routing algorithm" << endl;
-  cout << "\t\trtable FILENAME\tRouting Table Based routing algorithm with table in the specified file (mandatory)" << endl;
+  cout << "\t\trtable FILENAME\tRouting Table Based routing algorithm with table in the specified file (filename is mandatory)" << endl;
   cout << "\t-sel TYPE\tSet the selection strategy to TYPE where TYPE is one of the following (default " << DEFAULT_SELECTION_STRATEGY << "):" << endl;
   cout << "\t\trandom\t\tRandom selection strategy" << endl;
   cout << "\t\tbufferlevel\tBuffer-Level Based selection strategy" << endl;
@@ -60,6 +61,7 @@ void showHelp(char selfname[])
   cout << "\t\tuniform\t\tUniform traffic distribution" << endl;
   cout << "\t\ttranspose1\tTranspose matrix 1 traffic distribution" << endl;
   cout << "\t\ttranspose2\tTranspose matrix 2 traffic distribution" << endl;
+  cout << "\t\tttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file (filename is mandatory)" << endl;
   cout << "\t-warmup N\tStart to collect statistics after N cycles (default " << DEFAULT_STATS_WARM_UP_TIME << ")" << endl;
   cout << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << DEFAULT_SIMULATION_TIME << ")" << endl << endl;
   cout << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <mpalesi@diit.unict.it>" << endl;
@@ -73,19 +75,20 @@ void showHelp(char selfname[])
 void showConfig()
 {
   cout << "Using the following configuration: " << endl;
-  cout << "verbose_mode = " << TGlobalParams::verbose_mode << endl;
-  cout << "trace_mode = " << TGlobalParams::trace_mode << endl;
-  //  cout << "trace_filename = " << TGlobalParams::trace_filename << endl;
-  cout << "mesh_dim_x = " << TGlobalParams::mesh_dim_x << endl;
-  cout << "mesh_dim_y = " << TGlobalParams::mesh_dim_y << endl;
-  cout << "buffer_depth = " << TGlobalParams::buffer_depth << endl;
-  cout << "max_packet_size = " << TGlobalParams::max_packet_size << endl;
-  cout << "routing_algorithm = " << TGlobalParams::routing_algorithm << endl;
-  //  cout << "rtable_filename = " << TGlobalParams::rtable_filename << endl;
-  cout << "selection_strategy = " << TGlobalParams::selection_strategy << endl;
-  cout << "packet_injection_rate = " << TGlobalParams::packet_injection_rate << endl;
-  cout << "traffic_distribution = " << TGlobalParams::traffic_distribution << endl;
-  cout << "simulation_time = " << TGlobalParams::simulation_time << endl;
+  cout << "- verbose_mode = " << TGlobalParams::verbose_mode << endl;
+  cout << "- trace_mode = " << TGlobalParams::trace_mode << endl;
+  //  cout << "- trace_filename = " << TGlobalParams::trace_filename << endl;
+  cout << "- mesh_dim_x = " << TGlobalParams::mesh_dim_x << endl;
+  cout << "- mesh_dim_y = " << TGlobalParams::mesh_dim_y << endl;
+  cout << "- buffer_depth = " << TGlobalParams::buffer_depth << endl;
+  cout << "- max_packet_size = " << TGlobalParams::max_packet_size << endl;
+  cout << "- routing_algorithm = " << TGlobalParams::routing_algorithm << endl;
+  //  cout << "- rtable_filename = " << TGlobalParams::rtable_filename << endl;
+  cout << "- selection_strategy = " << TGlobalParams::selection_strategy << endl;
+  cout << "- packet_injection_rate = " << TGlobalParams::packet_injection_rate << endl;
+  cout << "- traffic_distribution = " << TGlobalParams::traffic_distribution << endl;
+  cout << "- simulation_time = " << TGlobalParams::simulation_time << endl;
+  cout << "- stats_warm_up_time = " << TGlobalParams::stats_warm_up_time << endl;
 }
 
 //---------------------------------------------------------------------------
@@ -214,6 +217,12 @@ int sc_main(int arg_num, char* arg_vet[])
         if(!strcmp(arg_vet[i+1],"uniform")) TGlobalParams::traffic_distribution = TRAFFIC_UNIFORM;
         else if(!strcmp(arg_vet[i+1],"transpose1")) TGlobalParams::traffic_distribution = TRAFFIC_TRANSPOSE1;
         else if(!strcmp(arg_vet[i+1],"transpose2")) TGlobalParams::traffic_distribution = TRAFFIC_TRANSPOSE2;
+        else if(!strcmp(arg_vet[i+1],"ttable"))
+	{
+          TGlobalParams::traffic_distribution = TRAFFIC_TTABLE_BASED;
+          strcpy(TGlobalParams::ttable_filename, arg_vet[i+2]);
+          i++;
+        }
         else badArgument(arg_vet[i+1], arg_vet[i]);
         i+=2;
       }

@@ -39,20 +39,21 @@ void TProcessingElement::txProcess()
   else
   {
     if (probabilityShot())
-      packet_queue.push(nextPacket());
-    
+    {
+      TPacket p = nextPacket();
+      // by Fafa      if(p!=NULL) packet_queue.push(p);           // In some cases (e.g. Traffic Table Based) packet generation is disabled
+      packet_queue.push(p);           // In some cases (e.g. Traffic Table Based) packet generation is disabled
+    }
     if (ack_tx.read() == current_level_tx)
+    {
+      if (!packet_queue.empty())
       {
-	if (!packet_queue.empty())
-	  {
-	    TFlit flit = nextFlit();                  // Generate a new flit
-	    flit_tx->write(flit);                     // Send the generated flit
-	    current_level_tx = 1-current_level_tx;    // Negate the old value for Alternating Bit Protocol (ABP)
-	    req_tx.write(current_level_tx);
-	  }    
-	    
+        TFlit flit = nextFlit();                  // Generate a new flit
+	flit_tx->write(flit);                     // Send the generated flit
+	current_level_tx = 1-current_level_tx;    // Negate the old value for Alternating Bit Protocol (ABP)
+	req_tx.write(current_level_tx);
       }
-	
+    }
   }
 }
 
@@ -145,7 +146,14 @@ TPacket TProcessingElement::nextPacket()
       fixRanges(src, dst);
       p.dst_id = coord2Id(dst);
       break;
-
+      /* by Fafa
+    case TRAFFIC_TTABLE_BASED:
+      if(true) return NULL; // if there is no occurrence in the table
+      else do {
+        p.dst_id = rand() % (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y);
+      } while(p.dst_id==p.src_id);
+      break;
+      */
     default:
       assert(false);
   }
