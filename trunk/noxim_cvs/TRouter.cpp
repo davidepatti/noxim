@@ -206,11 +206,12 @@ int TRouter::routing(int dir_in, int src_id, int dst_id)
     case ROUTING_FULLY_ADAPTIVE:
       return selectionFunction(routingFullyAdaptive(position, dst_coord));
 
-    case ROUTING_RTABLE_BASED:
-      return selectionFunction(routingRTableBased(dir_in, position, dst_coord));
+    case ROUTING_TABLE_BASED:
+      return selectionFunction(routingTableBased(dir_in, position, dst_coord));
 
     default:
       assert(false);
+      return 0;
     }
 }
 
@@ -293,6 +294,7 @@ int TRouter::selectionFunction(const vector<int>& directions)
 	    return selectionNoP(directions);
 	default:
 	    assert(false);
+            return 0;
     }
 }
 
@@ -511,7 +513,7 @@ vector<int> TRouter::routingFullyAdaptive(const TCoord& current, const TCoord& d
 
 //---------------------------------------------------------------------------
 
-vector<int> TRouter::routingRTableBased(const int dir_in, const TCoord& current, const TCoord& destination)
+vector<int> TRouter::routingTableBased(const int dir_in, const TCoord& current, const TCoord& destination)
 {
   TAdmissibleOutputs ao = rtable.getAdmissibleOutputs(dir_in, coord2Id(destination));
 

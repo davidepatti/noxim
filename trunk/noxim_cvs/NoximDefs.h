@@ -40,7 +40,7 @@ using namespace std;
 #define ROUTING_DYAD           5
 #define ROUTING_LOOK_AHEAD     6
 #define ROUTING_FULLY_ADAPTIVE 8
-#define ROUTING_RTABLE_BASED   9
+#define ROUTING_TABLE_BASED    9
 
 // Selection strategies
 #define SEL_RANDOM            0
@@ -52,31 +52,31 @@ using namespace std;
 #define TRAFFIC_TRANSPOSE1    1
 #define TRAFFIC_TRANSPOSE2    2
 #define TRAFFIC_HOTSPOT       3
-#define TRAFFIC_TTABLE_BASED  4
+#define TRAFFIC_TABLE_BASED   4
 
 //---------------------------------------------------------------------------
 
 // Default configuration can be overridden with command-line arguments
-#define DEFAULT_VERBOSE_MODE                   false
-#define DEFAULT_TRACE_MODE                     false
-#define DEFAULT_TRACE_FILENAME                    ""
-#define DEFAULT_MESH_DIM_X                         4
-#define DEFAULT_MESH_DIM_Y                         4
-#define DEFAULT_BUFFER_DEPTH                       4
-#define DEFAULT_MAX_PACKET_SIZE                   10
-#define DEFAULT_ROUTING_ALGORITHM         ROUTING_XY
-#define DEFAULT_RTABLE_FILENAME                   ""
-#define DEFAULT_SELECTION_STRATEGY        SEL_RANDOM
-#define DEFAULT_PACKET_INJECTION_RATE           0.01
-#define DEFAULT_TRAFFIC_DISTRIBUTION TRAFFIC_UNIFORM
-#define DEFAULT_TTABLE_FILENAME                   ""
-#define DEFAULT_SIMULATION_TIME                10000
-#define DEFAULT_STATS_WARM_UP_TIME                 0
+#define DEFAULT_VERBOSE_MODE                     false
+#define DEFAULT_TRACE_MODE                       false
+#define DEFAULT_TRACE_FILENAME                      ""
+#define DEFAULT_MESH_DIM_X                           4
+#define DEFAULT_MESH_DIM_Y                           4
+#define DEFAULT_BUFFER_DEPTH                         4
+#define DEFAULT_MAX_PACKET_SIZE                     10
+#define DEFAULT_ROUTING_ALGORITHM           ROUTING_XY
+#define DEFAULT_ROUTING_TABLE_FILENAME              ""
+#define DEFAULT_SELECTION_STRATEGY          SEL_RANDOM
+#define DEFAULT_PACKET_INJECTION_RATE             0.01
+#define DEFAULT_TRAFFIC_DISTRIBUTION   TRAFFIC_UNIFORM
+#define DEFAULT_TRAFFIC_TABLE_FILENAME              ""
+#define DEFAULT_RESET_TIME                        1000
+#define DEFAULT_SIMULATION_TIME                  10000
+#define DEFAULT_STATS_WARM_UP_TIME  DEFAULT_RESET_TIME
 
 // TGlobalParams -- used to forward configuration to every sub-block
-class TGlobalParams
+struct TGlobalParams
 {
-public:
   static int verbose_mode;
   static int trace_mode;
   static char trace_filename[128];
@@ -85,22 +85,22 @@ public:
   static int buffer_depth;
   static int max_packet_size;
   static int routing_algorithm;
-  static char rtable_filename[128];
+  static char routing_table_filename[128];
   static int selection_strategy;
   static float packet_injection_rate;
   static int traffic_distribution;
-  static char ttable_filename[128];
+  static char traffic_table_filename[128];
   static int simulation_time;
   static int stats_warm_up_time;
 };
-
 
 // TODO by Fafa - this MUST be removed!!!
 #define MAX_STATIC_DIM 20
 
 // TCoord -- XY coordinates type of the Tile inside the Mesh
-struct TCoord
+class TCoord
 {
+ public:
   int                x;            // X coordinate
   int                y;            // Y coordinate
 
@@ -127,13 +127,9 @@ struct TPayload
   }
 };
 
-// TPacket -- TPacket definition
+// TPacket -- Packet definition
 struct TPacket
 {
-  /*
-  TCoord             src_coord;    // The XY coordinates of the source tile
-  TCoord             dst_coord;    // The XY coordinates of the destination tile
-  */
   int                src_id;
   int                dst_id;
   double             timestamp;    // SC timestamp at packet generation
@@ -141,6 +137,8 @@ struct TPacket
   int                flit_left;    // Number of remaining flits inside the packet
 };
 
+
+// TNoP_data -- NoP Data definition
 struct TNoP_data
 {
     int sender_id;
@@ -238,6 +236,7 @@ inline TCoord id2Coord(int id)
   coord.x = id % TGlobalParams::mesh_dim_x;
   coord.y = id / TGlobalParams::mesh_dim_x;
 
+  assert(coord.x < TGlobalParams::mesh_dim_x);
   assert(coord.y < TGlobalParams::mesh_dim_y);
 
   return coord;

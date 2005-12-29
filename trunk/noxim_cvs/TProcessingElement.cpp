@@ -28,6 +28,8 @@ void TProcessingElement::rxProcess()
   }
 }
 
+//---------------------------------------------------------------------------
+
 void TProcessingElement::txProcess()
 {
   // This function is a simplified version of the corresponding method of the TRouter class
@@ -38,12 +40,7 @@ void TProcessingElement::txProcess()
   }
   else
   {
-    if (probabilityShot())
-    {
-      TPacket p = nextPacket();
-      // by Fafa      if(p!=NULL) packet_queue.push(p);           // In some cases (e.g. Traffic Table Based) packet generation is disabled
-      packet_queue.push(p);           // In some cases (e.g. Traffic Table Based) packet generation is disabled
-    }
+    if (probabilityShot()) packet_queue.push(nextPacket());
     if (ack_tx.read() == current_level_tx)
     {
       if (!packet_queue.empty())
@@ -56,6 +53,8 @@ void TProcessingElement::txProcess()
     }
   }
 }
+
+//---------------------------------------------------------------------------
 
 TFlit TProcessingElement::nextFlit()
 {
@@ -83,85 +82,160 @@ TFlit TProcessingElement::nextFlit()
   return flit;
 }
 
-int TProcessingElement::probabilityShot()
+//---------------------------------------------------------------------------
+
+bool TProcessingElement::probabilityShot()
 {
-  if ((double)rand()/RAND_MAX <= TGlobalParams::packet_injection_rate)
+  // For Traffic Table Based traffic distribution the PIR is normalized
+  if(TGlobalParams::traffic_distribution==TRAFFIC_TABLE_BASED)
+  {
+    if(occurrencesInTrafficTableAsSource)
+    {
+      if((double)rand()/RAND_MAX <= TGlobalParams::packet_injection_rate*occurrencesInTrafficTableAsSource)
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+    else return false;
+  }
+  else  // Normal case
+  if((double)rand()/RAND_MAX <= TGlobalParams::packet_injection_rate)
+  {
     return true;
-
+  }
+  else
+  {
+    return false;
+  }
+  
+/* wormhole test
+  static int s1 = 0;
+  static int s2 = 0;
+  TCoord position = id2Coord(id);
+  if (s1 != 0 && s2 != 0) return false;
+  if ( (position.x == 0 && position.y == 0) && s1 == 0)
+    {
+      s1++;
+      return true;
+    }
+  if ( (position.x == 1 && position.y == 0) && s2 == 0)
+    {
+      s2++;
+      return true;
+    }
   return false;
-  
-  /*---------------- wormhole test ---------------*/
-//   static int s1 = 0;
-//   static int s2 = 0;
+*/
 
-//   TCoord position = id2Coord(id);
-
-//   if (s1 != 0 && s2 != 0) return false;
-
-//   if ( (position.x == 0 && position.y == 0) && s1 == 0)
-//     {
-//       s1++;
-//       return true;
-//     }
-
-//   if ( (position.x == 1 && position.y == 0) && s2 == 0)
-//     {
-//       s2++;
-//       return true;
-//     }
-  
-//   return false;
-  /*----------------------------------------*/
 }
 
+//---------------------------------------------------------------------------
 
 TPacket TProcessingElement::nextPacket()
 {
-  TPacket p;
-  p.src_id = id;
-  TCoord src,dst;
-
   switch(TGlobalParams::traffic_distribution)
   {
     case TRAFFIC_UNIFORM:
-      do {
-        p.dst_id = rand() % (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y);
-      } while(p.dst_id==p.src_id);
+      return trafficUniform();
       break;
 
     case TRAFFIC_TRANSPOSE1:
-      src.x = id2Coord(p.src_id).x;
-      src.y = id2Coord(p.src_id).y;
-      dst.x = TGlobalParams::mesh_dim_x-1-src.y;
-      dst.y = TGlobalParams::mesh_dim_y-1-src.x;
-      fixRanges(src, dst);
-      p.dst_id = coord2Id(dst);
+      return trafficTranspose1();
       break;
 
     case TRAFFIC_TRANSPOSE2:
-      src.x = id2Coord(p.src_id).x;
-      src.y = id2Coord(p.src_id).y;
-      dst.x = src.y;
-      dst.y = src.x;
-      fixRanges(src, dst);
-      p.dst_id = coord2Id(dst);
+      return trafficTranspose2();
       break;
-      /* by Fafa
-    case TRAFFIC_TTABLE_BASED:
-      if(true) return NULL; // if there is no occurrence in the table
-      else do {
-        p.dst_id = rand() % (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y);
-      } while(p.dst_id==p.src_id);
+
+    case TRAFFIC_TABLE_BASED:
+      return trafficTableBased();
       break;
-      */
+
     default:
       assert(false);
+      return trafficUniform();
   }
+}
+
+//---------------------------------------------------------------------------
+
+TPacket TProcessingElement::trafficUniform()
+{
+  TPacket p;
+  p.src_id = id;
+
+  // Uniform destination distribution
+  do
+  {
+    p.dst_id = rand() % (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y);
+  } while(p.dst_id==p.src_id);
 
   p.timestamp = sc_simulation_time();
   p.size = p.flit_left = 2 + (rand() % TGlobalParams::max_packet_size);
   return p;
 }
+
+//---------------------------------------------------------------------------
+
+TPacket TProcessingElement::trafficTranspose1()
+{
+  TPacket p;
+  p.src_id = id;
+  TCoord src,dst;
+
+  // Transpose 1 destination distribution
+  src.x = id2Coord(p.src_id).x;
+  src.y = id2Coord(p.src_id).y;
+  dst.x = TGlobalParams::mesh_dim_x-1-src.y;
+  dst.y = TGlobalParams::mesh_dim_y-1-src.x;
+  fixRanges(src, dst);
+  p.dst_id = coord2Id(dst);
+
+  p.timestamp = sc_simulation_time();
+  p.size = p.flit_left = 2 + (rand() % TGlobalParams::max_packet_size);
+  return p;
+}
+
+//---------------------------------------------------------------------------
+
+TPacket TProcessingElement::trafficTranspose2()
+{
+  TPacket p;
+  p.src_id = id;
+  TCoord src,dst;
+
+  // Transpose 2 destination distribution
+  src.x = id2Coord(p.src_id).x;
+  src.y = id2Coord(p.src_id).y;
+  dst.x = src.y;
+  dst.y = src.x;
+  fixRanges(src, dst);
+  p.dst_id = coord2Id(dst);
+
+  p.timestamp = sc_simulation_time();
+  p.size = p.flit_left = 2 + (rand() % TGlobalParams::max_packet_size);
+  return p;
+}
+
+//---------------------------------------------------------------------------
+
+TPacket TProcessingElement::trafficTableBased()
+{
+  TPacket p;
+  p.src_id = id;
+
+  // Traffic Table Based destination distribution
+  p.dst_id = traffic_table->randomDestinationGivenTheSource(p.src_id);
+
+  p.timestamp = sc_simulation_time();
+  p.size = p.flit_left = 2 + (rand() % TGlobalParams::max_packet_size);
+  return p;
+}
+
+//---------------------------------------------------------------------------
 
 void TProcessingElement::fixRanges(const TCoord src, TCoord& dst)
 {
@@ -171,3 +245,5 @@ void TProcessingElement::fixRanges(const TCoord src, TCoord& dst)
   if(dst.x>=TGlobalParams::mesh_dim_x) dst.x=TGlobalParams::mesh_dim_x-1;
   if(dst.y>=TGlobalParams::mesh_dim_y) dst.y=TGlobalParams::mesh_dim_y-1;
 }
+
+//---------------------------------------------------------------------------

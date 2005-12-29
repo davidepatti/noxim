@@ -6,6 +6,7 @@
 
 #include "TNoC.h"
 #include "TGlobalRoutingTable.h"
+#include "TGlobalTrafficTable.h"
 
 //---------------------------------------------------------------------------
 
@@ -14,9 +15,13 @@ void TNoC::buildMesh()
 {
   // Check for routing table availability
   TGlobalRoutingTable grtable;
-  
-  if (TGlobalParams::routing_algorithm == ROUTING_RTABLE_BASED)
-    assert(grtable.load(TGlobalParams::rtable_filename));
+  if (TGlobalParams::routing_algorithm == ROUTING_TABLE_BASED)
+    assert(grtable.load(TGlobalParams::routing_table_filename));
+
+  // Check for traffic table availability
+  TGlobalTrafficTable gttable;
+  if (TGlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
+    assert(gttable.load(TGlobalParams::traffic_table_filename));
 
   // Create the mesh as a matrix of tiles
   for(int i=0; i<TGlobalParams::mesh_dim_x; i++)
@@ -35,6 +40,8 @@ void TNoC::buildMesh()
 
 	  // Tell to the PE its coordinates
 	  t[i][j]->pe->id = j * TGlobalParams::mesh_dim_x + i;
+	  t[i][j]->pe->traffic_table = &gttable;  // Needed to choose destination
+          t[i][j]->pe->occurrencesInTrafficTableAsSource = gttable.occurrencesAsSource(t[i][j]->pe->id);
 
 	  // Map clock and reset
 	  t[i][j]->clock(clock);
