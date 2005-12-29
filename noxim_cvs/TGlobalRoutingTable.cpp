@@ -63,6 +63,7 @@ int oLinkId2Direction(const TLinkId& out_link)
     return DIRECTION_SOUTH;
   else
     assert(false);
+  return 0;  
 }
 
 //---------------------------------------------------------------------------

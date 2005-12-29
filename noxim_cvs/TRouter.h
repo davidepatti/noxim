@@ -101,7 +101,7 @@ SC_MODULE(TRouter)
   vector<int> routingDyAD(const TCoord& current, const TCoord& destination);
   vector<int> routingLookAhead(const TCoord& current, const TCoord& destination);
   vector<int> routingFullyAdaptive(const TCoord& current, const TCoord& destination);
-  vector<int> routingRTableBased(const int dir_in, const TCoord& current, const TCoord& destination);
+  vector<int> routingTableBased(const int dir_in, const TCoord& current, const TCoord& destination);
   TNoP_data getCurrentNoPData() const;
   void NoP_report() const;
 };

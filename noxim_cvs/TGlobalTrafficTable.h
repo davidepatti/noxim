@@ -17,12 +17,13 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 
-class TLocalTrafficParams
+// Structure used to store information into the table
+struct TLocalTrafficLink
 {
-  TCoord src;
-  TCoord dst;
-  int traffic_distribution;
-}
+  int src;                    // ID of the source node (PE)
+  int dst;                    // ID of the destination node (PE)
+  int traffic;                // Type of traffic distribution
+};
 
 //---------------------------------------------------------------------------
 
@@ -37,16 +38,18 @@ public:
   // Load traffic table from file. Returns true if OK (and sets valid to true), false otherwise
   bool load(const char* fname);
 
-  // Tell if the couple Source-Destination has traffic or not
-  bool hasTraffic(const int src, const int dst);
+  // Tell how many times the PE whose ID is specified is in table as source
+  int occurrencesAsSource(const int id);
+
+  // Return a random destination ID from the table given a source ID
+  int randomDestinationGivenTheSource(const int src);
 
   // Tell if the current Traffic Table is valid
   bool isValid() { return valid; }
 
-
 private:
 
-  vector<TLocalTrafficParams> traffic_table;
+  vector<TLocalTrafficLink> traffic_table;
   bool valid;
 
 };

@@ -12,6 +12,8 @@
 #include <queue>
 #include <systemc.h>
 #include "NoximDefs.h"
+#include "TGlobalTrafficTable.h"
+using namespace std;
 
 SC_MODULE(TProcessingElement)
 {
@@ -33,19 +35,26 @@ SC_MODULE(TProcessingElement)
   sc_in<uint>         buffer_level_neighbor;
 
   // Registers
+
   int                 id;
   bool                current_level_rx;       // Current level for Alternating Bit Protocol (ABP)
   bool                current_level_tx;       // Current level for Alternating Bit Protocol (ABP)
-  std::queue<TPacket> packet_queue;
+  queue<TPacket>      packet_queue;
 
   // Functions
 
-  void                rxProcess();                       // The receiving process
-  void                txProcess();                       // The transmitting process
-  int                 probabilityShot();                 // The probability to send a new packet
-  TFlit               nextFlit();                        // Take the next flit of the current packet
-  TPacket             nextPacket();                      // Create a new packet
-  void                fixRanges(const TCoord, TCoord&);  // Fix the ranges of the destination
+  void                 rxProcess();                       // The receiving process
+  void                 txProcess();                       // The transmitting process
+  bool                 probabilityShot();                 // The probability to send a new packet
+  TFlit                nextFlit();                        // Take the next flit of the current packet
+  TPacket              nextPacket();                      // Create a new packet
+  TPacket              trafficUniform();                  // Uniform destination distribution
+  TPacket              trafficTranspose1();               // Transpose 1 destination distribution
+  TPacket              trafficTranspose2();               // Transpose 2 destination distribution
+  TPacket              trafficTableBased();               // Traffic Table Based destination distribution
+  TGlobalTrafficTable* traffic_table;                     // Reference to the Global traffic Table
+  int                  occurrencesInTrafficTableAsSource; // Number of occurrences in Traffic Table
+  void                 fixRanges(const TCoord, TCoord&);  // Fix the ranges of the destination
 
   // Constructor
 
