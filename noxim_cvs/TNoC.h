@@ -74,6 +74,10 @@ SC_MODULE(TNoC)
   TTile*             t[MAX_STATIC_DIM][MAX_STATIC_DIM];
 
 
+  // Global tables
+  TGlobalRoutingTable grtable;
+  TGlobalTrafficTable gttable;
+
   // Constructor
 
   SC_CTOR(TNoC)

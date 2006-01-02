@@ -29,6 +29,8 @@ int TGlobalTrafficTable::occurrencesAsSource(const int id)
 
 int TGlobalTrafficTable::randomDestinationGivenTheSource(const int src)
 {
+  assert(isValid());
+
   vector<int> possible_destinations;
   for(unsigned int i=0; i<traffic_table.size(); i++)
   {
@@ -42,7 +44,6 @@ int TGlobalTrafficTable::randomDestinationGivenTheSource(const int src)
 
 bool TGlobalTrafficTable::load(const char* fname)
 {
-
   // Open file
   ifstream fin(fname, ios::in);
   if(!fin)
@@ -64,8 +65,8 @@ bool TGlobalTrafficTable::load(const char* fname)
     {
       if (line[0] != '%')
       {
-        int src, dst, traffic=0;
-        if (sscanf(line+1, "%d %d %d", &src, &dst, &traffic) >= 2)
+        int src, dst, traffic=TRAFFIC_UNIFORM;
+        if (sscanf(line, "%d %d %d", &src, &dst, &traffic) >= 2)
         {
           // Create a link from the parameters read on the line
           TLocalTrafficLink link;
