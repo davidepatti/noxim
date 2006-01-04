@@ -20,8 +20,11 @@ void TProcessingElement::rxProcess()
   {
     if(req_rx.read()==1-current_level_rx)
     {
-      // Check and print received data (TO BE ADDED)
       TFlit flit_tmp = flit_rx.read();
+      if(TGlobalParams::verbose_mode)
+      {
+        cout << sc_simulation_time() << ": ProcessingElement[" << id << "] RECEIVING " << flit_tmp << endl;
+      }
       current_level_rx = 1-current_level_rx;     // Negate the old value for Alternating Bit Protocol (ABP)
     }
     ack_rx.write(current_level_rx);
@@ -95,7 +98,7 @@ bool TProcessingElement::probabilityShot()
   {
     if(occurrencesInTrafficTableAsSource)
     {
-      if((double)rand()/RAND_MAX <= TGlobalParams::packet_injection_rate*occurrencesInTrafficTableAsSource)
+      if((double)rand()/RAND_MAX <= (TGlobalParams::packet_injection_rate*TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y)*occurrencesInTrafficTableAsSource/traffic_table->size())
       {
         return true;
       }
