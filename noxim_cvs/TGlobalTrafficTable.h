@@ -47,10 +47,15 @@ public:
   // Tell if the current Traffic Table is valid
   bool isValid() { return valid; }
 
+
+  // Give back the number of lines in the table
+  int size() { return numberOfLines; }
+
 private:
 
   vector<TLocalTrafficLink> traffic_table;
   bool valid;
+  int numberOfLines;
 
 };
 

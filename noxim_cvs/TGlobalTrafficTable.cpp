@@ -11,6 +11,7 @@
 TGlobalTrafficTable::TGlobalTrafficTable()
 {
   valid = false;
+  numberOfLines = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -68,6 +69,8 @@ bool TGlobalTrafficTable::load(const char* fname)
         int src, dst, traffic=TRAFFIC_UNIFORM;
         if (sscanf(line, "%d %d %d", &src, &dst, &traffic) >= 2)
         {
+          numberOfLines++;
+
           // Create a link from the parameters read on the line
           TLocalTrafficLink link;
           link.src = src;
@@ -86,3 +89,4 @@ bool TGlobalTrafficTable::load(const char* fname)
 }
 
 //---------------------------------------------------------------------------
+
