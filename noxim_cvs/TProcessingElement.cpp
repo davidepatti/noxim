@@ -46,6 +46,10 @@ void TProcessingElement::txProcess()
       if (!packet_queue.empty())
       {
         TFlit flit = nextFlit();                  // Generate a new flit
+        if(TGlobalParams::verbose_mode)
+        {
+          cout << sc_simulation_time() << ": ProcessingElement[" << id << "] SENDING " << flit << endl;
+        }
 	flit_tx->write(flit);                     // Send the generated flit
 	current_level_tx = 1-current_level_tx;    // Negate the old value for Alternating Bit Protocol (ABP)
 	req_tx.write(current_level_tx);
