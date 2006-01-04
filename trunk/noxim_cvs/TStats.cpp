@@ -59,7 +59,7 @@ double TStats::getAverageDelay(const int src_id)
 
   for (unsigned int j=0; j<chist[i].delays.size(); j++)
     sum += chist[i].delays[j];
-  
+
   return sum/(double)chist[i].delays.size();
 }
 

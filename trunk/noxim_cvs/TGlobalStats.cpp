@@ -25,8 +25,11 @@ double TGlobalStats::getAverageDelay()
       {
 	unsigned int received_packets = noc->t[x][y]->r->stats.getReceivedPackets(); 
 
-	avg_delay += received_packets * noc->t[x][y]->r->stats.getAverageDelay();
-	total_packets += received_packets;	
+	if (received_packets)
+	  {
+	    avg_delay += received_packets * noc->t[x][y]->r->stats.getAverageDelay();
+	    total_packets += received_packets;
+	  }
       }
 
   avg_delay /= (double)total_packets;
@@ -68,8 +71,11 @@ double TGlobalStats::getAverageThroughput()
       {
 	unsigned int ncomms = noc->t[x][y]->r->stats.getTotalCommunications(); 
 
-	avg_throughput += ncomms * noc->t[x][y]->r->stats.getAverageThroughput();
-	total_comms += ncomms;
+	if (ncomms)
+	  {
+	    avg_throughput += ncomms * noc->t[x][y]->r->stats.getAverageThroughput();
+	    total_comms += ncomms;
+	  }
       }
 
   avg_throughput /= (double)total_comms;
