@@ -22,7 +22,7 @@ struct TLocalTrafficLink
 {
   int src;                    // ID of the source node (PE)
   int dst;                    // ID of the destination node (PE)
-  int traffic;                // Type of traffic distribution
+  float pir;                  // Packet Injection Rate for the link
 };
 
 //---------------------------------------------------------------------------
@@ -44,9 +44,11 @@ public:
   // Return a random destination ID from the table given a source ID
   int randomDestinationGivenTheSource(const int src);
 
+  // Return the PIR given a couple src/dst
+  float getPirForTheSelectedLink(int src_id, int dst_id);
+
   // Tell if the current Traffic Table is valid
   bool isValid() { return valid; }
-
 
   // Give back the number of lines in the table
   int size() { return numberOfLines; }
