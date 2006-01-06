@@ -38,7 +38,22 @@ int TGlobalTrafficTable::randomDestinationGivenTheSource(const int src)
     if(traffic_table[i].src == src)
       possible_destinations.push_back(traffic_table[i].dst);
   }
+  assert(possible_destinations.size()>0);
   return possible_destinations[rand()%possible_destinations.size()];
+}
+
+//---------------------------------------------------------------------------
+
+float TGlobalTrafficTable::getPirForTheSelectedLink(int src_id, int dst_id)
+{
+  for(unsigned int i=0; i<traffic_table.size(); i++)
+  {
+    if(traffic_table[i].src==src_id && traffic_table[i].dst==dst_id)
+      return traffic_table[i].pir;
+  }
+
+  assert(false);
+  return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -66,8 +81,9 @@ bool TGlobalTrafficTable::load(const char* fname)
     {
       if (line[0] != '%')
       {
-        int src, dst, traffic=TRAFFIC_UNIFORM;
-        if (sscanf(line, "%d %d %d", &src, &dst, &traffic) >= 2)
+        int src, dst;
+        float pir = TGlobalParams::packet_injection_rate;
+        if (sscanf(line, "%d %d %f", &src, &dst, &pir) >= 2)
         {
           numberOfLines++;
 
@@ -75,7 +91,7 @@ bool TGlobalTrafficTable::load(const char* fname)
           TLocalTrafficLink link;
           link.src = src;
           link.dst = dst;
-          link.traffic = traffic;
+          link.pir = pir;
 
           // Add this link to the vector of links
           traffic_table.push_back(link);

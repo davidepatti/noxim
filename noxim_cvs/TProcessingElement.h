@@ -36,16 +36,16 @@ SC_MODULE(TProcessingElement)
 
   // Registers
 
-  int                 id;
+  int                 id;                     // Unique identification number
   bool                current_level_rx;       // Current level for Alternating Bit Protocol (ABP)
   bool                current_level_tx;       // Current level for Alternating Bit Protocol (ABP)
-  queue<TPacket>      packet_queue;
+  queue<TPacket>      packet_queue;           // Local queue of packets
 
   // Functions
 
   void                 rxProcess();                       // The receiving process
   void                 txProcess();                       // The transmitting process
-  bool                 probabilityShot();                 // The probability to send a new packet
+  bool                 probabilityShot(TPacket p);        // The probability to send a new packet
   TFlit                nextFlit();                        // Take the next flit of the current packet
   TPacket              nextPacket();                      // Create a new packet
   TPacket              trafficUniform();                  // Uniform destination distribution

@@ -10,7 +10,6 @@
 
 void TProcessingElement::rxProcess()
 {
-  // This function is a simplified version of the corresponding method of the TRouter class
   if(reset.read())
   {
     ack_rx.write(0);
@@ -35,7 +34,6 @@ void TProcessingElement::rxProcess()
 
 void TProcessingElement::txProcess()
 {
-  // This function is a simplified version of the corresponding method of the TRouter class
   if(reset.read())
   {
     req_tx.write(0);
@@ -43,10 +41,16 @@ void TProcessingElement::txProcess()
   }
   else
   {
-    if (probabilityShot()) packet_queue.push(nextPacket());
-    if (ack_tx.read() == current_level_tx)
+    if( (TGlobalParams::traffic_distribution==TRAFFIC_TABLE_BASED && occurrencesInTrafficTableAsSource) || TGlobalParams::traffic_distribution!=TRAFFIC_TABLE_BASED)
     {
-      if (!packet_queue.empty())
+      TPacket transmittible_packet = nextPacket();
+      if(probabilityShot(transmittible_packet))
+        packet_queue.push(transmittible_packet);
+    }
+
+    if(ack_tx.read() == current_level_tx)
+    {
+      if(!packet_queue.empty())
       {
         TFlit flit = nextFlit();                  // Generate a new flit
         if(TGlobalParams::verbose_mode)
@@ -73,17 +77,17 @@ TFlit TProcessingElement::nextFlit()
   flit.timestamp   = packet.timestamp;
   flit.sequence_no = packet.size - packet.flit_left;
   flit.hop_no      = 0;
-  //  flit.payload     = DEF_PAYLOAD;
+  //  flit.payload     = DEFAULT_PAYLOAD;
 
-  if (packet.size == packet.flit_left)
+  if(packet.size == packet.flit_left)
     flit.flit_type = FLIT_TYPE_HEAD;
-  else if (packet.flit_left == 1)
+  else if(packet.flit_left == 1)
     flit.flit_type = FLIT_TYPE_TAIL;
   else
     flit.flit_type = FLIT_TYPE_BODY;
   
   packet_queue.front().flit_left--;
-  if (packet_queue.front().flit_left == 0)
+  if(packet_queue.front().flit_left == 0)
     packet_queue.pop();
 
   return flit;
@@ -91,14 +95,15 @@ TFlit TProcessingElement::nextFlit()
 
 //---------------------------------------------------------------------------
 
-bool TProcessingElement::probabilityShot()
+bool TProcessingElement::probabilityShot(TPacket p)
 {
   // For Traffic Table Based traffic distribution the PIR is normalized
   if(TGlobalParams::traffic_distribution==TRAFFIC_TABLE_BASED)
   {
     if(occurrencesInTrafficTableAsSource)
     {
-      if((double)rand()/RAND_MAX <= (TGlobalParams::packet_injection_rate*TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y)*occurrencesInTrafficTableAsSource/traffic_table->size())
+      float pir = traffic_table->getPirForTheSelectedLink(p.src_id, p.dst_id);
+      if((double)rand()/RAND_MAX <= (pir*TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y)*occurrencesInTrafficTableAsSource/traffic_table->size())
       {
         return true;
       }
@@ -123,13 +128,13 @@ bool TProcessingElement::probabilityShot()
   static int s1 = 0;
   static int s2 = 0;
   TCoord position = id2Coord(id);
-  if (s1 != 0 && s2 != 0) return false;
-  if ( (position.x == 0 && position.y == 0) && s1 == 0)
+  if(s1 != 0 && s2 != 0) return false;
+  if( (position.x == 0 && position.y == 0) && s1 == 0)
     {
       s1++;
       return true;
     }
-  if ( (position.x == 1 && position.y == 0) && s2 == 0)
+  if( (position.x == 1 && position.y == 0) && s2 == 0)
     {
       s2++;
       return true;
