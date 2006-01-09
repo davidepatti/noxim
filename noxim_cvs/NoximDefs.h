@@ -26,10 +26,9 @@ using namespace std;
 #define CHANNEL_EMPTY         0
 #define CHANNEL_HAS_HEAD      1
 #define CHANNEL_HAS_TAIL      2
-#define CHANNEL_NOT_RESERVED -1
-
-// To mark invalid/non exhistent nodes
-#define INVALID_ID           -1
+#define CHANNEL_NOT_RESERVED  3
+// To mark invalid or non exhistent values
+#define NOT_VALID            -1
 
 // Routing algorithms
 #define ROUTING_XY             0
@@ -137,20 +136,30 @@ struct TPacket
   int                flit_left;    // Number of remaining flits inside the packet
 };
 
+struct TBufferStatus
+{
+    int level;  // occupied buffer slots
+    int state; // (is empty, has head, has tail, not_reserved)
+    inline bool operator == (const TBufferStatus& bs) const
+    {
+	return (level == bs.level && state == bs.state);
+    };
+};
+
 
 // TNoP_data -- NoP Data definition
 struct TNoP_data
 {
     int sender_id;
-    uint buffer_level_neighbor[DIRECTIONS];
+    TBufferStatus buffer_status_neighbor[DIRECTIONS]; 
 
     inline bool operator == (const TNoP_data& nop_data) const
     {
-	return ( sender_id!=nop_data.sender_id &&
-	         nop_data.buffer_level_neighbor[0]!=buffer_level_neighbor[0] &&
-	         nop_data.buffer_level_neighbor[1]!=buffer_level_neighbor[1] &&
-	         nop_data.buffer_level_neighbor[2]!=buffer_level_neighbor[2] &&
-	         nop_data.buffer_level_neighbor[3]!=buffer_level_neighbor[3]);
+	return ( sender_id==nop_data.sender_id  &&
+	         nop_data.buffer_status_neighbor[0]==buffer_status_neighbor[0] &&
+	         nop_data.buffer_status_neighbor[1]==buffer_status_neighbor[1] &&
+	         nop_data.buffer_status_neighbor[2]==buffer_status_neighbor[2] &&
+	         nop_data.buffer_status_neighbor[3]==buffer_status_neighbor[3]);
     };
 };
 
@@ -177,6 +186,9 @@ struct TFlit
 
 inline ostream& operator << (ostream& os, const TFlit& flit)
 {
+  // TODO: decide what to do with the commented code. Move to a
+  // separate print_flit() function for debugging purposes ?
+
   /*
   os << "### FLIT ###" << endl;
   os << "Source Tile[" << flit.src_coord.x << "][" << flit.src_coord.y << "]" << endl;
@@ -192,21 +204,50 @@ inline ostream& operator << (ostream& os, const TFlit& flit)
   os << "Unix timestamp at packet generation " << flit.timestamp << endl;
   os << "Total number of hops from source to destination is " << flit.hop_no << endl;
   */
-  /*
-  os << "flit " << flit.sequence_no << " (" << flit.src_coord.x << "," << flit.src_coord.y << ") --> (" 
-     << flit.dst_coord.x << "," << flit.dst_coord.y << ")"; 
-  */
   os << "[flit seq=" << flit.sequence_no << ", " << flit.src_id << "-->" << flit.dst_id << "]"; 
 
   return os;
 }
 
-inline ostream& operator << (ostream& os, const TNoP_data& NoP_data)
+inline ostream& operator << (ostream& os, const TBufferStatus& bs)
 {
-    // TODO: complete this
-  os << "[sender_id =" << NoP_data.sender_id << "]"; 
+  string msg;
+  switch (bs.state)
+  {
+      case CHANNEL_EMPTY: 
+	  msg = "E";
+	  break;
+      case CHANNEL_HAS_HEAD:
+	  msg = "H";
+	  break;
+      case CHANNEL_HAS_TAIL:
+	  msg = "T";
+	  break;
+      case CHANNEL_NOT_RESERVED:
+	  msg = "N";
+	  break;
+      case NOT_VALID:
+	  msg = "x";
+	  break;
+      default:
+	  cout << "Error: channel state = " <<  bs.state << endl;
+	  assert(0);
+  }
+  os << msg << "(" << bs.level << ")"; 
   return os;
 }
+
+inline ostream& operator << (ostream& os, const TNoP_data& NoP_data)
+{
+  os << "   NoP data from [" << NoP_data.sender_id << "] [ ";
+
+  for (int j=0; j<DIRECTIONS; j++)
+      os << NoP_data.buffer_status_neighbor[j] << " ";
+
+  cout << "]" << endl;
+  return os;
+}
+
 
 inline void sc_trace(sc_trace_file*& tf, const TFlit& flit, string& name)
 {
@@ -225,8 +266,13 @@ inline void sc_trace(sc_trace_file*& tf, const TFlit& flit, string& name)
 
 inline void sc_trace(sc_trace_file*& tf, const TNoP_data& NoP_data, string& name)
 {
-    // TODO: really need to trace all fields ?
   sc_trace(tf, NoP_data.sender_id, name+".sender_id");
+}
+
+inline void sc_trace(sc_trace_file*& tf, const TBufferStatus& bs, string& name)
+{
+  sc_trace(tf, bs.level, name+".level");
+  sc_trace(tf, bs.state, name+".state");
 }
 
 inline TCoord id2Coord(int id) 

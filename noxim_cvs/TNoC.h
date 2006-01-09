@@ -29,10 +29,10 @@ SC_MODULE(TNoC)
   sc_signal<bool>  ack_to_east[][], ack_to_west[][], ack_to_south[][], ack_to_north[][];
 
   sc_signal<TFlit> flit_to_east[][], flit_to_west[][], flit_to_south[][], flit_to_north[][];
-  sc_signal<uint>  buffer_level_to_east[][], buffer_level_to_west[][], buffer_level_to_south[][], buffer_level_to_north[][];
+  sc_signal<uint>  buffer_status_to_east[][], buffer_status_to_west[][], buffer_status_to_south[][], buffer_status_to_north[][];
 
   sc_signal<TFlit> flit_to_east[20][20], flit_to_west[20][20], flit_to_south[20][20], flit_to_north[20][20];
-  sc_signal<uint>  buffer_level_to_east[20][20], buffer_level_to_west[20][20], buffer_level_to_south[20][20], buffer_level_to_north[20][20];
+  sc_signal<uint>  buffer_status_to_east[20][20], buffer_status_to_west[20][20], buffer_status_to_south[20][20], buffer_status_to_north[20][20];
 
   // Matrix of tiles
 
@@ -58,10 +58,10 @@ SC_MODULE(TNoC)
   sc_signal<TFlit>   flit_to_south[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
   sc_signal<TFlit>   flit_to_north[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
 
-  sc_signal<uint>    buffer_level_to_east[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
-  sc_signal<uint>    buffer_level_to_west[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
-  sc_signal<uint>    buffer_level_to_south[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
-  sc_signal<uint>    buffer_level_to_north[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
+  sc_signal<TBufferStatus>    buffer_status_to_east[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
+  sc_signal<TBufferStatus>    buffer_status_to_west[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
+  sc_signal<TBufferStatus>    buffer_status_to_south[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
+  sc_signal<TBufferStatus>    buffer_status_to_north[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
 
   // NoP
   sc_signal<TNoP_data>    NoP_data_to_east[MAX_STATIC_DIM][MAX_STATIC_DIM];
@@ -102,10 +102,10 @@ SC_MODULE(TNoC)
     **flit_to_south = new sc_signal<TFlit>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
     **flit_to_north = new sc_signal<TFlit>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
 
-    **buffer_level_to_east  = new sc_signal<uint>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **buffer_level_to_west  = new sc_signal<uint>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **buffer_level_to_south = new sc_signal<uint>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **buffer_level_to_north = new sc_signal<uint>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
+    **buffer_status_to_east  = new sc_signal<uint>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
+    **buffer_status_to_west  = new sc_signal<uint>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
+    **buffer_status_to_south = new sc_signal<uint>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
+    **buffer_status_to_north = new sc_signal<uint>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
 
     t = new TTile()[TGlobalParams::mesh_dim_x][TGlobalParams::mesh_dim_y];
     */

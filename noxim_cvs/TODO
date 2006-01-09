@@ -1,6 +1,8 @@
 TODO
 ---------------------------------------
-- add selection strategies based on buffer level (SEEMS ALREADY DONE?)
+- update current channel_status on router (IN PROGRESS)
+- implement all neighbors-on-path subspecies
+- add selection strategies based on buffer level (DO DEBUGGING)
 - processing element traffic generation
 - power/energy model
 

@@ -136,7 +136,7 @@ TNoP_data TRouter::getCurrentNoPData() const
     TNoP_data NoP_data;
 
     for (int j=0; j<DIRECTIONS; j++)
-	NoP_data.buffer_level_neighbor[j] = buffer_level_neighbor[j];
+	NoP_data.buffer_status_neighbor[j] = buffer_status_neighbor[j].read();
 
     NoP_data.sender_id = id;
 
@@ -149,15 +149,27 @@ void TRouter::bufferMonitor()
 {
   if (reset.read())
     {
-      for (int i=0; i<DIRECTIONS+1; i++) buffer_level[i] = 0;
+	// upon reset, buffer status is put to 0
+	TBufferStatus bs_empty;
+	bs_empty.level = 0;
+	bs_empty.state = CHANNEL_EMPTY;
+
+      for (int i=0; i<DIRECTIONS+1; i++) buffer_status[i].write(bs_empty);
     }
   else
   {
-      for (int i=0; i<DIRECTIONS+1; i++) 
-	  buffer_level[i].write(buffer[i].Size());
+      TBufferStatus tmp_bs;
 
-      // Neighbors-on-Path
-      // send neighbor info to each direction 'i'
+      // update current buffers status to neighbors
+
+      for (int i=0; i<DIRECTIONS+1; i++) 
+      {
+	  tmp_bs.level = buffer[i].Size();
+	  tmp_bs.state = channel_state[i];
+	  buffer_status[i].write(tmp_bs);
+      }
+
+      // NoP selection: send neighbor info to each direction 'i'
       TNoP_data current_NoP_data = getCurrentNoPData();
 
       for (int i=0; i<DIRECTIONS; i++)
@@ -225,10 +237,7 @@ void TRouter::NoP_report() const
       for (int i=0;i<DIRECTIONS; i++) 
       {
 	  NoP_tmp = NoP_data_in[i].read();
-	  cout << "   NoP data from [" << NoP_tmp.sender_id << "] ( ";
-	  for (int j=0; j<DIRECTIONS; j++)
-	      cout << NoP_tmp.buffer_level_neighbor[j] << " ";
-	  cout << ")" << endl;
+	  cout << NoP_tmp;
       }
 }
 //---------------------------------------------------------------------------
@@ -251,7 +260,7 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
 
     for (unsigned int i=0;i<directions.size();i++)
     {
-	unsigned int free_positions = buffer_depth - buffer_level_neighbor[directions[i]];
+	unsigned int free_positions = buffer_depth - buffer_status_neighbor[directions[i]].read().level;
 	if (free_positions >= max_free_positions)
 	{
 	    direction_choosen = directions[i];
@@ -263,7 +272,7 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
     {
       cout << sc_simulation_time() << ": Router[" << id << "], SELECTION between: ";
       for (unsigned int i=0;i<directions.size();i++)
-	cout << directions[i] << "(" << buffer_level_neighbor[directions[i]] << " flits),";
+	cout << directions[i] << "(" << buffer_status_neighbor[directions[i]] << " flits),";
       cout << " direction choosen: " << direction_choosen << endl;
     }
     
