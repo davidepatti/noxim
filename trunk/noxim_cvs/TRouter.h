@@ -32,10 +32,11 @@ SC_MODULE(TRouter)
   sc_out<bool>       req_tx[DIRECTIONS+1];    // The requests associated with the output channels
   sc_in<bool>        ack_tx[DIRECTIONS+1];    // The outgoing ack signals associated with the output channels
 
-  sc_out<uint>       buffer_level[DIRECTIONS+1];
-  sc_in<uint>        buffer_level_neighbor[DIRECTIONS+1];
+  sc_out<TBufferStatus>       buffer_status[DIRECTIONS+1];
+  sc_in<TBufferStatus>        buffer_status_neighbor[DIRECTIONS+1];
 
   // Neighbor-on-Path related I/O
+
   sc_out<TNoP_data>       NoP_data_out[DIRECTIONS];
   sc_in<TNoP_data>        NoP_data_in[DIRECTIONS];
 

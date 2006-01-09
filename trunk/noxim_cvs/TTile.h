@@ -29,8 +29,8 @@ SC_MODULE(TTile)
   sc_out<bool>        req_tx[DIRECTIONS];    // The requests associated with the output channels
   sc_in<bool>         ack_tx[DIRECTIONS];    // The outgoing ack signals associated with the output channels
 
-  sc_out<uint>        buffer_level[DIRECTIONS];
-  sc_in<uint>         buffer_level_neighbor[DIRECTIONS];
+  sc_out<TBufferStatus>        buffer_status[DIRECTIONS];
+  sc_in<TBufferStatus>         buffer_status_neighbor[DIRECTIONS];
 
   // NoP related I/O
   sc_out<TNoP_data>        NoP_data_out[DIRECTIONS];
@@ -46,8 +46,8 @@ SC_MODULE(TTile)
   sc_signal<bool>     req_tx_local;    // The requests associated with the output channels
   sc_signal<bool>     ack_tx_local;    // The outgoing ack signals associated with the output channels
   
-  sc_signal<uint>     buffer_level_local;
-  sc_signal<uint>     buffer_level_neighbor_local;
+  sc_signal<TBufferStatus>     buffer_status_local;
+  sc_signal<TBufferStatus>     buffer_status_neighbor_local;
 
 
   // Instances
@@ -73,8 +73,8 @@ SC_MODULE(TTile)
       r->req_tx[i](req_tx[i]);
       r->ack_tx[i](ack_tx[i]);
 
-      r->buffer_level[i](buffer_level[i]);
-      r->buffer_level_neighbor[i](buffer_level_neighbor[i]);
+      r->buffer_status[i](buffer_status[i]);
+      r->buffer_status_neighbor[i](buffer_status_neighbor[i]);
 
       // NoP 
       r->NoP_data_out[i](NoP_data_out[i]);
@@ -89,8 +89,8 @@ SC_MODULE(TTile)
     r->req_tx[DIRECTION_LOCAL](req_rx_local);
     r->ack_tx[DIRECTION_LOCAL](ack_rx_local);
 
-    r->buffer_level[DIRECTION_LOCAL](buffer_level_local);
-    r->buffer_level_neighbor[DIRECTION_LOCAL](buffer_level_neighbor_local);
+    r->buffer_status[DIRECTION_LOCAL](buffer_status_local);
+    r->buffer_status_neighbor[DIRECTION_LOCAL](buffer_status_neighbor_local);
 
     // Processing Element pin assignments
     pe = new TProcessingElement("ProcessingElement");
@@ -105,8 +105,8 @@ SC_MODULE(TTile)
     pe->req_tx(req_tx_local);
     pe->ack_tx(ack_tx_local);
 
-    pe->buffer_level(buffer_level_local);
-    pe->buffer_level_neighbor(buffer_level_neighbor_local);
+    pe->buffer_status(buffer_status_local);
+    pe->buffer_status_neighbor(buffer_status_neighbor_local);
 
   }
 
