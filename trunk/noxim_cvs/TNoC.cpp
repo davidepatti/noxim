@@ -79,15 +79,15 @@ void TNoC::buildMesh()
 	  t[i][j]->ack_tx[DIRECTION_WEST](ack_to_east[i][j]);
 
 	  // Map buffer level signals (analogy with req_tx/rx port mapping)
-	  t[i][j]->buffer_status[DIRECTION_NORTH](buffer_status_to_north[i][j]);
-	  t[i][j]->buffer_status[DIRECTION_EAST](buffer_status_to_east[i+1][j]);
-	  t[i][j]->buffer_status[DIRECTION_SOUTH](buffer_status_to_south[i][j+1]);
-	  t[i][j]->buffer_status[DIRECTION_WEST](buffer_status_to_west[i][j]);
+	  t[i][j]->buffer_level[DIRECTION_NORTH](buffer_level_to_north[i][j]);
+	  t[i][j]->buffer_level[DIRECTION_EAST](buffer_level_to_east[i+1][j]);
+	  t[i][j]->buffer_level[DIRECTION_SOUTH](buffer_level_to_south[i][j+1]);
+	  t[i][j]->buffer_level[DIRECTION_WEST](buffer_level_to_west[i][j]);
 
-	  t[i][j]->buffer_status_neighbor[DIRECTION_NORTH](buffer_status_to_south[i][j]);
-	  t[i][j]->buffer_status_neighbor[DIRECTION_EAST](buffer_status_to_west[i+1][j]);
-	  t[i][j]->buffer_status_neighbor[DIRECTION_SOUTH](buffer_status_to_north[i][j+1]);
-	  t[i][j]->buffer_status_neighbor[DIRECTION_WEST](buffer_status_to_east[i][j]);
+	  t[i][j]->buffer_level_neighbor[DIRECTION_NORTH](buffer_level_to_south[i][j]);
+	  t[i][j]->buffer_level_neighbor[DIRECTION_EAST](buffer_level_to_west[i+1][j]);
+	  t[i][j]->buffer_level_neighbor[DIRECTION_SOUTH](buffer_level_to_north[i][j+1]);
+	  t[i][j]->buffer_level_neighbor[DIRECTION_WEST](buffer_level_to_east[i][j]);
 
 	  // NoP 
 
@@ -107,20 +107,13 @@ void TNoC::buildMesh()
   // dummy empty TNoP_data structure
   TNoP_data tmp_NoP;
 
-  for (int i=0; i<DIRECTIONS; i++)
-  {
-      tmp_NoP.sender_id = NOT_VALID;
-      tmp_NoP.buffer_status_neighbor[i].state = NOT_VALID;
-      tmp_NoP.buffer_status_neighbor[i].level = NOT_VALID;
-  }
-  // dummy empty TBufferStatus structure
-  TBufferStatus tmp_bs;
-  for (int i=0; i<DIRECTIONS; i++)
-  {
-      tmp_bs.level = NOT_VALID;
-      tmp_bs.state = NOT_VALID;
-  }
+  tmp_NoP.sender_id = NOT_VALID;
 
+  for (int i=0; i<DIRECTIONS; i++)
+  {
+      tmp_NoP.channel_status_neighbor[i].buffer_level = 0;
+      tmp_NoP.channel_status_neighbor[i].available = false;
+  }
 
   // Clear the inputs on the borders
   for(int i=0; i<=TGlobalParams::mesh_dim_x; i++)
@@ -130,8 +123,8 @@ void TNoC::buildMesh()
       req_to_north[i][TGlobalParams::mesh_dim_y] = 0;
       ack_to_south[i][TGlobalParams::mesh_dim_y] = 0;
 
-      buffer_status_to_south[i][0].write(tmp_bs);
-      buffer_status_to_north[i][TGlobalParams::mesh_dim_y].write(tmp_bs);
+      buffer_level_to_south[i][0] = 0;
+      buffer_level_to_north[i][TGlobalParams::mesh_dim_y] = 0;
 
       NoP_data_to_south[i][0].write(tmp_NoP);
       NoP_data_to_north[i][TGlobalParams::mesh_dim_y].write(tmp_NoP);
@@ -144,8 +137,8 @@ void TNoC::buildMesh()
       req_to_west[TGlobalParams::mesh_dim_x][j] = 0;
       ack_to_east[TGlobalParams::mesh_dim_x][j] = 0;
 
-      buffer_status_to_east[0][j].write(tmp_bs);
-      buffer_status_to_west[TGlobalParams::mesh_dim_x][j].write(tmp_bs);
+      buffer_level_to_east[0][j] = 0;
+      buffer_level_to_west[TGlobalParams::mesh_dim_x][j] = 0;
 
       NoP_data_to_east[0][j].write(tmp_NoP);
       NoP_data_to_west[TGlobalParams::mesh_dim_x][j].write(tmp_NoP);

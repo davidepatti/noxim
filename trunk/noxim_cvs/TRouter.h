@@ -32,8 +32,8 @@ SC_MODULE(TRouter)
   sc_out<bool>       req_tx[DIRECTIONS+1];    // The requests associated with the output channels
   sc_in<bool>        ack_tx[DIRECTIONS+1];    // The outgoing ack signals associated with the output channels
 
-  sc_out<TBufferStatus>       buffer_status[DIRECTIONS+1];
-  sc_in<TBufferStatus>        buffer_status_neighbor[DIRECTIONS+1];
+  sc_out<uint>       buffer_level[DIRECTIONS+1];
+  sc_in<uint>        buffer_level_neighbor[DIRECTIONS+1];
 
   // Neighbor-on-Path related I/O
 
@@ -50,7 +50,6 @@ SC_MODULE(TRouter)
   int                selection_type;
   int                buffer_depth;
   TBuffer            buffer[DIRECTIONS+1];            // Buffer for each input channel 
-  int                channel_state[DIRECTIONS+1];     // Current state for each channel (is empty, has head, has tail)
   bool               current_level_rx[DIRECTIONS+1];  // Current level for Alternating Bit Protocol (ABP)
   bool               current_level_tx[DIRECTIONS+1];  // Current level for Alternating Bit Protocol (ABP)
   int                reservation_table[DIRECTIONS+1]; // Output channels reservations

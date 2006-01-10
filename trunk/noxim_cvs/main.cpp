@@ -49,7 +49,6 @@ void showHelp(char selfname[])
   cout << "\t\tnegativefirst\tNegative-First routing algorithm" << endl;
   cout << "\t\toddeven\t\tOdd-Even routing algorithm" << endl;
   cout << "\t\tdyad\t\tDyAD routing algorithm" << endl;
-  cout << "\t\tlookahead\tLook-Ahead routing algorithm" << endl;
   cout << "\t\tfullyadaptive\tFully-Adaptive routing algorithm" << endl;
   cout << "\t\ttable FILENAME\tRouting Table Based routing algorithm with table in the specified file (filename is mandatory)" << endl;
   cout << "\t-sel TYPE\tSet the selection strategy to TYPE where TYPE is one of the following (default " << DEFAULT_SELECTION_STRATEGY << "):" << endl;
@@ -191,7 +190,6 @@ int sc_main(int arg_num, char* arg_vet[])
         else if(!strcmp(arg_vet[i+1],"negativefirst")) TGlobalParams::routing_algorithm = ROUTING_NEGATIVE_FIRST;
         else if(!strcmp(arg_vet[i+1],"oddeven")) TGlobalParams::routing_algorithm = ROUTING_ODD_EVEN;
         else if(!strcmp(arg_vet[i+1],"dyad")) TGlobalParams::routing_algorithm = ROUTING_DYAD;
-        else if(!strcmp(arg_vet[i+1],"lookahead")) TGlobalParams::routing_algorithm = ROUTING_LOOK_AHEAD;
         else if(!strcmp(arg_vet[i+1],"fullyadaptive")) TGlobalParams::routing_algorithm = ROUTING_FULLY_ADAPTIVE;
         else if(!strcmp(arg_vet[i+1],"table"))
 	{

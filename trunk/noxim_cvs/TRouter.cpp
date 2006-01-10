@@ -10,46 +10,46 @@
 
 void TRouter::rxProcess()
 {
-  if(reset.read())
+    if(reset.read())
     {
-      // Clear outputs and indexes of receiving protocol
-      for(int i=0; i<DIRECTIONS+1; i++)
+	// Clear outputs and indexes of receiving protocol
+	for(int i=0; i<DIRECTIONS+1; i++)
 	{
-	  ack_rx[i].write(0);
-	  channel_state[i] = CHANNEL_EMPTY;
-	  current_level_rx[i] = 0;
-	  reservation_table[i] = CHANNEL_NOT_RESERVED;
+	    ack_rx[i].write(0);
+	    current_level_rx[i] = 0;
+	    reservation_table[i] = NOT_RESERVED;
 	}
     }
-  else
+    else
     {
-      // For each channel decide to accept or deny a new packet
-      for(int i=0; i<DIRECTIONS+1; i++)
+	// For each channel decide if a new flit can be accepted
+	//
+	// This process simply sees a flow of incoming flits. All arbitration
+	// and wormhole related issues are addressed in the txProcess()
+
+	for(int i=0; i<DIRECTIONS+1; i++)
 	{
-	  // To accept a new flit, the following conditions must match:
-	  //
-	  // 1) there is an incoming request
-	  // 2) there is a free location in the buffer
-	  // 3) if the buffer contains an initiated packet, only can continue with it, or
-	  // 4) if the buffer is empty or the last packet is completed, can accept a new one
-	  //
-	  // Actually since the Processing Element runs a Tx process a time (no multi-threading)
-	  // there's no need to check for conditions 3 and 4.
-	  if ( (req_rx[i].read()==1-current_level_rx[i]) && !buffer[i].IsFull() )
+	    // To accept a new flit, the following conditions must match:
+	    //
+	    // 1) there is an incoming request
+	    // 2) there is a free slot in the input buffer of direction i
+
+	    if ( (req_rx[i].read()==1-current_level_rx[i]) && !buffer[i].IsFull() )
 	    {
-              if(TGlobalParams::verbose_mode)
-              {
-                TFlit f = flit_rx[i].read();
-	        cout << sc_simulation_time() << ": Router[" << id <<"], Buffer["<< i << "], RECEIVED " << f << endl;
-              }
+		TFlit received_flit = flit_rx[i].read();
 
-	      // Store the incoming flit in the circular buffer
-	      buffer[i].Push(flit_rx[i].read());            
+		if(TGlobalParams::verbose_mode)
+		{
+		    cout << sc_simulation_time() << ": Router[" << id <<"], Buffer["<< i << "], RECEIVED " << received_flit << endl;
+		}
 
-	      // Negate the old value for Alternating Bit Protocol (ABP)
-	      current_level_rx[i] = 1-current_level_rx[i];
+		// Store the incoming flit in the circular buffer
+		buffer[i].Push(received_flit);            
+
+		// Negate the old value for Alternating Bit Protocol (ABP)
+		current_level_rx[i] = 1-current_level_rx[i];
 	    }
-	  ack_rx[i].write(current_level_rx[i]);
+	    ack_rx[i].write(current_level_rx[i]);
 	}
     }
 }
@@ -72,14 +72,15 @@ void TRouter::txProcess()
 	// For each channel see if it is possible to send a flit to its destination
 	for(int i=0; i<DIRECTIONS+1; i++)
 	{
-	    //TODO: non e' fair! 
-	    //Il canale i ha maggiore priorita' rispetto ai canali >i
+	    //TODO: currently not fair!
+	    //Channel i has higher priority than channels < i
 
 	    // To send a flit the following conditions must match:
 	    //
 	    // 1) there is a new flit in the buffer that needs to be sent (look at the indexes)
-	    // 2) if the destination got an initiated packet, only can continue with it (TO BE ADDED)
-	    // 3) if the destination completed the last packet, then can accept a new one (TO BE ADDED)
+	    // 2) if the destination got an initiated packet, only can continue with it 
+	    // 3) if the destination completed the last packet, then can accept a new one 
+
 	    if ( !buffer[i].IsEmpty() )
 	    {
 		int dest; // temporary to store current
@@ -94,7 +95,7 @@ void TRouter::txProcess()
 		if (flit.flit_type==FLIT_TYPE_HEAD) 
 		{
 		    dest = routing(i, flit.src_id, flit.dst_id);
-		    if (reservation_table[dest] == CHANNEL_NOT_RESERVED) 
+		    if (reservation_table[dest] == NOT_RESERVED) 
 		    {
 			short_circuit[i] = dest;     // crossbar: link input i to output dest 
 			reservation_table[dest] = i; // crossbar: reserve the output channel
@@ -116,7 +117,7 @@ void TRouter::txProcess()
 			req_tx[dest].write(current_level_tx[dest]);
 			buffer[i].Pop();
 
-			if (flit.flit_type==FLIT_TYPE_TAIL) reservation_table[short_circuit[i]] = CHANNEL_NOT_RESERVED;
+			if (flit.flit_type==FLIT_TYPE_TAIL) reservation_table[short_circuit[i]] = NOT_RESERVED;
 			
 			// Update stats
 			if (dest == DIRECTION_LOCAL)
@@ -136,7 +137,10 @@ TNoP_data TRouter::getCurrentNoPData() const
     TNoP_data NoP_data;
 
     for (int j=0; j<DIRECTIONS; j++)
-	NoP_data.buffer_status_neighbor[j] = buffer_status_neighbor[j].read();
+    {
+	NoP_data.channel_status_neighbor[j].buffer_level = buffer_level_neighbor[j].read();
+	NoP_data.channel_status_neighbor[j].available = (reservation_table[j]==NOT_RESERVED);
+    }
 
     NoP_data.sender_id = id;
 
@@ -148,36 +152,31 @@ TNoP_data TRouter::getCurrentNoPData() const
 void TRouter::bufferMonitor()
 {
   if (reset.read())
-    {
-	// upon reset, buffer status is put to 0
-	TBufferStatus bs_empty;
-	bs_empty.level = 0;
-	bs_empty.state = CHANNEL_EMPTY;
-
-      for (int i=0; i<DIRECTIONS+1; i++) buffer_status[i].write(bs_empty);
-    }
+  {
+    // upon reset, buffer level is put to 0
+    for (int i=0; i<DIRECTIONS+1; i++) buffer_level[i].write(0);
+  }
   else
   {
-      TBufferStatus tmp_bs;
 
-      // update current buffers status to neighbors
+    if (TGlobalParams::selection_strategy==SEL_BUFFER_LEVEL ||
+	TGlobalParams::selection_strategy==SEL_NOP)
+    {
 
-      for (int i=0; i<DIRECTIONS+1; i++) 
-      {
-	  tmp_bs.level = buffer[i].Size();
-	  tmp_bs.state = channel_state[i];
-	  buffer_status[i].write(tmp_bs);
-      }
+      // update current input buffers level to neighbors
+      for (int i=0; i<DIRECTIONS+1; i++)
+	buffer_level[i].write(buffer[i].Size());
 
       // NoP selection: send neighbor info to each direction 'i'
       TNoP_data current_NoP_data = getCurrentNoPData();
 
       for (int i=0; i<DIRECTIONS; i++)
-	  NoP_data_out[i].write(current_NoP_data);
-
-#if 0
+	NoP_data_out[i].write(current_NoP_data);
+#if 1
       NoP_report();
 #endif
+
+    }
   }
 }
 
@@ -212,9 +211,6 @@ int TRouter::routing(int dir_in, int src_id, int dst_id)
     case ROUTING_DYAD:
       return selectionFunction(routingDyAD(position, dst_coord));
 
-    case ROUTING_LOOK_AHEAD:
-      return selectionFunction(routingLookAhead(position, dst_coord));
-
     case ROUTING_FULLY_ADAPTIVE:
       return selectionFunction(routingFullyAdaptive(position, dst_coord));
 
@@ -237,15 +233,14 @@ void TRouter::NoP_report() const
       for (int i=0;i<DIRECTIONS; i++) 
       {
 	  NoP_tmp = NoP_data_in[i].read();
-	  cout << NoP_tmp;
+	  if (NoP_tmp.sender_id!=NOT_VALID)
+	    cout << NoP_tmp;
       }
 }
 //---------------------------------------------------------------------------
 
 int TRouter::selectionNoP(const vector<int>& directions)
 {
-    assert(false);
-
     // TODO: selection not implemented 
     return directions[rand() % directions.size()]; 
 }
@@ -254,28 +249,41 @@ int TRouter::selectionNoP(const vector<int>& directions)
 
 int TRouter::selectionBufferLevel(const vector<int>& directions)
 {
-    // TODO: currently unfair if multiple directions have same buffer level
+    // TODO: unfair if multiple directions have same buffer level
+    // TODO: to check when both available
+
     unsigned int max_free_positions = 0;
-    int direction_choosen = -1;
+    int direction_choosen = NOT_VALID;
 
     for (unsigned int i=0;i<directions.size();i++)
     {
-	unsigned int free_positions = buffer_depth - buffer_status_neighbor[directions[i]].read().level;
-	if (free_positions >= max_free_positions)
+	uint free_positions = buffer_depth - buffer_level_neighbor[directions[i]].read();
+	if ((free_positions >= max_free_positions) &&
+		(reservation_table[directions[i]] == NOT_RESERVED) )
 	{
 	    direction_choosen = directions[i];
 	    max_free_positions = free_positions;
 	}
     }
 
+    // No available channel 
+    if (direction_choosen==NOT_VALID)
+	direction_choosen = directions[rand() % directions.size()]; 
+
     if(TGlobalParams::verbose_mode)
     {
-      cout << sc_simulation_time() << ": Router[" << id << "], SELECTION between: ";
-      for (unsigned int i=0;i<directions.size();i++)
-	cout << directions[i] << "(" << buffer_status_neighbor[directions[i]] << " flits),";
-      cout << " direction choosen: " << direction_choosen << endl;
+	TChannelStatus tmp;
+
+	cout << sc_simulation_time() << ": Router[" << id << "], SELECTION between: " << endl;
+	for (unsigned int i=0;i<directions.size();i++)
+	{
+	    tmp.buffer_level = buffer_level_neighbor[directions[i]].read();
+	    tmp.available = (reservation_table[directions[i]]==NOT_RESERVED);
+	    cout << "    -> direction " << directions[i] << ", channel status: " << tmp << endl;
+	}
+	cout << " direction choosen: " << direction_choosen << endl;
     }
-    
+
     assert(direction_choosen>=0);
     return direction_choosen;
 }
@@ -290,7 +298,6 @@ int TRouter::selectionRandom(const vector<int>& directions)
 
 int TRouter::selectionFunction(const vector<int>& directions)
 {
-    // TODO: vedere che dice mau
     if (directions.size()==1) return directions[0];
 
     switch (TGlobalParams::selection_strategy)
@@ -469,19 +476,6 @@ vector<int> TRouter::routingDyAD(const TCoord& current, const TCoord& destinatio
   assert(false);
   return directions;
 }
-
-//---------------------------------------------------------------------------
-
-vector<int> TRouter::routingLookAhead(const TCoord& current, const TCoord& destination)
-{
-  vector<int> directions;
-
-  assert(false);
-  return directions;
-}
-
-//---------------------------------------------------------------------------
-
 
 //---------------------------------------------------------------------------
 

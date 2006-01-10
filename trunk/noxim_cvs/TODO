@@ -1,7 +1,8 @@
 TODO
 ---------------------------------------
-- update current channel_status on router (IN PROGRESS)
-- implement all neighbors-on-path subspecies
+- multiple verbosity levels
+- design space explorer (in progress)
+- implement all neighbors-on-path subspecies (in progress)
 - add selection strategies based on buffer level (DO DEBUGGING)
 - processing element traffic generation
 - power/energy model
@@ -9,8 +10,9 @@ TODO
 
 DONE
 ---------------------------------------
+- update current channel status on router (2006.01.10)
 - solve mesh dimension related bugs
 - web interface to choose arguments and run simulation (2005.12.14)
 - noc parameters from command line (2005.12.12)
-- create a todo file (5/12/2005)
 - a really working Makefile
+- create a todo file (5/12/2005)
