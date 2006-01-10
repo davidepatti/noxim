@@ -22,11 +22,9 @@ using namespace std;
 #define DIRECTION_WEST  3
 #define DIRECTION_LOCAL 4
 
-// Channel states for queues
-#define CHANNEL_EMPTY         0
-#define CHANNEL_HAS_HEAD      1
-#define CHANNEL_HAS_TAIL      2
-#define CHANNEL_NOT_RESERVED  3
+// Generic not reserved resource
+#define NOT_RESERVED  -1
+
 // To mark invalid or non exhistent values
 #define NOT_VALID            -1
 
@@ -37,7 +35,6 @@ using namespace std;
 #define ROUTING_NEGATIVE_FIRST 3
 #define ROUTING_ODD_EVEN       4
 #define ROUTING_DYAD           5
-#define ROUTING_LOOK_AHEAD     6
 #define ROUTING_FULLY_ADAPTIVE 8
 #define ROUTING_TABLE_BASED    9
 
@@ -136,13 +133,13 @@ struct TPacket
   int                flit_left;    // Number of remaining flits inside the packet
 };
 
-struct TBufferStatus
+struct TChannelStatus
 {
-    int level;  // occupied buffer slots
-    int state; // (is empty, has head, has tail, not_reserved)
-    inline bool operator == (const TBufferStatus& bs) const
+    uint buffer_level;  // occupied buffer slots
+    bool available; // 
+    inline bool operator == (const TChannelStatus& bs) const
     {
-	return (level == bs.level && state == bs.state);
+	return (buffer_level == bs.buffer_level && available == bs.available);
     };
 };
 
@@ -151,15 +148,15 @@ struct TBufferStatus
 struct TNoP_data
 {
     int sender_id;
-    TBufferStatus buffer_status_neighbor[DIRECTIONS]; 
+    TChannelStatus channel_status_neighbor[DIRECTIONS]; 
 
     inline bool operator == (const TNoP_data& nop_data) const
     {
 	return ( sender_id==nop_data.sender_id  &&
-	         nop_data.buffer_status_neighbor[0]==buffer_status_neighbor[0] &&
-	         nop_data.buffer_status_neighbor[1]==buffer_status_neighbor[1] &&
-	         nop_data.buffer_status_neighbor[2]==buffer_status_neighbor[2] &&
-	         nop_data.buffer_status_neighbor[3]==buffer_status_neighbor[3]);
+		nop_data.channel_status_neighbor[0]==channel_status_neighbor[0] &&
+		nop_data.channel_status_neighbor[1]==channel_status_neighbor[1] &&
+		nop_data.channel_status_neighbor[2]==channel_status_neighbor[2] &&
+		nop_data.channel_status_neighbor[3]==channel_status_neighbor[3]);
     };
 };
 
@@ -209,31 +206,13 @@ inline ostream& operator << (ostream& os, const TFlit& flit)
   return os;
 }
 
-inline ostream& operator << (ostream& os, const TBufferStatus& bs)
+inline ostream& operator << (ostream& os, const TChannelStatus& status)
 {
   string msg;
-  switch (bs.state)
-  {
-      case CHANNEL_EMPTY: 
-	  msg = "E";
-	  break;
-      case CHANNEL_HAS_HEAD:
-	  msg = "H";
-	  break;
-      case CHANNEL_HAS_TAIL:
-	  msg = "T";
-	  break;
-      case CHANNEL_NOT_RESERVED:
-	  msg = "N";
-	  break;
-      case NOT_VALID:
-	  msg = "x";
-	  break;
-      default:
-	  cout << "Error: channel state = " <<  bs.state << endl;
-	  assert(0);
-  }
-  os << msg << "(" << bs.level << ")"; 
+  if (status.available) msg = "A"; 
+  else
+      msg = "N";
+  os << msg << "(" << status.buffer_level << ")"; 
   return os;
 }
 
@@ -242,7 +221,7 @@ inline ostream& operator << (ostream& os, const TNoP_data& NoP_data)
   os << "   NoP data from [" << NoP_data.sender_id << "] [ ";
 
   for (int j=0; j<DIRECTIONS; j++)
-      os << NoP_data.buffer_status_neighbor[j] << " ";
+      os << NoP_data.channel_status_neighbor[j] << " ";
 
   cout << "]" << endl;
   return os;
@@ -269,10 +248,10 @@ inline void sc_trace(sc_trace_file*& tf, const TNoP_data& NoP_data, string& name
   sc_trace(tf, NoP_data.sender_id, name+".sender_id");
 }
 
-inline void sc_trace(sc_trace_file*& tf, const TBufferStatus& bs, string& name)
+inline void sc_trace(sc_trace_file*& tf, const TChannelStatus& bs, string& name)
 {
-  sc_trace(tf, bs.level, name+".level");
-  sc_trace(tf, bs.state, name+".state");
+  sc_trace(tf, bs.buffer_level, name+".buffer_level");
+  sc_trace(tf, bs.available, name+".available");
 }
 
 inline TCoord id2Coord(int id) 
