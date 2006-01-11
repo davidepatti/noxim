@@ -152,10 +152,44 @@ TTile* TNoC::searchNode(const int id) const
 {
   for (int i=0; i<TGlobalParams::mesh_dim_x; i++)
     for (int j=0; j<TGlobalParams::mesh_dim_y; j++)
-      if (t[i][j]->r->id == id)
+      if (t[i][j]->r->local_id == id)
 	return t[i][j];
 
   return false;
+}
+
+//---------------------------------------------------------------------------
+
+int TNoC::getNeighborId(const int _id, const int direction) const
+{
+    TCoord my_coord = id2Coord(_id);
+
+    switch (direction)
+    {
+	case DIRECTION_NORTH:
+	    if (my_coord.y==0) return NOT_VALID;
+	    my_coord.y--;
+	    break;
+	case DIRECTION_SOUTH:
+	    if (my_coord.y==TGlobalParams::mesh_dim_y-1) return NOT_VALID;
+	    my_coord.y++;
+	    break;
+	case DIRECTION_EAST:
+	    if (my_coord.x==TGlobalParams::mesh_dim_x-1) return NOT_VALID;
+	    my_coord.x++;
+	    break;
+	case DIRECTION_WEST:
+	    if (my_coord.x==0) return NOT_VALID;
+	    my_coord.x--;
+	    break;
+	default:
+	    cout << "direction not valid : " << direction;
+	    assert(false);
+    }
+
+    int neighbor_id = coord2Id(my_coord);
+
+  return neighbor_id;
 }
 
 //---------------------------------------------------------------------------
