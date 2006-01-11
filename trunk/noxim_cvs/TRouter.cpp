@@ -38,7 +38,7 @@ void TRouter::rxProcess()
 	    {
 		TFlit received_flit = flit_rx[i].read();
 
-		if(TGlobalParams::verbose_mode)
+		if(TGlobalParams::verbose_mode > VERBOSE_OFF)
 		{
 		    cout << sc_simulation_time() << ": Router[" << id <<"], Buffer["<< i << "], RECEIVED " << received_flit << endl;
 		}
@@ -85,7 +85,7 @@ void TRouter::txProcess()
 	    {
 		int dest; // temporary to store current
 
-                if(TGlobalParams::verbose_mode)
+                if(TGlobalParams::verbose_mode > VERBOSE_OFF)
                 {
                   cout << sc_simulation_time() << ": Router[" << id << "], Buffer[" << i << "](" << buffer[i].Size() << " flits)" << endl;
                 }
@@ -107,7 +107,7 @@ void TRouter::txProcess()
 		{
 		    if ( current_level_tx[dest] == ack_tx[dest].read() )
 		    {
-                      if(TGlobalParams::verbose_mode)
+                      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
                       {
 			cout << sc_simulation_time() << ": Router[" << id << "] SENDING " << flit << " towards port " << dest << endl;
                       }
@@ -270,7 +270,7 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
     if (direction_choosen==NOT_VALID)
 	direction_choosen = directions[rand() % directions.size()]; 
 
-    if(TGlobalParams::verbose_mode)
+    if(TGlobalParams::verbose_mode>VERBOSE_OFF)
     {
 	TChannelStatus tmp;
 

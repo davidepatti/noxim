@@ -36,7 +36,7 @@ void showHelp(char selfname[])
 {
   cout << "Usage: " << selfname << " [options]\nwhere [options] is one or more of the following ones:" << endl;
   cout << "\t-help\t\tShow this help and exit" << endl;
-  cout << "\t-verbose\tVerbose output (default off)" << endl;
+  cout << "\t-verbose N\tVerbosity level (1=low, 2=medium, 3=high, default off)" << endl;
   cout << "\t-trace FILENAME\tTrace signals to a VCD file named 'FILENAME.vcd' (default off, filename is mandatory)" << endl;
   cout << "\t-dimx N\t\tSet the mesh X dimension to the specified integer value (default " << DEFAULT_MESH_DIM_X << ")" << endl;
   cout << "\t-dimy N\t\tSet the mesh Y dimension to the specified integer value (default " << DEFAULT_MESH_DIM_Y << ")" << endl;
@@ -133,8 +133,18 @@ int sc_main(int arg_num, char* arg_vet[])
       if(!strcmp(arg_vet[i],"-help")) showHelp(arg_vet[0]);
       else if(!strcmp(arg_vet[i],"-verbose"))
       {
-        TGlobalParams::verbose_mode = true;
-        i++;
+	int level = atoi(arg_vet[i+1]);
+	if ( (level>0) && (level<4))
+	{
+	  TGlobalParams::verbose_mode = level;
+	  i+=2;
+	}
+	else if ( level>=4)
+	{
+	  TGlobalParams::verbose_mode = -level;
+	  i+=2;
+	}
+        else badArgument(arg_vet[i+1], arg_vet[i]);
       }
       else if(!strcmp(arg_vet[i],"-trace"))
       {
@@ -261,7 +271,7 @@ int sc_main(int arg_num, char* arg_vet[])
       else badOption(arg_vet[i]);
     } while (i<arg_num);
   }
-  if(TGlobalParams::verbose_mode) showConfig();
+  if(TGlobalParams::verbose_mode > VERBOSE_OFF) showConfig();
 
   // Signals
   sc_clock        clock("clock", 1);

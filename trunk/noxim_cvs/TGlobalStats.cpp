@@ -113,7 +113,7 @@ unsigned int TGlobalStats::getReceivedFlits()
 
 void TGlobalStats::showStats(std::ostream& out)
 {
-  if(TGlobalParams::verbose_mode)
+  if(TGlobalParams::verbose_mode > VERBOSE_OFF)
     for (int y=0; y<TGlobalParams::mesh_dim_y; y++)
       for (int x=0; x<TGlobalParams::mesh_dim_x; x++)
         noc->t[x][y]->r->stats.showStats(out);
