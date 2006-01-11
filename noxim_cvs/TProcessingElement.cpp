@@ -20,7 +20,7 @@ void TProcessingElement::rxProcess()
     if(req_rx.read()==1-current_level_rx)
     {
       TFlit flit_tmp = flit_rx.read();
-      if(TGlobalParams::verbose_mode)
+      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
       {
         cout << sc_simulation_time() << ": ProcessingElement[" << id << "] RECEIVING " << flit_tmp << endl;
       }
@@ -53,7 +53,7 @@ void TProcessingElement::txProcess()
       if(!packet_queue.empty())
       {
         TFlit flit = nextFlit();                  // Generate a new flit
-        if(TGlobalParams::verbose_mode)
+        if(TGlobalParams::verbose_mode > VERBOSE_OFF)
         {
           cout << sc_simulation_time() << ": ProcessingElement[" << id << "] SENDING " << flit << endl;
         }

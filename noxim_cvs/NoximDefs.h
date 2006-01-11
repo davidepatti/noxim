@@ -50,10 +50,17 @@ using namespace std;
 #define TRAFFIC_HOTSPOT       3
 #define TRAFFIC_TABLE_BASED   4
 
+
+// Verbosity levels
+#define VERBOSE_OFF 0
+#define VERBOSE_LOW 1
+#define VERBOSE_MEDIUM 2
+#define VERBOSE_HIGH 3
+
 //---------------------------------------------------------------------------
 
 // Default configuration can be overridden with command-line arguments
-#define DEFAULT_VERBOSE_MODE                     false
+#define DEFAULT_VERBOSE_MODE                     VERBOSE_OFF
 #define DEFAULT_TRACE_MODE                       false
 #define DEFAULT_TRACE_FILENAME                      ""
 #define DEFAULT_MESH_DIM_X                           4
