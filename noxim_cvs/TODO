@@ -1,15 +1,16 @@
 TODO
 ---------------------------------------
-- multiple verbosity levels
+- code cleanup: add "const" qualifiers where needed
 - design space explorer (in progress)
 - implement all neighbors-on-path subspecies (in progress)
-- add selection strategies based on buffer level (DO DEBUGGING)
 - processing element traffic generation
 - power/energy model
 
 
 DONE
 ---------------------------------------
+- multiple verbosity levels (2006.01.11)
+- add selection strategies based on buffer level (2006.01.10)
 - update current channel status on router (2006.01.10)
 - solve mesh dimension related bugs
 - web interface to choose arguments and run simulation (2005.12.14)

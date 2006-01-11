@@ -140,6 +140,15 @@ struct TPacket
   int                flit_left;    // Number of remaining flits inside the packet
 };
 
+// TRouteData -- data required to perform routing
+struct TRouteData
+{
+    int current_id;
+    int src_id;
+    int dst_id;
+    int dir_in; // direction from which the packet comes from
+};
+
 struct TChannelStatus
 {
     uint buffer_level;  // occupied buffer slots
@@ -190,24 +199,25 @@ struct TFlit
 
 inline ostream& operator << (ostream& os, const TFlit& flit)
 {
-  // TODO: decide what to do with the commented code. Move to a
-  // separate print_flit() function for debugging purposes ?
 
-  /*
-  os << "### FLIT ###" << endl;
-  os << "Source Tile[" << flit.src_coord.x << "][" << flit.src_coord.y << "]" << endl;
-  os << "Destination Tile[" << flit.dst_coord.x << "][" << flit.dst_coord.y << "]" << endl;
-  switch(flit.flit_type)
+  if (TGlobalParams::verbose_mode==VERBOSE_HIGH)
   {
-    case FLIT_TYPE_HEAD: os << "Flit Type is HEAD" << endl; break;
-    case FLIT_TYPE_BODY: os << "Flit Type is BODY" << endl; break;
-    case FLIT_TYPE_TAIL: os << "Flit Type is TAIL" << endl; break;
+
+      os << "### FLIT ###" << endl;
+      os << "Source Tile[" << flit.src_id << "]" << endl;
+      os << "Destination Tile[" << flit.dst_id << "]" << endl;
+      switch(flit.flit_type)
+      {
+	case FLIT_TYPE_HEAD: os << "Flit Type is HEAD" << endl; break;
+	case FLIT_TYPE_BODY: os << "Flit Type is BODY" << endl; break;
+	case FLIT_TYPE_TAIL: os << "Flit Type is TAIL" << endl; break;
+      }
+      os << "Sequence no. " << flit.sequence_no << endl;
+      os << "Payload printing not implemented (yet)." << endl;
+      os << "Unix timestamp at packet generation " << flit.timestamp << endl;
+      os << "Total number of hops from source to destination is " << flit.hop_no << endl;
   }
-  os << "Sequence no. " << flit.sequence_no << endl;
-  os << "Payload printing not implemented (yet)." << endl;
-  os << "Unix timestamp at packet generation " << flit.timestamp << endl;
-  os << "Total number of hops from source to destination is " << flit.hop_no << endl;
-  */
+  else
   os << "[flit seq=" << flit.sequence_no << ", " << flit.src_id << "-->" << flit.dst_id << "]"; 
 
   return os;

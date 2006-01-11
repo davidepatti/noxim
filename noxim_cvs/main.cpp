@@ -271,6 +271,14 @@ int sc_main(int arg_num, char* arg_vet[])
       else badOption(arg_vet[i]);
     } while (i<arg_num);
   }
+
+  if (TGlobalParams::routing_algorithm == ROUTING_XY &&
+      TGlobalParams::selection_strategy != SEL_RANDOM)
+  {
+    cout << "\n Error: -sel option cannot be used in conjunction of XY static routing!" << endl;
+    exit (1);
+  }
+
   if(TGlobalParams::verbose_mode > VERBOSE_OFF) showConfig();
 
   // Signals

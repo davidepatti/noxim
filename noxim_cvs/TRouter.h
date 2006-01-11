@@ -45,7 +45,7 @@ SC_MODULE(TRouter)
   /*
   TCoord             position;                        // Router position inside the mesh
   */
-  int                id;                              // Unique ID
+  int                local_id;                              // Unique ID
   int                routing_type;                    // Type of routing algorithm
   int                selection_type;
   int                buffer_depth;
@@ -86,13 +86,21 @@ SC_MODULE(TRouter)
 
  private:
 
-  int routing(int dir_in, int src_id, int dst_id);
+  // performs actual routing + selection
+  int route(const TRouteData& route_data);
 
-  int selectionFunction(const vector<int>& directions);
+  // wrappers
+  int selectionFunction(const vector<int>& directions,const TRouteData& route_data);
+  vector<int> routingFunction(const TRouteData& route_data);
+
+
+  // selection strategies
   int selectionRandom(const vector<int>& directions);
   int selectionBufferLevel(const vector<int>& directions);
-  int selectionNoP(const vector<int>& directions);
+  int selectionNoP(const vector<int>& directions,const TRouteData& route_data);
 
+
+  // routing functions
   vector<int> routingXY(const TCoord& current, const TCoord& destination);
   vector<int> routingWestFirst(const TCoord& current, const TCoord& destination);
   vector<int> routingNorthLast(const TCoord& current, const TCoord& destination);

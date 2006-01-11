@@ -119,6 +119,7 @@ SC_MODULE(TNoC)
 
   // Support methods
   TTile* searchNode(const int id) const;
+  int getNeighborId(const int _id,const int direction) const;
 
  private:
   void buildMesh();
