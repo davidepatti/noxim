@@ -15,18 +15,18 @@
 using namespace std;
 
 // Define the directions as numbers
-#define DIRECTIONS      4
-#define DIRECTION_NORTH 0
-#define DIRECTION_EAST  1
-#define DIRECTION_SOUTH 2
-#define DIRECTION_WEST  3
-#define DIRECTION_LOCAL 4
+#define DIRECTIONS             4
+#define DIRECTION_NORTH        0
+#define DIRECTION_EAST         1
+#define DIRECTION_SOUTH        2
+#define DIRECTION_WEST         3
+#define DIRECTION_LOCAL        4
 
 // Generic not reserved resource
-#define NOT_RESERVED  -1
+#define NOT_RESERVED          -1
 
 // To mark invalid or non exhistent values
-#define NOT_VALID            -1
+#define NOT_VALID             -1
 
 // Routing algorithms
 #define ROUTING_XY             0
@@ -39,28 +39,27 @@ using namespace std;
 #define ROUTING_TABLE_BASED    9
 
 // Selection strategies
-#define SEL_RANDOM            0
-#define SEL_BUFFER_LEVEL      1
-#define SEL_NOP               2
+#define SEL_RANDOM             0
+#define SEL_BUFFER_LEVEL       1
+#define SEL_NOP                2
 
 // Traffic distribution
-#define TRAFFIC_UNIFORM       0
-#define TRAFFIC_TRANSPOSE1    1
-#define TRAFFIC_TRANSPOSE2    2
-#define TRAFFIC_HOTSPOT       3
-#define TRAFFIC_TABLE_BASED   4
-
+#define TRAFFIC_UNIFORM        0
+#define TRAFFIC_TRANSPOSE1     1
+#define TRAFFIC_TRANSPOSE2     2
+#define TRAFFIC_HOTSPOT        3
+#define TRAFFIC_TABLE_BASED    4
 
 // Verbosity levels
-#define VERBOSE_OFF 0
-#define VERBOSE_LOW 1
-#define VERBOSE_MEDIUM 2
-#define VERBOSE_HIGH 3
+#define VERBOSE_OFF            0
+#define VERBOSE_LOW            1
+#define VERBOSE_MEDIUM         2
+#define VERBOSE_HIGH           3
 
 //---------------------------------------------------------------------------
 
 // Default configuration can be overridden with command-line arguments
-#define DEFAULT_VERBOSE_MODE                     VERBOSE_OFF
+#define DEFAULT_VERBOSE_MODE               VERBOSE_OFF
 #define DEFAULT_TRACE_MODE                       false
 #define DEFAULT_TRACE_FILENAME                      ""
 #define DEFAULT_MESH_DIM_X                           4
@@ -71,6 +70,7 @@ using namespace std;
 #define DEFAULT_ROUTING_TABLE_FILENAME              ""
 #define DEFAULT_SELECTION_STRATEGY          SEL_RANDOM
 #define DEFAULT_PACKET_INJECTION_RATE             0.01
+#define DEFAULT_PROBABILITY_OF_RETRANSMISSION     0.01
 #define DEFAULT_TRAFFIC_DISTRIBUTION   TRAFFIC_UNIFORM
 #define DEFAULT_TRAFFIC_TABLE_FILENAME              ""
 #define DEFAULT_RESET_TIME                        1000
@@ -91,6 +91,7 @@ struct TGlobalParams
   static char routing_table_filename[128];
   static int selection_strategy;
   static float packet_injection_rate;
+  static float probability_of_retransmission;
   static int traffic_distribution;
   static char traffic_table_filename[128];
   static int simulation_time;

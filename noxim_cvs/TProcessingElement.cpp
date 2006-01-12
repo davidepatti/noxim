@@ -38,15 +38,19 @@ void TProcessingElement::txProcess()
   {
     req_tx.write(0);
     current_level_tx = 0;
+    transmittedAtPreviousCycle = false;
   }
   else
   {
-    if( (TGlobalParams::traffic_distribution==TRAFFIC_TABLE_BASED && occurrencesInTrafficTableAsSource) || TGlobalParams::traffic_distribution!=TRAFFIC_TABLE_BASED)
+    TPacket transmittible_packet = nextPacket();
+    if(probabilityShot(transmittible_packet))
     {
-      TPacket transmittible_packet = nextPacket();
-      if(probabilityShot(transmittible_packet))
-        packet_queue.push(transmittible_packet);
+      packet_queue.push(transmittible_packet);
+      transmittedAtPreviousCycle = true;
     }
+    else
+      transmittedAtPreviousCycle = false;
+
 
     if(ack_tx.read() == current_level_tx)
     {
@@ -97,32 +101,24 @@ TFlit TProcessingElement::nextFlit()
 
 bool TProcessingElement::probabilityShot(TPacket p)
 {
-  // For Traffic Table Based traffic distribution the PIR is normalized
-  if(TGlobalParams::traffic_distribution==TRAFFIC_TABLE_BASED)
+  float pir;
+  switch(TGlobalParams::traffic_distribution)
   {
-    if(occurrencesInTrafficTableAsSource)
-    {
-      float pir = traffic_table->getPirForTheSelectedLink(p.src_id, p.dst_id);
-      if((double)rand()/RAND_MAX <= (pir*TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y)*occurrencesInTrafficTableAsSource/traffic_table->size())
-      {
-        return true;
-      }
+    case TRAFFIC_TABLE_BASED:
+      pir = traffic_table->getPirForTheSelectedLink(p.src_id, p.dst_id);
+      break;
+    default:
+      if (!transmittedAtPreviousCycle)
+        pir = TGlobalParams::packet_injection_rate;
       else
-      {
-        return false;
-      }
-    }
-    else return false;
+        pir = TGlobalParams::probability_of_retransmission;
+      break;
   }
-  else  // Normal case
-  if((double)rand()/RAND_MAX <= TGlobalParams::packet_injection_rate)
-  {
+
+  if( ((double)rand())/RAND_MAX < pir)
     return true;
-  }
   else
-  {
     return false;
-  }
   
 /* wormhole test
   static int s1 = 0;
