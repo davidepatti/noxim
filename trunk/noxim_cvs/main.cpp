@@ -25,6 +25,7 @@ int TGlobalParams::routing_algorithm            = DEFAULT_ROUTING_ALGORITHM;
 char TGlobalParams::routing_table_filename[128] = DEFAULT_ROUTING_TABLE_FILENAME;
 int TGlobalParams::selection_strategy           = DEFAULT_SELECTION_STRATEGY;
 float TGlobalParams::packet_injection_rate      = DEFAULT_PACKET_INJECTION_RATE;
+float TGlobalParams::probability_of_retransmission = DEFAULT_PROBABILITY_OF_RETRANSMISSION;
 int TGlobalParams::traffic_distribution         = DEFAULT_TRAFFIC_DISTRIBUTION;
 char TGlobalParams::traffic_table_filename[128] = DEFAULT_TRAFFIC_TABLE_FILENAME;
 int TGlobalParams::simulation_time              = DEFAULT_SIMULATION_TIME;
@@ -56,11 +57,12 @@ void showHelp(char selfname[])
   cout << "\t\tbufferlevel\tBuffer-Level Based selection strategy" << endl;
   cout << "\t\tnop\t\tNeigbors-on-Path selection strategy" << endl;
   cout << "\t-pir R\t\tSet the packet injection rate to the specified real value [0..1] (default " << DEFAULT_PACKET_INJECTION_RATE << ")" << endl;
+  cout << "\t-por R\t\tSet the probability of retransmission to the specified real value [0..1] (default same of PIR)" << endl;
   cout << "\t-traffic TYPE\tSet the traffic distribution to TYPE where TYPE is one of the following (default " << DEFAULT_TRAFFIC_DISTRIBUTION << "'):" << endl;
   cout << "\t\tuniform\t\tUniform traffic distribution" << endl;
   cout << "\t\ttranspose1\tTranspose matrix 1 traffic distribution" << endl;
   cout << "\t\ttranspose2\tTranspose matrix 2 traffic distribution" << endl;
-  cout << "\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file (filename is mandatory)" << endl;
+  cout << "\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file (ignores global PIR, filename is mandatory)" << endl;
   cout << "\t-warmup N\tStart to collect statistics after N cycles (default " << DEFAULT_STATS_WARM_UP_TIME << ")" << endl;
   cout << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << DEFAULT_SIMULATION_TIME << ")" << endl << endl;
   cout << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <mpalesi@diit.unict.it>" << endl;
@@ -85,6 +87,7 @@ void showConfig()
   //  cout << "- routing_table_filename = " << TGlobalParams::routing_table_filename << endl;
   cout << "- selection_strategy = " << TGlobalParams::selection_strategy << endl;
   cout << "- packet_injection_rate = " << TGlobalParams::packet_injection_rate << endl;
+  cout << "- probability_of_retransmission = " << TGlobalParams::probability_of_retransmission << endl;
   cout << "- traffic_distribution = " << TGlobalParams::traffic_distribution << endl;
   cout << "- simulation_time = " << TGlobalParams::simulation_time << endl;
   cout << "- stats_warm_up_time = " << TGlobalParams::stats_warm_up_time << endl;
@@ -118,6 +121,9 @@ void badInputFilename(char filename[])
 
 int sc_main(int arg_num, char* arg_vet[])
 {
+  bool specifiedPir = false;
+  bool specifiedPor = false;
+
   // Handle command-line arguments
   cout << endl << "\t\tNoxim - the NoC Simulator" << endl;
   cout << "\t\t(C) University of Catania" << endl << endl;
@@ -208,6 +214,7 @@ int sc_main(int arg_num, char* arg_vet[])
           FILE* fp = fopen(TGlobalParams::routing_table_filename, "r");
           if(fp==NULL) badInputFilename(TGlobalParams::routing_table_filename);
           fclose(fp);
+          TGlobalParams::packet_injection_rate = 0;
           i++;
         }
         else badArgument(arg_vet[i+1], arg_vet[i]);
@@ -228,6 +235,18 @@ int sc_main(int arg_num, char* arg_vet[])
 	{
           TGlobalParams::packet_injection_rate = new_pir;
           i+=2;
+          specifiedPir = true;
+        }
+        else badArgument(arg_vet[i+1], arg_vet[i]);
+      }
+      else if(!strcmp(arg_vet[i],"-por"))
+      {
+        float new_por = atof(arg_vet[i+1]);
+        if(new_por>0)
+	{
+          TGlobalParams::probability_of_retransmission = new_por;
+          i+=2;
+          specifiedPor = true;
         }
         else badArgument(arg_vet[i+1], arg_vet[i]);
       }
@@ -272,6 +291,10 @@ int sc_main(int arg_num, char* arg_vet[])
     } while (i<arg_num);
   }
 
+  // Check special cases
+  if(specifiedPir && !specifiedPor)
+    TGlobalParams::probability_of_retransmission = TGlobalParams::packet_injection_rate;
+
   if (TGlobalParams::routing_algorithm == ROUTING_XY &&
       TGlobalParams::selection_strategy != SEL_RANDOM)
   {
@@ -279,6 +302,7 @@ int sc_main(int arg_num, char* arg_vet[])
     exit (1);
   }
 
+  // Show configuration
   if(TGlobalParams::verbose_mode > VERBOSE_OFF) showConfig();
 
   // Signals

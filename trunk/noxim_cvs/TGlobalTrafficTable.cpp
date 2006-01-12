@@ -52,7 +52,6 @@ float TGlobalTrafficTable::getPirForTheSelectedLink(int src_id, int dst_id)
       return traffic_table[i].pir;
   }
 
-  assert(false);
   return 0;
 }
 
