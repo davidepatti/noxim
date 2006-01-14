@@ -74,13 +74,13 @@ vector<int> admissibleOutputsSet2Vector(const TAdmissibleOutputs& ao)
 
   for (TAdmissibleOutputs::iterator i=ao.begin(); i!=ao.end(); i++)
     dirs.push_back(oLinkId2Direction(*i));
-  
+
   return dirs;
 }
 
 //---------------------------------------------------------------------------
 
-#define COLUMN_AOC 23
+#define COLUMN_AOC 22
 
 //---------------------------------------------------------------------------
 
@@ -122,6 +122,7 @@ bool TGlobalRoutingTable::load(const char* fname)
 		  while (sscanf(pstr, "%d->%d", &out_src, &out_dst) == 2)
 		    {
 		      TLinkId lout(out_src, out_dst);
+
 		      rt_noc[node_id][lin][dst_id].insert(lout);
 		      
 		      pstr = strstr(pstr, ",");
@@ -167,3 +168,4 @@ TRoutingTableNode TGlobalRoutingTable::getNodeRoutingTable(const int node_id)
 }
 
 //---------------------------------------------------------------------------
+
