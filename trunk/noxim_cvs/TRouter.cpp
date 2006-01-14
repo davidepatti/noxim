@@ -550,7 +550,7 @@ vector<int> TRouter::routingFullyAdaptive(const TCoord& current, const TCoord& d
 vector<int> TRouter::routingTableBased(const int dir_in, const TCoord& current, const TCoord& destination)
 {
   TAdmissibleOutputs ao = rtable.getAdmissibleOutputs(dir_in, coord2Id(destination));
-
+  
   assert(ao.size() > 0);
   
   return admissibleOutputsSet2Vector(ao);
@@ -566,7 +566,7 @@ void TRouter::configure(const int _id,
   stats.configure(_id, _warm_up_time);
   
   if (grt.isValid())
-    grt.getNodeRoutingTable(_id);
+    rtable.configure(grt, _id);
 }
 
 //---------------------------------------------------------------------------

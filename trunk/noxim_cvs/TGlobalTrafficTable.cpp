@@ -38,8 +38,11 @@ int TGlobalTrafficTable::randomDestinationGivenTheSource(const int src)
     if(traffic_table[i].src == src)
       possible_destinations.push_back(traffic_table[i].dst);
   }
-  assert(possible_destinations.size()>0);
-  return possible_destinations[rand()%possible_destinations.size()];
+
+  //assert(possible_destinations.size()>0);
+  int ndests = possible_destinations.size();
+
+  return (ndests) ? possible_destinations[rand() % ndests] : NOT_VALID;
 }
 
 //---------------------------------------------------------------------------
