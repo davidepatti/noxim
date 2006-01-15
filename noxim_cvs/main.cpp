@@ -30,6 +30,7 @@ int TGlobalParams::traffic_distribution         = DEFAULT_TRAFFIC_DISTRIBUTION;
 char TGlobalParams::traffic_table_filename[128] = DEFAULT_TRAFFIC_TABLE_FILENAME;
 int TGlobalParams::simulation_time              = DEFAULT_SIMULATION_TIME;
 int TGlobalParams::stats_warm_up_time           = DEFAULT_STATS_WARM_UP_TIME;
+int TGlobalParams::rnd_generator_seed           = time(NULL);
 
 //---------------------------------------------------------------------------
 
@@ -64,6 +65,7 @@ void showHelp(char selfname[])
   cout << "\t\ttranspose2\tTranspose matrix 2 traffic distribution" << endl;
   cout << "\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file (ignores global PIR, filename is mandatory)" << endl;
   cout << "\t-warmup N\tStart to collect statistics after N cycles (default " << DEFAULT_STATS_WARM_UP_TIME << ")" << endl;
+  cout << "\t-seed N\tSet the seed of the random generator (default time())" << endl;
   cout << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << DEFAULT_SIMULATION_TIME << ")" << endl << endl;
   cout << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <mpalesi@diit.unict.it>" << endl;
   cout << "If you find this program useless please feel free to complain with Davide Patti <dpatti@diit.unict.it>" << endl;
@@ -91,6 +93,7 @@ void showConfig()
   cout << "- traffic_distribution = " << TGlobalParams::traffic_distribution << endl;
   cout << "- simulation_time = " << TGlobalParams::simulation_time << endl;
   cout << "- stats_warm_up_time = " << TGlobalParams::stats_warm_up_time << endl;
+  cout << "- rnd_generator_seed = " << TGlobalParams::rnd_generator_seed << endl;
 }
 
 //---------------------------------------------------------------------------
@@ -277,6 +280,16 @@ int sc_main(int arg_num, char* arg_vet[])
         }
         else badArgument(arg_vet[i+1], arg_vet[i]);
       }
+      else if(!strcmp(arg_vet[i],"-seed"))
+      {
+        int new_rnd_generator_seed = atoi(arg_vet[i+1]);
+        if(new_rnd_generator_seed>=0)
+	{
+          TGlobalParams::rnd_generator_seed = new_rnd_generator_seed;
+          i+=2;
+        }
+        else badArgument(arg_vet[i+1], arg_vet[i]);
+      }
       else if(!strcmp(arg_vet[i],"-sim"))
       {
         int new_sim = atoi(arg_vet[i+1]);
@@ -363,7 +376,7 @@ int sc_main(int arg_num, char* arg_vet[])
   // Reset the chip and run the simulation
   reset.write(1);
   cout << "Reset...";
-  srand(time(NULL));
+  srand(TGlobalParams::rnd_generator_seed); // time(NULL));
   sc_start(DEFAULT_RESET_TIME, SC_NS);
   reset.write(0);
   cout << " done! Now running for " << TGlobalParams::simulation_time << " cycles..." << endl;
