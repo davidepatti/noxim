@@ -96,6 +96,7 @@ struct TGlobalParams
   static char traffic_table_filename[128];
   static int simulation_time;
   static int stats_warm_up_time;
+  static int rnd_generator_seed;
 };
 
 // TODO by Fafa - this MUST be removed!!!
