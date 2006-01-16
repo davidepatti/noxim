@@ -17,8 +17,9 @@ void TRouter::rxProcess()
 	{
 	  ack_rx[i].write(0);
 	  current_level_rx[i] = 0;
-	  reservation_table[i] = NOT_RESERVED;
 	}
+      reservation_table.clear();
+      
     }
   else
     {
@@ -89,9 +90,9 @@ void TRouter::txProcess()
 
 		  int o = route(route_data);
 
-		  if (!rsv_table.isReserved(o))
+		  if (!reservation_table.isReserved(o))
 		    {
-		      rsv_table.reserve(i, o);
+		      reservation_table.reserve(i, o);
 		      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
 			{
 			  cout << sc_simulation_time() 
@@ -112,7 +113,7 @@ void TRouter::txProcess()
 	    {
 	      TFlit flit = buffer[i].Front();
 
-	      int o = rsv_table.getOutputPort(i);
+	      int o = reservation_table.getOutputPort(i);
 	      if (o != NOT_RESERVED)
 		{
 		  if ( current_level_tx[o] == ack_tx[o].read() )
@@ -130,7 +131,7 @@ void TRouter::txProcess()
 		      buffer[i].Pop();
 
 		      if (flit.flit_type == FLIT_TYPE_TAIL) 
-			rsv_table.release(o);
+			reservation_table.release(o);
 			
 		      // Update stats
 		      if (o == DIRECTION_LOCAL)
@@ -151,7 +152,7 @@ TNoP_data TRouter::getCurrentNoPData() const
     for (int j=0; j<DIRECTIONS; j++)
     {
 	NoP_data.channel_status_neighbor[j].buffer_level = buffer_level_neighbor[j].read();
-	NoP_data.channel_status_neighbor[j].available = (reservation_table[j]==NOT_RESERVED);
+	NoP_data.channel_status_neighbor[j].available = (!reservation_table.isReserved(j));
     }
 
     NoP_data.sender_id = local_id;
@@ -251,7 +252,7 @@ int TRouter::route(const TRouteData& route_data)
 void TRouter::NoP_report() const
 {
     TNoP_data NoP_tmp;
-      cout << sc_simulation_time() << ": Router[" << local_id << "], NoP report: " << endl;
+      cout << sc_simulation_time() << ": Router[" << local_id << "] NoP report: " << endl;
 
       for (int i=0;i<DIRECTIONS; i++) 
       {
@@ -262,21 +263,73 @@ void TRouter::NoP_report() const
 }
 //---------------------------------------------------------------------------
 
+int TRouter::NoPScore(const TNoP_data& nop_data, const vector<int>& nop_channels) const
+{
+    int score = 0;
+
+    if (TGlobalParams::verbose_mode==-58)
+    {
+	cout << nop_data;
+	cout << "      On-Path channels: " << endl;
+    }
+
+    for (unsigned int i=0;i<nop_channels.size();i++)
+    {
+	int available;
+	int level;
+
+	if (nop_data.channel_status_neighbor[nop_channels[i]].available)
+	    available = 1; 
+	else available = 0;
+
+	level = nop_data.channel_status_neighbor[nop_channels[i]].buffer_level;
+
+	if (TGlobalParams::verbose_mode==-58)
+	{
+	    cout << "       channel " << nop_channels[i] << " -> score: ";
+	    cout << " + " << available << " * (" << buffer_depth << " - " << level << ")" << endl;
+	}
+
+	score += available*(buffer_depth-level);
+    }
+
+    return score;
+}
+//---------------------------------------------------------------------------
+
 int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route_data)
 {
-  /*
   vector<int> neighbors_on_path;
+  vector<int> score;
 
-  for (int i=0; i<directions.size(); i++)
+  int current_id = route_data.current_id;
+
+  for (uint i=0; i<directions.size(); i++)
   {
     // get id of adjacent candidate
-    candidate_id = getNeighborId(current_id,directions[i]);
+    int candidate_id = getNeighborId(current_id,directions[i]);
 
-  // apply routing function to adjacent nodes on path
-    vector<int> next_candidate_channels = routingFunction(reflexDirection(directions[i]),candidate_id,dst_id);
+  // apply routing function to the adjacent candidate node
+    TRouteData tmp_route_data;
+    tmp_route_data.current_id = candidate_id;
+    tmp_route_data.src_id = route_data.src_id;
+    tmp_route_data.dst_id = route_data.dst_id;
+    tmp_route_data.dir_in = reflexDirection(directions[i]);
 
+    if (TGlobalParams::verbose_mode==-58)
+    {
+	cout << sc_simulation_time() << ": Router[" << local_id << "] NoP SELECTION " << endl;
+	cout << "      Adjacent node: " << candidate_id << " (direction " << directions[i] << ")" << endl;
+	cout << "      Packet: " << route_data.src_id << " --> " << route_data.dst_id << endl;
+    }
+
+    vector<int> next_candidate_channels = routingFunction(tmp_route_data);
+
+    // select useful data from Neighbor-on-Path input 
+    TNoP_data nop_tmp = NoP_data_in[directions[i]].read();
+
+    score.push_back(NoPScore(nop_tmp,next_candidate_channels));
   }
-  */
     return directions[rand() % directions.size()]; 
 }
 
@@ -294,7 +347,7 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
     {
 	uint free_positions = buffer_depth - buffer_level_neighbor[directions[i]].read();
 	if ((free_positions >= max_free_positions) &&
-		(reservation_table[directions[i]] == NOT_RESERVED) )
+	    (!reservation_table.isReserved(directions[i])))
 	{
 	    direction_choosen = directions[i];
 	    max_free_positions = free_positions;
@@ -309,11 +362,11 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
     {
 	TChannelStatus tmp;
 
-	cout << sc_simulation_time() << ": Router[" << local_id << "], SELECTION between: " << endl;
+	cout << sc_simulation_time() << ": Router[" << local_id << "] SELECTION between: " << endl;
 	for (unsigned int i=0;i<directions.size();i++)
 	{
 	    tmp.buffer_level = buffer_level_neighbor[directions[i]].read();
-	    tmp.available = (reservation_table[directions[i]]==NOT_RESERVED);
+	    tmp.available = (!reservation_table.isReserved(directions[i]));
 	    cout << "    -> direction " << directions[i] << ", channel status: " << tmp << endl;
 	}
 	cout << " direction choosen: " << direction_choosen << endl;
@@ -499,6 +552,14 @@ vector<int> TRouter::routingOddEven(const TCoord& current,
 	}
     }
   
+  if (!(directions.size() > 0 && directions.size() <= 2))
+  {
+      cout << "\n STAMPACCHIO :";
+      cout << source << endl;
+      cout << destination << endl;
+      cout << current << endl;
+
+  }
   assert(directions.size() > 0 && directions.size() <= 2);
   
   return directions;
@@ -593,6 +654,53 @@ void TRouter::configure(const int _id,
 
   if (grt.isValid())
     rtable.configure(grt, _id);
+
+  buffer_depth = TGlobalParams::buffer_depth;
 }
 
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+int TRouter::reflexDirection(int direction) const
+{
+    if (direction == DIRECTION_NORTH) return DIRECTION_SOUTH;
+    if (direction == DIRECTION_EAST) return DIRECTION_WEST;
+    if (direction == DIRECTION_WEST) return DIRECTION_EAST;
+    if (direction == DIRECTION_SOUTH) return DIRECTION_NORTH;
+
+    // you shouldn't be here
+    assert(false);
+    return NOT_VALID;
+}
+//---------------------------------------------------------------------------
+int TRouter::getNeighborId(int _id, int direction) const
+{
+    TCoord my_coord = id2Coord(_id);
+
+    switch (direction)
+    {
+	case DIRECTION_NORTH:
+	    if (my_coord.y==0) return NOT_VALID;
+	    my_coord.y--;
+	    break;
+	case DIRECTION_SOUTH:
+	    if (my_coord.y==TGlobalParams::mesh_dim_y-1) return NOT_VALID;
+	    my_coord.y++;
+	    break;
+	case DIRECTION_EAST:
+	    if (my_coord.x==TGlobalParams::mesh_dim_x-1) return NOT_VALID;
+	    my_coord.x++;
+	    break;
+	case DIRECTION_WEST:
+	    if (my_coord.x==0) return NOT_VALID;
+	    my_coord.x--;
+	    break;
+	default:
+	    cout << "direction not valid : " << direction;
+	    assert(false);
+    }
+
+    int neighbor_id = coord2Id(my_coord);
+
+  return neighbor_id;
+}
 //---------------------------------------------------------------------------

@@ -26,7 +26,7 @@ void TReservationTable::clear()
 
 //---------------------------------------------------------------------------
 
-bool TReservationTable::isReserved(const int port_out)
+bool TReservationTable::isReserved(const int port_out) const
 {
   assert(port_out >= 0 && port_out < DIRECTIONS+1);
 
@@ -57,8 +57,10 @@ void TReservationTable::release(const int port_out)
 
 //---------------------------------------------------------------------------
 
-int TReservationTable::getOutputPort(const int port_in)
+int TReservationTable::getOutputPort(const int port_in) const
 {
+    // x mau, quando implementi l'altro vettore sistema la funzione
+    // che ho aggiunto sotto!
   for (int i=0; i<DIRECTIONS+1; i++)
     if (rtable[i] == port_in)
       return i;

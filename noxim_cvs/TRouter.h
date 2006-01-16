@@ -33,8 +33,8 @@ SC_MODULE(TRouter)
   sc_out<bool>       req_tx[DIRECTIONS+1];    // The requests associated with the output channels
   sc_in<bool>        ack_tx[DIRECTIONS+1];    // The outgoing ack signals associated with the output channels
 
-  sc_out<uint>       buffer_level[DIRECTIONS+1];
-  sc_in<uint>        buffer_level_neighbor[DIRECTIONS+1];
+  sc_out<int>       buffer_level[DIRECTIONS+1];
+  sc_in<int>        buffer_level_neighbor[DIRECTIONS+1];
 
   // Neighbor-on-Path related I/O
 
@@ -53,11 +53,9 @@ SC_MODULE(TRouter)
   TBuffer            buffer[DIRECTIONS+1];            // Buffer for each input channel 
   bool               current_level_rx[DIRECTIONS+1];  // Current level for Alternating Bit Protocol (ABP)
   bool               current_level_tx[DIRECTIONS+1];  // Current level for Alternating Bit Protocol (ABP)
-  int                reservation_table[DIRECTIONS+1]; // Output channels reservations
-  int                short_circuit[DIRECTIONS+1];     // Crossbar I/O connections
   TStats             stats;                           // Statistics
   TLocalRoutingTable rtable;                          // Routing table
-  TReservationTable  rsv_table;                       // Switch reservation table
+  TReservationTable  reservation_table;                       // Switch reservation table
   int                start_from_port;                 // Port from which to start the reservation cycle
 
   // Functions
@@ -114,6 +112,11 @@ SC_MODULE(TRouter)
   vector<int> routingTableBased(const int dir_in, const TCoord& current, const TCoord& destination);
   TNoP_data getCurrentNoPData() const;
   void NoP_report() const;
+  int NoPScore(const TNoP_data& nop_data, const vector<int>& nop_channels) const;
+  int reflexDirection(int direction) const;
+  int getNeighborId(int _id,int direction) const;
+
+
 };
 
 #endif

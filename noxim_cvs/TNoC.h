@@ -58,10 +58,10 @@ SC_MODULE(TNoC)
   sc_signal<TFlit>   flit_to_south[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
   sc_signal<TFlit>   flit_to_north[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
 
-  sc_signal<uint>    buffer_level_to_east[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
-  sc_signal<uint>    buffer_level_to_west[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
-  sc_signal<uint>    buffer_level_to_south[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
-  sc_signal<uint>    buffer_level_to_north[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
+  sc_signal<int>    buffer_level_to_east[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
+  sc_signal<int>    buffer_level_to_west[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
+  sc_signal<int>    buffer_level_to_south[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
+  sc_signal<int>    buffer_level_to_north[MAX_STATIC_DIM+1][MAX_STATIC_DIM+1];
 
   // NoP
   sc_signal<TNoP_data>    NoP_data_to_east[MAX_STATIC_DIM][MAX_STATIC_DIM];
@@ -119,7 +119,6 @@ SC_MODULE(TNoC)
 
   // Support methods
   TTile* searchNode(const int id) const;
-  int getNeighborId(const int _id,const int direction) const;
 
  private:
   void buildMesh();

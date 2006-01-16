@@ -26,7 +26,7 @@ class TReservationTable
 
   // Returns true if port_out is reserved (i.e., connected to an
   // input port)
-  bool isReserved(const int port_out);
+  bool isReserved(const int port_out) const;
 
   // Connects port_in with port_out. Asserts if port_out is reserved
   void reserve(const int port_in, const int port_out);
@@ -36,8 +36,7 @@ class TReservationTable
 
   // Returns the output port connected to port_in. Asserts if port_out
   // is not reserved
-  int getOutputPort(const int port_in);
-
+  int getOutputPort(const int port_in) const;
 
 private:
   

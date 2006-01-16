@@ -77,6 +77,11 @@ using namespace std;
 #define DEFAULT_SIMULATION_TIME                  10000
 #define DEFAULT_STATS_WARM_UP_TIME  DEFAULT_RESET_TIME
 
+
+// TODO by Fafa - this MUST be removed!!!
+#define MAX_STATIC_DIM 20
+
+//---------------------------------------------------------------------------
 // TGlobalParams -- used to forward configuration to every sub-block
 struct TGlobalParams
 {
@@ -99,9 +104,8 @@ struct TGlobalParams
   static int rnd_generator_seed;
 };
 
-// TODO by Fafa - this MUST be removed!!!
-#define MAX_STATIC_DIM 20
 
+//---------------------------------------------------------------------------
 // TCoord -- XY coordinates type of the Tile inside the Mesh
 class TCoord
 {
@@ -115,12 +119,14 @@ class TCoord
   }
 };
 
+//---------------------------------------------------------------------------
 // TFlitType -- Flit type enumeration
 enum TFlitType
 {
   FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL
 };
 
+//---------------------------------------------------------------------------
 // TPayload -- Payload definition
 struct TPayload
 {
@@ -132,6 +138,7 @@ struct TPayload
   }
 };
 
+//---------------------------------------------------------------------------
 // TPacket -- Packet definition
 struct TPacket
 {
@@ -142,6 +149,7 @@ struct TPacket
   int                flit_left;    // Number of remaining flits inside the packet
 };
 
+//---------------------------------------------------------------------------
 // TRouteData -- data required to perform routing
 struct TRouteData
 {
@@ -151,9 +159,10 @@ struct TRouteData
     int dir_in; // direction from which the packet comes from
 };
 
+//---------------------------------------------------------------------------
 struct TChannelStatus
 {
-    uint buffer_level;  // occupied buffer slots
+    int buffer_level;  // occupied buffer slots
     bool available; // 
     inline bool operator == (const TChannelStatus& bs) const
     {
@@ -161,6 +170,7 @@ struct TChannelStatus
     };
 };
 
+//---------------------------------------------------------------------------
 
 // TNoP_data -- NoP Data definition
 struct TNoP_data
@@ -178,13 +188,10 @@ struct TNoP_data
     };
 };
 
+//---------------------------------------------------------------------------
 // TFlit -- Flit definition
 struct TFlit
 {
-  /*
-  TCoord             src_coord;    // The XY coordinates of the source tile
-  TCoord             dst_coord;    // The XY coordinates of the destination tile
-  */
   int                src_id;
   int                dst_id;
   TFlitType          flit_type;    // The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
@@ -199,6 +206,9 @@ struct TFlit
   }
 };
 
+// output redefinitions *******************************************
+
+//---------------------------------------------------------------------------
 inline ostream& operator << (ostream& os, const TFlit& flit)
 {
 
@@ -221,7 +231,7 @@ inline ostream& operator << (ostream& os, const TFlit& flit)
   }
   else
     {
-      os << "Type: ";
+      os << "[type: ";
       switch(flit.flit_type)
       {
 	case FLIT_TYPE_HEAD: os << "H"; break;
@@ -229,25 +239,27 @@ inline ostream& operator << (ostream& os, const TFlit& flit)
 	case FLIT_TYPE_TAIL: os << "T"; break;
       }
       
-      os << ", seq: " << flit.sequence_no << ", " << flit.src_id << "-->" << flit.dst_id; 
+      os << ", seq: " << flit.sequence_no << ", " << flit.src_id << "-->" << flit.dst_id << "]"; 
     }
 
   return os;
 }
+//---------------------------------------------------------------------------
 
 inline ostream& operator << (ostream& os, const TChannelStatus& status)
 {
-  string msg;
-  if (status.available) msg = "A"; 
+  char msg;
+  if (status.available) msg = 'A'; 
   else
-      msg = "N";
+      msg = 'N';
   os << msg << "(" << status.buffer_level << ")"; 
   return os;
 }
+//---------------------------------------------------------------------------
 
 inline ostream& operator << (ostream& os, const TNoP_data& NoP_data)
 {
-  os << "   NoP data from [" << NoP_data.sender_id << "] [ ";
+  os << "      NoP data from [" << NoP_data.sender_id << "] [ ";
 
   for (int j=0; j<DIRECTIONS; j++)
       os << NoP_data.channel_status_neighbor[j] << " ";
@@ -256,33 +268,43 @@ inline ostream& operator << (ostream& os, const TNoP_data& NoP_data)
   return os;
 }
 
+//---------------------------------------------------------------------------
 
+inline ostream& operator << (ostream& os, const TCoord& coord)
+{
+  os << "(" << coord.x << "," << coord.y << ")";
+
+  return os;
+}
+
+
+// trace redefinitions *******************************************
+//
+//---------------------------------------------------------------------------
 inline void sc_trace(sc_trace_file*& tf, const TFlit& flit, string& name)
 {
-  /*
-  sc_trace(tf, flit.src_coord.x, name+".src_coord.x");
-  sc_trace(tf, flit.src_coord.y, name+".src_coord.y");
-  sc_trace(tf, flit.dst_coord.x, name+".dst_coord.x");
-  sc_trace(tf, flit.dst_coord.y, name+".dst_coord.y");
-  */
   sc_trace(tf, flit.src_id, name+".src_id");
   sc_trace(tf, flit.dst_id, name+".dst_id");
   sc_trace(tf, flit.sequence_no, name+".sequence_no");
   sc_trace(tf, flit.timestamp, name+".timestamp");
   sc_trace(tf, flit.hop_no, name+".hop_no");
 }
+//---------------------------------------------------------------------------
 
 inline void sc_trace(sc_trace_file*& tf, const TNoP_data& NoP_data, string& name)
 {
   sc_trace(tf, NoP_data.sender_id, name+".sender_id");
 }
 
+//---------------------------------------------------------------------------
 inline void sc_trace(sc_trace_file*& tf, const TChannelStatus& bs, string& name)
 {
   sc_trace(tf, bs.buffer_level, name+".buffer_level");
   sc_trace(tf, bs.available, name+".available");
 }
 
+// misc common functions **************************************
+//---------------------------------------------------------------------------
 inline TCoord id2Coord(int id) 
 {
   TCoord coord;
@@ -296,6 +318,7 @@ inline TCoord id2Coord(int id)
   return coord;
 }
 
+//---------------------------------------------------------------------------
 inline int coord2Id(const TCoord& coord) 
 {
   int id = (coord.y * TGlobalParams::mesh_dim_x) + coord.x;

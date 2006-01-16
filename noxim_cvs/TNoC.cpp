@@ -104,14 +104,14 @@ void TNoC::buildMesh()
     }
 
 
-  // dummy empty TNoP_data structure
+  // dummy TNoP_data structure
   TNoP_data tmp_NoP;
 
   tmp_NoP.sender_id = NOT_VALID;
 
   for (int i=0; i<DIRECTIONS; i++)
   {
-      tmp_NoP.channel_status_neighbor[i].buffer_level = 0;
+      tmp_NoP.channel_status_neighbor[i].buffer_level = NOT_VALID;
       tmp_NoP.channel_status_neighbor[i].available = false;
   }
 
@@ -123,8 +123,8 @@ void TNoC::buildMesh()
       req_to_north[i][TGlobalParams::mesh_dim_y] = 0;
       ack_to_south[i][TGlobalParams::mesh_dim_y] = 0;
 
-      buffer_level_to_south[i][0] = 0;
-      buffer_level_to_north[i][TGlobalParams::mesh_dim_y] = 0;
+      buffer_level_to_south[i][0].write(NOT_VALID);
+      buffer_level_to_north[i][TGlobalParams::mesh_dim_y].write(NOT_VALID);
 
       NoP_data_to_south[i][0].write(tmp_NoP);
       NoP_data_to_north[i][TGlobalParams::mesh_dim_y].write(tmp_NoP);
@@ -137,8 +137,8 @@ void TNoC::buildMesh()
       req_to_west[TGlobalParams::mesh_dim_x][j] = 0;
       ack_to_east[TGlobalParams::mesh_dim_x][j] = 0;
 
-      buffer_level_to_east[0][j] = 0;
-      buffer_level_to_west[TGlobalParams::mesh_dim_x][j] = 0;
+      buffer_level_to_east[0][j].write(NOT_VALID);
+      buffer_level_to_west[TGlobalParams::mesh_dim_x][j].write(NOT_VALID);
 
       NoP_data_to_east[0][j].write(tmp_NoP);
       NoP_data_to_west[TGlobalParams::mesh_dim_x][j].write(tmp_NoP);
@@ -156,40 +156,6 @@ TTile* TNoC::searchNode(const int id) const
 	return t[i][j];
 
   return false;
-}
-
-//---------------------------------------------------------------------------
-
-int TNoC::getNeighborId(const int _id, const int direction) const
-{
-    TCoord my_coord = id2Coord(_id);
-
-    switch (direction)
-    {
-	case DIRECTION_NORTH:
-	    if (my_coord.y==0) return NOT_VALID;
-	    my_coord.y--;
-	    break;
-	case DIRECTION_SOUTH:
-	    if (my_coord.y==TGlobalParams::mesh_dim_y-1) return NOT_VALID;
-	    my_coord.y++;
-	    break;
-	case DIRECTION_EAST:
-	    if (my_coord.x==TGlobalParams::mesh_dim_x-1) return NOT_VALID;
-	    my_coord.x++;
-	    break;
-	case DIRECTION_WEST:
-	    if (my_coord.x==0) return NOT_VALID;
-	    my_coord.x--;
-	    break;
-	default:
-	    cout << "direction not valid : " << direction;
-	    assert(false);
-    }
-
-    int neighbor_id = coord2Id(my_coord);
-
-  return neighbor_id;
 }
 
 //---------------------------------------------------------------------------
