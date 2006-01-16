@@ -546,7 +546,7 @@ vector<int> TRouter::routingOddEven(const TCoord& current,
 	    {
 	      if (e1 > 0)
 		directions.push_back(DIRECTION_NORTH);
-	      else
+	      if (e1 < 0) 
 		directions.push_back(DIRECTION_SOUTH);
 	    }
 	}
