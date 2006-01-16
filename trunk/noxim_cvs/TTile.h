@@ -29,8 +29,8 @@ SC_MODULE(TTile)
   sc_out<bool>        req_tx[DIRECTIONS];    // The requests associated with the output channels
   sc_in<bool>         ack_tx[DIRECTIONS];    // The outgoing ack signals associated with the output channels
 
-  sc_out<uint>        buffer_level[DIRECTIONS];
-  sc_in<uint>         buffer_level_neighbor[DIRECTIONS];
+  sc_out<int>        buffer_level[DIRECTIONS];
+  sc_in<int>         buffer_level_neighbor[DIRECTIONS];
 
   // NoP related I/O
   sc_out<TNoP_data>        NoP_data_out[DIRECTIONS];
@@ -46,8 +46,8 @@ SC_MODULE(TTile)
   sc_signal<bool>     req_tx_local;    // The requests associated with the output channels
   sc_signal<bool>     ack_tx_local;    // The outgoing ack signals associated with the output channels
   
-  sc_signal<uint>     buffer_level_local;
-  sc_signal<uint>     buffer_level_neighbor_local;
+  sc_signal<int>     buffer_level_local;
+  sc_signal<int>     buffer_level_neighbor_local;
 
 
   // Instances
