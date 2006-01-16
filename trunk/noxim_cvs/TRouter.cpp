@@ -58,8 +58,6 @@ void TRouter::rxProcess()
 
 void TRouter::txProcess()
 {
-  static int start_from_direction = 0;
-
   if (reset.read())
     {
       // Clear outputs and indexes of transmitting protocol
@@ -74,7 +72,7 @@ void TRouter::txProcess()
       // 1st phase: Reservation
       for(int j=0; j<DIRECTIONS+1; j++)
 	{
-	  int i = (start_from_direction + j) % (DIRECTIONS + 1);
+	  int i = (start_from_port + j) % (DIRECTIONS + 1);
 
 	  if ( !buffer[i].IsEmpty() )
 	    {
@@ -105,7 +103,7 @@ void TRouter::txProcess()
 		}
 	    }
 	}
-      start_from_direction++;
+      start_from_port++;
 
       // 2nd phase: Forwarding
       for(int i=0; i<DIRECTIONS+1; i++)
@@ -590,7 +588,9 @@ void TRouter::configure(const int _id,
 {
   local_id = _id;
   stats.configure(_id, _warm_up_time);
-  
+
+  start_from_port = DIRECTION_LOCAL;
+
   if (grt.isValid())
     rtable.configure(grt, _id);
 }

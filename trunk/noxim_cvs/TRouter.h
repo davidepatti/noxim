@@ -58,6 +58,7 @@ SC_MODULE(TRouter)
   TStats             stats;                           // Statistics
   TLocalRoutingTable rtable;                          // Routing table
   TReservationTable  rsv_table;                       // Switch reservation table
+  int                start_from_port;                 // Port from which to start the reservation cycle
 
   // Functions
 
