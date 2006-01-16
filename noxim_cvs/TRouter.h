@@ -15,6 +15,7 @@
 #include "TStats.h"
 #include "TGlobalRoutingTable.h"
 #include "TLocalRoutingTable.h"
+#include "TReservationTable.h"
 
 SC_MODULE(TRouter)
 {
@@ -56,7 +57,7 @@ SC_MODULE(TRouter)
   int                short_circuit[DIRECTIONS+1];     // Crossbar I/O connections
   TStats             stats;                           // Statistics
   TLocalRoutingTable rtable;                          // Routing table
-
+  TReservationTable  rsv_table;                       // Switch reservation table
 
   // Functions
 

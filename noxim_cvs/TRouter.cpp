@@ -10,46 +10,46 @@
 
 void TRouter::rxProcess()
 {
-    if(reset.read())
+  if(reset.read())
     {
-	// Clear outputs and indexes of receiving protocol
-	for(int i=0; i<DIRECTIONS+1; i++)
+      // Clear outputs and indexes of receiving protocol
+      for(int i=0; i<DIRECTIONS+1; i++)
 	{
-	    ack_rx[i].write(0);
-	    current_level_rx[i] = 0;
-	    reservation_table[i] = NOT_RESERVED;
+	  ack_rx[i].write(0);
+	  current_level_rx[i] = 0;
+	  reservation_table[i] = NOT_RESERVED;
 	}
     }
-    else
+  else
     {
-	// For each channel decide if a new flit can be accepted
-	//
-	// This process simply sees a flow of incoming flits. All arbitration
-	// and wormhole related issues are addressed in the txProcess()
-
-	for(int i=0; i<DIRECTIONS+1; i++)
+      // For each channel decide if a new flit can be accepted
+      //
+      // This process simply sees a flow of incoming flits. All arbitration
+      // and wormhole related issues are addressed in the txProcess()
+ 
+      for(int i=0; i<DIRECTIONS+1; i++)
 	{
-	    // To accept a new flit, the following conditions must match:
-	    //
-	    // 1) there is an incoming request
-	    // 2) there is a free slot in the input buffer of direction i
+	  // To accept a new flit, the following conditions must match:
+	  //
+	  // 1) there is an incoming request
+	  // 2) there is a free slot in the input buffer of direction i
 
-	    if ( (req_rx[i].read()==1-current_level_rx[i]) && !buffer[i].IsFull() )
+	  if ( (req_rx[i].read()==1-current_level_rx[i]) && !buffer[i].IsFull() )
 	    {
-		TFlit received_flit = flit_rx[i].read();
+	      TFlit received_flit = flit_rx[i].read();
 
-		if(TGlobalParams::verbose_mode > VERBOSE_OFF)
+	      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
 		{
-		    cout << sc_simulation_time() << ": Router[" << local_id <<"], Buffer["<< i << "], RECEIVED " << received_flit << endl;
+		  cout << sc_simulation_time() << ": Router[" << local_id <<"], Input[" << i << "], Received flit: " << received_flit << endl;
 		}
 
-		// Store the incoming flit in the circular buffer
-		buffer[i].Push(received_flit);            
+	      // Store the incoming flit in the circular buffer
+	      buffer[i].Push(received_flit);            
 
-		// Negate the old value for Alternating Bit Protocol (ABP)
-		current_level_rx[i] = 1-current_level_rx[i];
+	      // Negate the old value for Alternating Bit Protocol (ABP)
+	      current_level_rx[i] = 1-current_level_rx[i];
 	    }
-	    ack_rx[i].write(current_level_rx[i]);
+	  ack_rx[i].write(current_level_rx[i]);
 	}
     }
 }
@@ -60,7 +60,7 @@ void TRouter::txProcess()
 {
   static int start_from_direction = 0;
 
-  if(reset.read())
+  if (reset.read())
     {
       // Clear outputs and indexes of transmitting protocol
       for(int i=0; i<DIRECTIONS+1; i++)
@@ -71,26 +71,13 @@ void TRouter::txProcess()
     }
   else
     {
-      // For each channel see if it is possible to send a flit to its destination
+      // 1st phase: Reservation
       for(int j=0; j<DIRECTIONS+1; j++)
 	{
 	  int i = (start_from_direction + j) % (DIRECTIONS + 1);
 
-	  // To send a flit the following conditions must match:
-	  //
-	  // 1) there is a new flit in the buffer that needs to be sent (look at the indexes)
-	  // 2) if the destination got an initiated packet, only can continue with it 
-	  // 3) if the destination completed the last packet, then can accept a new one 
-
 	  if ( !buffer[i].IsEmpty() )
 	    {
-	      int dest; // temporary to store current
-
-	      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
-                {
-                  cout << sc_simulation_time() << ": Router[" << local_id << "], Buffer[" << i << "](" << buffer[i].Size() << " flits)" << endl;
-                }
-
 	      TFlit flit = buffer[i].Front();
 
 	      if (flit.flit_type==FLIT_TYPE_HEAD) 
@@ -102,40 +89,58 @@ void TRouter::txProcess()
 		  route_data.dst_id = flit.dst_id;
 		  route_data.dir_in = i;
 
-		  dest = route(route_data);
-		  if (reservation_table[dest] == NOT_RESERVED) 
+		  int o = route(route_data);
+
+		  if (!rsv_table.isReserved(o))
 		    {
-		      short_circuit[i] = dest;     // crossbar: link input i to output dest 
-		      reservation_table[dest] = i; // crossbar: reserve the output channel
+		      rsv_table.reserve(i, o);
+		      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
+			{
+			  cout << sc_simulation_time() 
+			       << ": Router[" << local_id 
+			       << "], Input[" << i << "] (" << buffer[i].Size() << " flits)" 
+			       << ", reserved Output[" << o << "], flit: " << flit << endl;
+			}		      
 		    }
 		}
-	      else dest = short_circuit[i];  // previously set by header flit
+	    }
+	}
+      start_from_direction++;
 
-	      if (reservation_table[dest] == i)  // current flit belong to the worm that reserved the output
+      // 2nd phase: Forwarding
+      for(int i=0; i<DIRECTIONS+1; i++)
+	{
+	  if ( !buffer[i].IsEmpty() )
+	    {
+	      TFlit flit = buffer[i].Front();
+
+	      int o = rsv_table.getOutputPort(i);
+	      if (o != NOT_RESERVED)
 		{
-		  if ( current_level_tx[dest] == ack_tx[dest].read() )
+		  if ( current_level_tx[o] == ack_tx[o].read() )
 		    {
                       if(TGlobalParams::verbose_mode > VERBOSE_OFF)
 			{
-			  cout << sc_simulation_time() << ": Router[" << local_id << "] SENDING " << flit << " towards port " << dest << endl;
+			  cout << sc_simulation_time() 
+			       << ": Router[" << local_id 
+			       << "], Input[" << i << "] forward to Output[" << o << "], flit: " << flit << endl;
 			}
 
-		      flit_tx[dest].write(flit);
-		      current_level_tx[dest] = 1 - current_level_tx[dest];
-		      req_tx[dest].write(current_level_tx[dest]);
+		      flit_tx[o].write(flit);
+		      current_level_tx[o] = 1 - current_level_tx[o];
+		      req_tx[o].write(current_level_tx[o]);
 		      buffer[i].Pop();
 
-		      if (flit.flit_type==FLIT_TYPE_TAIL) reservation_table[short_circuit[i]] = NOT_RESERVED;
+		      if (flit.flit_type == FLIT_TYPE_TAIL) 
+			rsv_table.release(o);
 			
 		      // Update stats
-		      if (dest == DIRECTION_LOCAL)
+		      if (o == DIRECTION_LOCAL)
 			stats.receivedFlit(sc_simulation_time(), flit);
 		    }
 		}
-
-	    } // if buffer
-	} // for
-      start_from_direction++;
+	    }
+	}
     } // else
 }
 
@@ -554,6 +559,13 @@ vector<int> TRouter::routingTableBased(const int dir_in, const TCoord& current, 
 {
   TAdmissibleOutputs ao = rtable.getAdmissibleOutputs(dir_in, coord2Id(destination));
   
+  if (ao.size() == 0)
+    {
+      cout << "dir: " << dir_in << ", (" << current.x << "," << current.y << ") --> "
+	   << "(" << destination.x << "," << destination.y << ")" << endl
+	   << coord2Id(current) << "->" << coord2Id(destination) << endl;
+    }
+
   assert(ao.size() > 0);
 
   //-----
