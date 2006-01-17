@@ -16,5 +16,11 @@ spacefilegen: spacefilegen.o
 spacefilegen.o: spacefilegen.cpp
 	$(CC) $(CFLAGS) -c spacefilegen.cpp -o spacefilegen.o
 
+noxim_explorer: noxim_explorer.o
+	$(CC) $(CFLAGS) noxim_explorer.o -o noxim_explorer
+
+noxim_explorer.o: noxim_explorer.cpp
+	$(CC) $(CFLAGS) -c noxim_explorer.cpp -o noxim_explorer.o
+
 clean:
-	rm -f *.o spacefilegen apsra2noxim
+	rm -f *.o spacefilegen apsra2noxim noxim_explorer
