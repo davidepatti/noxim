@@ -10,8 +10,11 @@ apsra2noxim: apsra2noxim.o
 apsra2noxim.o: TOOLS/apsra2noxim.cpp
 	$(CC) $(CFLAGS) -c apsra2noxim.cpp -o apsra2noxim.o
 
-explorer: explorer.o
-	$(CC) $(CFLAGS) explorer.o -o explorer
+spacefilegen: spacefilegen.o
+	$(CC) $(CFLAGS) spacefilegen.o -o spacefilegen
 
-explorer.o: explorer.cpp
-	$(CC) $(CFLAGS) -c explorer.cpp -o explorer.o
+spacefilegen.o: spacefilegen.cpp
+	$(CC) $(CFLAGS) -c spacefilegen.cpp -o spacefilegen.o
+
+clean:
+	rm -f *.o spacefilegen apsra2noxim
