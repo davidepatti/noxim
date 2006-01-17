@@ -6,7 +6,7 @@ OTHER  = -Wall -Wno-deprecated
 CFLAGS = $(OPT) $(OTHER)
 # CFLAGS = $(DEBUG) $(OTHER)
 
-MODULE = run
+MODULE = noxim
 SRCS = TNoC.cpp TRouter.cpp TProcessingElement.cpp TBuffer.cpp TStats.cpp \
 	TGlobalStats.cpp TGlobalRoutingTable.cpp TLocalRoutingTable.cpp \
 	TGlobalTrafficTable.cpp TReservationTable.cpp main.cpp
@@ -14,9 +14,3 @@ OBJS = $(SRCS:.cpp=.o)
 
 include ./Makefile.defs
 
-# stand-alone applications
-apsra2noxim: apsra2noxim.o
-	$(CC) $(CFLAGS) apsra2noxim.o -o apsra2noxim
-
-apsra2noxim.o: apsra2noxim.cpp
-	$(CC) $(CFLAGS) -c apsra2noxim.cpp -o apsra2noxim.o
