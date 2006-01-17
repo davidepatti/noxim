@@ -8,9 +8,9 @@ LIBDIR = -L. -L.. -L$(SYSTEMC)/lib-$(TARGET_ARCH)
 LIBS   =  -lsystemc -lm $(EXTRA_LIBS)
 
 
-EXE    = $(MODULE).x
+EXE    = $(MODULE)
 
-.SUFFIXES: .cc .cpp .o .x
+.SUFFIXES: .cc .cpp .o 
 
 $(EXE): $(OBJS) $(SYSTEMC)/lib-$(TARGET_ARCH)/libsystemc.a 
 	$(CC) $(CFLAGS) $(INCDIR) $(LIBDIR) -o $@ $(OBJS) $(LIBS) 2>&1 | c++filt
@@ -22,7 +22,7 @@ $(EXE): $(OBJS) $(SYSTEMC)/lib-$(TARGET_ARCH)/libsystemc.a
 	$(CC) $(CFLAGS) $(INCDIR) -c $<
 
 clean::
-	rm -f $(OBJS) *~ $(EXE) core *~ *.o
+	rm -f $(OBJS) *~ $(EXE) core *~ *.o noxim
 
 ultraclean: clean
 	rm -f Makefile.deps
