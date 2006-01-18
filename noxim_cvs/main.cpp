@@ -184,7 +184,7 @@ int sc_main(int arg_num, char* arg_vet[])
       else if(!strcmp(arg_vet[i],"-buffer"))
       {
         int new_buffer = atoi(arg_vet[i+1]);
-        if(new_buffer>1)
+        if(new_buffer>=1)
 	{
           TGlobalParams::buffer_depth = new_buffer;
           i+=2;
@@ -311,8 +311,7 @@ int sc_main(int arg_num, char* arg_vet[])
   if (TGlobalParams::routing_algorithm == ROUTING_XY &&
       TGlobalParams::selection_strategy != SEL_RANDOM)
   {
-    cout << "\n Error: -sel option cannot be used in conjunction of XY static routing!" << endl;
-    exit (1);
+    cout << "\n Warning: using -sel option in conjunction of XY static routing!" << endl;
   }
 
   // Show configuration
