@@ -38,6 +38,9 @@ class TReservationTable
   // is not reserved
   int getOutputPort(const int port_in) const;
 
+  // Makes output port no longer available for reservation/release
+  void invalidate(const int port_out);
+
 private:
   
   vector<int> rtable; // reservation vector: rtable[i] gives the input
