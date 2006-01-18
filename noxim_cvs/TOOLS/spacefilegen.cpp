@@ -16,6 +16,11 @@ void print_values(const vector<int>& v)
 {
     for (unsigned int i=0;i<v.size();i++) cout << v[i] << " ";
 }
+
+void print_values(const vector<string>& v)
+{
+    for (unsigned int i=0;i<v.size();i++) cout << v[i] << " ";
+}
 void print_values(const vector<Tdim>& v)
 {
     for (unsigned int i=0;i<v.size();i++) cout << "(" << v[i].dimx << ","<< v[i].dimy<<") ";
@@ -74,8 +79,9 @@ int main()
     string traffic_table;
 
     int repetitions,sim_length;
+    string simulator_path;
     //int seed;
-    //int warmup;
+    int warmup;
 
     int tmp_par;
     string word;
@@ -85,16 +91,16 @@ int main()
     system("clear");
 
     cout << "\n -------------------------------------------------------";
-    cout << "\n  s p a c e f i l e g e n (segfault version) ";
+    cout << "\n  s p a c e f i l e g e n ";
     cout << "\n -------------------------------------------------------";
-    cout << "\n space file creator for Noxim network-on-chip simulator";
+    cout << "\n   space file generator for Noxim NoC simulator";
     cout << endl << endl;
 
     // --------------------------------------------------------------------------
     Tdim tmp_dim;
     do
     {
-	cout << "\n Add Topology";
+	cout << "\n Add Mesh Topology";
 	cout << "\n ----------------------------------------------------";
 	cout << "\n current values = [ ";
 	print_values(topology);
@@ -106,7 +112,8 @@ int main()
 	topology.push_back(tmp_dim);
 
 	cout << "\n Ok, " << tmp_dim.dimx << " x " << tmp_dim.dimy << " topology added!" << endl;
-	cout << "\n (a)dd another topology , (c)ontinue with other parameters";
+	cout << "\n (a)dd another topology";
+	cout << "\n (c)ontinue with other parameters";
 	cout << "\n choice:";
 	cin >> word;
     }
@@ -122,15 +129,15 @@ int main()
 	cout << "\n current values = [ ";
 	print_values(traffic);
 	cout << " ]" << endl;
-	cout << "\n (1) uniformtraffic";
+	cout << "\n (1) uniform";
 	cout << "\n (2) transpose1 ";
 	cout << "\n (3) transpose2 ";
 	cout << "\n (4) table";
-	cout << "\n (x) exit and continue with other parameters";
+	cout << "\n (c)ontinue with other parameters";
 	cout << "\n\n choice : ";
 	cin >> word;
 
-	if (word!="x")
+	if (word!="c")
 	{
 	    tmp_par = atoi(word.c_str());
 
@@ -142,7 +149,7 @@ int main()
 	    traffic.push_back(tmp_par);
 	}
     }
-    while (word!="x");
+    while (word!="c");
 
     // --------------------------------------------------------------------------
 
@@ -162,16 +169,16 @@ int main()
 	cout << "\n (6) dyad            DyAD routing algorithm";
 	cout << "\n (7) fullyadaptive   Fully-Adaptive routing algorithm";
 	cout << "\n (8) table FILENAME ";
-	cout << "\n (x) exit and continue with other parameters";
+	cout << "\n (c)ontinue with other parameters";
 	cout << "\n\n choice : ";
 	cin >> word;
-	if (word!="x")
+	if (word!="c")
 	{
 	    tmp_par = atoi(word.c_str());
 	    routing.push_back(tmp_par);
 	}
 
-    } while (word!="x");
+    } while (word!="c");
 
     // --------------------------------------------------------------------------
     
@@ -186,16 +193,16 @@ int main()
 	cout << "\n (1) random ";
 	cout << "\n (2) bufferlevel ";
 	cout << "\n (3) nop ";
-	cout << "\n (x) exit and continue with other parameters";
+	cout << "\n (c)ontinue with other parameters";
 	cout << "\n\n choice : ";
 	cin >> word;
-	if (word!="x")
+	if (word!="c")
 	{
 	    tmp_par = atoi(word.c_str());
 	    selection.push_back(tmp_par);
 	}
 
-    } while (word!="x");
+    } while (word!="c");
 
     // --------------------------------------------------------------------------
     do
@@ -207,15 +214,15 @@ int main()
 	print_values(size);
 	cout << " ]";
 	cout << endl;
-	cout << "\n Enter a packet size (flits) (x to continue):";
+	cout << "\n Enter a packet size (flits) (c to continue):";
 	cin >> word;
-	if (word!="x")
+	if (word!="c")
 	{
 	    tmp_par = atoi(word.c_str());
 	    size.push_back(tmp_par);
 	}
 
-    } while (word!="x");
+    } while (word!="c");
 
     // --------------------------------------------------------------------------
 
@@ -227,15 +234,15 @@ int main()
 	cout << "\n current values = [ ";
 	print_values(buffer);
 	cout << " ]" << endl;
-	cout << "\n Enter a buffer size (flits) (x to continue):";
+	cout << "\n Enter a buffer size (flits) (c to continue):";
 	cin >> word;
-	if (word!="x")
+	if (word!="c")
 	{
 	    tmp_par = atoi(word.c_str());
 	    buffer.push_back(tmp_par);
 	}
 
-    } while (word!="x");
+    } while (word!="c");
 
     system("clear");
     cout << "\n   Traffic generation ";
@@ -249,29 +256,51 @@ int main()
     cout << "\n n. repetitions for each PIR point: ";
     cin >> repetitions;
 
-    cout << "\n Max cycles: ";
+    system("clear");
+    cout << "\n    noxim simulator path";
+    cout << "\n ---------------------------------------------------";
+    cout << "\n (1) assume default [ /usr/design/noxim_cvs/noxim ]";
+    cout << "\n (2) specify new path";
+    cout << "\n choice:";
+    cin >> word;
+
+    if (word=="1") simulator_path = "/usr/design/noxim_cvs/noxim";
+    else
+    {
+	cout << "\n Enter the new path:";
+	cin >> simulator_path;
+    }
+
+
+    cout << "\n Simulation length (cycles): ";
     cin >> sim_length;
 
     //cout << "\n Seed: ";
     //cin >> seed;
 
-    //cout << "\n warmup: ";
-    //cin >> warmup;
+    cout << "\n warmup cyles: ";
+    cin >> warmup;
 
     do 
     {
-	cout << "\n Add aggregate parameters label" << endl;
-	cout << "\n (for a list of parameter labels see noxim -help) " << endl;
-	cout << "\n (x to continue)";
+	system("clear");
+	cout << "\n Add aggregation parameter";
+	cout << "\n ---------------------------------------------------";
+	cout << "\n current values = [ ";
+	print_values(aggregate);
+	cout << " ]";
+	cout << endl;
+	cout << "\n (for a list of parameters see noxim -help) " << endl;
+	cout << "\n Enter a parameter string (c to continue):";
 	cin >> word;
-	if (word!="x") 
+	if (word!="c") 
 	{
 	    aggregate.push_back(word);
 	}
     }
-    while (word!="x");
+    while (word!="c");
 
-    cout << "\n Choose a file to save the space: ";
+    cout << "\n Choose filename to save the spacefile: ";
     cin >> word;
     std::ofstream space_file(word.c_str());
 
@@ -327,20 +356,27 @@ int main()
     space_file << "\n[/size]"; 
 
     space_file << endl;
-    space_file << "\n[defaults]";
+    space_file << "\n[default]";
     space_file << "\n\% parameters not changed during space exploration";
     //space_file << "\n-seed " << seed << " -warmup " << warmup << " -sim " << sim_length;
-    space_file << "\n-sim " << sim_length;
-    space_file << "\n[/defaults]";
+    space_file << "\n-sim " << sim_length << " -warmup " << warmup;
+    space_file << "\n[/default]";
 
     space_file << endl;
-    space_file << "\n[aggregate]";
+    space_file << "\n[aggregation]";
     space_file << "\n\% parameters that change value inside each generated file";
     for (unsigned int i=0;i<aggregate.size();i++)
     {
 	space_file << "\n" << aggregate[i];
     }
-    space_file << "\n[/aggregate]";
+    space_file << "\n[/aggregation]";
+
+    space_file << endl;
+    space_file << "\n[explorer]";
+    space_file << "\nrepetitions " << repetitions;
+    space_file << "\nsimulator " << simulator_path;
+    space_file << "\n[/explorer]";
+
     space_file << "\n\% end of file";
 }
 
