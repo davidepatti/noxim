@@ -54,7 +54,7 @@ SC_MODULE(TRouter)
   bool               current_level_rx[DIRECTIONS+1];  // Current level for Alternating Bit Protocol (ABP)
   bool               current_level_tx[DIRECTIONS+1];  // Current level for Alternating Bit Protocol (ABP)
   TStats             stats;                           // Statistics
-  TLocalRoutingTable rtable;                          // Routing table
+  TLocalRoutingTable routing_table;                          // Routing table
   TReservationTable  reservation_table;                       // Switch reservation table
   int                start_from_port;                 // Port from which to start the reservation cycle
 
