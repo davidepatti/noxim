@@ -1,0 +1,21 @@
+Noxim TOOLS
+*****************************************************
+- to compile everything, just type 'make'
+
+
+
+spacefilegen
+-----------------------------------------------------
+- this tool helps in creating a valid space file for noxim_explorer by
+  interactively posing questions to the user
+
+apsra2noxim
+-----------------------------------------------------
+- add description here
+
+
+noxim_explorer
+-----------------------------------------------------
+- add description here
+
+
