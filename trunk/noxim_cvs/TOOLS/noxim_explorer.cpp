@@ -32,6 +32,8 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 
+typedef unsigned int uint;
+
 // parameter values
 typedef vector<string> TParameterSpace;
 
@@ -81,11 +83,11 @@ string TrimLeftAndRight(const string& s)
 
 bool ExtractParameter(const string& s, string& parameter)
 {
-  int i = s.find("[");
+  uint i = s.find("[");
 
   if (i != string::npos)
     {
-      int j = s.rfind("]");
+      uint j = s.rfind("]");
       
       if (j != string::npos)
 	{
@@ -256,7 +258,7 @@ bool ParseConfigurationFile(const string& fname,
 
 bool LastCombination(const vector<pair<int,int> >& indexes)
 {
-  for (int i=0; i<indexes.size(); i++)
+  for (uint i=0; i<indexes.size(); i++)
     if (indexes[i].first < indexes[i].second-1)
       return false;
 
@@ -267,7 +269,7 @@ bool LastCombination(const vector<pair<int,int> >& indexes)
 
 bool IncrementCombinatorialIndexes(vector<pair<int,int> >& indexes)
 {
-  for (int i=0; i<indexes.size(); i++)
+  for (uint i=0; i<indexes.size(); i++)
     {
       if (indexes[i].first < indexes[i].second - 1)
 	{
@@ -339,7 +341,7 @@ bool RemoveAggregateParameters(TParametersSpace& params_space,
 			       TParametersSpace& aggragated_params_space,
 			       string& error_msg)
 {
-  for (int i=0; i<aggregated_params.size(); i++)
+  for (uint i=0; i<aggregated_params.size(); i++)
     {
       string param_name = aggregated_params[i];
       TParameterSpace param_space;
@@ -383,7 +385,7 @@ string Configuration2CmdLine(const TConfiguration& conf)
 {
   string cl;
 
-  for (int i=0; i<conf.size(); i++)
+  for (uint i=0; i<conf.size(); i++)
     cl = cl + ParamValue2Cmd(conf[i]) + " ";
   
   return cl;
@@ -395,7 +397,7 @@ string Configuration2FileName(const TConfiguration& conf)
 {
   string fn;
 
-  for (int i=0; i<conf.size(); i++)
+  for (uint i=0; i<conf.size(); i++)
     fn = fn + conf[i].first + "_" + conf[i].second + ".";
   fn = fn + "m";
   
@@ -417,17 +419,17 @@ bool ExtractExplorerParams(const TParameterSpace& explorer_params,
   eparams.simulator   = DEF_SIMULATOR;
   eparams.repetitions = DEF_REPETITIONS;
 
-  for (int i=0; i<explorer_params.size(); i++)
+  for (uint i=0; i<explorer_params.size(); i++)
     {
       istringstream iss(explorer_params[i]);
 
-      string label, value;
-      iss >> label >> value;
+      string label;
+      iss >> label;
       
       if (label == SIMULATOR_LABEL)
-	eparams.simulator = value;
+	iss >> eparams.simulator;
       else if (label == REPETITIONS_LABEL)
-	eparams.repetitions = 10; // value.to_int();
+	iss >> eparams.repetitions;
       else
 	{
 	  error_msg = "Invalid explorer option '" + label + "'";
@@ -480,7 +482,7 @@ bool ReadResults(const string& fname,
       string line;
       getline(fin, line);
 
-      int pos;
+      uint pos;
       
       pos = line.find(RPACKETS_LABEL);
       if (pos != string::npos) 
@@ -534,7 +536,7 @@ bool RunSimulation(const string& cmd_base,
 		   TSimulationResults& sres, 
 		   string& error_msg)
 {
-  string cmd = cmd_base + " > " + TMP_FILE_NAME;
+  string cmd = cmd_base + " >& " + TMP_FILE_NAME;
   cout << cmd << endl;
   system(cmd.c_str());
   if (!ReadResults(TMP_FILE_NAME, sres, error_msg))
@@ -548,20 +550,23 @@ bool RunSimulation(const string& cmd_base,
 
 //---------------------------------------------------------------------------
 
-bool RunSimulations(const string& cmd, const int repetitions,
+bool RunSimulations(pair<uint,uint>& sim_counter,
+		    const string& cmd, const int repetitions,
 		    const TConfiguration& aggr_conf, 
 		    ofstream& fout, 
 		    string& error_msg)
 {
   for (int i=0; i<repetitions; i++)
     {
+      cout << "# simulation " << (++sim_counter.first) << " of " << sim_counter.second << endl;
+
       TSimulationResults sres;
       if (!RunSimulation(cmd, sres, error_msg))
 	return false;
 
       // Print aggragated parameters
       fout << "  ";
-      for (int i=0; i<aggr_conf.size(); i++)
+      for (uint i=0; i<aggr_conf.size(); i++)
 	fout << setw(MATRIX_COLUMN_WIDTH) << aggr_conf[i].second;
 
       // Print results;
@@ -598,11 +603,44 @@ bool PrintMatlabVariableBegin(const TParametersSpace& aggragated_params_space,
 
 //---------------------------------------------------------------------------
 
+bool GenMatlabCode(const string& var_name,
+		   const int repetitions, const int column,
+		   ofstream& fout, string& error_msg)
+{
+  fout << var_name << " = [];" << endl
+       << "for i = 1:rows/" << repetitions << "," << endl
+       << "   ifirst = (i - 1) * " << repetitions << " + 1;" << endl
+       << "   ilast  = ifirst + " << repetitions << " - 1;" << endl
+       << "   tmp = " << MATLAB_VAR_NAME << "(ifirst:ilast, cols-4+" << column << ");" << endl
+       << "   avg = mean(tmp);" << endl
+       << "   [h sig ci] = ttest(tmp, 0.1);" << endl
+       << "   ci = (ci(2)-ci(1))/2;" << endl
+       << "   " << var_name << " = [" << var_name << "; " << MATLAB_VAR_NAME << "(ifirst, 1:cols-4), avg ci];" << endl
+       << "end" << endl
+       << endl;
+
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
 bool PrintMatlabVariableEnd(const int repetitions,
 			    ofstream& fout, string& error_msg)
 {
-  fout << "];" << endl;
+  fout << "];" << endl << endl;
 
+  fout << "rows = size(data, 1);" << endl
+       << "cols = size(data, 2);" << endl
+       << endl;
+
+  if (!GenMatlabCode(string(MATLAB_VAR_NAME) + "_delay",
+		     repetitions, 1, fout, error_msg))
+    return false;
+
+  if (!GenMatlabCode(string(MATLAB_VAR_NAME) + "_throughput",
+		     repetitions, 2, fout, error_msg))
+    return false;
+  
   return true;
 }
 
@@ -620,12 +658,15 @@ bool RunSimulations(const TConfigurationSpace& conf_space,
 
   // Make dafault parameters string
   string def_cmd_line;
-  for (int i=0; i<default_params.size(); i++)
+  for (uint i=0; i<default_params.size(); i++)
     def_cmd_line = def_cmd_line + default_params[i] + " ";
 
   // Explore configuration space
   TConfigurationSpace aggr_conf_space = Explore(aggragated_params_space);
-  for (int i=0; i<conf_space.size(); i++)
+
+  pair<uint,uint> sim_counter(0, conf_space.size() * aggr_conf_space.size() * eparams.repetitions);
+  
+  for (uint i=0; i<conf_space.size(); i++)
     {
       string conf_cmd_line = Configuration2CmdLine(conf_space[i]);
 
@@ -638,7 +679,7 @@ bool RunSimulations(const TConfigurationSpace& conf_space,
       if (!PrintMatlabVariableBegin(aggragated_params_space, fout, error_msg))
 	return false;
 
-      for (int j=0; j<aggr_conf_space.size(); j++)
+      for (uint j=0; j<aggr_conf_space.size(); j++)
 	{
 	  string aggr_cmd_line = Configuration2CmdLine(aggr_conf_space[j]);
 
@@ -646,9 +687,8 @@ bool RunSimulations(const TConfigurationSpace& conf_space,
 	    + def_cmd_line + " "
 	    + conf_cmd_line + " "
 	    + aggr_cmd_line;
-
-	  // fout << eparams.simulator << " " << def_cmd_line << " " << conf_cmd_line << " " << aggr_cmd_line << endl;
-	  if (!RunSimulations(cmd, eparams.repetitions,
+	  
+	  if (!RunSimulations(sim_counter, cmd, eparams.repetitions,
 			      aggr_conf_space[j], fout, error_msg))
 	    return false;
 	}
