@@ -22,7 +22,7 @@ void TStats::configure(const int node_id, const double _warm_up_time)
 void TStats::receivedFlit(const double arrival_time,
 			  const TFlit& flit)
 {
-  if (arrival_time < warm_up_time)
+  if (arrival_time - DEFAULT_RESET_TIME < warm_up_time)
     return;
 
   int i = searchCommHistory(flit.src_id);
