@@ -4,7 +4,7 @@ OPT    = -O2 # -O3
 DEBUG  = -g
 OTHER  = -Wall -Wno-deprecated
 CFLAGS = $(OPT) $(OTHER)
-# CFLAGS = $(DEBUG) $(OTHER)
+#CFLAGS = $(DEBUG) $(OPT) $(OTHER)
 
 MODULE = noxim
 SRCS = TNoC.cpp TRouter.cpp TProcessingElement.cpp TBuffer.cpp TStats.cpp \
