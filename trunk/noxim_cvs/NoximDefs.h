@@ -23,7 +23,7 @@ using namespace std;
 #define DIRECTION_LOCAL        4
 
 // Generic not reserved resource
-#define NOT_RESERVED          -1
+#define NOT_RESERVED          -2
 
 // To mark invalid or non exhistent values
 #define NOT_VALID             -1
