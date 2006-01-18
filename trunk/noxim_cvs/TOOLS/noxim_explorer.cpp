@@ -745,7 +745,10 @@ bool RunSimulations(const string& script_fname,
 int main(int argc, char **argv)
 {
   if (argc != 2)
-    return -1;
+    {
+      cout << "Usage: " << argv[0] << " <cfg file>" << endl;
+      return -1;
+    }
 
   string fname(argv[1]);
   string error_msg;
