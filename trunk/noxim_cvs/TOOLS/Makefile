@@ -4,10 +4,13 @@ DEBUG  = -g
 OTHER  = -Wall -Wno-deprecated
 CFLAGS = $(OPT) $(OTHER)
 
+
+all: apsra2noxim spacefilegen noxim_explorer
+
 apsra2noxim: apsra2noxim.o
 	$(CC) $(CFLAGS) apsra2noxim.o -o apsra2noxim
 
-apsra2noxim.o: TOOLS/apsra2noxim.cpp
+apsra2noxim.o: apsra2noxim.cpp
 	$(CC) $(CFLAGS) -c apsra2noxim.cpp -o apsra2noxim.o
 
 spacefilegen: spacefilegen.o
@@ -24,3 +27,4 @@ noxim_explorer.o: noxim_explorer.cpp
 
 clean:
 	rm -f *.o spacefilegen apsra2noxim noxim_explorer
+
