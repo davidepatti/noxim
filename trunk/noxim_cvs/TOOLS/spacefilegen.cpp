@@ -290,7 +290,13 @@ int main()
 	print_values(aggregate);
 	cout << " ]";
 	cout << endl;
-	cout << "\n (for a list of parameters see noxim -help) " << endl;
+	cout << "\n One or more parameter labels can be choosen so that";
+	cout << "\n noxim_explorer tool will not create new output files when";
+	cout << "\n the specified parameters change. A common choice is to";
+	cout << "\n enter 'pir', so that, for each configuration of all";
+	cout << "\n other parameters a file is created containing all the simulations";
+	cout << "\n at the different pir values.";
+	cout << "\n If you don't know what we are talking about, simply enter 'pir'.";
 	cout << "\n Enter a parameter string (c to continue):";
 	cin >> word;
 	if (word!="c") 
@@ -378,5 +384,9 @@ int main()
     space_file << "\n[/explorer]";
 
     space_file << "\n\% end of file";
+
+    cout << "\n\n Ok, created space file "  << word;
+    cout << "\n Use it as input of noxim_explorer tool";
+    cout << "\n and enjoy your exploration!" << endl;
 }
 
