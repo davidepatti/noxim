@@ -26,25 +26,26 @@ void TReservationTable::clear()
 
 //---------------------------------------------------------------------------
 
-bool TReservationTable::isReserved(const int port_out) const
+bool TReservationTable::isAvailable(const int port_out) const
 {
   assert(port_out >= 0 && port_out < DIRECTIONS+1);
 
-  return ( (rtable[port_out] != NOT_RESERVED) &&
-	   (rtable[port_out] != NOT_VALID) );
+  return ((rtable[port_out] == NOT_RESERVED));
 }
 
 //---------------------------------------------------------------------------
 
 void TReservationTable::reserve(const int port_in, const int port_out)
 {
+    // reservation of reserved/not valid ports is illegal. Correctness
+    // should be assured by TReservationTable users
+    assert(isAvailable(port_out));
 
-  int o = getOutputPort(port_in);
+    // check for previous reservation to be released
+  int port = getOutputPort(port_in);
 
-  assert(o!=NOT_VALID);
-
-  if (o != NOT_RESERVED)
-    release(o);
+  if (port!=NOT_RESERVED)
+    release(port);
 
   rtable[port_out] = port_in;
 }
@@ -53,7 +54,9 @@ void TReservationTable::reserve(const int port_in, const int port_out)
 
 void TReservationTable::release(const int port_out)
 {
-  assert(isReserved(port_out));
+  assert(port_out >= 0 && port_out < DIRECTIONS+1);
+    // there is a valid reservation on port_out
+  assert(rtable[port_out] >= 0 && rtable[port_out] < DIRECTIONS+1);
 
   rtable[port_out] = NOT_RESERVED;
 }
@@ -62,17 +65,20 @@ void TReservationTable::release(const int port_out)
 
 int TReservationTable::getOutputPort(const int port_in) const
 {
+  assert(port_in >= 0 && port_in < DIRECTIONS+1);
+
   for (int i=0; i<DIRECTIONS+1; i++)
     if (rtable[i] == port_in)
-      return i;
+      return i; // port_in reserved outport i
 
+  // semantic: port_in currently doesn't reserve any out port
   return NOT_RESERVED;
 }
 //---------------------------------------------------------------------------
 
+// makes port_out no longer available for reservation/release
 void TReservationTable::invalidate(const int port_out)
 {
-    assert(!isReserved(port_out));
     rtable[port_out] = NOT_VALID;
 }
 

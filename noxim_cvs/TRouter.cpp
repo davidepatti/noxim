@@ -19,7 +19,6 @@ void TRouter::rxProcess()
 	  current_level_rx[i] = 0;
 	}
       reservation_table.clear();
-      
     }
   else
     {
@@ -90,7 +89,7 @@ void TRouter::txProcess()
 
 		  int o = route(route_data);
 
-		  if (!reservation_table.isReserved(o))
+		  if (reservation_table.isAvailable(o))
 		    {
 		      reservation_table.reserve(i, o);
 		      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
@@ -152,7 +151,7 @@ TNoP_data TRouter::getCurrentNoPData() const
     for (int j=0; j<DIRECTIONS; j++)
     {
 	NoP_data.channel_status_neighbor[j].buffer_level = buffer_level_neighbor[j].read();
-	NoP_data.channel_status_neighbor[j].available = (!reservation_table.isReserved(j));
+	NoP_data.channel_status_neighbor[j].available = (reservation_table.isAvailable(j));
     }
 
     NoP_data.sender_id = local_id;
@@ -347,7 +346,7 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
     {
 	uint free_positions = buffer_depth - buffer_level_neighbor[directions[i]].read();
 	if ((free_positions >= max_free_positions) &&
-	    (!reservation_table.isReserved(directions[i])))
+	    (reservation_table.isAvailable(directions[i])))
 	{
 	    direction_choosen = directions[i];
 	    max_free_positions = free_positions;
@@ -366,7 +365,7 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
 	for (unsigned int i=0;i<directions.size();i++)
 	{
 	    tmp.buffer_level = buffer_level_neighbor[directions[i]].read();
-	    tmp.available = (!reservation_table.isReserved(directions[i]));
+	    tmp.available = (reservation_table.isAvailable(directions[i]));
 	    cout << "    -> direction " << directions[i] << ", channel status: " << tmp << endl;
 	}
 	cout << " direction choosen: " << direction_choosen << endl;
@@ -616,7 +615,7 @@ vector<int> TRouter::routingFullyAdaptive(const TCoord& current, const TCoord& d
 
 vector<int> TRouter::routingTableBased(const int dir_in, const TCoord& current, const TCoord& destination)
 {
-  TAdmissibleOutputs ao = rtable.getAdmissibleOutputs(dir_in, coord2Id(destination));
+  TAdmissibleOutputs ao = routing_table.getAdmissibleOutputs(dir_in, coord2Id(destination));
   
   if (ao.size() == 0)
     {
@@ -653,7 +652,7 @@ void TRouter::configure(const int _id,
   start_from_port = DIRECTION_LOCAL;
 
   if (grt.isValid())
-    rtable.configure(grt, _id);
+    routing_table.configure(grt, _id);
 
   buffer_depth = TGlobalParams::buffer_depth;
 }

@@ -115,7 +115,7 @@ void TNoC::buildMesh()
       tmp_NoP.channel_status_neighbor[i].available = false;
   }
 
-  // Clear the inputs on the borders
+  // Clear signals for borderline nodes
   for(int i=0; i<=TGlobalParams::mesh_dim_x; i++)
     {
       req_to_south[i][0] = 0;
@@ -128,6 +128,7 @@ void TNoC::buildMesh()
 
       NoP_data_to_south[i][0].write(tmp_NoP);
       NoP_data_to_north[i][TGlobalParams::mesh_dim_y].write(tmp_NoP);
+
     }
 
   for(int j=0; j<=TGlobalParams::mesh_dim_y; j++)
@@ -142,6 +143,19 @@ void TNoC::buildMesh()
 
       NoP_data_to_east[0][j].write(tmp_NoP);
       NoP_data_to_west[TGlobalParams::mesh_dim_x][j].write(tmp_NoP);
+
+    }
+
+  // invalidate reservation table entries for non-exhistent channels
+  for(int i=0; i<TGlobalParams::mesh_dim_x; i++)
+    {
+      t[i][0]->r->reservation_table.invalidate(DIRECTION_NORTH);
+      t[i][TGlobalParams::mesh_dim_y-1]->r->reservation_table.invalidate(DIRECTION_SOUTH);
+    }
+  for(int j=0; j<TGlobalParams::mesh_dim_y; j++)
+    {
+      t[0][j]->r->reservation_table.invalidate(DIRECTION_WEST);
+      t[TGlobalParams::mesh_dim_x-1][j]->r->reservation_table.invalidate(DIRECTION_EAST);
     }
 
 }
