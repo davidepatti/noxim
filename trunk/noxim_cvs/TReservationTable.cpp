@@ -30,7 +30,8 @@ bool TReservationTable::isReserved(const int port_out) const
 {
   assert(port_out >= 0 && port_out < DIRECTIONS+1);
 
-  return (rtable[port_out] != NOT_RESERVED);
+  return ( (rtable[port_out] != NOT_RESERVED) &&
+	   (rtable[port_out] != NOT_VALID) );
 }
 
 //---------------------------------------------------------------------------
@@ -39,6 +40,8 @@ void TReservationTable::reserve(const int port_in, const int port_out)
 {
 
   int o = getOutputPort(port_in);
+
+  assert(o!=NOT_VALID);
 
   if (o != NOT_RESERVED)
     release(o);
@@ -59,17 +62,19 @@ void TReservationTable::release(const int port_out)
 
 int TReservationTable::getOutputPort(const int port_in) const
 {
-    // x mau, quando implementi l'altro vettore sistema la funzione
-    // che ho aggiunto sotto!
   for (int i=0; i<DIRECTIONS+1; i++)
     if (rtable[i] == port_in)
       return i;
 
   return NOT_RESERVED;
 }
-
 //---------------------------------------------------------------------------
 
+void TReservationTable::invalidate(const int port_out)
+{
+    assert(!isReserved(port_out));
+    rtable[port_out] = NOT_VALID;
+}
 
 
 
