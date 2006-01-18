@@ -744,17 +744,24 @@ bool RunSimulations(const string& script_fname,
 
 int main(int argc, char **argv)
 {
-  if (argc != 2)
+  if (argc < 2)
     {
-      cout << "Usage: " << argv[0] << " <cfg file>" << endl;
+      cout << "Usage: " << argv[0] << " <cfg file> [<cfg file>]" << endl;
       return -1;
     }
 
-  string fname(argv[1]);
-  string error_msg;
+  for (int i=1; i<argc; i++)
+    {
+      string fname(argv[i]);
+      cout << "# Exploring configuration space " << fname << endl;
 
-  if (!RunSimulations(fname, error_msg))
-    cout << "Error: " << error_msg << endl;
+      string error_msg;
+
+      if (!RunSimulations(fname, error_msg))
+	cout << "Error: " << error_msg << endl;
+
+      cout << endl;
+    }
 
   return 0;
 }
