@@ -20,6 +20,7 @@ char TGlobalParams::trace_filename[128]         = DEFAULT_TRACE_FILENAME;
 int TGlobalParams::mesh_dim_x                   = DEFAULT_MESH_DIM_X;
 int TGlobalParams::mesh_dim_y                   = DEFAULT_MESH_DIM_Y;
 int TGlobalParams::buffer_depth                 = DEFAULT_BUFFER_DEPTH;
+int TGlobalParams::min_packet_size              = DEFAULT_MIN_PACKET_SIZE;
 int TGlobalParams::max_packet_size              = DEFAULT_MAX_PACKET_SIZE;
 int TGlobalParams::routing_algorithm            = DEFAULT_ROUTING_ALGORITHM;
 char TGlobalParams::routing_table_filename[128] = DEFAULT_ROUTING_TABLE_FILENAME;
@@ -43,7 +44,7 @@ void showHelp(char selfname[])
   cout << "\t-dimx N\t\tSet the mesh X dimension to the specified integer value (default " << DEFAULT_MESH_DIM_X << ")" << endl;
   cout << "\t-dimy N\t\tSet the mesh Y dimension to the specified integer value (default " << DEFAULT_MESH_DIM_Y << ")" << endl;
   cout << "\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value [flits] (default " << DEFAULT_BUFFER_DEPTH << ")" << endl;
-  cout << "\t-size N\t\tSet the maximum packet size to the specified integer value [flits] (default " << DEFAULT_MAX_PACKET_SIZE << ")" << endl;
+  cout << "\t-size n N\t\tSet the minimum and maximum packet size to the specified integer value [flits] (default min=" << DEFAULT_MIN_PACKET_SIZE << ", max=" << DEFAULT_MAX_PACKET_SIZE << ")" << endl;
   cout << "\t-routing TYPE\tSet the routing algorithm to TYPE where TYPE is one of the following (default " << DEFAULT_ROUTING_ALGORITHM << "):" << endl;
   cout << "\t\txy\t\tXY routing algorithm" << endl;
   cout << "\t\twestfirst\tWest-First routing algorithm" << endl;
@@ -193,11 +194,13 @@ int sc_main(int arg_num, char* arg_vet[])
       }
       else if(!strcmp(arg_vet[i],"-size"))
       {
-        int new_size = atoi(arg_vet[i+1]);
-        if(new_size>1)
+        int new_min_size = atoi(arg_vet[i+1]);
+        int new_max_size = atoi(arg_vet[i+2]);
+        if(new_min_size>=2 && new_max_size >= new_min_size)
 	{
-          TGlobalParams::max_packet_size = new_size;
-          i+=2;
+          TGlobalParams::min_packet_size = new_min_size;
+          TGlobalParams::max_packet_size = new_max_size;
+          i+=3;
         }
         else badArgument(arg_vet[i+1], arg_vet[i]);
       }

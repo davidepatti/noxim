@@ -8,6 +8,13 @@
 
 //---------------------------------------------------------------------------
 
+int TProcessingElement::randInt(int min, int max)
+{
+  return min + (int)((double)(max-min+1) * rand()/(RAND_MAX+1.0));
+}
+
+//---------------------------------------------------------------------------
+
 void TProcessingElement::rxProcess()
 {
   if(reset.read())
@@ -178,11 +185,13 @@ TPacket TProcessingElement::trafficUniform()
   // Uniform destination distribution
   do
   {
-    p.dst_id = rand() % (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y);
+    p.dst_id = randInt(0, (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y)-1);
   } while(p.dst_id==p.src_id);
 
   p.timestamp = sc_simulation_time();
-  p.size = p.flit_left = 2 + (rand() % TGlobalParams::max_packet_size);
+  p.size = p.flit_left = randInt(TGlobalParams::min_packet_size, 
+				 TGlobalParams::max_packet_size); // 2 + (rand() % TGlobalParams::max_packet_size);
+
   return p;
 }
 
@@ -203,7 +212,9 @@ TPacket TProcessingElement::trafficTranspose1()
   p.dst_id = coord2Id(dst);
 
   p.timestamp = sc_simulation_time();
-  p.size = p.flit_left = 2 + (rand() % TGlobalParams::max_packet_size);
+  
+  p.size = p.flit_left = randInt(TGlobalParams::min_packet_size, 
+				 TGlobalParams::max_packet_size); 
   return p;
 }
 
@@ -224,7 +235,10 @@ TPacket TProcessingElement::trafficTranspose2()
   p.dst_id = coord2Id(dst);
 
   p.timestamp = sc_simulation_time();
-  p.size = p.flit_left = 2 + (rand() % TGlobalParams::max_packet_size);
+
+  p.size = p.flit_left = randInt(TGlobalParams::min_packet_size, 
+				 TGlobalParams::max_packet_size);
+
   return p;
 }
 
@@ -239,7 +253,10 @@ TPacket TProcessingElement::trafficTableBased()
   p.dst_id = traffic_table->randomDestinationGivenTheSource(p.src_id);
 
   p.timestamp = sc_simulation_time();
-  p.size = p.flit_left = 2 + (rand() % TGlobalParams::max_packet_size);
+  
+  p.size = p.flit_left = randInt(TGlobalParams::min_packet_size, 
+				 TGlobalParams::max_packet_size);
+
   return p;
 }
 

@@ -56,6 +56,7 @@ SC_MODULE(TProcessingElement)
   TGlobalTrafficTable* traffic_table;                     // Reference to the Global traffic Table
   int                  occurrencesInTrafficTableAsSource; // Number of occurrences in Traffic Table
   void                 fixRanges(const TCoord, TCoord&);  // Fix the ranges of the destination
+  int                  randInt(int min, int max);         // Extracts a random integer number between min and max
 
   // Constructor
 
