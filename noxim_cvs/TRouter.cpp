@@ -167,6 +167,7 @@ void TRouter::bufferMonitor()
   {
     // upon reset, buffer level is put to 0
     for (int i=0; i<DIRECTIONS+1; i++) buffer_level[i].write(0);
+
   }
   else
   {
@@ -300,8 +301,16 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
 {
   vector<int> neighbors_on_path;
   vector<int> score;
+  int direction_selected = NOT_VALID;
 
   int current_id = route_data.current_id;
+
+  if (TGlobalParams::verbose_mode==-58)
+  {
+    cout << endl;
+    cout << sc_simulation_time() << ": Router[" << local_id << "] NoP SELECTION ----------------" << endl;
+    cout << "      Packet: " << route_data.src_id << " --> " << route_data.dst_id << endl;
+  }
 
   for (uint i=0; i<directions.size(); i++)
   {
@@ -317,9 +326,7 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
 
     if (TGlobalParams::verbose_mode==-58)
     {
-	cout << sc_simulation_time() << ": Router[" << local_id << "] NoP SELECTION " << endl;
-	cout << "      Adjacent node: " << candidate_id << " (direction " << directions[i] << ")" << endl;
-	cout << "      Packet: " << route_data.src_id << " --> " << route_data.dst_id << endl;
+	cout << "\n    -> Adjacent candidate: " << candidate_id << " (direction " << directions[i] << ")" << endl;
     }
 
     vector<int> next_candidate_channels = routingFunction(tmp_route_data);
@@ -327,9 +334,43 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
     // select useful data from Neighbor-on-Path input 
     TNoP_data nop_tmp = NoP_data_in[directions[i]].read();
 
+    // store the score of node in the direction[i]
     score.push_back(NoPScore(nop_tmp,next_candidate_channels));
   }
-    return directions[rand() % directions.size()]; 
+
+  // check for direction with higher score
+  int max_direction = directions[0];
+  int max = score[0];
+  for (unsigned int i = 0;i<directions.size();i++)
+  {
+      if (score[i]>max)
+      {
+	  max_direction = directions[i];
+	  max = score[i];
+      }
+  }
+
+  // if multiple direction have the same score = max, choose randomly.
+  
+  vector<int> equivalent_directions;
+
+  for (unsigned int i = 0;i<directions.size();i++)
+      if (score[i]==max)
+	  equivalent_directions.push_back(directions[i]);
+
+  direction_selected =  equivalent_directions[rand() % equivalent_directions.size()]; 
+
+  if (TGlobalParams::verbose_mode==-58)
+  {
+      if (equivalent_directions.size()>1)
+      {
+	  cout << "\n    equivalent directions found! : ";
+	  for (unsigned int i =0;i<equivalent_directions.size();i++)
+	      cout  << " " << equivalent_directions[i];
+      }
+      cout << "\n CHOICE: node " << getNeighborId(current_id,direction_selected) << " (direction " << direction_selected << ")" << endl;
+  }
+  return direction_selected; 
 }
 
 //---------------------------------------------------------------------------
