@@ -49,7 +49,6 @@ SC_MODULE(TRouter)
   int                local_id;                              // Unique ID
   int                routing_type;                    // Type of routing algorithm
   int                selection_type;
-  int                buffer_depth;
   TBuffer            buffer[DIRECTIONS+1];            // Buffer for each input channel 
   bool               current_level_rx[DIRECTIONS+1];  // Current level for Alternating Bit Protocol (ABP)
   bool               current_level_tx[DIRECTIONS+1];  // Current level for Alternating Bit Protocol (ABP)
@@ -64,6 +63,7 @@ SC_MODULE(TRouter)
   void               txProcess();        // The transmitting process
   void               bufferMonitor();
   void               configure(const int _id, const double _warm_up_time,
+			       const unsigned int _max_buffer_size,
 			       TGlobalRoutingTable& grt);
 
 

@@ -28,6 +28,8 @@ class TBuffer
   void SetMaxBufferSize(const unsigned int bms); // Set buffer max
 						 // size (in flits)
 
+  unsigned int GetMaxBufferSize() const; // Get max buffer size
+
   bool IsFull(); // Returns true if buffer is full
   bool IsEmpty(); // Returns true if buffer is empty
 

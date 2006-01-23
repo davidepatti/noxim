@@ -24,6 +24,13 @@ void TBuffer::SetMaxBufferSize(const unsigned int bms)
 
 //---------------------------------------------------------------------------
 
+unsigned int TBuffer::GetMaxBufferSize() const
+{
+  return max_buffer_size;
+}
+
+//---------------------------------------------------------------------------
+
 bool TBuffer::IsFull()
 {
   return buffer.size() == max_buffer_size;

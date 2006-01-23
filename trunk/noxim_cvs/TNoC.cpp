@@ -33,6 +33,7 @@ void TNoC::buildMesh()
 	  // Tell to the router its coordinates
 	  t[i][j]->r->configure(j * TGlobalParams::mesh_dim_x + i,
 				TGlobalParams::stats_warm_up_time,
+				TGlobalParams::buffer_depth,
 				grtable);
 
 	  // Tell to the PE its coordinates
