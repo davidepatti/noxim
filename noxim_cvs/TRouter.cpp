@@ -266,7 +266,7 @@ void TRouter::NoP_report() const
 int TRouter::NoPScore(const TNoP_data& nop_data, const vector<int>& nop_channels) const
 {
     int score = 0;
-
+    //--------------->DAVIDE: devo usare i oppure nop_channels[i]?
     if (TGlobalParams::verbose_mode==-58)
     {
 	cout << nop_data;
@@ -287,10 +287,10 @@ int TRouter::NoPScore(const TNoP_data& nop_data, const vector<int>& nop_channels
 	if (TGlobalParams::verbose_mode==-58)
 	{
 	    cout << "       channel " << nop_channels[i] << " -> score: ";
-	    cout << " + " << available << " * (" << buffer_depth << " - " << level << ")" << endl;
+	    cout << " + " << available << " * (" << buffer[i].GetMaxBufferSize() << " - " << level << ")" << endl;
 	}
 
-	score += available*(buffer_depth-level);
+	score += available*(buffer[i].GetMaxBufferSize() - level);
     }
 
     return score;
@@ -382,10 +382,10 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
 
     unsigned int max_free_positions = 0;
     int direction_choosen = NOT_VALID;
-
+    //--------------->DAVIDE: devo usare i ppure directions[i]?
     for (unsigned int i=0;i<directions.size();i++)
     {
-	uint free_positions = buffer_depth - buffer_level_neighbor[directions[i]].read();
+	uint free_positions = buffer[i].GetMaxBufferSize() - buffer_level_neighbor[directions[i]].read();
 	if ((free_positions >= max_free_positions) &&
 	    (reservation_table.isAvailable(directions[i])))
 	{
@@ -685,6 +685,7 @@ vector<int> TRouter::routingTableBased(const int dir_in, const TCoord& current, 
 
 void TRouter::configure(const int _id, 
 			const double _warm_up_time,
+			const unsigned int _max_buffer_size,
 			TGlobalRoutingTable& grt)
 {
   local_id = _id;
@@ -695,7 +696,8 @@ void TRouter::configure(const int _id,
   if (grt.isValid())
     routing_table.configure(grt, _id);
 
-  buffer_depth = TGlobalParams::buffer_depth;
+  for (int i=0; i<DIRECTIONS+1; i++)
+    buffer[i].SetMaxBufferSize(_max_buffer_size);
 }
 
 //---------------------------------------------------------------------------
