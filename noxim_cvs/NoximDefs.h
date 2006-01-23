@@ -66,6 +66,7 @@ using namespace std;
 #define DEFAULT_MESH_DIM_Y                           4
 #define DEFAULT_BUFFER_DEPTH                         4
 #define DEFAULT_MAX_PACKET_SIZE                     10
+#define DEFAULT_MIN_PACKET_SIZE                      2
 #define DEFAULT_ROUTING_ALGORITHM           ROUTING_XY
 #define DEFAULT_ROUTING_TABLE_FILENAME              ""
 #define DEFAULT_SELECTION_STRATEGY          SEL_RANDOM
@@ -91,6 +92,7 @@ struct TGlobalParams
   static int mesh_dim_x;
   static int mesh_dim_y;
   static int buffer_depth;
+  static int min_packet_size;
   static int max_packet_size;
   static int routing_algorithm;
   static char routing_table_filename[128];
