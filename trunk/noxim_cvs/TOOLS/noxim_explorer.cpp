@@ -16,9 +16,11 @@ using namespace std;
 #define EXPLORER_KEY        "explorer"
 #define SIMULATOR_LABEL     "simulator"
 #define REPETITIONS_LABEL   "repetitions"
+#define TMP_DIR_LABEL       "tmp"
 
 #define DEF_SIMULATOR       "./noxim"
 #define DEF_REPETITIONS     5
+#define DEF_TMP_DIR         "./"
 
 #define TMP_FILE_NAME       ".noxim_explorer.tmp"
 
@@ -48,6 +50,7 @@ typedef vector<TConfiguration> TConfigurationSpace;
 struct TExplorerParams
 {
   string simulator;
+  string tmp_dir;
   int    repetitions;
 };
 
@@ -417,6 +420,7 @@ bool ExtractExplorerParams(const TParameterSpace& explorer_params,
 			   string& error_msg)
 {
   eparams.simulator   = DEF_SIMULATOR;
+  eparams.tmp_dir     = DEF_TMP_DIR;
   eparams.repetitions = DEF_REPETITIONS;
 
   for (uint i=0; i<explorer_params.size(); i++)
@@ -430,6 +434,8 @@ bool ExtractExplorerParams(const TParameterSpace& explorer_params,
 	iss >> eparams.simulator;
       else if (label == REPETITIONS_LABEL)
 	iss >> eparams.repetitions;
+      else if (label == TMP_DIR_LABEL)
+	iss >> eparams.tmp_dir;
       else
 	{
 	  error_msg = "Invalid explorer option '" + label + "'";
@@ -532,17 +538,19 @@ bool ReadResults(const string& fname,
 
 //---------------------------------------------------------------------------
 
-bool RunSimulation(const string& cmd_base, 
+bool RunSimulation(const string& cmd_base,
+		   const string& tmp_dir,
 		   TSimulationResults& sres, 
 		   string& error_msg)
 {
-  string cmd = cmd_base + " >& " + TMP_FILE_NAME;
+  string tmp_fname = tmp_dir + TMP_FILE_NAME;
+  string cmd = cmd_base + " >& " + tmp_fname;
   cout << cmd << endl;
   system(cmd.c_str());
-  if (!ReadResults(TMP_FILE_NAME, sres, error_msg))
+  if (!ReadResults(tmp_fname, sres, error_msg))
     return false;
 
-  string rm_cmd = string("rm -f ") + TMP_FILE_NAME;
+  string rm_cmd = string("rm -f ") + tmp_fname;
   system(cmd.c_str());
 
   return true;
@@ -551,7 +559,7 @@ bool RunSimulation(const string& cmd_base,
 //---------------------------------------------------------------------------
 
 bool RunSimulations(pair<uint,uint>& sim_counter,
-		    const string& cmd, const int repetitions,
+		    const string& cmd, const string& tmp_dir, const int repetitions,
 		    const TConfiguration& aggr_conf, 
 		    ofstream& fout, 
 		    string& error_msg)
@@ -561,7 +569,7 @@ bool RunSimulations(pair<uint,uint>& sim_counter,
       cout << "# simulation " << (++sim_counter.first) << " of " << sim_counter.second << endl;
 
       TSimulationResults sres;
-      if (!RunSimulation(cmd, sres, error_msg))
+      if (!RunSimulation(cmd, tmp_dir, sres, error_msg))
 	return false;
 
       // Print aggragated parameters
@@ -688,7 +696,7 @@ bool RunSimulations(const TConfigurationSpace& conf_space,
 	    + conf_cmd_line + " "
 	    + aggr_cmd_line;
 	  
-	  if (!RunSimulations(sim_counter, cmd, eparams.repetitions,
+	  if (!RunSimulations(sim_counter, cmd, eparams.tmp_dir, eparams.repetitions,
 			      aggr_conf_space[j], fout, error_msg))
 	    return false;
 	}
