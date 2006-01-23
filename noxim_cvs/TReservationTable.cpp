@@ -20,8 +20,9 @@ void TReservationTable::clear()
 {
   rtable.resize(DIRECTIONS+1);
   
+  // note that NOT_VALID entries should remain untouched
   for (int i=0; i<DIRECTIONS+1; i++)
-    rtable[i] = NOT_RESERVED;
+    if (rtable[i] != NOT_VALID) rtable[i] = NOT_RESERVED;
 }
 
 //---------------------------------------------------------------------------
