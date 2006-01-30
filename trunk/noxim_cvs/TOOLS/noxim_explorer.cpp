@@ -11,26 +11,27 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 
-#define DEFAULT_KEY         "default"
-#define AGGREGATION_KEY     "aggregation"
-#define EXPLORER_KEY        "explorer"
-#define SIMULATOR_LABEL     "simulator"
-#define REPETITIONS_LABEL   "repetitions"
-#define TMP_DIR_LABEL       "tmp"
+#define DEFAULT_KEY          "default"
+#define AGGREGATION_KEY      "aggregation"
+#define EXPLORER_KEY         "explorer"
+#define SIMULATOR_LABEL      "simulator"
+#define REPETITIONS_LABEL    "repetitions"
+#define TMP_DIR_LABEL        "tmp"
 
-#define DEF_SIMULATOR       "./noxim"
-#define DEF_REPETITIONS     5
-#define DEF_TMP_DIR         "./"
+#define DEF_SIMULATOR        "./noxim"
+#define DEF_REPETITIONS      5
+#define DEF_TMP_DIR          "./"
 
-#define TMP_FILE_NAME       ".noxim_explorer.tmp"
+#define TMP_FILE_NAME        ".noxim_explorer.tmp"
 
-#define RPACKETS_LABEL      "% Total received packets:"
-#define RFLITS_LABEL        "% Total received flits:"
-#define DELAY_LABEL         "% Global average delay (cycles):"
-#define THROUGHPUT_LABEL    "% Global average throughput (flits/cycle):"
+#define RPACKETS_LABEL       "% Total received packets:"
+#define RFLITS_LABEL         "% Total received flits:"
+#define AVG_DELAY_LABEL      "% Global average delay (cycles):"
+#define AVG_THROUGHPUT_LABEL "% Global average throughput (flits/cycle):"
+#define THROUGHPUT_LABEL     "% Throughput (flits/cycle/IP):"
 
-#define MATLAB_VAR_NAME     "data"
-#define MATRIX_COLUMN_WIDTH 15
+#define MATLAB_VAR_NAME      "data"
+#define MATRIX_COLUMN_WIDTH  15
 
 //---------------------------------------------------------------------------
 
@@ -56,8 +57,9 @@ struct TExplorerParams
 
 struct TSimulationResults
 {
-  double       delay;
+  double       avg_delay;
   double       throughput;
+  double       avg_throughput;
   unsigned int rpackets;
   unsigned int rflits;
 };
@@ -508,12 +510,21 @@ bool ReadResults(const string& fname,
 	  continue;
 	}
 
-      pos = line.find(DELAY_LABEL);
+      pos = line.find(AVG_DELAY_LABEL);
       if (pos != string::npos) 
 	{
 	  nread++;
-	  istringstream iss(line.substr(pos + string(DELAY_LABEL).size()));
-	  iss >> sres.delay;
+	  istringstream iss(line.substr(pos + string(AVG_DELAY_LABEL).size()));
+	  iss >> sres.avg_delay;
+	  continue;
+	}
+
+      pos = line.find(AVG_THROUGHPUT_LABEL);
+      if (pos != string::npos) 
+	{
+	  nread++;
+	  istringstream iss(line.substr(pos + string(AVG_THROUGHPUT_LABEL).size()));
+	  iss >> sres.avg_throughput;
 	  continue;
 	}
 
@@ -527,7 +538,7 @@ bool ReadResults(const string& fname,
 	}
     }
 
-  if (nread != 4)
+  if (nread != 5)
     {
       error_msg = "Output file " + fname + " corrupted";
       return false;
@@ -578,7 +589,7 @@ bool RunSimulations(pair<uint,uint>& sim_counter,
 	fout << setw(MATRIX_COLUMN_WIDTH) << aggr_conf[i].second;
 
       // Print results;
-      fout << setw(MATRIX_COLUMN_WIDTH) << sres.delay
+      fout << setw(MATRIX_COLUMN_WIDTH) << sres.avg_delay
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.throughput
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.rpackets
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.rflits 
@@ -599,7 +610,7 @@ bool PrintMatlabVariableBegin(const TParametersSpace& aggragated_params_space,
        i!=aggragated_params_space.end(); i++)
     fout << setw(MATRIX_COLUMN_WIDTH) << i->first;
 
-  fout << setw(MATRIX_COLUMN_WIDTH) << "delay"
+  fout << setw(MATRIX_COLUMN_WIDTH) << "avg_delay"
        << setw(MATRIX_COLUMN_WIDTH) << "throughput"
        << setw(MATRIX_COLUMN_WIDTH) << "rpackets"
        << setw(MATRIX_COLUMN_WIDTH) << "rflits";

@@ -111,6 +111,18 @@ unsigned int TGlobalStats::getReceivedFlits()
 
 //---------------------------------------------------------------------------
 
+double TGlobalStats::getThroughput()
+{
+  int total_cycles = TGlobalParams::simulation_time - 
+    TGlobalParams::stats_warm_up_time;
+
+  int number_of_ip = TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y;
+
+  return (double)getReceivedFlits()/(double)(total_cycles * number_of_ip);
+}
+
+//---------------------------------------------------------------------------
+
 void TGlobalStats::showStats(std::ostream& out)
 {
   if(TGlobalParams::verbose_mode > VERBOSE_OFF)
@@ -122,6 +134,7 @@ void TGlobalStats::showStats(std::ostream& out)
   out << "% Total received flits: " << getReceivedFlits() << endl;
   out << "% Global average delay (cycles): " << getAverageDelay() << endl;
   out << "% Global average throughput (flits/cycle): " << getAverageThroughput() << endl;
+  out << "% Throughput (flits/cycle/IP): " << getThroughput() << endl;
 }
 
 //---------------------------------------------------------------------------
