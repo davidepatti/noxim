@@ -29,23 +29,24 @@ class TBuffer
 						 // size (in flits)
 
   unsigned int GetMaxBufferSize() const; // Get max buffer size
+  unsigned int getCurrentFreeSlots() const; // free buffer slots
 
-  bool IsFull(); // Returns true if buffer is full
-  bool IsEmpty(); // Returns true if buffer is empty
+  bool IsFull() const; // Returns true if buffer is full
+  bool IsEmpty() const; // Returns true if buffer is empty
 
-  virtual void Drop(const TFlit& flit); // Called by Push() when
+  virtual void Drop(const TFlit& flit) const; // Called by Push() when
 					// buffer is full
 
-  virtual void Empty(); // Called by Pop() when buffer is empty
+  virtual void Empty() const; // Called by Pop() when buffer is empty
 
   void Push(const TFlit& flit); // Push a flit. Calls Drop method if
 				// buffer is full.
 
   TFlit Pop(); // Pop a flit.
 
-  TFlit Front(); // Return a copy of the first flit in the buffer.
+  TFlit Front() const; // Return a copy of the first flit in the buffer.
 
-  unsigned int Size();
+  unsigned int Size() const;
 
 private:
   

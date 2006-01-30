@@ -150,7 +150,7 @@ TNoP_data TRouter::getCurrentNoPData() const
 
     for (int j=0; j<DIRECTIONS; j++)
     {
-	NoP_data.channel_status_neighbor[j].buffer_level = buffer_level_neighbor[j].read();
+	NoP_data.channel_status_neighbor[j].free_slots = free_slots_neighbor[j].read();
 	NoP_data.channel_status_neighbor[j].available = (reservation_table.isAvailable(j));
     }
 
@@ -165,9 +165,7 @@ void TRouter::bufferMonitor()
 {
   if (reset.read())
   {
-    // upon reset, buffer level is put to 0
-    for (int i=0; i<DIRECTIONS+1; i++) buffer_level[i].write(0);
-
+    for (int i=0; i<DIRECTIONS+1; i++) free_slots[i].write(buffer[i].GetMaxBufferSize());
   }
   else
   {
@@ -178,7 +176,7 @@ void TRouter::bufferMonitor()
 
       // update current input buffers level to neighbors
       for (int i=0; i<DIRECTIONS+1; i++)
-	buffer_level[i].write(buffer[i].Size());
+	free_slots[i].write(buffer[i].getCurrentFreeSlots());
 
       // NoP selection: send neighbor info to each direction 'i'
       TNoP_data current_NoP_data = getCurrentNoPData();
@@ -266,7 +264,7 @@ void TRouter::NoP_report() const
 int TRouter::NoPScore(const TNoP_data& nop_data, const vector<int>& nop_channels) const
 {
     int score = 0;
-    //--------------->DAVIDE: devo usare i oppure nop_channels[i]?
+
     if (TGlobalParams::verbose_mode==-58)
     {
 	cout << nop_data;
@@ -276,21 +274,20 @@ int TRouter::NoPScore(const TNoP_data& nop_data, const vector<int>& nop_channels
     for (unsigned int i=0;i<nop_channels.size();i++)
     {
 	int available;
-	int level;
 
 	if (nop_data.channel_status_neighbor[nop_channels[i]].available)
 	    available = 1; 
 	else available = 0;
 
-	level = nop_data.channel_status_neighbor[nop_channels[i]].buffer_level;
+	int free_slots = nop_data.channel_status_neighbor[nop_channels[i]].free_slots;
 
 	if (TGlobalParams::verbose_mode==-58)
 	{
 	    cout << "       channel " << nop_channels[i] << " -> score: ";
-	    cout << " + " << available << " * (" << buffer[i].GetMaxBufferSize() << " - " << level << ")" << endl;
+	    cout << " + " << available << " * (" << free_slots << ")" << endl;
 	}
 
-	score += available*(buffer[i].GetMaxBufferSize() - level);
+	score += available*free_slots;
     }
 
     return score;
@@ -380,17 +377,17 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
     // TODO: unfair if multiple directions have same buffer level
     // TODO: to check when both available
 
-    unsigned int max_free_positions = 0;
+    unsigned int max_free_slots = 0;
     int direction_choosen = NOT_VALID;
-    //--------------->DAVIDE: devo usare i ppure directions[i]?
+
     for (unsigned int i=0;i<directions.size();i++)
     {
-	uint free_positions = buffer[i].GetMaxBufferSize() - buffer_level_neighbor[directions[i]].read();
-	if ((free_positions >= max_free_positions) &&
+	int free_slots = free_slots_neighbor[directions[i]].read();
+	if ((free_slots >= max_free_slots) &&
 	    (reservation_table.isAvailable(directions[i])))
 	{
 	    direction_choosen = directions[i];
-	    max_free_positions = free_positions;
+	    max_free_slots = free_slots;
 	}
     }
 
@@ -405,7 +402,7 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
 	cout << sc_simulation_time() << ": Router[" << local_id << "] SELECTION between: " << endl;
 	for (unsigned int i=0;i<directions.size();i++)
 	{
-	    tmp.buffer_level = buffer_level_neighbor[directions[i]].read();
+	    tmp.free_slots = free_slots_neighbor[directions[i]].read();
 	    tmp.available = (reservation_table.isAvailable(directions[i]));
 	    cout << "    -> direction " << directions[i] << ", channel status: " << tmp << endl;
 	}
