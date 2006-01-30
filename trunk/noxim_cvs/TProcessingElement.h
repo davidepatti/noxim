@@ -31,8 +31,8 @@ SC_MODULE(TProcessingElement)
   sc_out<bool>         req_tx;       // The request associated with the output channel
   sc_in<bool>          ack_tx;       // The outgoing ack signal associated with the output channel
 
-  sc_out<int>         buffer_level;
-  sc_in<int>          buffer_level_neighbor;
+  sc_out<int>         free_slots;
+  sc_in<int>          free_slots_neighbor;
 
   // Registers
 

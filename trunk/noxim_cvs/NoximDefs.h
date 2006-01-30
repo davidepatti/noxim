@@ -164,11 +164,11 @@ struct TRouteData
 //---------------------------------------------------------------------------
 struct TChannelStatus
 {
-    int buffer_level;  // occupied buffer slots
+    int free_slots;  // occupied buffer slots
     bool available; // 
     inline bool operator == (const TChannelStatus& bs) const
     {
-	return (buffer_level == bs.buffer_level && available == bs.available);
+	return (free_slots == bs.free_slots && available == bs.available);
     };
 };
 
@@ -254,7 +254,7 @@ inline ostream& operator << (ostream& os, const TChannelStatus& status)
   if (status.available) msg = 'A'; 
   else
       msg = 'N';
-  os << msg << "(" << status.buffer_level << ")"; 
+  os << msg << "(" << status.free_slots << ")"; 
   return os;
 }
 //---------------------------------------------------------------------------
@@ -301,7 +301,7 @@ inline void sc_trace(sc_trace_file*& tf, const TNoP_data& NoP_data, string& name
 //---------------------------------------------------------------------------
 inline void sc_trace(sc_trace_file*& tf, const TChannelStatus& bs, string& name)
 {
-  sc_trace(tf, bs.buffer_level, name+".buffer_level");
+  sc_trace(tf, bs.free_slots, name+".free_slots");
   sc_trace(tf, bs.available, name+".available");
 }
 

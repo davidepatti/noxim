@@ -29,8 +29,8 @@ SC_MODULE(TTile)
   sc_out<bool>        req_tx[DIRECTIONS];    // The requests associated with the output channels
   sc_in<bool>         ack_tx[DIRECTIONS];    // The outgoing ack signals associated with the output channels
 
-  sc_out<int>        buffer_level[DIRECTIONS];
-  sc_in<int>         buffer_level_neighbor[DIRECTIONS];
+  sc_out<int>        free_slots[DIRECTIONS];
+  sc_in<int>         free_slots_neighbor[DIRECTIONS];
 
   // NoP related I/O
   sc_out<TNoP_data>        NoP_data_out[DIRECTIONS];
@@ -46,8 +46,8 @@ SC_MODULE(TTile)
   sc_signal<bool>     req_tx_local;    // The requests associated with the output channels
   sc_signal<bool>     ack_tx_local;    // The outgoing ack signals associated with the output channels
   
-  sc_signal<int>     buffer_level_local;
-  sc_signal<int>     buffer_level_neighbor_local;
+  sc_signal<int>     free_slots_local;
+  sc_signal<int>     free_slots_neighbor_local;
 
 
   // Instances
@@ -73,8 +73,8 @@ SC_MODULE(TTile)
       r->req_tx[i](req_tx[i]);
       r->ack_tx[i](ack_tx[i]);
 
-      r->buffer_level[i](buffer_level[i]);
-      r->buffer_level_neighbor[i](buffer_level_neighbor[i]);
+      r->free_slots[i](free_slots[i]);
+      r->free_slots_neighbor[i](free_slots_neighbor[i]);
 
       // NoP 
       r->NoP_data_out[i](NoP_data_out[i]);
@@ -89,8 +89,8 @@ SC_MODULE(TTile)
     r->req_tx[DIRECTION_LOCAL](req_rx_local);
     r->ack_tx[DIRECTION_LOCAL](ack_rx_local);
 
-    r->buffer_level[DIRECTION_LOCAL](buffer_level_local);
-    r->buffer_level_neighbor[DIRECTION_LOCAL](buffer_level_neighbor_local);
+    r->free_slots[DIRECTION_LOCAL](free_slots_local);
+    r->free_slots_neighbor[DIRECTION_LOCAL](free_slots_neighbor_local);
 
     // Processing Element pin assignments
     pe = new TProcessingElement("ProcessingElement");
@@ -105,8 +105,8 @@ SC_MODULE(TTile)
     pe->req_tx(req_tx_local);
     pe->ack_tx(ack_tx_local);
 
-    pe->buffer_level(buffer_level_local);
-    pe->buffer_level_neighbor(buffer_level_neighbor_local);
+    pe->free_slots(free_slots_local);
+    pe->free_slots_neighbor(free_slots_neighbor_local);
 
   }
 

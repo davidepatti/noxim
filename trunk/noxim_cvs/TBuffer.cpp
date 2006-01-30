@@ -31,28 +31,28 @@ unsigned int TBuffer::GetMaxBufferSize() const
 
 //---------------------------------------------------------------------------
 
-bool TBuffer::IsFull()
+bool TBuffer::IsFull() const
 {
   return buffer.size() == max_buffer_size;
 }
 
 //---------------------------------------------------------------------------
 
-bool TBuffer::IsEmpty()
+bool TBuffer::IsEmpty() const
 {
   return buffer.size() == 0;
 }
 
 //---------------------------------------------------------------------------
 
-void TBuffer::Drop(const TFlit& flit)
+void TBuffer::Drop(const TFlit& flit) const
 {
   assert(false);
 }
 
 //---------------------------------------------------------------------------
 
-void TBuffer::Empty()
+void TBuffer::Empty() const
 {
   assert(false);
 }
@@ -86,7 +86,7 @@ TFlit TBuffer::Pop()
 
 //---------------------------------------------------------------------------
 
-TFlit TBuffer::Front()
+TFlit TBuffer::Front() const
 {
   TFlit f;
 
@@ -100,9 +100,14 @@ TFlit TBuffer::Front()
 
 //---------------------------------------------------------------------------
 
-unsigned int TBuffer::Size()
+unsigned int TBuffer::Size() const
 {
   return buffer.size();
 }
 
+//---------------------------------------------------------------------------
+unsigned int TBuffer::getCurrentFreeSlots() const
+{
+    return (GetMaxBufferSize()-Size());
+}
 //---------------------------------------------------------------------------

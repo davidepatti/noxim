@@ -80,15 +80,15 @@ void TNoC::buildMesh()
 	  t[i][j]->ack_tx[DIRECTION_WEST](ack_to_east[i][j]);
 
 	  // Map buffer level signals (analogy with req_tx/rx port mapping)
-	  t[i][j]->buffer_level[DIRECTION_NORTH](buffer_level_to_north[i][j]);
-	  t[i][j]->buffer_level[DIRECTION_EAST](buffer_level_to_east[i+1][j]);
-	  t[i][j]->buffer_level[DIRECTION_SOUTH](buffer_level_to_south[i][j+1]);
-	  t[i][j]->buffer_level[DIRECTION_WEST](buffer_level_to_west[i][j]);
+	  t[i][j]->free_slots[DIRECTION_NORTH](free_slots_to_north[i][j]);
+	  t[i][j]->free_slots[DIRECTION_EAST](free_slots_to_east[i+1][j]);
+	  t[i][j]->free_slots[DIRECTION_SOUTH](free_slots_to_south[i][j+1]);
+	  t[i][j]->free_slots[DIRECTION_WEST](free_slots_to_west[i][j]);
 
-	  t[i][j]->buffer_level_neighbor[DIRECTION_NORTH](buffer_level_to_south[i][j]);
-	  t[i][j]->buffer_level_neighbor[DIRECTION_EAST](buffer_level_to_west[i+1][j]);
-	  t[i][j]->buffer_level_neighbor[DIRECTION_SOUTH](buffer_level_to_north[i][j+1]);
-	  t[i][j]->buffer_level_neighbor[DIRECTION_WEST](buffer_level_to_east[i][j]);
+	  t[i][j]->free_slots_neighbor[DIRECTION_NORTH](free_slots_to_south[i][j]);
+	  t[i][j]->free_slots_neighbor[DIRECTION_EAST](free_slots_to_west[i+1][j]);
+	  t[i][j]->free_slots_neighbor[DIRECTION_SOUTH](free_slots_to_north[i][j+1]);
+	  t[i][j]->free_slots_neighbor[DIRECTION_WEST](free_slots_to_east[i][j]);
 
 	  // NoP 
 
@@ -112,7 +112,7 @@ void TNoC::buildMesh()
 
   for (int i=0; i<DIRECTIONS; i++)
   {
-      tmp_NoP.channel_status_neighbor[i].buffer_level = NOT_VALID;
+      tmp_NoP.channel_status_neighbor[i].free_slots = NOT_VALID;
       tmp_NoP.channel_status_neighbor[i].available = false;
   }
 
@@ -124,8 +124,8 @@ void TNoC::buildMesh()
       req_to_north[i][TGlobalParams::mesh_dim_y] = 0;
       ack_to_south[i][TGlobalParams::mesh_dim_y] = 0;
 
-      buffer_level_to_south[i][0].write(NOT_VALID);
-      buffer_level_to_north[i][TGlobalParams::mesh_dim_y].write(NOT_VALID);
+      free_slots_to_south[i][0].write(NOT_VALID);
+      free_slots_to_north[i][TGlobalParams::mesh_dim_y].write(NOT_VALID);
 
       NoP_data_to_south[i][0].write(tmp_NoP);
       NoP_data_to_north[i][TGlobalParams::mesh_dim_y].write(tmp_NoP);
@@ -139,8 +139,8 @@ void TNoC::buildMesh()
       req_to_west[TGlobalParams::mesh_dim_x][j] = 0;
       ack_to_east[TGlobalParams::mesh_dim_x][j] = 0;
 
-      buffer_level_to_east[0][j].write(NOT_VALID);
-      buffer_level_to_west[TGlobalParams::mesh_dim_x][j].write(NOT_VALID);
+      free_slots_to_east[0][j].write(NOT_VALID);
+      free_slots_to_west[TGlobalParams::mesh_dim_x][j].write(NOT_VALID);
 
       NoP_data_to_east[0][j].write(tmp_NoP);
       NoP_data_to_west[TGlobalParams::mesh_dim_x][j].write(tmp_NoP);
