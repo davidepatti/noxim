@@ -4,66 +4,83 @@
 TNoC.o: TNoC.h TTile.h TRouter.h NoximDefs.h TBuffer.h TStats.h
 TNoC.o: TGlobalRoutingTable.h TLocalRoutingTable.h TReservationTable.h
 TNoC.o: TProcessingElement.h TGlobalTrafficTable.h /usr/include/stdio.h
-TNoC.o: /usr/include/features.h /usr/include/sys/cdefs.h
-TNoC.o: /usr/include/gnu/stubs.h /usr/include/bits/types.h
-TNoC.o: /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h
-TNoC.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
-TNoC.o: /usr/include/bits/wchar.h /usr/include/gconv.h
-TNoC.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
-TNoC.o: /usr/include/stdlib.h
+TNoC.o: /usr/include/_ansi.h /usr/include/newlib.h /usr/include/sys/config.h
+TNoC.o: /usr/include/machine/ieeefp.h
+TNoC.o: /usr/lib/gcc-lib/i686-pc-cygwin/3.3.3/include/stddef.h
+TNoC.o: /usr/lib/gcc-lib/i686-pc-cygwin/3.3.3/include/stdarg.h
+TNoC.o: /usr/include/sys/reent.h /usr/include/sys/_types.h
+TNoC.o: /usr/include/sys/lock.h /usr/include/sys/types.h
+TNoC.o: /usr/include/machine/_types.h /usr/include/limits.h
+TNoC.o: /usr/include/machine/types.h /usr/include/sys/stdio.h
+TNoC.o: /usr/include/stdlib.h /usr/include/machine/stdlib.h
+TNoC.o: /usr/include/alloca.h
 TRouter.o: TRouter.h NoximDefs.h TBuffer.h TStats.h TGlobalRoutingTable.h
 TRouter.o: TLocalRoutingTable.h TReservationTable.h
 TProcessingElement.o: TProcessingElement.h NoximDefs.h TGlobalTrafficTable.h
-TProcessingElement.o: /usr/include/stdio.h /usr/include/features.h
-TProcessingElement.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
-TProcessingElement.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
-TProcessingElement.o: /usr/include/bits/typesizes.h /usr/include/libio.h
-TProcessingElement.o: /usr/include/_G_config.h /usr/include/wchar.h
-TProcessingElement.o: /usr/include/bits/wchar.h /usr/include/gconv.h
-TProcessingElement.o: /usr/include/bits/stdio_lim.h
-TProcessingElement.o: /usr/include/bits/sys_errlist.h /usr/include/stdlib.h
+TProcessingElement.o: /usr/include/stdio.h /usr/include/_ansi.h
+TProcessingElement.o: /usr/include/newlib.h /usr/include/sys/config.h
+TProcessingElement.o: /usr/include/machine/ieeefp.h
+TProcessingElement.o: /usr/lib/gcc-lib/i686-pc-cygwin/3.3.3/include/stddef.h
+TProcessingElement.o: /usr/lib/gcc-lib/i686-pc-cygwin/3.3.3/include/stdarg.h
+TProcessingElement.o: /usr/include/sys/reent.h /usr/include/sys/_types.h
+TProcessingElement.o: /usr/include/sys/lock.h /usr/include/sys/types.h
+TProcessingElement.o: /usr/include/machine/_types.h /usr/include/limits.h
+TProcessingElement.o: /usr/include/machine/types.h /usr/include/sys/stdio.h
+TProcessingElement.o: /usr/include/stdlib.h /usr/include/machine/stdlib.h
+TProcessingElement.o: /usr/include/alloca.h
 TBuffer.o: TBuffer.h NoximDefs.h
 TStats.o: TStats.h NoximDefs.h
 TGlobalStats.o: TGlobalStats.h TNoC.h TTile.h TRouter.h NoximDefs.h TBuffer.h
 TGlobalStats.o: TStats.h TGlobalRoutingTable.h TLocalRoutingTable.h
 TGlobalStats.o: TReservationTable.h TProcessingElement.h
 TGlobalStats.o: TGlobalTrafficTable.h /usr/include/stdio.h
-TGlobalStats.o: /usr/include/features.h /usr/include/sys/cdefs.h
-TGlobalStats.o: /usr/include/gnu/stubs.h /usr/include/bits/types.h
-TGlobalStats.o: /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h
-TGlobalStats.o: /usr/include/libio.h /usr/include/_G_config.h
-TGlobalStats.o: /usr/include/wchar.h /usr/include/bits/wchar.h
-TGlobalStats.o: /usr/include/gconv.h /usr/include/bits/stdio_lim.h
-TGlobalStats.o: /usr/include/bits/sys_errlist.h /usr/include/stdlib.h
-TGlobalRoutingTable.o: /usr/include/stdio.h /usr/include/features.h
-TGlobalRoutingTable.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
-TGlobalRoutingTable.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
-TGlobalRoutingTable.o: /usr/include/bits/typesizes.h /usr/include/libio.h
-TGlobalRoutingTable.o: /usr/include/_G_config.h /usr/include/wchar.h
-TGlobalRoutingTable.o: /usr/include/bits/wchar.h /usr/include/gconv.h
-TGlobalRoutingTable.o: /usr/include/bits/stdio_lim.h
-TGlobalRoutingTable.o: /usr/include/bits/sys_errlist.h /usr/include/stdlib.h
-TGlobalRoutingTable.o: /usr/include/string.h NoximDefs.h
+TGlobalStats.o: /usr/include/_ansi.h /usr/include/newlib.h
+TGlobalStats.o: /usr/include/sys/config.h /usr/include/machine/ieeefp.h
+TGlobalStats.o: /usr/lib/gcc-lib/i686-pc-cygwin/3.3.3/include/stddef.h
+TGlobalStats.o: /usr/lib/gcc-lib/i686-pc-cygwin/3.3.3/include/stdarg.h
+TGlobalStats.o: /usr/include/sys/reent.h /usr/include/sys/_types.h
+TGlobalStats.o: /usr/include/sys/lock.h /usr/include/sys/types.h
+TGlobalStats.o: /usr/include/machine/_types.h /usr/include/limits.h
+TGlobalStats.o: /usr/include/machine/types.h /usr/include/sys/stdio.h
+TGlobalStats.o: /usr/include/stdlib.h /usr/include/machine/stdlib.h
+TGlobalStats.o: /usr/include/alloca.h
+TGlobalRoutingTable.o: /usr/include/stdio.h /usr/include/_ansi.h
+TGlobalRoutingTable.o: /usr/include/newlib.h /usr/include/sys/config.h
+TGlobalRoutingTable.o: /usr/include/machine/ieeefp.h
+TGlobalRoutingTable.o: /usr/lib/gcc-lib/i686-pc-cygwin/3.3.3/include/stddef.h
+TGlobalRoutingTable.o: /usr/lib/gcc-lib/i686-pc-cygwin/3.3.3/include/stdarg.h
+TGlobalRoutingTable.o: /usr/include/sys/reent.h /usr/include/sys/_types.h
+TGlobalRoutingTable.o: /usr/include/sys/lock.h /usr/include/sys/types.h
+TGlobalRoutingTable.o: /usr/include/machine/_types.h /usr/include/limits.h
+TGlobalRoutingTable.o: /usr/include/machine/types.h /usr/include/sys/stdio.h
+TGlobalRoutingTable.o: /usr/include/stdlib.h /usr/include/machine/stdlib.h
+TGlobalRoutingTable.o: /usr/include/alloca.h /usr/include/string.h
+TGlobalRoutingTable.o: /usr/include/sys/string.h NoximDefs.h
 TGlobalRoutingTable.o: TGlobalRoutingTable.h
 TLocalRoutingTable.o: TLocalRoutingTable.h TGlobalRoutingTable.h NoximDefs.h
 TGlobalTrafficTable.o: TGlobalTrafficTable.h /usr/include/stdio.h
-TGlobalTrafficTable.o: /usr/include/features.h /usr/include/sys/cdefs.h
-TGlobalTrafficTable.o: /usr/include/gnu/stubs.h /usr/include/bits/types.h
-TGlobalTrafficTable.o: /usr/include/bits/wordsize.h
-TGlobalTrafficTable.o: /usr/include/bits/typesizes.h /usr/include/libio.h
-TGlobalTrafficTable.o: /usr/include/_G_config.h /usr/include/wchar.h
-TGlobalTrafficTable.o: /usr/include/bits/wchar.h /usr/include/gconv.h
-TGlobalTrafficTable.o: /usr/include/bits/stdio_lim.h
-TGlobalTrafficTable.o: /usr/include/bits/sys_errlist.h /usr/include/stdlib.h
-TGlobalTrafficTable.o: NoximDefs.h
+TGlobalTrafficTable.o: /usr/include/_ansi.h /usr/include/newlib.h
+TGlobalTrafficTable.o: /usr/include/sys/config.h
+TGlobalTrafficTable.o: /usr/include/machine/ieeefp.h
+TGlobalTrafficTable.o: /usr/lib/gcc-lib/i686-pc-cygwin/3.3.3/include/stddef.h
+TGlobalTrafficTable.o: /usr/lib/gcc-lib/i686-pc-cygwin/3.3.3/include/stdarg.h
+TGlobalTrafficTable.o: /usr/include/sys/reent.h /usr/include/sys/_types.h
+TGlobalTrafficTable.o: /usr/include/sys/lock.h /usr/include/sys/types.h
+TGlobalTrafficTable.o: /usr/include/machine/_types.h /usr/include/limits.h
+TGlobalTrafficTable.o: /usr/include/machine/types.h /usr/include/sys/stdio.h
+TGlobalTrafficTable.o: /usr/include/stdlib.h /usr/include/machine/stdlib.h
+TGlobalTrafficTable.o: /usr/include/alloca.h NoximDefs.h
 TReservationTable.o: NoximDefs.h TReservationTable.h
 main.o: NoximDefs.h TNoC.h TTile.h TRouter.h TBuffer.h TStats.h
 main.o: TGlobalRoutingTable.h TLocalRoutingTable.h TReservationTable.h
 main.o: TProcessingElement.h TGlobalTrafficTable.h /usr/include/stdio.h
-main.o: /usr/include/features.h /usr/include/sys/cdefs.h
-main.o: /usr/include/gnu/stubs.h /usr/include/bits/types.h
-main.o: /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h
-main.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
-main.o: /usr/include/bits/wchar.h /usr/include/gconv.h
-main.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
-main.o: /usr/include/stdlib.h TGlobalStats.h
+main.o: /usr/include/_ansi.h /usr/include/newlib.h /usr/include/sys/config.h
+main.o: /usr/include/machine/ieeefp.h
+main.o: /usr/lib/gcc-lib/i686-pc-cygwin/3.3.3/include/stddef.h
+main.o: /usr/lib/gcc-lib/i686-pc-cygwin/3.3.3/include/stdarg.h
+main.o: /usr/include/sys/reent.h /usr/include/sys/_types.h
+main.o: /usr/include/sys/lock.h /usr/include/sys/types.h
+main.o: /usr/include/machine/_types.h /usr/include/limits.h
+main.o: /usr/include/machine/types.h /usr/include/sys/stdio.h
+main.o: /usr/include/stdlib.h /usr/include/machine/stdlib.h
+main.o: /usr/include/alloca.h TGlobalStats.h
