@@ -39,7 +39,7 @@ bool seek(const char* fname, const char* rt_label, ifstream& fin)
   bool found = false;
   while (!fin.eof() && !found)
     {
-      char line[128];
+      char line[256];
       fin.getline(line, sizeof(line)-1);
 
       if (strstr(line, rt_label) != NULL)

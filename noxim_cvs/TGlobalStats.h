@@ -40,6 +40,9 @@ public:
   // Returns the total number of received flits
   unsigned int getReceivedFlits();
 
+  // Return the maximum value of the accepted traffic
+  double getThroughput();
+
   // Shows global statistics
   void showStats(std::ostream& out = std::cout);
 
