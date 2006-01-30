@@ -108,21 +108,31 @@ TFlit TProcessingElement::nextFlit()
 
 bool TProcessingElement::probabilityShot(TPacket p)
 {
-  float pir;
-  switch(TGlobalParams::traffic_distribution)
+  float threshold;
+  if(!transmittedAtPreviousCycle)
   {
-    case TRAFFIC_TABLE_BASED:
-      pir = traffic_table->getPirForTheSelectedLink(p.src_id, p.dst_id);
-      break;
-    default:
-      if (!transmittedAtPreviousCycle)
-        pir = TGlobalParams::packet_injection_rate;
-      else
-        pir = TGlobalParams::probability_of_retransmission;
-      break;
+    if(TGlobalParams::traffic_distribution==TRAFFIC_TABLE_BASED)
+    {
+      threshold = traffic_table->getPirForTheSelectedLink(p.src_id, p.dst_id);
+    }
+    else
+    {
+      threshold = TGlobalParams::packet_injection_rate;
+    }
+  }
+  else
+  {
+    if(TGlobalParams::traffic_distribution==TRAFFIC_TABLE_BASED)
+    {
+      threshold = traffic_table->getPorForTheSelectedLink(p.src_id, p.dst_id);
+    }
+    else
+    {
+      threshold = TGlobalParams::probability_of_retransmission;
+    }
   }
 
-  if( ((double)rand())/RAND_MAX < pir)
+  if( ((double)rand())/RAND_MAX < threshold)
     return true;
   else
     return false;
