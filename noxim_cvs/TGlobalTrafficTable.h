@@ -23,6 +23,7 @@ struct TLocalTrafficLink
   int src;                    // ID of the source node (PE)
   int dst;                    // ID of the destination node (PE)
   float pir;                  // Packet Injection Rate for the link
+  float por;                  // Probability Of Retransmission for the link
 };
 
 //---------------------------------------------------------------------------
@@ -46,6 +47,9 @@ public:
 
   // Return the PIR given a couple src/dst
   float getPirForTheSelectedLink(int src_id, int dst_id);
+
+  // Return the POR given a couple src/dst
+  float getPorForTheSelectedLink(int src_id, int dst_id);
 
   // Tell if the current Traffic Table is valid
   bool isValid() { return valid; }

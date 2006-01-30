@@ -60,6 +60,19 @@ float TGlobalTrafficTable::getPirForTheSelectedLink(int src_id, int dst_id)
 
 //---------------------------------------------------------------------------
 
+float TGlobalTrafficTable::getPorForTheSelectedLink(int src_id, int dst_id)
+{
+  for(unsigned int i=0; i<traffic_table.size(); i++)
+  {
+    if(traffic_table[i].src==src_id && traffic_table[i].dst==dst_id)
+      return traffic_table[i].por;
+  }
+
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+
 bool TGlobalTrafficTable::load(const char* fname)
 {
   // Open file
@@ -85,7 +98,8 @@ bool TGlobalTrafficTable::load(const char* fname)
       {
         int src, dst;
         float pir = TGlobalParams::packet_injection_rate;
-        if (sscanf(line, "%d %d %f", &src, &dst, &pir) >= 2)
+        float por = TGlobalParams::probability_of_retransmission;
+        if (sscanf(line, "%d %d %f", &src, &dst, &pir, &por) >= 2)
         {
           numberOfLines++;
 
@@ -94,6 +108,7 @@ bool TGlobalTrafficTable::load(const char* fname)
           link.src = src;
           link.dst = dst;
           link.pir = pir;
+          link.por = por;
 
           // Add this link to the vector of links
           traffic_table.push_back(link);
