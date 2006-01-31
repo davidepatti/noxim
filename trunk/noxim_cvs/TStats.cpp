@@ -70,8 +70,12 @@ double TStats::getAverageDelay()
   double avg = 0.0;
 
   for (unsigned int k=0; k<chist.size(); k++)
-    avg += (double)chist[k].delays.size() * getAverageDelay(chist[k].src_id);
-  
+    {
+      unsigned int samples = chist[k].delays.size();
+      if (samples)
+	avg += (double)samples * getAverageDelay(chist[k].src_id);
+    }
+
   return avg/(double)getReceivedPackets();
 }
 
