@@ -66,7 +66,7 @@ void showHelp(char selfname[])
   cout << "\t\ttranspose2\tTranspose matrix 2 traffic distribution" << endl;
   cout << "\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file (ignores global PIR, filename is mandatory)" << endl;
   cout << "\t-warmup N\tStart to collect statistics after N cycles (default " << DEFAULT_STATS_WARM_UP_TIME << ")" << endl;
-  cout << "\t-seed N\tSet the seed of the random generator (default time())" << endl;
+  cout << "\t-seed N\t\tSet the seed of the random generator (default time())" << endl;
   cout << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << DEFAULT_SIMULATION_TIME << ")" << endl << endl;
   cout << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <mpalesi@diit.unict.it>" << endl;
   cout << "If you find this program useless please feel free to complain with Davide Patti <dpatti@diit.unict.it>" << endl;
