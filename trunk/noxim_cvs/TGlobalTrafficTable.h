@@ -24,6 +24,9 @@ struct TLocalTrafficLink
   int dst;                    // ID of the destination node (PE)
   float pir;                  // Packet Injection Rate for the link
   float por;                  // Probability Of Retransmission for the link
+  int t_on;                   // Time (in cycles) at which activity begins
+  int t_off;                  // Time (in cycles) at which activity ends
+  int t_period;               // Period after which activity starts again
 };
 
 //---------------------------------------------------------------------------

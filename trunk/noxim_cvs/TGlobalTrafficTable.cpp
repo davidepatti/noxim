@@ -96,10 +96,14 @@ bool TGlobalTrafficTable::load(const char* fname)
     {
       if (line[0] != '%')
       {
-        int src, dst;
+        int src, dst;  // Mandatory
         float pir = TGlobalParams::packet_injection_rate;
         float por = TGlobalParams::probability_of_retransmission;
-        if (sscanf(line, "%d %d %f", &src, &dst, &pir, &por) >= 2)
+        int t_on = DEFAULT_RESET_TIME;
+        int t_off = DEFAULT_RESET_TIME+TGlobalParams::simulation_time;
+        int t_period = 0;  // Means no periodicity
+
+        if (sscanf(line, "%d %d %f %f %d %d %d", &src, &dst, &pir, &por, &t_on, &t_off, &t_period) >= 2)
         {
           numberOfLines++;
 
@@ -109,6 +113,11 @@ bool TGlobalTrafficTable::load(const char* fname)
           link.dst = dst;
           link.pir = pir;
           link.por = por;
+          assert(t_off>t_on);
+          link.por = t_on;
+          link.por = t_off;
+          if(t_period!=0) assert(t_period>t_on+t_off);
+          link.por = t_period;
 
           // Add this link to the vector of links
           traffic_table.push_back(link);
