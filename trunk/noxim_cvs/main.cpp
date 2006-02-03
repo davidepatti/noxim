@@ -61,7 +61,7 @@ void showHelp(char selfname[])
   cout << "\t-pir R\t\tSet the packet injection rate to the specified real value [0..1] (default " << DEFAULT_PACKET_INJECTION_RATE << ")" << endl;
   cout << "\t-por R\t\tSet the probability of retransmission to the specified real value [0..1] (default same of PIR)" << endl;
   cout << "\t-traffic TYPE\tSet the traffic distribution to TYPE where TYPE is one of the following (default " << DEFAULT_TRAFFIC_DISTRIBUTION << "'):" << endl;
-  cout << "\t\tuniform\t\tUniform traffic distribution" << endl;
+  cout << "\t\trandom\t\tRandom traffic distribution" << endl;
   cout << "\t\ttranspose1\tTranspose matrix 1 traffic distribution" << endl;
   cout << "\t\ttranspose2\tTranspose matrix 2 traffic distribution" << endl;
   cout << "\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file (ignores global PIR, filename is mandatory)" << endl;
@@ -258,7 +258,7 @@ int sc_main(int arg_num, char* arg_vet[])
       }
       else if(!strcmp(arg_vet[i],"-traffic"))
       {
-        if(!strcmp(arg_vet[i+1],"uniform")) TGlobalParams::traffic_distribution = TRAFFIC_UNIFORM;
+        if(!strcmp(arg_vet[i+1],"random")) TGlobalParams::traffic_distribution = TRAFFIC_RANDOM;
         else if(!strcmp(arg_vet[i+1],"transpose1")) TGlobalParams::traffic_distribution = TRAFFIC_TRANSPOSE1;
         else if(!strcmp(arg_vet[i+1],"transpose2")) TGlobalParams::traffic_distribution = TRAFFIC_TRANSPOSE2;
         else if(!strcmp(arg_vet[i+1],"table"))

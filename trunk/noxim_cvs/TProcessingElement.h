@@ -49,7 +49,7 @@ SC_MODULE(TProcessingElement)
   bool                 probabilityShot(TPacket p);        // The probability to send a new packet
   TFlit                nextFlit();                        // Take the next flit of the current packet
   TPacket              nextPacket();                      // Create a new packet
-  TPacket              trafficUniform();                  // Uniform destination distribution
+  TPacket              trafficRandom();                  // Random destination distribution
   TPacket              trafficTranspose1();               // Transpose 1 destination distribution
   TPacket              trafficTranspose2();               // Transpose 2 destination distribution
   TPacket              trafficTableBased();               // Traffic Table Based destination distribution
