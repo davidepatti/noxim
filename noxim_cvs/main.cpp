@@ -40,11 +40,11 @@ void showHelp(char selfname[])
   cout << "Usage: " << selfname << " [options]\nwhere [options] is one or more of the following ones:" << endl;
   cout << "\t-help\t\tShow this help and exit" << endl;
   cout << "\t-verbose N\tVerbosity level (1=low, 2=medium, 3=high, default off)" << endl;
-  cout << "\t-trace FILENAME\tTrace signals to a VCD file named 'FILENAME.vcd' (default off, filename is mandatory)" << endl;
+  cout << "\t-trace FILENAME\tTrace signals to a VCD file named 'FILENAME.vcd' (default off)" << endl;
   cout << "\t-dimx N\t\tSet the mesh X dimension to the specified integer value (default " << DEFAULT_MESH_DIM_X << ")" << endl;
   cout << "\t-dimy N\t\tSet the mesh Y dimension to the specified integer value (default " << DEFAULT_MESH_DIM_Y << ")" << endl;
   cout << "\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value [flits] (default " << DEFAULT_BUFFER_DEPTH << ")" << endl;
-  cout << "\t-size n N\t\tSet the minimum and maximum packet size to the specified integer value [flits] (default min=" << DEFAULT_MIN_PACKET_SIZE << ", max=" << DEFAULT_MAX_PACKET_SIZE << ")" << endl;
+  cout << "\t-size Nmin Nmax\tSet the minimum and maximum packet size to the specified integer values [flits] (default min=" << DEFAULT_MIN_PACKET_SIZE << ", max=" << DEFAULT_MAX_PACKET_SIZE << ")" << endl;
   cout << "\t-routing TYPE\tSet the routing algorithm to TYPE where TYPE is one of the following (default " << DEFAULT_ROUTING_ALGORITHM << "):" << endl;
   cout << "\t\txy\t\tXY routing algorithm" << endl;
   cout << "\t\twestfirst\tWest-First routing algorithm" << endl;
@@ -53,18 +53,22 @@ void showHelp(char selfname[])
   cout << "\t\toddeven\t\tOdd-Even routing algorithm" << endl;
   cout << "\t\tdyad\t\tDyAD routing algorithm" << endl;
   cout << "\t\tfullyadaptive\tFully-Adaptive routing algorithm" << endl;
-  cout << "\t\ttable FILENAME\tRouting Table Based routing algorithm with table in the specified file (filename is mandatory)" << endl;
+  cout << "\t\ttable FILENAME\tRouting Table Based routing algorithm with table in the specified file" << endl;
   cout << "\t-sel TYPE\tSet the selection strategy to TYPE where TYPE is one of the following (default " << DEFAULT_SELECTION_STRATEGY << "):" << endl;
   cout << "\t\trandom\t\tRandom selection strategy" << endl;
   cout << "\t\tbufferlevel\tBuffer-Level Based selection strategy" << endl;
   cout << "\t\tnop\t\tNeigbors-on-Path selection strategy" << endl;
   cout << "\t-pir R\t\tSet the packet injection rate to the specified real value [0..1] (default " << DEFAULT_PACKET_INJECTION_RATE << ")" << endl;
-  cout << "\t-por R\t\tSet the probability of retransmission to the specified real value [0..1] (default same of PIR)" << endl;
-  cout << "\t-traffic TYPE\tSet the traffic distribution to TYPE where TYPE is one of the following (default " << DEFAULT_TRAFFIC_DISTRIBUTION << "'):" << endl;
+  cout << "\t-dist TYPE\tSet the time distribution of traffic to TYPE where TYPE is one of the following:" << endl;
+  cout << "\t\tpoisson\t\tMemory-less Poisson distribution (default)" << endl;
+  cout << "\t\tburst R\t\tBurst distribution with given real burstness" << endl;
+  cout << "\t\tpareto Aon Aoff r\tSelf-similar Pareto distribution with given real parameters" << endl;
+  cout << "\t\tcustom R\tCustom distribution with given real probability of retransmission" << endl;
+  cout << "\t-traffic TYPE\tSet the spatial distribution of traffic to TYPE where TYPE is one of the following (default " << DEFAULT_TRAFFIC_DISTRIBUTION << "'):" << endl;
   cout << "\t\trandom\t\tRandom traffic distribution" << endl;
   cout << "\t\ttranspose1\tTranspose matrix 1 traffic distribution" << endl;
   cout << "\t\ttranspose2\tTranspose matrix 2 traffic distribution" << endl;
-  cout << "\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file (ignores global PIR, filename is mandatory)" << endl;
+  cout << "\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file" << endl;
   cout << "\t-warmup N\tStart to collect statistics after N cycles (default " << DEFAULT_STATS_WARM_UP_TIME << ")" << endl;
   cout << "\t-seed N\t\tSet the seed of the random generator (default time())" << endl;
   cout << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << DEFAULT_SIMULATION_TIME << ")" << endl << endl;
@@ -245,16 +249,37 @@ int sc_main(int arg_num, char* arg_vet[])
         }
         else badArgument(arg_vet[i+1], arg_vet[i]);
       }
-      else if(!strcmp(arg_vet[i],"-por"))
+      else if(!strcmp(arg_vet[i],"-dist"))
       {
-        float new_por = atof(arg_vet[i+1]);
-        if(new_por>0)
-	{
-          TGlobalParams::probability_of_retransmission = new_por;
-          i+=2;
-          specifiedPor = true;
+        float new_por = 0;
+        if(!strcmp(arg_vet[i+1],"poisson"))
+        {
+          new_por = TGlobalParams::packet_injection_rate;
+        }
+        else if(!strcmp(arg_vet[i+1],"burst"))
+        {
+          float burstness = atof(arg_vet[i+2]);
+          new_por = TGlobalParams::packet_injection_rate/(1-burstness);
+          i++;
+        }
+        else if(!strcmp(arg_vet[i+1],"pareto"))
+        {
+          float Aon = atof(arg_vet[i+2]);
+          float Aoff = atof(arg_vet[i+3]);
+          float r = atof(arg_vet[i+4]);
+          new_por = TGlobalParams::packet_injection_rate*pow((1-r),(1/Aoff-1/Aon));
+          i+=3;
+        }
+        else if(!strcmp(arg_vet[i+1],"custom"))
+        {
+          new_por = atof(arg_vet[i+2]);
+          i++;
         }
         else badArgument(arg_vet[i+1], arg_vet[i]);
+        assert(new_por>=0 && new_por<=1);
+        specifiedPor = true;
+        TGlobalParams::probability_of_retransmission = new_por;  
+        i+=2;
       }
       else if(!strcmp(arg_vet[i],"-traffic"))
       {
