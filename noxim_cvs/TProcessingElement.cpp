@@ -163,8 +163,8 @@ TPacket TProcessingElement::nextPacket()
 {
   switch(TGlobalParams::traffic_distribution)
   {
-    case TRAFFIC_UNIFORM:
-      return trafficUniform();
+    case TRAFFIC_RANDOM:
+      return trafficRandom();
       break;
 
     case TRAFFIC_TRANSPOSE1:
@@ -181,18 +181,18 @@ TPacket TProcessingElement::nextPacket()
 
     default:
       assert(false);
-      return trafficUniform();
+      return trafficRandom();
   }
 }
 
 //---------------------------------------------------------------------------
 
-TPacket TProcessingElement::trafficUniform()
+TPacket TProcessingElement::trafficRandom()
 {
   TPacket p;
   p.src_id = id;
 
-  // Uniform destination distribution
+  // Random destination distribution
   do
   {
     p.dst_id = randInt(0, (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y)-1);

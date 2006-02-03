@@ -44,7 +44,7 @@ using namespace std;
 #define SEL_NOP                2
 
 // Traffic distribution
-#define TRAFFIC_UNIFORM        0
+#define TRAFFIC_RANDOM        0
 #define TRAFFIC_TRANSPOSE1     1
 #define TRAFFIC_TRANSPOSE2     2
 #define TRAFFIC_HOTSPOT        3
@@ -72,7 +72,7 @@ using namespace std;
 #define DEFAULT_SELECTION_STRATEGY          SEL_RANDOM
 #define DEFAULT_PACKET_INJECTION_RATE             0.01
 #define DEFAULT_PROBABILITY_OF_RETRANSMISSION     0.01
-#define DEFAULT_TRAFFIC_DISTRIBUTION   TRAFFIC_UNIFORM
+#define DEFAULT_TRAFFIC_DISTRIBUTION   TRAFFIC_RANDOM
 #define DEFAULT_TRAFFIC_TABLE_FILENAME              ""
 #define DEFAULT_RESET_TIME                        1000
 #define DEFAULT_SIMULATION_TIME                  10000
