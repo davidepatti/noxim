@@ -398,18 +398,17 @@ string Configuration2CmdLine(const TConfiguration& conf)
 
 //---------------------------------------------------------------------------
 
-string Configuration2FileName(const TConfiguration& conf)
+string Configuration2FunctionName(const TConfiguration& conf)
 {
   string fn;
 
   for (uint i=0; i<conf.size(); i++)
-    fn = fn + conf[i].first + "_" + conf[i].second + ".";
-  fn = fn + "m";
+    fn = fn + conf[i].first + "_" + conf[i].second + "__";
   
   // Replace " " with "_"
   int len = fn.length();
   for (int i=0; i<len; i++)
-    if (fn.at(i) == ' ')
+    if (fn.at(i) == ' ' || fn.at(i) == '.' || fn.at(i) == '-')
       fn[i] = '_';
   
   return fn;
@@ -467,6 +466,18 @@ bool PrintHeader(const string& fname,
        << "% " << eparams.simulator << " "
        << conf_cmd_line << " " << def_cmd_line
        << endl << endl;
+
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
+bool PrintMatlabFunction(const string& mfname,
+			 ofstream& fout, 
+			 string& error_msg)
+{
+  fout << "function " << mfname << "(symbol)" << endl
+       << endl;
 
   return true;
 }
@@ -623,6 +634,7 @@ bool PrintMatlabVariableBegin(const TParametersSpace& aggragated_params_space,
 //---------------------------------------------------------------------------
 
 bool GenMatlabCode(const string& var_name,
+		   const int fig_no,
 		   const int repetitions, const int column,
 		   ofstream& fout, string& error_msg)
 {
@@ -636,6 +648,11 @@ bool GenMatlabCode(const string& var_name,
        << "   ci = (ci(2)-ci(1))/2;" << endl
        << "   " << var_name << " = [" << var_name << "; " << MATLAB_VAR_NAME << "(ifirst, 1:cols-4), avg ci];" << endl
        << "end" << endl
+       << endl;
+
+  fout << "figure(" << fig_no << ");" << endl
+       << "hold on;" << endl
+       << "plot(" << var_name << "(:,1), " << var_name << "(:,2), symbol);" << endl
        << endl;
 
   return true;
@@ -652,11 +669,11 @@ bool PrintMatlabVariableEnd(const int repetitions,
        << "cols = size(data, 2);" << endl
        << endl;
 
-  if (!GenMatlabCode(string(MATLAB_VAR_NAME) + "_delay",
+  if (!GenMatlabCode(string(MATLAB_VAR_NAME) + "_delay", 1,
 		     repetitions, 1, fout, error_msg))
     return false;
 
-  if (!GenMatlabCode(string(MATLAB_VAR_NAME) + "_throughput",
+  if (!GenMatlabCode(string(MATLAB_VAR_NAME) + "_throughput", 2,
 		     repetitions, 2, fout, error_msg))
     return false;
   
@@ -689,10 +706,14 @@ bool RunSimulations(const TConfigurationSpace& conf_space,
     {
       string conf_cmd_line = Configuration2CmdLine(conf_space[i]);
 
-      string   fname = Configuration2FileName(conf_space[i]);
+      string   mfname = Configuration2FunctionName(conf_space[i]);
+      string   fname  = mfname + ".m";
       ofstream fout;
       if (!PrintHeader(fname, eparams, 
 		       def_cmd_line, conf_cmd_line, fout, error_msg))
+	return false;
+
+      if (!PrintMatlabFunction(mfname, fout, error_msg))
 	return false;
 
       if (!PrintMatlabVariableBegin(aggragated_params_space, fout, error_msg))
