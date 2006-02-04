@@ -109,52 +109,43 @@ TFlit TProcessingElement::nextFlit()
 bool TProcessingElement::probabilityShot(TPacket p)
 {
   float threshold;
-  if(!transmittedAtPreviousCycle)
+
+
+  // Normal case (using global parameters)
+  if(TGlobalParams::traffic_distribution!=TRAFFIC_TABLE_BASED)
   {
-    if(TGlobalParams::traffic_distribution==TRAFFIC_TABLE_BASED)
-    {
-      threshold = traffic_table->getPirForTheSelectedLink(p.src_id, p.dst_id);
-    }
-    else
-    {
+    if(!transmittedAtPreviousCycle)
       threshold = TGlobalParams::packet_injection_rate;
-    }
+    else
+      threshold = TGlobalParams::probability_of_retransmission;
   }
   else
+  // Traffic Table Based (using the proper parameter for each link)
   {
-    if(TGlobalParams::traffic_distribution==TRAFFIC_TABLE_BASED)
+    if(occurrencesInTrafficTableAsSource==0) return false;
+
+    int now = (int)sc_simulation_time();
+    int t_on = traffic_table->getTonForTheSelectedLink(p.src_id, p.dst_id);
+    int t_off = traffic_table->getToffForTheSelectedLink(p.src_id, p.dst_id);
+    int t_period = traffic_table->getTperiodForTheSelectedLink(p.src_id, p.dst_id);
+    if(t_period<=0) t_period = DEFAULT_RESET_TIME+TGlobalParams::simulation_time;
+
+    if((now%t_period)>t_on && (now%t_period)<t_off)
     {
-      threshold = traffic_table->getPorForTheSelectedLink(p.src_id, p.dst_id);
+      if(!transmittedAtPreviousCycle)
+        threshold = traffic_table->getPirForTheSelectedLink(p.src_id, p.dst_id);
+      else
+        threshold = traffic_table->getPorForTheSelectedLink(p.src_id, p.dst_id);
     }
-    else
-    {
-      threshold = TGlobalParams::probability_of_retransmission;
-    }
+    else return false;
   }
+
 
   if( ((double)rand())/RAND_MAX < threshold)
     return true;
   else
     return false;
   
-/* wormhole test
-  static int s1 = 0;
-  static int s2 = 0;
-  TCoord position = id2Coord(id);
-  if(s1 != 0 && s2 != 0) return false;
-  if( (position.x == 0 && position.y == 0) && s1 == 0)
-    {
-      s1++;
-      return true;
-    }
-  if( (position.x == 1 && position.y == 0) && s2 == 0)
-    {
-      s2++;
-      return true;
-    }
-  return false;
-*/
-
 }
 
 //---------------------------------------------------------------------------

@@ -54,6 +54,15 @@ public:
   // Return the POR given a couple src/dst
   float getPorForTheSelectedLink(int src_id, int dst_id);
 
+  // Return t_on given a couple src/dst
+  int getTonForTheSelectedLink(int src_id, int dst_id);
+
+  // Return t_off given a couple src/dst
+  int getToffForTheSelectedLink(int src_id, int dst_id);
+
+  // Return t_period given a couple src/dst
+  int getTperiodForTheSelectedLink(int src_id, int dst_id);
+
   // Tell if the current Traffic Table is valid
   bool isValid() { return valid; }
 
