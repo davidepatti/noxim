@@ -49,7 +49,7 @@ SC_MODULE(TProcessingElement)
   bool                 probabilityShot(TPacket p);        // The probability to send a new packet
   TFlit                nextFlit();                        // Take the next flit of the current packet
   TPacket              nextPacket();                      // Create a new packet
-  TPacket              trafficRandom();                  // Random destination distribution
+  TPacket              trafficRandom();                   // Random destination distribution
   TPacket              trafficTranspose1();               // Transpose 1 destination distribution
   TPacket              trafficTranspose2();               // Transpose 2 destination distribution
   TPacket              trafficTableBased();               // Traffic Table Based destination distribution
@@ -57,6 +57,7 @@ SC_MODULE(TProcessingElement)
   int                  occurrencesInTrafficTableAsSource; // Number of occurrences in Traffic Table
   void                 fixRanges(const TCoord, TCoord&);  // Fix the ranges of the destination
   int                  randInt(int min, int max);         // Extracts a random integer number between min and max
+  int                  getRandomSize();                   // Returns a random size in flits for the packet
 
   // Constructor
 

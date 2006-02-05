@@ -110,7 +110,6 @@ bool TProcessingElement::probabilityShot(TPacket p)
 {
   float threshold;
 
-
   // Normal case (using global parameters)
   if(TGlobalParams::traffic_distribution!=TRAFFIC_TABLE_BASED)
   {
@@ -128,7 +127,7 @@ bool TProcessingElement::probabilityShot(TPacket p)
     int t_on = traffic_table->getTonForTheSelectedLink(p.src_id, p.dst_id);
     int t_off = traffic_table->getToffForTheSelectedLink(p.src_id, p.dst_id);
     int t_period = traffic_table->getTperiodForTheSelectedLink(p.src_id, p.dst_id);
-    if(t_period<=0) t_period = DEFAULT_RESET_TIME+TGlobalParams::simulation_time;
+    if(t_period<=0) t_period = DEFAULT_RESET_TIME + TGlobalParams::simulation_time;
 
     if((now%t_period)>t_on && (now%t_period)<t_off)
     {
@@ -190,8 +189,7 @@ TPacket TProcessingElement::trafficRandom()
   } while(p.dst_id==p.src_id);
 
   p.timestamp = sc_simulation_time();
-  p.size = p.flit_left = randInt(TGlobalParams::min_packet_size, 
-				 TGlobalParams::max_packet_size); // 2 + (rand() % TGlobalParams::max_packet_size);
+  p.size = p.flit_left = getRandomSize();
 
   return p;
 }
@@ -213,9 +211,8 @@ TPacket TProcessingElement::trafficTranspose1()
   p.dst_id = coord2Id(dst);
 
   p.timestamp = sc_simulation_time();
-  
-  p.size = p.flit_left = randInt(TGlobalParams::min_packet_size, 
-				 TGlobalParams::max_packet_size); 
+  p.size = p.flit_left = getRandomSize();
+
   return p;
 }
 
@@ -236,9 +233,7 @@ TPacket TProcessingElement::trafficTranspose2()
   p.dst_id = coord2Id(dst);
 
   p.timestamp = sc_simulation_time();
-
-  p.size = p.flit_left = randInt(TGlobalParams::min_packet_size, 
-				 TGlobalParams::max_packet_size);
+  p.size = p.flit_left = getRandomSize();
 
   return p;
 }
@@ -254,9 +249,7 @@ TPacket TProcessingElement::trafficTableBased()
   p.dst_id = traffic_table->randomDestinationGivenTheSource(p.src_id);
 
   p.timestamp = sc_simulation_time();
-  
-  p.size = p.flit_left = randInt(TGlobalParams::min_packet_size, 
-				 TGlobalParams::max_packet_size);
+  p.size = p.flit_left = getRandomSize();
 
   return p;
 }
@@ -270,6 +263,14 @@ void TProcessingElement::fixRanges(const TCoord src, TCoord& dst)
   if(dst.y<0) dst.y=0;
   if(dst.x>=TGlobalParams::mesh_dim_x) dst.x=TGlobalParams::mesh_dim_x-1;
   if(dst.y>=TGlobalParams::mesh_dim_y) dst.y=TGlobalParams::mesh_dim_y-1;
+}
+
+//---------------------------------------------------------------------------
+
+int TProcessingElement::getRandomSize()
+{
+  return randInt(TGlobalParams::min_packet_size, 
+                 TGlobalParams::max_packet_size);
 }
 
 //---------------------------------------------------------------------------
