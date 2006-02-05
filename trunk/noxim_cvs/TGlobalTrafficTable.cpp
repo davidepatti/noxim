@@ -139,30 +139,39 @@ bool TGlobalTrafficTable::load(const char* fname)
       if (line[0] != '%')
       {
         int src, dst;  // Mandatory
-        float pir = TGlobalParams::packet_injection_rate;
-        float por = TGlobalParams::probability_of_retransmission;
-        int t_on = 0;
-        int t_off = TGlobalParams::simulation_time;
-        int t_period = 0;  // Means no periodicity
+        float pir, por;
+        int t_on, t_off, t_period;
 
-        if (sscanf(line, "%d %d %f %f %d %d %d", &src, &dst, &pir, &por, &t_on, &t_off, &t_period) >= 2)
+        if(int params = sscanf(line, "%d %d %f %f %d %d %d", &src, &dst, &pir, &por, &t_on, &t_off, &t_period) >= 2)
         {
           numberOfLines++;
 
           // Create a link from the parameters read on the line
           TLocalTrafficLink link;
+
+          // Mandatory fields
           link.src = src;
           link.dst = dst;
-          if(pir>0) link.pir = pir;
-          if(por>0) link.por = por;
-          assert(t_off>t_on);
-          link.t_on = t_on;
-          link.t_off = t_off;
-          if(t_period>0)
-          {
-            assert(t_period>t_off);
-            link.t_period = t_period;
-          }
+
+          // Custom PIR
+          if(params>=3 && pir>=0 && pir<=1) link.pir = pir;
+          else link.pir = TGlobalParams::packet_injection_rate;
+
+          // Custom POR
+          if(params>=4 && por>=0 && pir<=1) link.por = por;
+          else link.por = TGlobalParams::probability_of_retransmission;
+
+          // Custom Ton
+          if(params>=5 && t_on>=0) link.t_on = t_on;
+          else link.t_on = 0;
+
+          // Custom Toff
+          if(params>=6 && t_off>=0) { assert(t_off>t_on); link.t_off = t_off; }
+          else link.t_off = DEFAULT_SIMULATION_TIME + TGlobalParams::simulation_time;
+
+          // Custom Tperiod
+          if(params>=7 && t_period>0) { assert(t_period>t_off); link.t_period = t_period; }
+          else link.t_period = DEFAULT_SIMULATION_TIME + TGlobalParams::simulation_time;
 
           // Add this link to the vector of links
           traffic_table.push_back(link);
