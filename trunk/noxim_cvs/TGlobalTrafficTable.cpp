@@ -128,57 +128,66 @@ bool TGlobalTrafficTable::load(const char* fname)
 
   // Cycle reading file
   while(!fin.eof() && !stop)
-  {
-    char line[128];
-    fin.getline(line, sizeof(line)-1);
-
-    if (line[0] == '\0')
-      stop = true;
-    else
     {
-      if (line[0] != '%')
-      {
-        int src, dst;  // Mandatory
-        float pir, por;
-        int t_on, t_off, t_period;
+      char line[128];
+      fin.getline(line, sizeof(line)-1);
 
-        if(int params = sscanf(line, "%d %d %f %f %d %d %d", &src, &dst, &pir, &por, &t_on, &t_off, &t_period) >= 2)
-        {
-          numberOfLines++;
+      if (line[0] == '\0')
+	stop = true;
+      else
+	{
+	  if (line[0] != '%')
+	    {
+	      int src, dst;  // Mandatory
+	      float pir, por;
+	      int t_on, t_off, t_period;
 
-          // Create a link from the parameters read on the line
-          TLocalTrafficLink link;
+	      int params = sscanf(line, "%d %d %f %f %d %d %d", &src, &dst, &pir, &por, &t_on, &t_off, &t_period);
+	      if (params >= 2)
+		{
+		  numberOfLines++;
 
-          // Mandatory fields
-          link.src = src;
-          link.dst = dst;
+		  // Create a link from the parameters read on the line
+		  TLocalTrafficLink link;
+	    
+		  // Mandatory fields
+		  link.src = src;
+		  link.dst = dst;
+	    
+		  // Custom PIR
+		  if(params>=3 && pir>=0 && pir<=1) link.pir = pir;
+		  else link.pir = TGlobalParams::packet_injection_rate;
+	  
+		  // Custom POR
+		  if(params>=4 && por>=0 && pir<=1) link.por = por;
+		  else link.por = TGlobalParams::probability_of_retransmission;
+	  
+		  // Custom Ton
+		  if(params>=5 && t_on>=0) link.t_on = t_on;
+		  else link.t_on = 0;
+	  
+		  // Custom Toff
+		  if(params>=6 && t_off>=0) { assert(t_off>t_on); link.t_off = t_off; }
+		  else link.t_off = DEFAULT_SIMULATION_TIME + TGlobalParams::simulation_time;
 
-          // Custom PIR
-          if(params>=3 && pir>=0 && pir<=1) link.pir = pir;
-          else link.pir = TGlobalParams::packet_injection_rate;
+		  // Custom Tperiod
+		  if(params>=7 && t_period>0) { assert(t_period>t_off); link.t_period = t_period; }
+		  else link.t_period = DEFAULT_SIMULATION_TIME + TGlobalParams::simulation_time;
 
-          // Custom POR
-          if(params>=4 && por>=0 && pir<=1) link.por = por;
-          else link.por = TGlobalParams::probability_of_retransmission;
-
-          // Custom Ton
-          if(params>=5 && t_on>=0) link.t_on = t_on;
-          else link.t_on = 0;
-
-          // Custom Toff
-          if(params>=6 && t_off>=0) { assert(t_off>t_on); link.t_off = t_off; }
-          else link.t_off = DEFAULT_SIMULATION_TIME + TGlobalParams::simulation_time;
-
-          // Custom Tperiod
-          if(params>=7 && t_period>0) { assert(t_period>t_off); link.t_period = t_period; }
-          else link.t_period = DEFAULT_SIMULATION_TIME + TGlobalParams::simulation_time;
-
-          // Add this link to the vector of links
-          traffic_table.push_back(link);
+		  // Add this link to the vector of links
+		  traffic_table.push_back(link);
+		  cout << "params: " << params << ": "
+		       << "link: " << link.src << ", " 
+		       << link.dst << ", "
+		       << link.pir << ", "
+		       << link.por << ", "
+		       << link.t_on << ", "
+		       << link.t_off << ", "
+		       << link.t_period << endl;
+		}
+	    }
 	}
-      }
     }
-  }
 
   valid = true;
   return true;

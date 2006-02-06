@@ -61,7 +61,7 @@ bool ExtractRoutingTables(char* apsra_fname, char* rt_fname)
     }
 
   ifstream fin;
-  if (!seek(apsra_fname, "rtsize_1", fin))
+  if (!seek(apsra_fname, "rtsize", fin))
     {
       cerr << "Invalid file format (cannot locate label 'rtsize_1')" << endl;
       assert(false);
@@ -104,8 +104,8 @@ bool ExtractCommunicationGraph(char* apsra_fname, char* cg_fname)
   ifstream fin;
   if (!seek(apsra_fname, "Communication Graph", fin))
     {
-      cerr << "Invalid file format (cannot locate label 'Communication Graph')" << endl;
-      assert(false);
+      cerr << "Error: Invalid file format (cannot locate label 'Communication Graph')" << endl;
+      return false;
     }
 
   fout << "% Communication graph extracted from " << apsra_fname << endl;
@@ -148,16 +148,11 @@ int main(int argc, char **argv)
     }
 
   if (!ExtractCommunicationGraph(apsra_fname, cg_fname))
-    {
-      cerr << "Cannot extract communication graph" << endl;
-      return 1;
-    }
+    cerr << "Warning: Cannot extract communication graph" << endl;
+
 
   if (!ExtractRoutingTables(apsra_fname, rt_fname))
-    {
-      cerr << "Cannot extract routing tables" << endl;
-      return 1;
-    }
-
+    cerr << "Warning: Cannot extract routing tables" << endl;
+  
   return 0;
 }
