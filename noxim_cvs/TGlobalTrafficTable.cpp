@@ -176,14 +176,6 @@ bool TGlobalTrafficTable::load(const char* fname)
 
 		  // Add this link to the vector of links
 		  traffic_table.push_back(link);
-		  cout << "params: " << params << ": "
-		       << "link: " << link.src << ", " 
-		       << link.dst << ", "
-		       << link.pir << ", "
-		       << link.por << ", "
-		       << link.t_on << ", "
-		       << link.t_off << ", "
-		       << link.t_period << endl;
 		}
 	    }
 	}
