@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <systemc.h>
+#include <vector>
 
 using namespace std;
 
@@ -104,6 +105,7 @@ struct TGlobalParams
   static int simulation_time;
   static int stats_warm_up_time;
   static int rnd_generator_seed;
+  static vector<pair<int,double> > hotspots;
 };
 
 
