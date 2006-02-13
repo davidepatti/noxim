@@ -29,7 +29,7 @@ void TProcessingElement::rxProcess()
       TFlit flit_tmp = flit_rx.read();
       if(TGlobalParams::verbose_mode > VERBOSE_OFF)
       {
-        cout << sc_simulation_time() << ": ProcessingElement[" << id << "] RECEIVING " << flit_tmp << endl;
+        cout << sc_simulation_time() << ": ProcessingElement[" << local_id << "] RECEIVING " << flit_tmp << endl;
       }
       current_level_rx = 1-current_level_rx;     // Negate the old value for Alternating Bit Protocol (ABP)
     }
@@ -66,7 +66,7 @@ void TProcessingElement::txProcess()
         TFlit flit = nextFlit();                  // Generate a new flit
         if(TGlobalParams::verbose_mode > VERBOSE_OFF)
         {
-          cout << sc_simulation_time() << ": ProcessingElement[" << id << "] SENDING " << flit << endl;
+          cout << sc_simulation_time() << ": ProcessingElement[" << local_id << "] SENDING " << flit << endl;
         }
 	flit_tx->write(flit);                     // Send the generated flit
 	current_level_tx = 1-current_level_tx;    // Negate the old value for Alternating Bit Protocol (ABP)
@@ -180,12 +180,36 @@ TPacket TProcessingElement::nextPacket()
 TPacket TProcessingElement::trafficRandom()
 {
   TPacket p;
-  p.src_id = id;
+  p.src_id = local_id;
+  double rnd = rand()/(double)RAND_MAX;
+  double range_start = 0.0;
+
+  //cout << "\n " << sc_simulation_time() << " PE " << local_id << " rnd = " << rnd << endl;
+
+  int max_id = (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y)-1;
 
   // Random destination distribution
   do
   {
-    p.dst_id = randInt(0, (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y)-1);
+    p.dst_id = randInt(0, max_id);
+
+    // check for hotspot destination
+    for (uint i = 0; i<TGlobalParams::hotspots.size(); i++)
+    {
+	//cout << sc_simulation_time() << " PE " << local_id << " Checking node " << TGlobalParams::hotspots[i].first << " with P = " << TGlobalParams::hotspots[i].second << endl;
+
+	if (rnd>=range_start && rnd < range_start + TGlobalParams::hotspots[i].second)
+	{
+	    if (local_id != TGlobalParams::hotspots[i].first)
+	    {
+		//cout << sc_simulation_time() << " PE " << local_id <<" That is ! " << endl;
+		p.dst_id = TGlobalParams::hotspots[i].first;
+	    }
+	    break;
+	}
+	else 
+	    range_start+=TGlobalParams::hotspots[i].second; // try next
+    }
   } while(p.dst_id==p.src_id);
 
   p.timestamp = sc_simulation_time();
@@ -199,7 +223,7 @@ TPacket TProcessingElement::trafficRandom()
 TPacket TProcessingElement::trafficTranspose1()
 {
   TPacket p;
-  p.src_id = id;
+  p.src_id = local_id;
   TCoord src,dst;
 
   // Transpose 1 destination distribution
@@ -221,7 +245,7 @@ TPacket TProcessingElement::trafficTranspose1()
 TPacket TProcessingElement::trafficTranspose2()
 {
   TPacket p;
-  p.src_id = id;
+  p.src_id = local_id;
   TCoord src,dst;
 
   // Transpose 2 destination distribution
@@ -243,7 +267,7 @@ TPacket TProcessingElement::trafficTranspose2()
 TPacket TProcessingElement::trafficTableBased()
 {
   TPacket p;
-  p.src_id = id;
+  p.src_id = local_id;
 
   // Traffic Table Based destination distribution
   p.dst_id = traffic_table->randomDestinationGivenTheSource(p.src_id);

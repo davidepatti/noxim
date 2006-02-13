@@ -32,6 +32,7 @@ char TGlobalParams::traffic_table_filename[128] = DEFAULT_TRAFFIC_TABLE_FILENAME
 int TGlobalParams::simulation_time              = DEFAULT_SIMULATION_TIME;
 int TGlobalParams::stats_warm_up_time           = DEFAULT_STATS_WARM_UP_TIME;
 int TGlobalParams::rnd_generator_seed           = time(NULL);
+vector<pair<int,double> > TGlobalParams::hotspots;
 
 //---------------------------------------------------------------------------
 
@@ -69,6 +70,7 @@ void showHelp(char selfname[])
   cout << "\t\ttranspose1\tTranspose matrix 1 traffic distribution" << endl;
   cout << "\t\ttranspose2\tTranspose matrix 2 traffic distribution" << endl;
   cout << "\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file" << endl;
+  cout << "\t-hs ID P\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)" << endl;
   cout << "\t-warmup N\tStart to collect statistics after N cycles (default " << DEFAULT_STATS_WARM_UP_TIME << ")" << endl;
   cout << "\t-seed N\t\tSet the seed of the random generator (default time())" << endl;
   cout << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << DEFAULT_SIMULATION_TIME << ")" << endl << endl;
@@ -283,20 +285,38 @@ int sc_main(int arg_num, char* arg_vet[])
       }
       else if(!strcmp(arg_vet[i],"-traffic"))
       {
-        if(!strcmp(arg_vet[i+1],"random")) TGlobalParams::traffic_distribution = TRAFFIC_RANDOM;
-        else if(!strcmp(arg_vet[i+1],"transpose1")) TGlobalParams::traffic_distribution = TRAFFIC_TRANSPOSE1;
-        else if(!strcmp(arg_vet[i+1],"transpose2")) TGlobalParams::traffic_distribution = TRAFFIC_TRANSPOSE2;
-        else if(!strcmp(arg_vet[i+1],"table"))
-	{
-          TGlobalParams::traffic_distribution = TRAFFIC_TABLE_BASED;
-          strcpy(TGlobalParams::traffic_table_filename, arg_vet[i+2]);
-          FILE* fp = fopen(TGlobalParams::traffic_table_filename, "r");
-          if(fp==NULL) badInputFilename(TGlobalParams::traffic_table_filename);
-          fclose(fp);
-          i++;
-        }
-        else badArgument(arg_vet[i+1], arg_vet[i]);
-        i+=2;
+	  if(!strcmp(arg_vet[i+1],"random")) TGlobalParams::traffic_distribution = TRAFFIC_RANDOM;
+	  else if(!strcmp(arg_vet[i+1],"transpose1")) TGlobalParams::traffic_distribution = TRAFFIC_TRANSPOSE1;
+	  else if(!strcmp(arg_vet[i+1],"transpose2")) TGlobalParams::traffic_distribution = TRAFFIC_TRANSPOSE2;
+	  else if(!strcmp(arg_vet[i+1],"table"))
+	  {
+	      TGlobalParams::traffic_distribution = TRAFFIC_TABLE_BASED;
+	      strcpy(TGlobalParams::traffic_table_filename, arg_vet[i+2]);
+	      FILE* fp = fopen(TGlobalParams::traffic_table_filename, "r");
+	      if(fp==NULL) badInputFilename(TGlobalParams::traffic_table_filename);
+	      fclose(fp);
+	      i++;
+	  }
+	  else badArgument(arg_vet[i+1], arg_vet[i]);
+	  i+=2;
+      }
+      else if(!strcmp(arg_vet[i],"-hs")) 
+      {
+	  int node = atoi(arg_vet[i+1]);
+	  double percentage = atof(arg_vet[i+2]);
+
+	  if ( node>=0 && percentage >= 0.0)
+	  {
+	      pair<int,double> t(node,percentage);
+	      TGlobalParams::hotspots.push_back(t);
+	      i+=3;
+	      cout << "\n Added node " << node << " with P = " << percentage << endl;
+	  }
+	  else
+	  {
+	      cout << "\n Bad -hs arguments ! " << endl;
+	      exit(1);
+	  }
       }
       else if(!strcmp(arg_vet[i],"-warmup"))
       {
