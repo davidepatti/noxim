@@ -10,7 +10,7 @@
   if(in_array($_POST["routing"], array("xy","westfirst","northlast","negativefirst","oddeven","dyad","fullyadaptive"))) $command.=(" -routing ".$_POST["routing"]);
   if(in_array($_POST["sel"], array("random","bufferlevel","nop"))) $command.=(" -sel ".$_POST["sel"]);
   if($_POST["pir"]>0 && $_POST["pir"]<=1) $command.=(" -pir ".$_POST["pir"]);
-  if(in_array($_POST["traffic"], array("uniform","transpose1","transpose2"))) $command.=(" -traffic ".$_POST["traffic"]);
+  if(in_array($_POST["traffic"], array("random","transpose1","transpose2"))) $command.=(" -traffic ".$_POST["traffic"]);
   if($_POST["sim"]>1000 && $_POST["sim"]<=100000) $command.=(" -sim ".$_POST["sim"]);
 
   $output = shell_exec($command." 2>&1");
