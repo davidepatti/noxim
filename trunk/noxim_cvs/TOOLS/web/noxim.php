@@ -15,7 +15,7 @@
 
   $output = shell_exec($command." 2>&1");
   $all_values = explode(" ", $output);
-  $delay = floatval($all_values[count($all_values)-6]);
+  $delay = floatval($all_values[count($all_values)-9]);
   if($delay>0) {
     print("<p>Executed command <tt>$command</tt> and obtained:</p>\n");
     print("<table border='1'><tr><th>Global average delay</th><td>$delay</td></tr></table>\n");
