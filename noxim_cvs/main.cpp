@@ -58,12 +58,12 @@ void showHelp(char selfname[])
   cout << "\t-sel TYPE\tSet the selection strategy to TYPE where TYPE is one of the following (default " << DEFAULT_SELECTION_STRATEGY << "):" << endl;
   cout << "\t\trandom\t\tRandom selection strategy" << endl;
   cout << "\t\tbufferlevel\tBuffer-Level Based selection strategy" << endl;
-  cout << "\t\tnop\t\tNeigbors-on-Path selection strategy" << endl;
+  cout << "\t\tnop\t\tNeighbors-on-Path selection strategy" << endl;
   cout << "\t-pir R\t\tSet the packet injection rate to the specified real value [0..1] (default " << DEFAULT_PACKET_INJECTION_RATE << ")" << endl;
   cout << "\t-dist TYPE\tSet the time distribution of traffic to TYPE where TYPE is one of the following:" << endl;
   cout << "\t\tpoisson\t\tMemory-less Poisson distribution (default)" << endl;
   cout << "\t\tburst R\t\tBurst distribution with given real burstness" << endl;
-  cout << "\t\tpareto Aon Aoff r\tSelf-similar Pareto distribution with given real parameters" << endl;
+  cout << "\t\tpareto on off r\tSelf-similar Pareto distribution with given real parameters (alfa-on alfa-off r)" << endl;
   cout << "\t\tcustom R\tCustom distribution with given real probability of retransmission" << endl;
   cout << "\t-traffic TYPE\tSet the spatial distribution of traffic to TYPE where TYPE is one of the following (default " << DEFAULT_TRAFFIC_DISTRIBUTION << "'):" << endl;
   cout << "\t\trandom\t\tRandom traffic distribution" << endl;
