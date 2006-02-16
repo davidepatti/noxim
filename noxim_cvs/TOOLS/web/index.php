@@ -31,7 +31,15 @@
   }
 ?>
 </select></td></tr>
-<tr><th>Maximum Packet Size</th><td><select name="size">
+<tr><th>Minimum Packet Size</th><td><select name="size_min">
+<?php
+  for($i=2; $i<=20; $i++) {
+    if($i==2) print("<option value='$i' selected>$i flits (Default)</option>\n");
+    else print("<option value='$i'>$i flits</option>\n");
+  }
+?>
+</select></td></tr>
+<tr><th>Maximum Packet Size</th><td><select name="size_max">
 <?php
   for($i=2; $i<=20; $i++) {
     if($i==10) print("<option value='$i' selected>$i flits (Default)</option>\n");
@@ -46,14 +54,12 @@
   <option value="negativefirst">Negative First</option>
   <option value="oddeven">Odd-Even</option>
   <option value="dyad">Dyad</option>
-  <option value="lookahead">Look-Ahead</option>
-  <option value="nopcar">Nopcar</option>
   <option value="fullyadaptive">Fully Adaptive</option>
 </select></td></tr>
 <tr><th>Selection Strategy</th><td><select name="sel">
   <option value="random" selected>Random (Default)</option>
   <option value="bufferlevel">Buffer-level</option>
-  <option value="nopcar">Nopcar</option>
+  <option value="nop">Neighbors-on-Path</option>
 </select></td></tr>
 <tr><th>Packet Injection Rate</th><td><select name="pir">
 <?php
