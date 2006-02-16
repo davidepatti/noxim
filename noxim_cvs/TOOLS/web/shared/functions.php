@@ -18,7 +18,7 @@ function print_header() {
 <meta name='Keywords' content='noxim, noc, simulator, network-on-chip, catania, systemc, router, mesh, tile, dyad, odd-even, xy, routing, wormhole, flit'>
 <meta name="Author" content="Fabrizio Fazzino">
 <meta name="Reply-To" content="fabrizio@fazzino.it">
-<meta name="Copyright" content="(C) 2005 University of Catania">
+<meta name="Copyright" content="(C) 2005-2006 University of Catania">
 <meta name="Generator" content="Just my fingertips">
 <meta name="Robots" content="INDEX, FOLLOW">
 <link rel="shortcut icon" href="images/noxicon.ico">
