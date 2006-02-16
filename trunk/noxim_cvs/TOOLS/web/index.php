@@ -70,7 +70,7 @@
 ?>
 </select></td></tr>
 <tr><th>Traffic Distribution</th><td><select name="traffic">
-  <option value="uniform" selected>Uniform (Default)</option>
+  <option value="random" selected>Random (Default)</option>
   <option value="transpose1">Transpose 1</option>
   <option value="transpose2">Transpose 2</option>
 </select></td></tr>
