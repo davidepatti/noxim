@@ -38,7 +38,7 @@ function print_header() {
 /***************************/
 function print_footer() {
 ?>
-<p class="subTitle">&copy; 2005 Universit&agrave; di Catania</p>
+<p class="subTitle">&copy; 2005-2006 Universit&agrave; di Catania</p>
 </div>
 </body>
 </html>
