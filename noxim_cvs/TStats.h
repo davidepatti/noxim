@@ -46,6 +46,13 @@ public:
   // Returns the average delay (cycles) for the current node
   double getAverageDelay();
 
+  // Returns the max delay for the current node as regards the
+  // communication whose source node is src_id
+  double getMaxDelay(const int src_id);
+
+  // Returns the max delay (cycles) for the current node
+  double getMaxDelay();
+
   // Returns the average throughput (flits/cycle) for the current node
   // and for the communication whose source is src_id
   double getAverageThroughput(const int src_id);

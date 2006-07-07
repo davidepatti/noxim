@@ -78,40 +78,35 @@ SC_MODULE(TNoC)
   TGlobalRoutingTable grtable;
   TGlobalTrafficTable gttable;
 
+  //---------- Mau experiment <start>
+  void flitsMonitor() {
+
+    if (!reset.read())
+      {
+	//	if ((int)sc_simulation_time() % 5)
+	//	  return;
+
+	unsigned int count = 0;
+	for(int i=0; i<TGlobalParams::mesh_dim_x; i++)
+	  for(int j=0; j<TGlobalParams::mesh_dim_y; j++)
+	    count += t[i][j]->r->getFlitsCount();
+	cout << count << endl;
+      }
+  }
+  //---------- Mau experiment <stop>
+
   // Constructor
 
   SC_CTOR(TNoC)
   {
 
-    // TODO by Fafa - this commented code should be used... (continues)
-
+    //---------- Mau experiment <start>
     /*
-    // Instance the matrixes of signals
-    **req_to_east  = new sc_signal<bool>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **req_to_west  = new sc_signal<bool>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **req_to_south = new sc_signal<bool>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **req_to_north = new sc_signal<bool>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-
-    **ack_to_east  = new sc_signal<bool>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **ack_to_west  = new sc_signal<bool>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **ack_to_south = new sc_signal<bool>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **ack_to_north = new sc_signal<bool>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-
-    **flit_to_east  = new sc_signal<TFlit>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **flit_to_west  = new sc_signal<TFlit>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **flit_to_south = new sc_signal<TFlit>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **flit_to_north = new sc_signal<TFlit>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-
-    **buffer_status_to_east  = new sc_signal<uint>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **buffer_status_to_west  = new sc_signal<uint>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **buffer_status_to_south = new sc_signal<uint>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-    **buffer_status_to_north = new sc_signal<uint>[TGlobalParams::mesh_dim_x+1][TGlobalParams::mesh_dim_y+1];
-
-    t = new TTile()[TGlobalParams::mesh_dim_x][TGlobalParams::mesh_dim_y];
+    SC_METHOD(flitsMonitor);
+    sensitive(reset);
+    sensitive_pos(clock);
     */
-
-    // TODO by Fafa - ...instead of this one
-
+    //---------- Mau experiment <stop>
 
     // Build the Mesh
     buildMesh();
@@ -119,6 +114,7 @@ SC_MODULE(TNoC)
 
   // Support methods
   TTile* searchNode(const int id) const;
+
 
  private:
   void buildMesh();

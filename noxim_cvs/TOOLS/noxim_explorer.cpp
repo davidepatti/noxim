@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <cassert>
+#include <sys/time.h>
 
 using namespace std;
 
@@ -29,6 +30,7 @@ using namespace std;
 #define AVG_DELAY_LABEL      "% Global average delay (cycles):"
 #define AVG_THROUGHPUT_LABEL "% Global average throughput (flits/cycle):"
 #define THROUGHPUT_LABEL     "% Throughput (flits/cycle/IP):"
+#define MAX_DELAY_LABEL      "% Max delay (cycles):"
 
 #define MATLAB_VAR_NAME      "data"
 #define MATRIX_COLUMN_WIDTH  15
@@ -60,9 +62,35 @@ struct TSimulationResults
   double       avg_delay;
   double       throughput;
   double       avg_throughput;
+  double       max_delay;
   unsigned int rpackets;
   unsigned int rflits;
 };
+
+//---------------------------------------------------------------------------
+
+double GetCurrentTime()
+{
+  struct timeval tv;
+
+  gettimeofday(&tv, NULL);
+
+  return tv.tv_sec + (tv.tv_usec * 1.0e-6);
+}
+
+//---------------------------------------------------------------------------
+
+void TimeToFinish(double elapsed_sec,
+		  int completed, int total,
+		  int& hours, int& minutes, int &seconds)
+{
+  double total_time_sec = (elapsed_sec * total)/completed;
+  double remain_time_sec = total_time_sec - elapsed_sec;
+
+  seconds = (int)remain_time_sec % 60;
+  minutes = ((int)remain_time_sec / 60) % 60;
+  hours   = (int)remain_time_sec / 3600;
+}
 
 //---------------------------------------------------------------------------
 
@@ -476,7 +504,7 @@ bool PrintMatlabFunction(const string& mfname,
 			 ofstream& fout, 
 			 string& error_msg)
 {
-  fout << "function " << mfname << "(symbol)" << endl
+  fout << "function [max_pir, max_throughput, min_delay] = " << mfname << "(symbol)" << endl
        << endl;
 
   return true;
@@ -547,9 +575,18 @@ bool ReadResults(const string& fname,
 	  iss >> sres.throughput;
 	  continue;
 	}
+
+      pos = line.find(MAX_DELAY_LABEL);
+      if (pos != string::npos) 
+	{
+	  nread++;
+	  istringstream iss(line.substr(pos + string(MAX_DELAY_LABEL).size()));
+	  iss >> sres.max_delay;
+	  continue;
+	}
     }
 
-  if (nread != 5)
+  if (nread != 6)
     {
       error_msg = "Output file " + fname + " corrupted";
       return false;
@@ -580,19 +617,28 @@ bool RunSimulation(const string& cmd_base,
 
 //---------------------------------------------------------------------------
 
-bool RunSimulations(pair<uint,uint>& sim_counter,
+bool RunSimulations(double start_time,
+		    pair<uint,uint>& sim_counter,
 		    const string& cmd, const string& tmp_dir, const int repetitions,
 		    const TConfiguration& aggr_conf, 
 		    ofstream& fout, 
 		    string& error_msg)
 {
+  int    h, m, s;
+  
   for (int i=0; i<repetitions; i++)
     {
-      cout << "# simulation " << (++sim_counter.first) << " of " << sim_counter.second << endl;
+      cout << "# simulation " << (++sim_counter.first) << " of " << sim_counter.second;
+      if (i != 0)
+	cout << ", estimated time to finish " << h << "h " << m << "m " << s << "s";
+      cout << endl;
 
       TSimulationResults sres;
       if (!RunSimulation(cmd, tmp_dir, sres, error_msg))
 	return false;
+
+      double current_time = GetCurrentTime();
+      TimeToFinish(current_time-start_time, sim_counter.first, sim_counter.second, h, m, s);
 
       // Print aggragated parameters
       fout << "  ";
@@ -602,6 +648,7 @@ bool RunSimulations(pair<uint,uint>& sim_counter,
       // Print results;
       fout << setw(MATRIX_COLUMN_WIDTH) << sres.avg_delay
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.throughput
+	   << setw(MATRIX_COLUMN_WIDTH) << sres.max_delay
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.rpackets
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.rflits 
 	   << endl;
@@ -623,6 +670,7 @@ bool PrintMatlabVariableBegin(const TParametersSpace& aggragated_params_space,
 
   fout << setw(MATRIX_COLUMN_WIDTH) << "avg_delay"
        << setw(MATRIX_COLUMN_WIDTH) << "throughput"
+       << setw(MATRIX_COLUMN_WIDTH) << "max_delay"
        << setw(MATRIX_COLUMN_WIDTH) << "rpackets"
        << setw(MATRIX_COLUMN_WIDTH) << "rflits";
 
@@ -642,11 +690,11 @@ bool GenMatlabCode(const string& var_name,
        << "for i = 1:rows/" << repetitions << "," << endl
        << "   ifirst = (i - 1) * " << repetitions << " + 1;" << endl
        << "   ilast  = ifirst + " << repetitions << " - 1;" << endl
-       << "   tmp = " << MATLAB_VAR_NAME << "(ifirst:ilast, cols-4+" << column << ");" << endl
+       << "   tmp = " << MATLAB_VAR_NAME << "(ifirst:ilast, cols-5+" << column << ");" << endl
        << "   avg = mean(tmp);" << endl
        << "   [h sig ci] = ttest(tmp, 0.1);" << endl
        << "   ci = (ci(2)-ci(1))/2;" << endl
-       << "   " << var_name << " = [" << var_name << "; " << MATLAB_VAR_NAME << "(ifirst, 1:cols-4), avg ci];" << endl
+       << "   " << var_name << " = [" << var_name << "; " << MATLAB_VAR_NAME << "(ifirst, 1:cols-5), avg ci];" << endl
        << "end" << endl
        << endl;
 
@@ -660,13 +708,38 @@ bool GenMatlabCode(const string& var_name,
 
 //---------------------------------------------------------------------------
 
+bool GenMatlabCodeSaturationAnalysis(const string& var_name,
+				     ofstream& fout, string& error_msg)
+{
+
+  fout << endl 
+       << "%-------- Saturation Analysis -----------" << endl
+       << "slope=[];"  << endl
+       << "for i=2:size(" << var_name << "_throughput,1),"  << endl
+       << "    slope(i-1) = (" << var_name << "_throughput(i,2)-" << var_name << "_throughput(i-1,2))/(" << var_name << "_throughput(i,1)-" << var_name << "_throughput(i-1,1));"  << endl
+       << "end"  << endl
+       << endl
+       << "for i=2:size(slope,2),"  << endl
+       << "    if slope(i) < (0.95*mean(slope(1:i)))"  << endl
+       << "        max_pir = " << var_name << "_throughput(i, 1);"  << endl
+       << "        max_throughput = " << var_name << "_throughput(i, 2);"  << endl
+       << "        min_delay = " << var_name << "_delay(i, 2);"  << endl
+       << "        break;"  << endl
+       << "    end"  << endl
+       << "end"  << endl;
+
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
 bool PrintMatlabVariableEnd(const int repetitions,
 			    ofstream& fout, string& error_msg)
 {
   fout << "];" << endl << endl;
 
-  fout << "rows = size(data, 1);" << endl
-       << "cols = size(data, 2);" << endl
+  fout << "rows = size(" << MATLAB_VAR_NAME << ", 1);" << endl
+       << "cols = size(" << MATLAB_VAR_NAME << ", 2);" << endl
        << endl;
 
   if (!GenMatlabCode(string(MATLAB_VAR_NAME) + "_delay", 1,
@@ -676,7 +749,14 @@ bool PrintMatlabVariableEnd(const int repetitions,
   if (!GenMatlabCode(string(MATLAB_VAR_NAME) + "_throughput", 2,
 		     repetitions, 2, fout, error_msg))
     return false;
-  
+
+  if (!GenMatlabCode(string(MATLAB_VAR_NAME) + "_maxdelay", 3,
+		     repetitions, 3, fout, error_msg))
+    return false;
+
+  if (!GenMatlabCodeSaturationAnalysis(string(MATLAB_VAR_NAME), fout, error_msg))
+    return false;
+
   return true;
 }
 
@@ -702,6 +782,7 @@ bool RunSimulations(const TConfigurationSpace& conf_space,
 
   pair<uint,uint> sim_counter(0, conf_space.size() * aggr_conf_space.size() * eparams.repetitions);
   
+  double start_time = GetCurrentTime();
   for (uint i=0; i<conf_space.size(); i++)
     {
       string conf_cmd_line = Configuration2CmdLine(conf_space[i]);
@@ -728,7 +809,8 @@ bool RunSimulations(const TConfigurationSpace& conf_space,
 	    + conf_cmd_line + " "
 	    + aggr_cmd_line;
 	  
-	  if (!RunSimulations(sim_counter, cmd, eparams.tmp_dir, eparams.repetitions,
+	  if (!RunSimulations(start_time,
+			      sim_counter, cmd, eparams.tmp_dir, eparams.repetitions,
 			      aggr_conf_space[j], fout, error_msg))
 	    return false;
 	}
