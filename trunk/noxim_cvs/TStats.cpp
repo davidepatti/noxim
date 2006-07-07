@@ -81,25 +81,71 @@ double TStats::getAverageDelay()
 
 //---------------------------------------------------------------------------
 
+double TStats::getMaxDelay(const int src_id)
+{
+  double maxd = -1.0;
+  
+  int i = searchCommHistory(src_id);
+
+  assert(i >= 0);
+
+  for (unsigned int j=0; j<chist[i].delays.size(); j++)
+    if (chist[i].delays[j] > maxd)
+      {
+	//	cout << src_id << " -> " << id << ": " << chist[i].delays[j] << endl;
+	maxd = chist[i].delays[j];
+      }
+  return maxd;
+}
+
+//---------------------------------------------------------------------------
+
+double TStats::getMaxDelay()
+{
+  double maxd = -1.0;
+
+  for (unsigned int k=0; k<chist.size(); k++)
+    {
+      unsigned int samples = chist[k].delays.size();
+      if (samples)
+	{
+	  double m = getMaxDelay(chist[k].src_id);
+	  if (m > maxd)
+	    maxd = m;
+	}
+    }
+
+  return maxd;
+}
+
+//---------------------------------------------------------------------------
+
 double TStats::getAverageThroughput(const int src_id)
 {
   int i = searchCommHistory(src_id);
 
   assert(i >= 0);
 
-  return (double)chist[i].total_received_flits/(double)chist[i].last_received_flit_time;
+  if (chist[i].total_received_flits == 0)
+    return -1.0;
+  else
+    return (double)chist[i].total_received_flits/(double)chist[i].last_received_flit_time;
 }
 
 //---------------------------------------------------------------------------
 
 double TStats::getAverageThroughput()
 {
-  double avg = 0.0;
+  double sum = 0.0;
 
   for (unsigned int k=0; k<chist.size(); k++)
-    avg += getAverageThroughput(chist[k].src_id);
-  
-  return avg/(double)chist.size();
+    {
+      double avg = getAverageThroughput(chist[k].src_id);
+      if (avg > 0.0)
+	sum += avg;
+    }
+
+  return sum;
 }
 
 //---------------------------------------------------------------------------

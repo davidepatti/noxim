@@ -78,7 +78,7 @@ using namespace std;
 #define DEFAULT_RESET_TIME                        1000
 #define DEFAULT_SIMULATION_TIME                  10000
 #define DEFAULT_STATS_WARM_UP_TIME  DEFAULT_RESET_TIME
-
+#define DEFAULT_DETAILED                         false
 
 // TODO by Fafa - this MUST be removed!!!
 #define MAX_STATIC_DIM 20
@@ -105,6 +105,7 @@ struct TGlobalParams
   static int simulation_time;
   static int stats_warm_up_time;
   static int rnd_generator_seed;
+  static bool detailed;
   static vector<pair<int,double> > hotspots;
 };
 

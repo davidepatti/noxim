@@ -56,6 +56,7 @@ SC_MODULE(TRouter)
   TLocalRoutingTable routing_table;                          // Routing table
   TReservationTable  reservation_table;                       // Switch reservation table
   int                start_from_port;                 // Port from which to start the reservation cycle
+  unsigned long      routed_flits;
 
   // Functions
 
@@ -66,6 +67,9 @@ SC_MODULE(TRouter)
 			       const unsigned int _max_buffer_size,
 			       TGlobalRoutingTable& grt);
 
+  unsigned long getRoutedFlits(); // Returns the number of routed flits 
+
+  unsigned int  getFlitsCount();  // Returns the number of flits into the router
 
   // Constructor
 
@@ -115,7 +119,6 @@ SC_MODULE(TRouter)
   int NoPScore(const TNoP_data& nop_data, const vector<int>& nop_channels) const;
   int reflexDirection(int direction) const;
   int getNeighborId(int _id,int direction) const;
-
 
 };
 

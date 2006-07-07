@@ -19,6 +19,7 @@ void TRouter::rxProcess()
 	  current_level_rx[i] = 0;
 	}
       reservation_table.clear();
+      routed_flits = 0;
     }
   else
     {
@@ -135,6 +136,9 @@ void TRouter::txProcess()
 		      // Update stats
 		      if (o == DIRECTION_LOCAL)
 			stats.receivedFlit(sc_simulation_time(), flit);
+		      else if (i != DIRECTION_LOCAL)
+		      // Increment routed flits counter
+			routed_flits++;
 		    }
 		}
 	    }
@@ -412,6 +416,7 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
     assert(direction_choosen>=0);
     return direction_choosen;
 }
+
 //---------------------------------------------------------------------------
 
 int TRouter::selectionRandom(const vector<int>& directions)
@@ -698,7 +703,26 @@ void TRouter::configure(const int _id,
 }
 
 //---------------------------------------------------------------------------
+
+unsigned long TRouter::getRoutedFlits()
+{ 
+  return routed_flits; 
+}
+
 //---------------------------------------------------------------------------
+
+unsigned int TRouter::getFlitsCount()
+{
+  unsigned count = 0;
+
+  for (int i=0; i<DIRECTIONS+1; i++)
+    count += buffer[i].Size();
+
+  return count;
+}
+
+//---------------------------------------------------------------------------
+
 int TRouter::reflexDirection(int direction) const
 {
     if (direction == DIRECTION_NORTH) return DIRECTION_SOUTH;
@@ -710,7 +734,9 @@ int TRouter::reflexDirection(int direction) const
     assert(false);
     return NOT_VALID;
 }
+
 //---------------------------------------------------------------------------
+
 int TRouter::getNeighborId(int _id, int direction) const
 {
     TCoord my_coord = id2Coord(_id);
