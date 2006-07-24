@@ -79,6 +79,7 @@ using namespace std;
 #define DEFAULT_SIMULATION_TIME                  10000
 #define DEFAULT_STATS_WARM_UP_TIME  DEFAULT_RESET_TIME
 #define DEFAULT_DETAILED                         false
+#define DEFAULT_DYAD_THRESHOLD                     0.6
 
 // TODO by Fafa - this MUST be removed!!!
 #define MAX_STATIC_DIM 20
@@ -107,6 +108,7 @@ struct TGlobalParams
   static int rnd_generator_seed;
   static bool detailed;
   static vector<pair<int,double> > hotspots;
+  static float dyad_threshold;
 };
 
 

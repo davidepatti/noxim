@@ -110,7 +110,7 @@ SC_MODULE(TRouter)
   vector<int> routingNorthLast(const TCoord& current, const TCoord& destination);
   vector<int> routingNegativeFirst(const TCoord& current, const TCoord& destination);
   vector<int> routingOddEven(const TCoord& current, const TCoord& source, const TCoord& destination);
-  vector<int> routingDyAD(const TCoord& current, const TCoord& destination);
+  vector<int> routingDyAD(const TCoord& current, const TCoord& source, const TCoord& destination);
   vector<int> routingLookAhead(const TCoord& current, const TCoord& destination);
   vector<int> routingFullyAdaptive(const TCoord& current, const TCoord& destination);
   vector<int> routingTableBased(const int dir_in, const TCoord& current, const TCoord& destination);
@@ -119,7 +119,7 @@ SC_MODULE(TRouter)
   int NoPScore(const TNoP_data& nop_data, const vector<int>& nop_channels) const;
   int reflexDirection(int direction) const;
   int getNeighborId(int _id,int direction) const;
-
+  bool inCongestion();
 };
 
 #endif

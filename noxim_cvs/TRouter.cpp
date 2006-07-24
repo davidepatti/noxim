@@ -221,7 +221,7 @@ vector<int> TRouter::routingFunction(const TRouteData& route_data)
       return routingOddEven(position, src_coord, dst_coord);
 
     case ROUTING_DYAD:
-      return routingDyAD(position, dst_coord);
+      return routingDyAD(position, src_coord, dst_coord);
 
     case ROUTING_FULLY_ADAPTIVE:
       return routingFullyAdaptive(position, dst_coord);
@@ -609,11 +609,16 @@ vector<int> TRouter::routingOddEven(const TCoord& current,
 
 //---------------------------------------------------------------------------
 
-vector<int> TRouter::routingDyAD(const TCoord& current, const TCoord& destination)
+vector<int> TRouter::routingDyAD(const TCoord& current, 
+				 const TCoord& source, const TCoord& destination)
 {
   vector<int> directions;
 
-  assert(false);
+  directions = routingOddEven(current, source, destination);
+
+  if (!inCongestion())
+    directions.resize(1);
+  
   return directions;
 }
 
@@ -768,4 +773,19 @@ int TRouter::getNeighborId(int _id, int direction) const
 
   return neighbor_id;
 }
+
+//---------------------------------------------------------------------------
+
+bool TRouter::inCongestion()
+{
+  for (int i=0; i<DIRECTIONS; i++)
+    {
+      int flits = TGlobalParams::buffer_depth - free_slots_neighbor[i];
+      if (flits > (int)(TGlobalParams::buffer_depth * TGlobalParams::dyad_threshold))
+	return true;
+    }
+
+  return false;
+}
+
 //---------------------------------------------------------------------------
