@@ -33,7 +33,7 @@ int   TGlobalParams::simulation_time                = DEFAULT_SIMULATION_TIME;
 int   TGlobalParams::stats_warm_up_time             = DEFAULT_STATS_WARM_UP_TIME;
 int   TGlobalParams::rnd_generator_seed             = time(NULL);
 bool  TGlobalParams::detailed                       = DEFAULT_DETAILED;
-
+float TGlobalParams::dyad_threshold                 = DEFAULT_DYAD_THRESHOLD;
 vector<pair<int,double> > TGlobalParams::hotspots;
 
 //---------------------------------------------------------------------------
@@ -54,7 +54,7 @@ void showHelp(char selfname[])
   cout << "\t\tnorthlast\tNorth-Last routing algorithm" << endl;
   cout << "\t\tnegativefirst\tNegative-First routing algorithm" << endl;
   cout << "\t\toddeven\t\tOdd-Even routing algorithm" << endl;
-  cout << "\t\tdyad\t\tDyAD routing algorithm" << endl;
+  cout << "\t\tdyad T\t\tDyAD routing algorithm with threshold T" << endl;
   cout << "\t\tfullyadaptive\tFully-Adaptive routing algorithm" << endl;
   cout << "\t\ttable FILENAME\tRouting Table Based routing algorithm with table in the specified file" << endl;
   cout << "\t-sel TYPE\tSet the selection strategy to TYPE where TYPE is one of the following (default " << DEFAULT_SELECTION_STRATEGY << "):" << endl;
@@ -220,7 +220,12 @@ int sc_main(int arg_num, char* arg_vet[])
         else if(!strcmp(arg_vet[i+1],"northlast")) TGlobalParams::routing_algorithm = ROUTING_NORTH_LAST;
         else if(!strcmp(arg_vet[i+1],"negativefirst")) TGlobalParams::routing_algorithm = ROUTING_NEGATIVE_FIRST;
         else if(!strcmp(arg_vet[i+1],"oddeven")) TGlobalParams::routing_algorithm = ROUTING_ODD_EVEN;
-        else if(!strcmp(arg_vet[i+1],"dyad")) TGlobalParams::routing_algorithm = ROUTING_DYAD;
+        else if(!strcmp(arg_vet[i+1],"dyad")) 
+	  {
+	    TGlobalParams::routing_algorithm = ROUTING_DYAD;
+	    TGlobalParams::dyad_threshold = atof(arg_vet[i+2]);
+	    i++;
+	  }
         else if(!strcmp(arg_vet[i+1],"fullyadaptive")) TGlobalParams::routing_algorithm = ROUTING_FULLY_ADAPTIVE;
         else if(!strcmp(arg_vet[i+1],"table"))
 	{
