@@ -3,11 +3,13 @@
 [/topology]
 
 [routing]
-   dyad 0.6
+   oddeven
 [/routing]
 
 [sel]
+   random
    bufferlevel
+   nop
 [/sel]
 
 [pir]
