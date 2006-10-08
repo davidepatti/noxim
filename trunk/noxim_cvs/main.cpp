@@ -11,29 +11,32 @@
 
 using namespace std;
 
+
+
 //---------------------------------------------------------------------------
 
 // Initialize global configuration parameters (can be overridden with command-line arguments)
-int   TGlobalParams::verbose_mode                   = DEFAULT_VERBOSE_MODE;
-int   TGlobalParams::trace_mode                     = DEFAULT_TRACE_MODE;
-char  TGlobalParams::trace_filename[128]            = DEFAULT_TRACE_FILENAME;
-int   TGlobalParams::mesh_dim_x                     = DEFAULT_MESH_DIM_X;
-int   TGlobalParams::mesh_dim_y                     = DEFAULT_MESH_DIM_Y;
-int   TGlobalParams::buffer_depth                   = DEFAULT_BUFFER_DEPTH;
-int   TGlobalParams::min_packet_size                = DEFAULT_MIN_PACKET_SIZE;
-int   TGlobalParams::max_packet_size                = DEFAULT_MAX_PACKET_SIZE;
-int   TGlobalParams::routing_algorithm              = DEFAULT_ROUTING_ALGORITHM;
-char  TGlobalParams::routing_table_filename[128]    = DEFAULT_ROUTING_TABLE_FILENAME;
-int   TGlobalParams::selection_strategy             = DEFAULT_SELECTION_STRATEGY;
-float TGlobalParams::packet_injection_rate          = DEFAULT_PACKET_INJECTION_RATE;
-float TGlobalParams::probability_of_retransmission  = DEFAULT_PROBABILITY_OF_RETRANSMISSION;
-int   TGlobalParams::traffic_distribution           = DEFAULT_TRAFFIC_DISTRIBUTION;
-char  TGlobalParams::traffic_table_filename[128]    = DEFAULT_TRAFFIC_TABLE_FILENAME;
-int   TGlobalParams::simulation_time                = DEFAULT_SIMULATION_TIME;
-int   TGlobalParams::stats_warm_up_time             = DEFAULT_STATS_WARM_UP_TIME;
-int   TGlobalParams::rnd_generator_seed             = time(NULL);
-bool  TGlobalParams::detailed                       = DEFAULT_DETAILED;
-float TGlobalParams::dyad_threshold                 = DEFAULT_DYAD_THRESHOLD;
+int   TGlobalParams::verbose_mode                     = DEFAULT_VERBOSE_MODE;
+int   TGlobalParams::trace_mode                       = DEFAULT_TRACE_MODE;
+char  TGlobalParams::trace_filename[128]              = DEFAULT_TRACE_FILENAME;
+int   TGlobalParams::mesh_dim_x                       = DEFAULT_MESH_DIM_X;
+int   TGlobalParams::mesh_dim_y                       = DEFAULT_MESH_DIM_Y;
+int   TGlobalParams::buffer_depth                     = DEFAULT_BUFFER_DEPTH;
+int   TGlobalParams::min_packet_size                  = DEFAULT_MIN_PACKET_SIZE;
+int   TGlobalParams::max_packet_size                  = DEFAULT_MAX_PACKET_SIZE;
+int   TGlobalParams::routing_algorithm                = DEFAULT_ROUTING_ALGORITHM;
+char  TGlobalParams::routing_table_filename[128]      = DEFAULT_ROUTING_TABLE_FILENAME;
+int   TGlobalParams::selection_strategy               = DEFAULT_SELECTION_STRATEGY;
+float TGlobalParams::packet_injection_rate            = DEFAULT_PACKET_INJECTION_RATE;
+float TGlobalParams::probability_of_retransmission    = DEFAULT_PROBABILITY_OF_RETRANSMISSION;
+int   TGlobalParams::traffic_distribution             = DEFAULT_TRAFFIC_DISTRIBUTION;
+char  TGlobalParams::traffic_table_filename[128]      = DEFAULT_TRAFFIC_TABLE_FILENAME;
+int   TGlobalParams::simulation_time                  = DEFAULT_SIMULATION_TIME;
+int   TGlobalParams::stats_warm_up_time               = DEFAULT_STATS_WARM_UP_TIME;
+int   TGlobalParams::rnd_generator_seed               = time(NULL);
+bool  TGlobalParams::detailed                         = DEFAULT_DETAILED;
+float TGlobalParams::dyad_threshold                   = DEFAULT_DYAD_THRESHOLD;
+unsigned int TGlobalParams::max_volume_to_be_drained  = DEFAULT_MAX_VOLUME_TO_BE_DRAINED;
 vector<pair<int,double> > TGlobalParams::hotspots;
 
 //---------------------------------------------------------------------------
@@ -76,6 +79,7 @@ void showHelp(char selfname[])
   cout << "\t-warmup N\tStart to collect statistics after N cycles (default " << DEFAULT_STATS_WARM_UP_TIME << ")" << endl;
   cout << "\t-seed N\t\tSet the seed of the random generator (default time())" << endl;
   cout << "\t-detailed\tShow detailed statistics" << endl;
+  cout << "\t-volume N\tStop the simulation when either the maximum number of cycles has been reached or N flits have been delivered" << endl;
   cout << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << DEFAULT_SIMULATION_TIME << ")" << endl << endl;
   cout << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <mpalesi@diit.unict.it>" << endl;
   cout << "If you find this program useless please feel free to complain with Davide Patti <dpatti@diit.unict.it>" << endl;
@@ -351,6 +355,16 @@ int sc_main(int arg_num, char* arg_vet[])
 	  TGlobalParams::detailed = true;
 	  i++;
 	}
+      else if(!strcmp(arg_vet[i],"-volume"))
+	{
+        int new_vol = atoi(arg_vet[i+1]);
+        if(new_vol>1)
+	{
+          TGlobalParams::max_volume_to_be_drained = new_vol;
+          i+=2;
+        }
+        else badArgument(arg_vet[i+1], arg_vet[i]);
+      }
       else if(!strcmp(arg_vet[i],"-sim"))
 	{
         int new_sim = atoi(arg_vet[i+1]);
@@ -455,7 +469,7 @@ int sc_main(int arg_num, char* arg_vet[])
     for (int x=0; x<MESH_DIM_X; x++)
       n->t[x][y]->r->stats.showStats();
   */
-  
+
   return 0;
 }
 

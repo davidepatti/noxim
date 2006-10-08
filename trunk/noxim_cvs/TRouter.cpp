@@ -8,6 +8,10 @@
 
 //---------------------------------------------------------------------------
 
+static unsigned int drained_volume = 0;
+
+//---------------------------------------------------------------------------
+
 void TRouter::rxProcess()
 {
   if(reset.read())
@@ -49,10 +53,14 @@ void TRouter::rxProcess()
 
 	      // Negate the old value for Alternating Bit Protocol (ABP)
 	      current_level_rx[i] = 1-current_level_rx[i];
+
+	      // Incoming flit
+	      stats.power.Incoming();
 	    }
 	  ack_rx[i].write(current_level_rx[i]);
 	}
     }
+  stats.power.Standby();
 }
 
 //---------------------------------------------------------------------------
@@ -130,20 +138,34 @@ void TRouter::txProcess()
 		      req_tx[o].write(current_level_tx[o]);
 		      buffer[i].Pop();
 
+		      stats.power.Forward();
+
 		      if (flit.flit_type == FLIT_TYPE_TAIL) 
 			reservation_table.release(o);
 			
 		      // Update stats
 		      if (o == DIRECTION_LOCAL)
-			stats.receivedFlit(sc_simulation_time(), flit);
+			{
+			  stats.receivedFlit(sc_simulation_time(), flit);
+			  if (TGlobalParams::max_volume_to_be_drained)
+			    {
+			      if (drained_volume >= TGlobalParams::max_volume_to_be_drained)
+				sc_stop();
+			      else
+				drained_volume++;
+			    }
+			}
 		      else if (i != DIRECTION_LOCAL)
-		      // Increment routed flits counter
-			routed_flits++;
+			{
+			  // Increment routed flits counter
+			  routed_flits++;
+			}
 		    }
 		}
 	    }
 	}
     } // else
+  stats.power.Standby();
 }
 
 //---------------------------------------------------------------------------
@@ -241,6 +263,8 @@ vector<int> TRouter::routingFunction(const TRouteData& route_data)
 
 int TRouter::route(const TRouteData& route_data)
 {
+  stats.power.Routing();
+
   if (route_data.dst_id == local_id)
     return DIRECTION_LOCAL;
 
@@ -429,21 +453,22 @@ int TRouter::selectionRandom(const vector<int>& directions)
 int TRouter::selectionFunction(const vector<int>& directions, const TRouteData& route_data)
 {
   // not so elegant but fast escape ;)
-    if (directions.size()==1) return directions[0];
-
-    switch (TGlobalParams::selection_strategy)
+  if (directions.size()==1) return directions[0];
+  
+  stats.power.Selection();
+  switch (TGlobalParams::selection_strategy)
     {
-	case SEL_RANDOM:
-	    return selectionRandom(directions);
-	case SEL_BUFFER_LEVEL:
-	    return selectionBufferLevel(directions);
-	case SEL_NOP:
-	    return selectionNoP(directions,route_data);
-	default:
-	    assert(false);
+    case SEL_RANDOM:
+      return selectionRandom(directions);
+    case SEL_BUFFER_LEVEL:
+      return selectionBufferLevel(directions);
+    case SEL_NOP:
+      return selectionNoP(directions,route_data);
+    default:
+      assert(false);
     }
-
-    return 0;	    
+  
+  return 0;	    
 }
 
 //---------------------------------------------------------------------------
@@ -724,6 +749,13 @@ unsigned int TRouter::getFlitsCount()
     count += buffer[i].Size();
 
   return count;
+}
+
+//---------------------------------------------------------------------------
+
+double TRouter::getPower()
+{
+  return stats.power.getPower();
 }
 
 //---------------------------------------------------------------------------

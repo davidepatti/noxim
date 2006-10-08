@@ -226,6 +226,19 @@ vector<vector<unsigned long> > TGlobalStats::getRoutedFlitsMtx()
 
 //---------------------------------------------------------------------------
 
+double TGlobalStats::getPower()
+{
+  double power = 0.0;
+
+  for(int y=0; y<TGlobalParams::mesh_dim_y; y++)
+    for(int x=0; x<TGlobalParams::mesh_dim_x; x++)
+      power += noc->t[x][y]->r->getPower();
+
+  return power;
+}
+
+//---------------------------------------------------------------------------
+
 void TGlobalStats::showStats(std::ostream& out, bool detailed)
 {
   if(TGlobalParams::verbose_mode > VERBOSE_OFF)
@@ -239,6 +252,7 @@ void TGlobalStats::showStats(std::ostream& out, bool detailed)
   out << "% Global average throughput (flits/cycle): " << getAverageThroughput() << endl;
   out << "% Throughput (flits/cycle/IP): " << getThroughput() << endl;
   out << "% Max delay (cycles): " << getMaxDelay() << endl;
+  out << "% Total energy (J): " << getPower() << endl;
 
   if (detailed)
     {
