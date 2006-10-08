@@ -71,6 +71,8 @@ SC_MODULE(TRouter)
 
   unsigned int  getFlitsCount();  // Returns the number of flits into the router
 
+  double        getPower();  // Returns the total power dissipated by the router
+
   // Constructor
 
   SC_CTOR(TRouter)

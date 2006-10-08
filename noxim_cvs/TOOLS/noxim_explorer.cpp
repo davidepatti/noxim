@@ -31,6 +31,7 @@ using namespace std;
 #define AVG_THROUGHPUT_LABEL "% Global average throughput (flits/cycle):"
 #define THROUGHPUT_LABEL     "% Throughput (flits/cycle/IP):"
 #define MAX_DELAY_LABEL      "% Max delay (cycles):"
+#define TOTAL_ENERGY_LABEL   "% Total energy (J):"
 
 #define MATLAB_VAR_NAME      "data"
 #define MATRIX_COLUMN_WIDTH  15
@@ -63,6 +64,7 @@ struct TSimulationResults
   double       throughput;
   double       avg_throughput;
   double       max_delay;
+  double       total_energy;
   unsigned int rpackets;
   unsigned int rflits;
 };
@@ -584,9 +586,18 @@ bool ReadResults(const string& fname,
 	  iss >> sres.max_delay;
 	  continue;
 	}
+
+      pos = line.find(TOTAL_ENERGY_LABEL);
+      if (pos != string::npos) 
+	{
+	  nread++;
+	  istringstream iss(line.substr(pos + string(TOTAL_ENERGY_LABEL).size()));
+	  iss >> sres.total_energy;
+	  continue;
+	}
     }
 
-  if (nread != 6)
+  if (nread != 7)
     {
       error_msg = "Output file " + fname + " corrupted";
       return false;
@@ -649,6 +660,7 @@ bool RunSimulations(double start_time,
       fout << setw(MATRIX_COLUMN_WIDTH) << sres.avg_delay
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.throughput
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.max_delay
+	   << setw(MATRIX_COLUMN_WIDTH) << sres.total_energy
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.rpackets
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.rflits 
 	   << endl;
@@ -671,6 +683,7 @@ bool PrintMatlabVariableBegin(const TParametersSpace& aggragated_params_space,
   fout << setw(MATRIX_COLUMN_WIDTH) << "avg_delay"
        << setw(MATRIX_COLUMN_WIDTH) << "throughput"
        << setw(MATRIX_COLUMN_WIDTH) << "max_delay"
+       << setw(MATRIX_COLUMN_WIDTH) << "total_energy"
        << setw(MATRIX_COLUMN_WIDTH) << "rpackets"
        << setw(MATRIX_COLUMN_WIDTH) << "rflits";
 
@@ -690,11 +703,11 @@ bool GenMatlabCode(const string& var_name,
        << "for i = 1:rows/" << repetitions << "," << endl
        << "   ifirst = (i - 1) * " << repetitions << " + 1;" << endl
        << "   ilast  = ifirst + " << repetitions << " - 1;" << endl
-       << "   tmp = " << MATLAB_VAR_NAME << "(ifirst:ilast, cols-5+" << column << ");" << endl
+       << "   tmp = " << MATLAB_VAR_NAME << "(ifirst:ilast, cols-6+" << column << ");" << endl
        << "   avg = mean(tmp);" << endl
        << "   [h sig ci] = ttest(tmp, 0.1);" << endl
        << "   ci = (ci(2)-ci(1))/2;" << endl
-       << "   " << var_name << " = [" << var_name << "; " << MATLAB_VAR_NAME << "(ifirst, 1:cols-5), avg ci];" << endl
+       << "   " << var_name << " = [" << var_name << "; " << MATLAB_VAR_NAME << "(ifirst, 1:cols-6), avg ci];" << endl
        << "end" << endl
        << endl;
 
@@ -752,6 +765,10 @@ bool PrintMatlabVariableEnd(const int repetitions,
 
   if (!GenMatlabCode(string(MATLAB_VAR_NAME) + "_maxdelay", 3,
 		     repetitions, 3, fout, error_msg))
+    return false;
+
+  if (!GenMatlabCode(string(MATLAB_VAR_NAME) + "_totalenergy", 4,
+		     repetitions, 4, fout, error_msg))
     return false;
 
   if (!GenMatlabCodeSaturationAnalysis(string(MATLAB_VAR_NAME), fout, error_msg))

@@ -61,6 +61,9 @@ public:
   // Returns the number of routed flits for each router
   vector<vector<unsigned long> > getRoutedFlitsMtx();
 
+  // Returns the total power
+  double getPower();
+
   // Shows global statistics
   void showStats(std::ostream& out = std::cout, bool detailed = false);
 

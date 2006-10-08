@@ -11,6 +11,7 @@
 
 #include <vector>
 #include "NoximDefs.h"
+#include "TPower.h"
 
 using namespace std;
 
@@ -72,6 +73,12 @@ public:
 
   // Shows statistics for the current node
   void showStats(std::ostream& out = std::cout);
+
+
+public:
+  
+  TPower              power;
+
 
 private:
 

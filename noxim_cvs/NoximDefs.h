@@ -15,6 +15,7 @@
 
 using namespace std;
 
+
 // Define the directions as numbers
 #define DIRECTIONS             4
 #define DIRECTION_NORTH        0
@@ -45,7 +46,7 @@ using namespace std;
 #define SEL_NOP                2
 
 // Traffic distribution
-#define TRAFFIC_RANDOM        0
+#define TRAFFIC_RANDOM         0
 #define TRAFFIC_TRANSPOSE1     1
 #define TRAFFIC_TRANSPOSE2     2
 #define TRAFFIC_HOTSPOT        3
@@ -80,6 +81,7 @@ using namespace std;
 #define DEFAULT_STATS_WARM_UP_TIME  DEFAULT_RESET_TIME
 #define DEFAULT_DETAILED                         false
 #define DEFAULT_DYAD_THRESHOLD                     0.6
+#define DEFAULT_MAX_VOLUME_TO_BE_DRAINED             0
 
 // TODO by Fafa - this MUST be removed!!!
 #define MAX_STATIC_DIM 20
@@ -109,6 +111,7 @@ struct TGlobalParams
   static bool detailed;
   static vector<pair<int,double> > hotspots;
   static float dyad_threshold;
+  static unsigned int max_volume_to_be_drained;
 };
 
 
