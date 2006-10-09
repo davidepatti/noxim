@@ -464,6 +464,15 @@ int sc_main(int arg_num, char* arg_vet[])
   TGlobalStats gs(n);
   gs.showStats(std::cout, TGlobalParams::detailed);
 
+  if ((TGlobalParams::max_volume_to_be_drained>0) &&
+      (sc_simulation_time()>=TGlobalParams::simulation_time))
+      {
+	  cout << "\nWARNING! the number of flits specified with -volume option"<<endl;
+	  cout << "has not been reached."<<endl;
+	  cout << "You might want to try an higher value of simulation cycles" << endl;
+	  cout << "using -sim option." << endl;
+      }
+
   /*
   for (int y=0; y<MESH_DIM_Y; y++)
     for (int x=0; x<MESH_DIM_X; x++)
