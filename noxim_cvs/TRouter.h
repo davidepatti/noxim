@@ -17,6 +17,8 @@
 #include "TLocalRoutingTable.h"
 #include "TReservationTable.h"
 
+extern unsigned int drained_volume;
+
 SC_MODULE(TRouter)
 {
 
@@ -122,6 +124,9 @@ SC_MODULE(TRouter)
   int reflexDirection(int direction) const;
   int getNeighborId(int _id,int direction) const;
   bool inCongestion();
+
+ public:
+  unsigned int local_drained;
 };
 
 #endif

@@ -7,10 +7,8 @@
 #include "TRouter.h"
 
 //---------------------------------------------------------------------------
-
-static unsigned int drained_volume = 0;
-
 //---------------------------------------------------------------------------
+
 
 void TRouter::rxProcess()
 {
@@ -24,6 +22,7 @@ void TRouter::rxProcess()
 	}
       reservation_table.clear();
       routed_flits = 0;
+      local_drained = 0;
     }
   else
     {
@@ -152,7 +151,10 @@ void TRouter::txProcess()
 			      if (drained_volume >= TGlobalParams::max_volume_to_be_drained)
 				sc_stop();
 			      else
+			      {
 				drained_volume++;
+				local_drained++;
+			      }
 			    }
 			}
 		      else if (i != DIRECTION_LOCAL)

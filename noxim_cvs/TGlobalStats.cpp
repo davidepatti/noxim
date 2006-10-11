@@ -12,6 +12,10 @@
 TGlobalStats::TGlobalStats(const TNoC* _noc)
 {
   noc = _noc;
+
+#ifdef TESTING
+  drained_total = 0;
+#endif
 }
 
 //---------------------------------------------------------------------------
@@ -174,7 +178,12 @@ unsigned int TGlobalStats::getReceivedFlits()
 
   for (int y=0; y<TGlobalParams::mesh_dim_y; y++)
     for (int x=0; x<TGlobalParams::mesh_dim_x; x++)
+    {
        n += noc->t[x][y]->r->stats.getReceivedFlits();
+#ifdef TESTING
+       drained_total+= noc->t[x][y]->r->local_drained;
+#endif
+    }
 
   return n;
 }
