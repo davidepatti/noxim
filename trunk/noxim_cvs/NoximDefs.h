@@ -338,6 +338,7 @@ inline int coord2Id(const TCoord& coord)
   return id;
 }
 
+
 #endif  // NOXIMDEFS_H
 
 

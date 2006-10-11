@@ -67,6 +67,10 @@ public:
   // Shows global statistics
   void showStats(std::ostream& out = std::cout, bool detailed = false);
 
+#ifdef TESTING
+  unsigned int drained_total;
+#endif
+
 private:
   const TNoC* noc;
 };

@@ -11,7 +11,8 @@
 
 using namespace std;
 
-
+// need to be globally visible to allow "-volume" simulation stop
+unsigned int drained_volume;
 
 //---------------------------------------------------------------------------
 
@@ -138,6 +139,8 @@ void badInputFilename(char filename[])
 
 int sc_main(int arg_num, char* arg_vet[])
 {
+    // TEMP
+    drained_volume = 0;
   bool specifiedPir = false;
   bool specifiedPor = false;
 
@@ -468,9 +471,13 @@ int sc_main(int arg_num, char* arg_vet[])
       (sc_simulation_time()>=TGlobalParams::simulation_time))
       {
 	  cout << "\nWARNING! the number of flits specified with -volume option"<<endl;
-	  cout << "has not been reached."<<endl;
+	  cout << "has not been reached. ( " << drained_volume << " instead of " << TGlobalParams::max_volume_to_be_drained << " )" <<endl;
 	  cout << "You might want to try an higher value of simulation cycles" << endl;
 	  cout << "using -sim option." << endl;
+#ifdef TESTING
+	  cout << "\n Sum of local drained flits: "  << gs.drained_total << endl;
+	  cout << "\n Effective drained volume: " << drained_volume;
+#endif
       }
 
   /*
