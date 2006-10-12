@@ -462,6 +462,7 @@ int sc_main(int arg_num, char* arg_vet[])
   // Close the simulation
   if(TGlobalParams::trace_mode) sc_close_vcd_trace_file(tf);
   cout << "Noxim simulation completed." << endl;
+  cout << " ( " << sc_simulation_time() << " cycles executed)" << endl;
 
   // Show statistics
   TGlobalStats gs(n);
