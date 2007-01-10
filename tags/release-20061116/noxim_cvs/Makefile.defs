@@ -1,0 +1,38 @@
+## Variable that points to SystemC installation path
+SYSTEMC = /usr/local/systemc-2.1.v1
+
+
+INCDIR = -I. -I.. -I$(SYSTEMC)/include
+LIBDIR = -L. -L.. -L$(SYSTEMC)/lib-$(TARGET_ARCH)
+
+LIBS   =  -lsystemc -lm $(EXTRA_LIBS)
+
+
+EXE    = $(MODULE)
+
+.SUFFIXES: .cc .cpp .o 
+
+$(EXE): $(OBJS) $(SYSTEMC)/lib-$(TARGET_ARCH)/libsystemc.a 
+	$(CC) $(CFLAGS) $(INCDIR) $(LIBDIR) -o $@ $(OBJS) $(LIBS) 2>&1 | c++filt
+
+.cpp.o:
+	$(CC) $(CFLAGS) $(INCDIR) -c $<
+
+.cc.o:
+	$(CC) $(CFLAGS) $(INCDIR) -c $<
+
+clean::
+	rm -f $(OBJS) *~ $(EXE) core *~ *.o noxim
+
+ultraclean: clean
+	rm -f Makefile.deps
+
+tar: clean
+	touch noxim.tar.gz
+	rm noxim.tar.gz
+	tar zcvf noxim.tar.gz Makefile* *.h *.cpp
+
+depend:
+	makedepend $(SRCS) -f Makefile.deps
+
+include ./Makefile.deps

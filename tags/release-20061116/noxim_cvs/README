@@ -1,0 +1,14 @@
+
+Noxim 
+----------------------------------
+
+to compile:
+
+1) touch Makefile.deps
+2) make depend
+3) make
+
+Note: You don't need to repeat steps 1) and 2) after the first
+compilation.
+
+
