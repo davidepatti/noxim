@@ -4,8 +4,9 @@
 
  *****************************************************************************/
 
+#include <iostream>
+#include <iomanip>
 #include "TStats.h"
-
 // TODO: nan in averageDelay
 
 
@@ -192,18 +193,44 @@ int TStats::searchCommHistory(int src_id)
 
 //---------------------------------------------------------------------------
 
-void TStats::showStats(std::ostream& out)
+void TStats::showStats(int curr_node,
+		       std::ostream& out,
+		       bool header)
 {
-  out << "% node id: " << id << endl;
-  for (unsigned int i=0; i<chist.size(); i++)
+  if (header)
     {
-      out << "% source id: " << chist[i].src_id 
-	  << ", received " << chist[i].delays.size() << " packets" << " (" << chist[i].total_received_flits << " flits)"
-	  << ", avg delay " << getAverageDelay(chist[i].src_id) << " cycles"
-	  << ", avg throughput " << getAverageThroughput(chist[i].src_id) << " flits/cycle"
+      out << "%" 
+	  << setw(5)  << "src"
+	  << setw(5)  << "dst"
+	  << setw(10) << "delay avg"
+	  << setw(10) << "delay max"
+	  << setw(15) << "throughput"
+	  << setw(12) << "received"
+	  << setw(12) << "received" 
+	  << endl;
+      out << "%" 
+	  << setw(5)  << ""
+	  << setw(5)  << ""
+	  << setw(10) << "cycles"
+	  << setw(10) << "cycles"
+	  << setw(15) << "flits/cycle"
+	  << setw(12) << "packets"
+	  << setw(12) << "flits" 
 	  << endl;
     }
-
+  for (unsigned int i=0; i<chist.size(); i++)
+    {
+      out << " "
+	  << setw(5)  << chist[i].src_id
+	  << setw(5)  << curr_node
+	  << setw(10) << getAverageDelay(chist[i].src_id)
+	  << setw(10) << getMaxDelay(chist[i].src_id)
+	  << setw(15) << getAverageThroughput(chist[i].src_id)
+	  << setw(12) << chist[i].delays.size()
+	  << setw(12) << chist[i].total_received_flits
+	  << endl;
+    }
+  
   out << "% Aggregated average delay (cycles): " << getAverageDelay() << endl;
   out << "% Aggregated average throughput (flits/cycle): " << getAverageThroughput() << endl;
 }
