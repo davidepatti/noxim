@@ -250,11 +250,6 @@ double TGlobalStats::getPower()
 
 void TGlobalStats::showStats(std::ostream& out, bool detailed)
 {
-  if(TGlobalParams::verbose_mode > VERBOSE_OFF)
-    for (int y=0; y<TGlobalParams::mesh_dim_y; y++)
-      for (int x=0; x<TGlobalParams::mesh_dim_x; x++)
-        noc->t[x][y]->r->stats.showStats(out);
-
   out << "% Total received packets: " << getReceivedPackets() << endl;
   out << "% Total received flits: " << getReceivedFlits() << endl;
   out << "% Global average delay (cycles): " << getAverageDelay() << endl;
@@ -265,6 +260,14 @@ void TGlobalStats::showStats(std::ostream& out, bool detailed)
 
   if (detailed)
     {
+      out << endl << "detailed = [" << endl;
+      for (int y=0; y<TGlobalParams::mesh_dim_y; y++)
+	for (int x=0; x<TGlobalParams::mesh_dim_x; x++)
+	  noc->t[x][y]->r->stats.showStats(y*TGlobalParams::mesh_dim_x+x,
+					   out, 
+					   true);
+      out << "];" << endl;
+
       // show MaxDelay matrix
       vector<vector<double> > md_mtx = getMaxDelayMtx();
 

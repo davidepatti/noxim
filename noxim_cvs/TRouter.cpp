@@ -404,43 +404,67 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
 
 int TRouter::selectionBufferLevel(const vector<int>& directions)
 {
-    // TODO: unfair if multiple directions have same buffer level
-    // TODO: to check when both available
-
-    unsigned int max_free_slots = 0;
-    int direction_choosen = NOT_VALID;
-
-    for (unsigned int i=0;i<directions.size();i++)
+  vector<int>  best_dirs;
+  int          max_free_slots = 0;
+  for (unsigned int i=0; i<directions.size(); i++)
     {
-	int free_slots = free_slots_neighbor[directions[i]].read();
-	if ((free_slots >= max_free_slots) &&
-	    (reservation_table.isAvailable(directions[i])))
+      int free_slots = free_slots_neighbor[directions[i]].read();
+      bool available = reservation_table.isAvailable(directions[i]);
+      if (available)
 	{
-	    direction_choosen = directions[i];
-	    max_free_slots = free_slots;
+	  if (free_slots > max_free_slots) 
+	    {
+	      max_free_slots = free_slots;
+	      best_dirs.clear();
+	      best_dirs.push_back(directions[i]);
+	    }
+	  else if (free_slots == max_free_slots)
+	    best_dirs.push_back(directions[i]);
 	}
     }
 
-    // No available channel 
-    if (direction_choosen==NOT_VALID)
-	direction_choosen = directions[rand() % directions.size()]; 
+  if (best_dirs.size())
+    return(best_dirs[rand() % best_dirs.size()]);
+  else
+    return(directions[rand() % directions.size()]);
 
-    if(TGlobalParams::verbose_mode>VERBOSE_OFF)
-    {
-	TChannelStatus tmp;
+  //-------------------------
+  // TODO: unfair if multiple directions have same buffer level
+  // TODO: to check when both available
+//   unsigned int max_free_slots = 0;
+//   int direction_choosen = NOT_VALID;
 
-	cout << sc_simulation_time() << ": Router[" << local_id << "] SELECTION between: " << endl;
-	for (unsigned int i=0;i<directions.size();i++)
-	{
-	    tmp.free_slots = free_slots_neighbor[directions[i]].read();
-	    tmp.available = (reservation_table.isAvailable(directions[i]));
-	    cout << "    -> direction " << directions[i] << ", channel status: " << tmp << endl;
-	}
-	cout << " direction choosen: " << direction_choosen << endl;
-    }
+//   for (unsigned int i=0;i<directions.size();i++)
+//     {
+//       int free_slots = free_slots_neighbor[directions[i]].read();
+//       if ((free_slots >= max_free_slots) &&
+// 	  (reservation_table.isAvailable(directions[i])))
+// 	{
+// 	  direction_choosen = directions[i];
+// 	  max_free_slots = free_slots;
+// 	}
+//     }
 
-    assert(direction_choosen>=0);
-    return direction_choosen;
+//   // No available channel 
+//   if (direction_choosen==NOT_VALID)
+//     direction_choosen = directions[rand() % directions.size()]; 
+
+//   if(TGlobalParams::verbose_mode>VERBOSE_OFF)
+//     {
+//       TChannelStatus tmp;
+
+//       cout << sc_simulation_time() << ": Router[" << local_id << "] SELECTION between: " << endl;
+//       for (unsigned int i=0;i<directions.size();i++)
+// 	{
+// 	  tmp.free_slots = free_slots_neighbor[directions[i]].read();
+// 	  tmp.available = (reservation_table.isAvailable(directions[i]));
+// 	  cout << "    -> direction " << directions[i] << ", channel status: " << tmp << endl;
+// 	}
+//       cout << " direction choosen: " << direction_choosen << endl;
+//     }
+
+//   assert(direction_choosen>=0);
+//   return direction_choosen;
 }
 
 //---------------------------------------------------------------------------

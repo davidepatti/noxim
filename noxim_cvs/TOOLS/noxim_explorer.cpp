@@ -435,10 +435,10 @@ string Configuration2FunctionName(const TConfiguration& conf)
   for (uint i=0; i<conf.size(); i++)
     fn = fn + conf[i].first + "_" + conf[i].second + "__";
   
-  // Replace " " with "_"
+  // Replace " ", "-", ".", "/" with "_"
   int len = fn.length();
   for (int i=0; i<len; i++)
-    if (fn.at(i) == ' ' || fn.at(i) == '.' || fn.at(i) == '-')
+    if (fn.at(i) == ' ' || fn.at(i) == '.' || fn.at(i) == '-' || fn.at(i) == '/')
       fn[i] = '_';
   
   return fn;
@@ -621,7 +621,7 @@ bool RunSimulation(const string& cmd_base,
     return false;
 
   string rm_cmd = string("rm -f ") + tmp_fname;
-  system(cmd.c_str());
+  system(rm_cmd.c_str());
 
   return true;
 }

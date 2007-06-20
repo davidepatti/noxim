@@ -72,7 +72,7 @@ public:
   unsigned int getTotalCommunications();
 
   // Shows statistics for the current node
-  void showStats(std::ostream& out = std::cout);
+  void showStats(int curr_node, std::ostream& out = std::cout, bool header = false);
 
 
 public:
