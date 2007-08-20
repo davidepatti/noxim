@@ -4,8 +4,8 @@
 
  *****************************************************************************/
 /* Copyright 2005-2007  
-    Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
     Maurizio Palesi <mpalesi@diit.unict.it>
+    Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
     Davide Patti <dpatti@diit.unict.it>
 
  *  This program is free software; you can redistribute it and/or modify
@@ -67,11 +67,11 @@ void TProcessingElement::txProcess()
   }
   else
   {
-    TPacket transmittible_packet = nextPacket();
-    
-    if(probabilityShot(transmittible_packet))
+    TPacket packet;
+
+    if (canShot(packet))
     {
-      packet_queue.push(transmittible_packet);
+      packet_queue.push(packet);
       transmittedAtPreviousCycle = true;
     }
     else
@@ -85,7 +85,7 @@ void TProcessingElement::txProcess()
         TFlit flit = nextFlit();                  // Generate a new flit
         if(TGlobalParams::verbose_mode > VERBOSE_OFF)
         {
-          cout << sc_simulation_time() << ": ProcessingElement[" << local_id << "] SENDING " << flit << endl;
+          cout << sc_time_stamp().to_double()/1000 << ": ProcessingElement[" << local_id << "] SENDING " << flit << endl;
         }
 	flit_tx->write(flit);                     // Send the generated flit
 	current_level_tx = 1-current_level_tx;    // Negate the old value for Alternating Bit Protocol (ABP)
@@ -125,88 +125,66 @@ TFlit TProcessingElement::nextFlit()
 
 //---------------------------------------------------------------------------
 
-bool TProcessingElement::probabilityShot(TPacket p)
+bool TProcessingElement::canShot(TPacket& packet)
 {
-  float threshold;
+  bool   shot;
+  double threshold;
 
-  // Normal case (using global parameters)
-  if(TGlobalParams::traffic_distribution!=TRAFFIC_TABLE_BASED)
+  if (TGlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED)
     {
-      if(!transmittedAtPreviousCycle)
+      if (!transmittedAtPreviousCycle)
 	threshold = TGlobalParams::packet_injection_rate;
       else
 	threshold = TGlobalParams::probability_of_retransmission;
-    }
-  else
-    // Traffic Table Based (using the proper parameter for each link)
-    {
-      if(occurrencesInTrafficTableAsSource==0) return false;
 
-      int now = (int)sc_simulation_time();
-      int t_on = traffic_table->getTonForTheSelectedLink(p.src_id, p.dst_id);
-      int t_off = traffic_table->getToffForTheSelectedLink(p.src_id, p.dst_id);
-      int t_period = traffic_table->getTperiodForTheSelectedLink(p.src_id, p.dst_id);
-      if(t_period<=0) t_period = DEFAULT_RESET_TIME + TGlobalParams::simulation_time;
-
-      if((now%t_period)>t_on && (now%t_period)<t_off)
+      shot = (((double)rand())/RAND_MAX < threshold);
+      if (shot)
 	{
-	  if(!transmittedAtPreviousCycle)
-	    threshold = traffic_table->getPirForTheSelectedLink(p.src_id, p.dst_id);
-	  else
-	    threshold = traffic_table->getPorForTheSelectedLink(p.src_id, p.dst_id);
-	}
-      else 
-	{
-	  //---------- Mau experiment <start>
-	  /*
-	  if ((int)sc_simulation_time() == 1000)
+	  switch(TGlobalParams::traffic_distribution)
 	    {
-	      TPacket p = packet_queue.front();	      
-	      while (!packet_queue.empty())
-		packet_queue.pop();
-	      packet_queue.push(p);
+	    case TRAFFIC_RANDOM:
+	      packet = trafficRandom();
+	      break;
+	      
+	    case TRAFFIC_TRANSPOSE1:
+	      packet = trafficTranspose1();
+	      break;
+	      
+	    case TRAFFIC_TRANSPOSE2:
+	      packet = trafficTranspose2();
+	      break;
+	      
+	    default:
+	      assert(false);
 	    }
-	  */
-	  //---------- Mau experiment <stop>
+	}
+    }
+  else
+    { // Table based communication traffic
+      if (never_transmit)
+	return false;
 
-	  return false;
+      double now         = sc_time_stamp().to_double()/1000;
+      bool   use_pir     = (transmittedAtPreviousCycle == false);
+      vector<pair<int,double> > dst_prob;
+      double threshold = traffic_table->getCumulativePirPor(local_id, (int)now, use_pir, dst_prob);
+
+      double prob = (double)rand()/RAND_MAX;
+      shot = (prob < threshold);
+      if (shot)
+	{
+	  for (unsigned int i=0; i<dst_prob.size(); i++)
+	    {
+	      if (prob < dst_prob[i].second) 
+		{
+		  packet.make(local_id, dst_prob[i].first, now, getRandomSize());
+		  break;
+		}
+	    }
 	}
     }
 
-
-  if( ((double)rand())/RAND_MAX < threshold)
-    return true;
-  else
-    return false;
-  
-}
-
-//---------------------------------------------------------------------------
-
-TPacket TProcessingElement::nextPacket()
-{
-  switch(TGlobalParams::traffic_distribution)
-  {
-    case TRAFFIC_RANDOM:
-      return trafficRandom();
-      break;
-
-    case TRAFFIC_TRANSPOSE1:
-      return trafficTranspose1();
-      break;
-
-    case TRAFFIC_TRANSPOSE2:
-      return trafficTranspose2();
-      break;
-
-    case TRAFFIC_TABLE_BASED:
-      return trafficTableBased();
-      break;
-
-    default:
-      assert(false);
-      return trafficRandom();
-  }
+  return shot;
 }
 
 //---------------------------------------------------------------------------
@@ -218,7 +196,7 @@ TPacket TProcessingElement::trafficRandom()
   double rnd = rand()/(double)RAND_MAX;
   double range_start = 0.0;
 
-  //cout << "\n " << sc_simulation_time() << " PE " << local_id << " rnd = " << rnd << endl;
+  //cout << "\n " << sc_time_stamp().to_double()/1000 << " PE " << local_id << " rnd = " << rnd << endl;
 
   int max_id = (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y)-1;
 
@@ -230,13 +208,13 @@ TPacket TProcessingElement::trafficRandom()
     // check for hotspot destination
     for (uint i = 0; i<TGlobalParams::hotspots.size(); i++)
     {
-	//cout << sc_simulation_time() << " PE " << local_id << " Checking node " << TGlobalParams::hotspots[i].first << " with P = " << TGlobalParams::hotspots[i].second << endl;
+	//cout << sc_time_stamp().to_double()/1000 << " PE " << local_id << " Checking node " << TGlobalParams::hotspots[i].first << " with P = " << TGlobalParams::hotspots[i].second << endl;
 
 	if (rnd>=range_start && rnd < range_start + TGlobalParams::hotspots[i].second)
 	{
 	    if (local_id != TGlobalParams::hotspots[i].first)
 	    {
-		//cout << sc_simulation_time() << " PE " << local_id <<" That is ! " << endl;
+		//cout << sc_time_stamp().to_double()/1000 << " PE " << local_id <<" That is ! " << endl;
 		p.dst_id = TGlobalParams::hotspots[i].first;
 	    }
 	    break;
@@ -246,7 +224,7 @@ TPacket TProcessingElement::trafficRandom()
     }
   } while(p.dst_id==p.src_id);
 
-  p.timestamp = sc_simulation_time();
+  p.timestamp = sc_time_stamp().to_double()/1000;
   p.size = p.flit_left = getRandomSize();
 
   return p;
@@ -268,7 +246,7 @@ TPacket TProcessingElement::trafficTranspose1()
   fixRanges(src, dst);
   p.dst_id = coord2Id(dst);
 
-  p.timestamp = sc_simulation_time();
+  p.timestamp = sc_time_stamp().to_double()/1000;
   p.size = p.flit_left = getRandomSize();
 
   return p;
@@ -290,23 +268,7 @@ TPacket TProcessingElement::trafficTranspose2()
   fixRanges(src, dst);
   p.dst_id = coord2Id(dst);
 
-  p.timestamp = sc_simulation_time();
-  p.size = p.flit_left = getRandomSize();
-
-  return p;
-}
-
-//---------------------------------------------------------------------------
-
-TPacket TProcessingElement::trafficTableBased()
-{
-  TPacket p;
-  p.src_id = local_id;
-
-  // Traffic Table Based destination distribution
-  p.dst_id = traffic_table->randomDestinationGivenTheSource(p.src_id);
-
-  p.timestamp = sc_simulation_time();
+  p.timestamp = sc_time_stamp().to_double()/1000;
   p.size = p.flit_left = getRandomSize();
 
   return p;

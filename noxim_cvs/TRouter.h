@@ -98,16 +98,16 @@ SC_MODULE(TRouter)
   SC_CTOR(TRouter)
   {
     SC_METHOD(rxProcess);
-    sensitive(reset);
-    sensitive_pos(clock);
+    sensitive << reset;
+    sensitive << clock.pos();
 
     SC_METHOD(txProcess);
-    sensitive(reset);
-    sensitive_pos(clock);
+    sensitive << reset;
+    sensitive << clock.pos();
 
     SC_METHOD(bufferMonitor);
-    sensitive(reset);
-    sensitive_pos(clock);
+    sensitive << reset;
+    sensitive << clock.pos();
   }
 
  private:

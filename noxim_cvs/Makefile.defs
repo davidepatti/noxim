@@ -9,7 +9,7 @@ LIBS   =  -lsystemc -lm $(EXTRA_LIBS)
 
 EXE    = $(MODULE)
 
-.SUFFIXES: .cc .cpp .o 
+.SUFFIXES: .cpp .o 
 
 $(EXE): $(OBJS) $(SYSTEMC)/lib-$(TARGET_ARCH)/libsystemc.a 
 	$(CC) $(CFLAGS) $(INCDIR) $(LIBDIR) -o $@ $(OBJS) $(LIBS) 2>&1 | c++filt
@@ -17,21 +17,11 @@ $(EXE): $(OBJS) $(SYSTEMC)/lib-$(TARGET_ARCH)/libsystemc.a
 .cpp.o:
 	$(CC) $(CFLAGS) $(INCDIR) -c $<
 
-.cc.o:
-	$(CC) $(CFLAGS) $(INCDIR) -c $<
+clean:
+	rm -f Makefile.deps $(OBJS) *~ $(EXE) core *~ *.o
+	touch Makefile.deps
 
-clean::
-	rm -f $(OBJS) *~ $(EXE) core *~ *.o noxim
-
-ultraclean: clean
-	rm -f Makefile.deps
-
-tar: clean
-	touch noxim.tar.gz
-	rm noxim.tar.gz
-	tar zcvf noxim.tar.gz Makefile* *.h *.cpp
-
-depend:
-	makedepend $(SRCS) -f Makefile.deps
+depend: 
+	makedepend $(SRCS) -Y -f Makefile.deps
 
 include ./Makefile.deps

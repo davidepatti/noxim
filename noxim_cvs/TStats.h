@@ -89,6 +89,12 @@ public:
   // current node
   unsigned int getTotalCommunications();
 
+  // Returns the energy consumed for communication src_id-->dst_id
+  // under the following assumptions: (i) Minimal routing is
+  // considered, (ii) constant packet size is considered (as the
+  // average between the minimum and the maximum packet size).
+  double getCommunicationEnergy(int src_id, int dst_id);
+
   // Shows statistics for the current node
   void showStats(int curr_node, std::ostream& out = std::cout, bool header = false);
 

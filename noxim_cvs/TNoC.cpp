@@ -57,7 +57,7 @@ void TNoC::buildMesh()
 	  // Tell to the PE its coordinates
 	  t[i][j]->pe->local_id = j * TGlobalParams::mesh_dim_x + i;
           t[i][j]->pe->traffic_table = &gttable;  // Needed to choose destination
-          t[i][j]->pe->occurrencesInTrafficTableAsSource = gttable.occurrencesAsSource(t[i][j]->pe->local_id);
+          t[i][j]->pe->never_transmit = (gttable.occurrencesAsSource(t[i][j]->pe->local_id) == 0);
 
 	  // Map clock and reset
 	  t[i][j]->clock(clock);
