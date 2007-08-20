@@ -64,15 +64,16 @@ SC_MODULE(TProcessingElement)
 
   void                 rxProcess();                       // The receiving process
   void                 txProcess();                       // The transmitting process
-  bool                 probabilityShot(TPacket p);        // The probability to send a new packet
+  bool                 canShot(TPacket& packet);          // True when the packet must be shot
   TFlit                nextFlit();                        // Take the next flit of the current packet
-  TPacket              nextPacket();                      // Create a new packet
   TPacket              trafficRandom();                   // Random destination distribution
   TPacket              trafficTranspose1();               // Transpose 1 destination distribution
   TPacket              trafficTranspose2();               // Transpose 2 destination distribution
-  TPacket              trafficTableBased();               // Traffic Table Based destination distribution
+
   TGlobalTrafficTable* traffic_table;                     // Reference to the Global traffic Table
-  int                  occurrencesInTrafficTableAsSource; // Number of occurrences in Traffic Table
+  bool                 never_transmit;                    // true if the PE does not transmit any packet 
+                                                          //  (valid only for the table based traffic)
+
   void                 fixRanges(const TCoord, TCoord&);  // Fix the ranges of the destination
   int                  randInt(int min, int max);         // Extracts a random integer number between min and max
   int                  getRandomSize();                   // Returns a random size in flits for the packet
@@ -82,12 +83,12 @@ SC_MODULE(TProcessingElement)
   SC_CTOR(TProcessingElement)
   {
     SC_METHOD(rxProcess);
-    sensitive(reset);
-    sensitive_pos(clock);
+    sensitive << reset;
+    sensitive << clock.pos();
 
     SC_METHOD(txProcess);
-    sensitive(reset);
-    sensitive_pos(clock);
+    sensitive << reset;
+    sensitive << clock.pos();
   }    
 
 };

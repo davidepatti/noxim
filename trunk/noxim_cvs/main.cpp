@@ -415,7 +415,7 @@ int sc_main(int arg_num, char* arg_vet[])
   if(TGlobalParams::verbose_mode > VERBOSE_OFF) showConfig();
 
   // Signals
-  sc_clock        clock("clock", 1);
+  sc_clock        clock("clock", 1, SC_NS);
   sc_signal<bool> reset;
 
   // NoC instance
@@ -481,14 +481,14 @@ int sc_main(int arg_num, char* arg_vet[])
   // Close the simulation
   if(TGlobalParams::trace_mode) sc_close_vcd_trace_file(tf);
   cout << "Noxim simulation completed." << endl;
-  cout << " ( " << sc_simulation_time() << " cycles executed)" << endl;
+  cout << " ( " << sc_time_stamp().to_double()/1000 << " cycles executed)" << endl;
 
   // Show statistics
   TGlobalStats gs(n);
   gs.showStats(std::cout, TGlobalParams::detailed);
 
   if ((TGlobalParams::max_volume_to_be_drained>0) &&
-      (sc_simulation_time()>=TGlobalParams::simulation_time))
+      (sc_time_stamp().to_double()/1000 >= TGlobalParams::simulation_time))
       {
 	  cout << "\nWARNING! the number of flits specified with -volume option"<<endl;
 	  cout << "has not been reached. ( " << drained_volume << " instead of " << TGlobalParams::max_volume_to_be_drained << " )" <<endl;

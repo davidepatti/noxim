@@ -175,6 +175,15 @@ struct TPacket
   double             timestamp;    // SC timestamp at packet generation
   int                size;
   int                flit_left;    // Number of remaining flits inside the packet
+
+  TPacket() {;}
+  TPacket(const int s, const int d, const double ts, const int sz) {
+    make(s, d, ts, sz);
+  }
+
+  void make(const int s, const int d, const double ts, const int sz) {
+    src_id = s; dst_id = d; timestamp = ts; size = sz; flit_left = sz;
+  }
 };
 
 //---------------------------------------------------------------------------

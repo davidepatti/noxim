@@ -4,8 +4,8 @@
 
 *****************************************************************************/
 /* Copyright 2005-2007  
-    Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
     Maurizio Palesi <mpalesi@diit.unict.it>
+    Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
     Davide Patti <dpatti@diit.unict.it>
 
  *  This program is free software; you can redistribute it and/or modify
@@ -28,107 +28,6 @@
 
 TGlobalTrafficTable::TGlobalTrafficTable()
 {
-  valid = false;
-  numberOfLines = 0;
-}
-
-//---------------------------------------------------------------------------
-
-int TGlobalTrafficTable::occurrencesAsSource(const int id)
-{
-  int count=0;
-  for(unsigned int i=0; i<traffic_table.size(); i++)
-  {
-    if(traffic_table[i].src == id) count++;
-  }
-  return count;
-}
-
-//---------------------------------------------------------------------------
-
-int TGlobalTrafficTable::randomDestinationGivenTheSource(const int src)
-{
-  assert(isValid());
-
-  vector<int> possible_destinations;
-  for(unsigned int i=0; i<traffic_table.size(); i++)
-  {
-    if(traffic_table[i].src == src)
-      possible_destinations.push_back(traffic_table[i].dst);
-  }
-
-  //assert(possible_destinations.size()>0);
-  int ndests = possible_destinations.size();
-
-  return (ndests) ? possible_destinations[rand() % ndests] : NOT_VALID;
-}
-
-//---------------------------------------------------------------------------
-
-float TGlobalTrafficTable::getPirForTheSelectedLink(int src_id, int dst_id)
-{
-  for(unsigned int i=0; i<traffic_table.size(); i++)
-  {
-    if(traffic_table[i].src==src_id && traffic_table[i].dst==dst_id)
-      return traffic_table[i].pir;
-  }
-
-  return 0;
-}
-
-//---------------------------------------------------------------------------
-
-float TGlobalTrafficTable::getPorForTheSelectedLink(int src_id, int dst_id)
-{
-  for(unsigned int i=0; i<traffic_table.size(); i++)
-  {
-    if(traffic_table[i].src==src_id && traffic_table[i].dst==dst_id)
-      return traffic_table[i].por;
-  }
-
-  return 0;
-}
-
-//---------------------------------------------------------------------------
-
-int TGlobalTrafficTable::getTonForTheSelectedLink(int src_id, int dst_id)
-{
-  for(unsigned int i=0; i<traffic_table.size(); i++)
-  {
-    if(traffic_table[i].src==src_id && traffic_table[i].dst==dst_id)
-      return traffic_table[i].t_on;
-  }
-
-  assert(false);
-  return 0;
-}
-
-//---------------------------------------------------------------------------
-
-int TGlobalTrafficTable::getToffForTheSelectedLink(int src_id, int dst_id)
-{
-  for(unsigned int i=0; i<traffic_table.size(); i++)
-  {
-    if(traffic_table[i].src==src_id && traffic_table[i].dst==dst_id)
-      return traffic_table[i].t_off;
-  }
-
-  assert(false);
-  return 0;
-}
-
-//---------------------------------------------------------------------------
-
-int TGlobalTrafficTable::getTperiodForTheSelectedLink(int src_id, int dst_id)
-{
-  for(unsigned int i=0; i<traffic_table.size(); i++)
-  {
-    if(traffic_table[i].src==src_id && traffic_table[i].dst==dst_id)
-      return traffic_table[i].t_period;
-  }
-
-  assert(false);
-  return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -137,22 +36,19 @@ bool TGlobalTrafficTable::load(const char* fname)
 {
   // Open file
   ifstream fin(fname, ios::in);
-  if(!fin)
+  if (!fin)
     return false;
   
   // Initialize variables
   traffic_table.clear();
-  bool stop = false;
 
   // Cycle reading file
-  while(!fin.eof() && !stop)
+  while (!fin.eof())
     {
       char line[128];
       fin.getline(line, sizeof(line)-1);
 
-      if (line[0] == '\0')
-	stop = true;
-      else
+      if (line[0] != '\0')
 	{
 	  if (line[0] != '%')
 	    {
@@ -163,45 +59,83 @@ bool TGlobalTrafficTable::load(const char* fname)
 	      int params = sscanf(line, "%d %d %f %f %d %d %d", &src, &dst, &pir, &por, &t_on, &t_off, &t_period);
 	      if (params >= 2)
 		{
-		  numberOfLines++;
-
-		  // Create a link from the parameters read on the line
-		  TLocalTrafficLink link;
+		  // Create a communication from the parameters read on the line
+		  TCommunication communication;
 	    
 		  // Mandatory fields
-		  link.src = src;
-		  link.dst = dst;
+		  communication.src = src;
+		  communication.dst = dst;
 	    
 		  // Custom PIR
-		  if(params>=3 && pir>=0 && pir<=1) link.pir = pir;
-		  else link.pir = TGlobalParams::packet_injection_rate;
+		  if(params>=3 && pir>=0 && pir<=1) communication.pir = pir;
+		  else communication.pir = TGlobalParams::packet_injection_rate;
 	  
 		  // Custom POR
-		  if(params>=4 && por>=0 && pir<=1) link.por = por;
-		  else link.por = TGlobalParams::probability_of_retransmission;
+		  if(params>=4 && por>=0 && pir<=1) communication.por = por;
+		  else communication.por = TGlobalParams::probability_of_retransmission;
 	  
 		  // Custom Ton
-		  if(params>=5 && t_on>=0) link.t_on = t_on;
-		  else link.t_on = 0;
+		  if(params>=5 && t_on>=0) communication.t_on = t_on;
+		  else communication.t_on = 0;
 	  
 		  // Custom Toff
-		  if(params>=6 && t_off>=0) { assert(t_off>t_on); link.t_off = t_off; }
-		  else link.t_off = DEFAULT_SIMULATION_TIME + TGlobalParams::simulation_time;
+		  if(params>=6 && t_off>=0) { assert(t_off>t_on); communication.t_off = t_off; }
+		  else communication.t_off = DEFAULT_RESET_TIME + TGlobalParams::simulation_time;
 
 		  // Custom Tperiod
-		  if(params>=7 && t_period>0) { assert(t_period>t_off); link.t_period = t_period; }
-		  else link.t_period = DEFAULT_SIMULATION_TIME + TGlobalParams::simulation_time;
+		  if(params>=7 && t_period>0) { assert(t_period>t_off); communication.t_period = t_period; }
+		  else communication.t_period = DEFAULT_RESET_TIME + TGlobalParams::simulation_time;
 
-		  // Add this link to the vector of links
-		  traffic_table.push_back(link);
+		  // Add this communication to the vector of communications
+		  traffic_table.push_back(communication);
 		}
 	    }
 	}
     }
 
-  valid = true;
   return true;
 }
 
 //---------------------------------------------------------------------------
 
+double TGlobalTrafficTable::getCumulativePirPor(const int src_id, 
+						const int ccycle,
+						const bool pir_not_por,
+						vector<pair<int,double> >& dst_prob)
+{
+  double cpirnpor = 0.0;
+
+  dst_prob.clear();
+
+  for (unsigned int i=0; i<traffic_table.size(); i++)
+    {
+      TCommunication comm = traffic_table[i];
+      if (comm.src == src_id)
+	{
+	  int r_ccycle = ccycle % comm.t_period;
+	  if (r_ccycle > comm.t_on && r_ccycle < comm.t_off)
+	    {
+	      cpirnpor += pir_not_por ? comm.pir : comm.por;
+	      pair<int,double> dp(comm.dst, cpirnpor);
+	      dst_prob.push_back(dp);
+	    }
+	}
+    }
+
+  return cpirnpor;
+}
+
+//---------------------------------------------------------------------------
+
+int TGlobalTrafficTable::occurrencesAsSource(const int src_id)
+{
+  int count = 0;
+
+  for (unsigned int i=0; i<traffic_table.size(); i++)
+    if (traffic_table[i].src == src_id)
+      count++;
+
+  return count;
+}
+
+//---------------------------------------------------------------------------

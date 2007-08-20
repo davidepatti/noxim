@@ -72,6 +72,12 @@ class TPower
 
   double getPower() { return pwr; }
 
+  double getPwrRouting() { return pwr_routing; }
+  double getPwrSelection() { return pwr_selection; }
+  double getPwrForward() { return pwr_forward; }
+  double getPwrStandBy() { return pwr_standby; }
+  double getPwrIncoming() { return pwr_incoming; }
+
  private:
 
   double pwr_routing;

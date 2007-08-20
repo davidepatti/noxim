@@ -200,6 +200,26 @@ unsigned int TStats::getTotalCommunications()
 
 //---------------------------------------------------------------------------
 
+double TStats::getCommunicationEnergy(int src_id, int dst_id)
+{
+  // Assumptions: minimal path routing, constant packet size
+
+  TCoord src_coord = id2Coord(src_id);
+  TCoord dst_coord = id2Coord(dst_id);
+
+  int hops = abs(src_coord.x - dst_coord.x) + abs(src_coord.y - dst_coord.y);
+
+  double energy = 
+    hops * (
+	    (power.getPwrForward() + power.getPwrIncoming()) * (TGlobalParams::min_packet_size + TGlobalParams::max_packet_size)/2 +
+	    power.getPwrRouting() + power.getPwrSelection()
+	    );
+    
+  return energy;
+}
+
+//---------------------------------------------------------------------------
+
 int TStats::searchCommHistory(int src_id)
 {
   for (unsigned int i=0; i<chist.size(); i++)
@@ -223,6 +243,7 @@ void TStats::showStats(int curr_node,
 	  << setw(10) << "delay avg"
 	  << setw(10) << "delay max"
 	  << setw(15) << "throughput"
+	  << setw(13) << "energy"
 	  << setw(12) << "received"
 	  << setw(12) << "received" 
 	  << endl;
@@ -232,6 +253,7 @@ void TStats::showStats(int curr_node,
 	  << setw(10) << "cycles"
 	  << setw(10) << "cycles"
 	  << setw(15) << "flits/cycle"
+	  << setw(13) << "Joule"
 	  << setw(12) << "packets"
 	  << setw(12) << "flits" 
 	  << endl;
@@ -244,6 +266,7 @@ void TStats::showStats(int curr_node,
 	  << setw(10) << getAverageDelay(chist[i].src_id)
 	  << setw(10) << getMaxDelay(chist[i].src_id)
 	  << setw(15) << getAverageThroughput(chist[i].src_id)
+	  << setw(13) << getCommunicationEnergy(chist[i].src_id, curr_node)
 	  << setw(12) << chist[i].delays.size()
 	  << setw(12) << chist[i].total_received_flits
 	  << endl;

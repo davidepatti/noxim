@@ -36,15 +36,15 @@ using namespace std;
 //---------------------------------------------------------------------------
 
 // Structure used to store information into the table
-struct TLocalTrafficLink
+struct TCommunication
 {
-  int src;                    // ID of the source node (PE)
-  int dst;                    // ID of the destination node (PE)
+  int   src;                  // ID of the source node (PE)
+  int   dst;                  // ID of the destination node (PE)
   float pir;                  // Packet Injection Rate for the link
   float por;                  // Probability Of Retransmission for the link
-  int t_on;                   // Time (in cycles) at which activity begins
-  int t_off;                  // Time (in cycles) at which activity ends
-  int t_period;               // Period after which activity starts again
+  int   t_on;                 // Time (in cycles) at which activity begins
+  int   t_off;                // Time (in cycles) at which activity ends
+  int   t_period;             // Period after which activity starts again
 };
 
 //---------------------------------------------------------------------------
@@ -54,45 +54,26 @@ class TGlobalTrafficTable
 
 public:
 
-  // The constructor by default sets valid to false
   TGlobalTrafficTable(); 
 
-  // Load traffic table from file. Returns true if OK (and sets valid to true), false otherwise
+  // Load traffic table from file. Returns true if ok, false otherwise
   bool load(const char* fname);
 
-  // Tell how many times the PE whose ID is specified is in table as source
-  int occurrencesAsSource(const int id);
+  // Returns the cumulative pir por along with a vector of pairs. The
+  // first component of the pair is the destination. The second
+  // component is the cumulative shotting probability.
+  double getCumulativePirPor(const int src_id, 
+			     const int ccycle,
+			     const bool pir_not_por,
+			     vector<pair<int,double> >& dst_prob);
 
-  // Return a random destination ID from the table given a source ID
-  int randomDestinationGivenTheSource(const int src);
-
-  // Return the PIR given a couple src/dst
-  float getPirForTheSelectedLink(int src_id, int dst_id);
-
-  // Return the POR given a couple src/dst
-  float getPorForTheSelectedLink(int src_id, int dst_id);
-
-  // Return t_on given a couple src/dst
-  int getTonForTheSelectedLink(int src_id, int dst_id);
-
-  // Return t_off given a couple src/dst
-  int getToffForTheSelectedLink(int src_id, int dst_id);
-
-  // Return t_period given a couple src/dst
-  int getTperiodForTheSelectedLink(int src_id, int dst_id);
-
-  // Tell if the current Traffic Table is valid
-  bool isValid() { return valid; }
-
-  // Give back the number of lines in the table
-  int size() { return numberOfLines; }
+  // Returns the number of occurrences of soruce src_id in the traffic
+  // table
+  int occurrencesAsSource(const int src_id);
 
 private:
 
-  vector<TLocalTrafficLink> traffic_table;
-  bool valid;
-  int numberOfLines;
-
+  vector<TCommunication> traffic_table;
 };
 
 //---------------------------------------------------------------------------

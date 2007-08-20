@@ -62,7 +62,7 @@ void TRouter::rxProcess()
 
 	      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
 		{
-		  cout << sc_simulation_time() << ": Router[" << local_id <<"], Input[" << i << "], Received flit: " << received_flit << endl;
+		  cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id <<"], Input[" << i << "], Received flit: " << received_flit << endl;
 		}
 
 	      // Store the incoming flit in the circular buffer
@@ -120,7 +120,7 @@ void TRouter::txProcess()
 		      reservation_table.reserve(i, o);
 		      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
 			{
-			  cout << sc_simulation_time() 
+			  cout << sc_time_stamp().to_double()/1000 
 			       << ": Router[" << local_id 
 			       << "], Input[" << i << "] (" << buffer[i].Size() << " flits)" 
 			       << ", reserved Output[" << o << "], flit: " << flit << endl;
@@ -145,7 +145,7 @@ void TRouter::txProcess()
 		    {
                       if(TGlobalParams::verbose_mode > VERBOSE_OFF)
 			{
-			  cout << sc_simulation_time() 
+			  cout << sc_time_stamp().to_double()/1000 
 			       << ": Router[" << local_id 
 			       << "], Input[" << i << "] forward to Output[" << o << "], flit: " << flit << endl;
 			}
@@ -163,7 +163,7 @@ void TRouter::txProcess()
 		      // Update stats
 		      if (o == DIRECTION_LOCAL)
 			{
-			  stats.receivedFlit(sc_simulation_time(), flit);
+			  stats.receivedFlit(sc_time_stamp().to_double()/1000, flit);
 			  if (TGlobalParams::max_volume_to_be_drained)
 			    {
 			      if (drained_volume >= TGlobalParams::max_volume_to_be_drained)
@@ -298,7 +298,7 @@ int TRouter::route(const TRouteData& route_data)
 void TRouter::NoP_report() const
 {
     TNoP_data NoP_tmp;
-      cout << sc_simulation_time() << ": Router[" << local_id << "] NoP report: " << endl;
+      cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id << "] NoP report: " << endl;
 
       for (int i=0;i<DIRECTIONS; i++) 
       {
@@ -353,7 +353,7 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
   if (TGlobalParams::verbose_mode==-58)
   {
     cout << endl;
-    cout << sc_simulation_time() << ": Router[" << local_id << "] NoP SELECTION ----------------" << endl;
+    cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id << "] NoP SELECTION ----------------" << endl;
     cout << "      Packet: " << route_data.src_id << " --> " << route_data.dst_id << endl;
   }
 
@@ -471,7 +471,7 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
 //     {
 //       TChannelStatus tmp;
 
-//       cout << sc_simulation_time() << ": Router[" << local_id << "] SELECTION between: " << endl;
+//       cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id << "] SELECTION between: " << endl;
 //       for (unsigned int i=0;i<directions.size();i++)
 // 	{
 // 	  tmp.free_slots = free_slots_neighbor[directions[i]].read();
