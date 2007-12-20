@@ -94,6 +94,9 @@ void showHelp(char selfname[])
   cout << "\t\trandom\t\tRandom traffic distribution" << endl;
   cout << "\t\ttranspose1\tTranspose matrix 1 traffic distribution" << endl;
   cout << "\t\ttranspose2\tTranspose matrix 2 traffic distribution" << endl;
+  cout << "\t\tbitreversal\tBit-reversal traffic distribution" << endl;
+  cout << "\t\tbutterfly\tButterfly traffic distribution" << endl;
+  cout << "\t\tshuffle\t\tShuffle traffic distribution" << endl;
   cout << "\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file" << endl;
   cout << "\t-hs ID P\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)" << endl;
   cout << "\t-warmup N\tStart to collect statistics after N cycles (default " << DEFAULT_STATS_WARM_UP_TIME << ")" << endl;
@@ -322,6 +325,9 @@ int sc_main(int arg_num, char* arg_vet[])
 	  if(!strcmp(arg_vet[i+1],"random")) TGlobalParams::traffic_distribution = TRAFFIC_RANDOM;
 	  else if(!strcmp(arg_vet[i+1],"transpose1")) TGlobalParams::traffic_distribution = TRAFFIC_TRANSPOSE1;
 	  else if(!strcmp(arg_vet[i+1],"transpose2")) TGlobalParams::traffic_distribution = TRAFFIC_TRANSPOSE2;
+	  else if(!strcmp(arg_vet[i+1],"bitreversal")) TGlobalParams::traffic_distribution = TRAFFIC_BIT_REVERSAL;
+	  else if(!strcmp(arg_vet[i+1],"butterfly")) TGlobalParams::traffic_distribution = TRAFFIC_BUTTERFLY;
+	  else if(!strcmp(arg_vet[i+1],"shuffle")) TGlobalParams::traffic_distribution = TRAFFIC_SHUFFLE;
 	  else if(!strcmp(arg_vet[i+1],"table"))
 	  {
 	      TGlobalParams::traffic_distribution = TRAFFIC_TABLE_BASED;

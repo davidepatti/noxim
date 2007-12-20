@@ -154,6 +154,18 @@ bool TProcessingElement::canShot(TPacket& packet)
 	      packet = trafficTranspose2();
 	      break;
 	      
+	    case TRAFFIC_BIT_REVERSAL:
+	      packet = trafficBitReversal();
+	      break;
+
+	    case TRAFFIC_SHUFFLE:
+	      packet = trafficShuffle();
+	      break;
+
+	    case TRAFFIC_BUTTERFLY:
+	      packet = trafficButterfly();
+	      break;
+
 	    default:
 	      assert(false);
 	    }
@@ -267,6 +279,97 @@ TPacket TProcessingElement::trafficTranspose2()
   dst.y = src.x;
   fixRanges(src, dst);
   p.dst_id = coord2Id(dst);
+
+  p.timestamp = sc_time_stamp().to_double()/1000;
+  p.size = p.flit_left = getRandomSize();
+
+  return p;
+}
+
+//---------------------------------------------------------------------------
+
+void TProcessingElement::setBit(int &x, int w, int v)
+{
+  int mask = 1 << w;
+  
+  if (v == 1)
+    x = x | mask;
+  else if (v == 0)
+    x = x & ~mask;
+  else
+    assert(false);    
+}
+
+//---------------------------------------------------------------------------
+
+int TProcessingElement::getBit(int x, int w)
+{
+  return (x >> w) & 1;
+}
+
+//---------------------------------------------------------------------------
+
+inline double TProcessingElement::log2ceil(double x)
+{
+  return ceil(log(x)/log(2.0));
+}
+
+//---------------------------------------------------------------------------
+
+TPacket TProcessingElement::trafficBitReversal()
+{
+  
+  int nbits = (int)log2ceil((double)(TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y));
+  int dnode = 0;
+  for (int i=0; i<nbits; i++)
+    setBit(dnode, i, getBit(local_id, nbits-i-1));
+
+  TPacket p;
+  p.src_id = local_id;
+  p.dst_id = dnode;
+
+  p.timestamp = sc_time_stamp().to_double()/1000;
+  p.size = p.flit_left = getRandomSize();
+
+  return p;
+}
+
+//---------------------------------------------------------------------------
+
+TPacket TProcessingElement::trafficShuffle()
+{
+  
+  int nbits = (int)log2ceil((double)(TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y));
+  int dnode = 0;
+  for (int i=0; i<nbits-1; i++)
+    setBit(dnode, i+1, getBit(local_id, i));
+  setBit(dnode, 0, getBit(local_id, nbits-1));
+
+  TPacket p;
+  p.src_id = local_id;
+  p.dst_id = dnode;
+
+  p.timestamp = sc_time_stamp().to_double()/1000;
+  p.size = p.flit_left = getRandomSize();
+
+  return p;
+}
+
+//---------------------------------------------------------------------------
+
+TPacket TProcessingElement::trafficButterfly()
+{
+  
+  int nbits = (int)log2ceil((double)(TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y));
+  int dnode = 0;
+  for (int i=1; i<nbits-1; i++)
+    setBit(dnode, i, getBit(local_id, i));
+  setBit(dnode, 0, getBit(local_id, nbits-1));
+  setBit(dnode, nbits-1, getBit(local_id, 0));
+
+  TPacket p;
+  p.src_id = local_id;
+  p.dst_id = dnode;
 
   p.timestamp = sc_time_stamp().to_double()/1000;
   p.size = p.flit_left = getRandomSize();
