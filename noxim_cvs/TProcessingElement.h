@@ -69,6 +69,10 @@ SC_MODULE(TProcessingElement)
   TPacket              trafficRandom();                   // Random destination distribution
   TPacket              trafficTranspose1();               // Transpose 1 destination distribution
   TPacket              trafficTranspose2();               // Transpose 2 destination distribution
+  TPacket              trafficBitReversal();              // Bit-reversal destination distribution
+  TPacket              trafficShuffle();                  // Shuffle destination distribution
+  TPacket              trafficButterfly();                // Butterfly destination distribution
+
 
   TGlobalTrafficTable* traffic_table;                     // Reference to the Global traffic Table
   bool                 never_transmit;                    // true if the PE does not transmit any packet 
@@ -77,6 +81,9 @@ SC_MODULE(TProcessingElement)
   void                 fixRanges(const TCoord, TCoord&);  // Fix the ranges of the destination
   int                  randInt(int min, int max);         // Extracts a random integer number between min and max
   int                  getRandomSize();                   // Returns a random size in flits for the packet
+  void                 setBit(int &x, int w, int v);
+  int                  getBit(int x, int w);
+  double               log2ceil(double x);
 
   // Constructor
 
