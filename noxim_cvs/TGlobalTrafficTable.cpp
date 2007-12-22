@@ -67,12 +67,12 @@ bool TGlobalTrafficTable::load(const char* fname)
 		  communication.dst = dst;
 	    
 		  // Custom PIR
-		  if(params>=3 && pir>=0 && pir<=1) communication.pir = pir;
-		  else communication.pir = TGlobalParams::packet_injection_rate;
+		  if (params>=3 && pir>=0 && pir<=1) communication.pir = pir;
+		  else communication.pir = TGlobalParams::packet_injection_rate; 
 	  
 		  // Custom POR
 		  if(params>=4 && por>=0 && por<=1) communication.por = por;
-		  else communication.por = TGlobalParams::probability_of_retransmission;
+		  else communication.por = communication.pir; // TGlobalParams::probability_of_retransmission;
 	  
 		  // Custom Ton
 		  if(params>=5 && t_on>=0) communication.t_on = t_on;
