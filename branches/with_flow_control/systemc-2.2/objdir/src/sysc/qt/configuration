@@ -1,0 +1,17 @@
+set config_machine=iX86
+set config_init=10000000
+set config_runone=1000000
+set config_blockint=1000000
+set config_blockfloat=1000000
+set config_vainit0=1000000
+set config_vainit2=1000000
+set config_vainit4=1000000
+set config_vainit8=1000000
+set config_vastart0=1000000
+set config_vastart2=1000000
+set config_vastart4=1000000
+set config_vastart8=1000000
+set config_bcall_reg=1000000
+set config_bcall_imm=1000000
+set config_b_add=100000000
+set config_b_load=10000000

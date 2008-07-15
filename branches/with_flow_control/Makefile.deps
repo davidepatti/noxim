@@ -1,0 +1,22 @@
+# DO NOT DELETE
+
+TNoC.o: TNoC.h TTile.h TRouter.h NoximDefs.h TBuffer.h TStats.h TPower.h
+TNoC.o: TGlobalRoutingTable.h TLocalRoutingTable.h TReservationTable.h
+TNoC.o: TProcessingElement.h TGlobalTrafficTable.h
+TRouter.o: TRouter.h NoximDefs.h TBuffer.h TStats.h TPower.h
+TRouter.o: TGlobalRoutingTable.h TLocalRoutingTable.h TReservationTable.h
+TProcessingElement.o: TProcessingElement.h NoximDefs.h TGlobalTrafficTable.h
+TBuffer.o: TBuffer.h NoximDefs.h
+TStats.o: TStats.h NoximDefs.h TPower.h
+TGlobalStats.o: TGlobalStats.h TNoC.h TTile.h TRouter.h NoximDefs.h TBuffer.h
+TGlobalStats.o: TStats.h TPower.h TGlobalRoutingTable.h TLocalRoutingTable.h
+TGlobalStats.o: TReservationTable.h TProcessingElement.h
+TGlobalStats.o: TGlobalTrafficTable.h
+TGlobalRoutingTable.o: NoximDefs.h TGlobalRoutingTable.h
+TLocalRoutingTable.o: TLocalRoutingTable.h TGlobalRoutingTable.h NoximDefs.h
+TGlobalTrafficTable.o: TGlobalTrafficTable.h NoximDefs.h
+TReservationTable.o: NoximDefs.h TReservationTable.h
+TPower.o: NoximDefs.h TPower.h
+main.o: NoximDefs.h TNoC.h TTile.h TRouter.h TBuffer.h TStats.h TPower.h
+main.o: TGlobalRoutingTable.h TLocalRoutingTable.h TReservationTable.h
+main.o: TProcessingElement.h TGlobalTrafficTable.h TGlobalStats.h
