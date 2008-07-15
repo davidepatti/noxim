@@ -4,9 +4,9 @@
 
  *****************************************************************************/
 /* Copyright 2005-2007  
-    Maurizio Palesi <mpalesi@diit.unict.it>
-    Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
-    Davide Patti <dpatti@diit.unict.it>
+   Maurizio Palesi <mpalesi@diit.unict.it>
+   Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
+   Davide Patti <dpatti@diit.unict.it>
 
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ void TProcessingElement::rxProcess()
       TFlit flit_tmp = flit_rx.read();
       if(TGlobalParams::verbose_mode > VERBOSE_OFF)
       {
-        cout << sc_simulation_time() << ": ProcessingElement[" << local_id << "] RECEIVING " << flit_tmp << endl;
+        cout << sc_time_stamp() << ": ProcessingElement[" << local_id << "] RECEIVING " << flit_tmp << endl;
       }
       current_level_rx = 1-current_level_rx;     // Negate the old value for Alternating Bit Protocol (ABP)
     }
@@ -87,9 +87,9 @@ void TProcessingElement::txProcess()
         {
           cout << sc_time_stamp().to_double()/1000 << ": ProcessingElement[" << local_id << "] SENDING " << flit << endl;
         }
-	flit_tx->write(flit);                     // Send the generated flit
-	current_level_tx = 1-current_level_tx;    // Negate the old value for Alternating Bit Protocol (ABP)
-	req_tx.write(current_level_tx);
+        flit_tx->write(flit);                     // Send the generated flit
+        current_level_tx = 1-current_level_tx;    // Negate the old value for Alternating Bit Protocol (ABP)
+        req_tx.write(current_level_tx);
       }
     }
   }
@@ -115,7 +115,7 @@ TFlit TProcessingElement::nextFlit()
     flit.flit_type = FLIT_TYPE_TAIL;
   else
     flit.flit_type = FLIT_TYPE_BODY;
-  
+
   packet_queue.front().flit_left--;
   if(packet_queue.front().flit_left == 0)
     packet_queue.pop();
@@ -131,70 +131,70 @@ bool TProcessingElement::canShot(TPacket& packet)
   double threshold;
 
   if (TGlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED)
+  {
+    if (!transmittedAtPreviousCycle)
+      threshold = TGlobalParams::packet_injection_rate;
+    else
+      threshold = TGlobalParams::probability_of_retransmission;
+
+    shot = (((double)rand())/RAND_MAX < threshold);
+    if (shot)
     {
-      if (!transmittedAtPreviousCycle)
-	threshold = TGlobalParams::packet_injection_rate;
-      else
-	threshold = TGlobalParams::probability_of_retransmission;
+      switch(TGlobalParams::traffic_distribution)
+      {
+        case TRAFFIC_RANDOM:
+          packet = trafficRandom();
+          break;
 
-      shot = (((double)rand())/RAND_MAX < threshold);
-      if (shot)
-	{
-	  switch(TGlobalParams::traffic_distribution)
-	    {
-	    case TRAFFIC_RANDOM:
-	      packet = trafficRandom();
-	      break;
-	      
-	    case TRAFFIC_TRANSPOSE1:
-	      packet = trafficTranspose1();
-	      break;
-	      
-	    case TRAFFIC_TRANSPOSE2:
-	      packet = trafficTranspose2();
-	      break;
-	      
-	    case TRAFFIC_BIT_REVERSAL:
-	      packet = trafficBitReversal();
-	      break;
+        case TRAFFIC_TRANSPOSE1:
+          packet = trafficTranspose1();
+          break;
 
-	    case TRAFFIC_SHUFFLE:
-	      packet = trafficShuffle();
-	      break;
+        case TRAFFIC_TRANSPOSE2:
+          packet = trafficTranspose2();
+          break;
 
-	    case TRAFFIC_BUTTERFLY:
-	      packet = trafficButterfly();
-	      break;
+        case TRAFFIC_BIT_REVERSAL:
+          packet = trafficBitReversal();
+          break;
 
-	    default:
-	      assert(false);
-	    }
-	}
+        case TRAFFIC_SHUFFLE:
+          packet = trafficShuffle();
+          break;
+
+        case TRAFFIC_BUTTERFLY:
+          packet = trafficButterfly();
+          break;
+
+        default:
+          assert(false);
+      }
     }
+  }
   else
-    { // Table based communication traffic
-      if (never_transmit)
-	return false;
+  { // Table based communication traffic
+    if (never_transmit)
+      return false;
 
-      double now         = sc_time_stamp().to_double()/1000;
-      bool   use_pir     = (transmittedAtPreviousCycle == false);
-      vector<pair<int,double> > dst_prob;
-      double threshold = traffic_table->getCumulativePirPor(local_id, (int)now, use_pir, dst_prob);
+    double now         = sc_time_stamp().to_double()/1000;
+    bool   use_pir     = (transmittedAtPreviousCycle == false);
+    vector<pair<int,double> > dst_prob;
+    double threshold = traffic_table->getCumulativePirPor(local_id, (int)now, use_pir, dst_prob);
 
-      double prob = (double)rand()/RAND_MAX;
-      shot = (prob < threshold);
-      if (shot)
-	{
-	  for (unsigned int i=0; i<dst_prob.size(); i++)
-	    {
-	      if (prob < dst_prob[i].second) 
-		{
-		  packet.make(local_id, dst_prob[i].first, now, getRandomSize());
-		  break;
-		}
-	    }
-	}
+    double prob = (double)rand()/RAND_MAX;
+    shot = (prob < threshold);
+    if (shot)
+    {
+      for (unsigned int i=0; i<dst_prob.size(); i++)
+      {
+        if (prob < dst_prob[i].second) 
+        {
+          packet.make(local_id, dst_prob[i].first, now, getRandomSize());
+          break;
+        }
+      }
     }
+  }
 
   return shot;
 }
@@ -220,19 +220,19 @@ TPacket TProcessingElement::trafficRandom()
     // check for hotspot destination
     for (uint i = 0; i<TGlobalParams::hotspots.size(); i++)
     {
-	//cout << sc_time_stamp().to_double()/1000 << " PE " << local_id << " Checking node " << TGlobalParams::hotspots[i].first << " with P = " << TGlobalParams::hotspots[i].second << endl;
+      //cout << sc_time_stamp().to_double()/1000 << " PE " << local_id << " Checking node " << TGlobalParams::hotspots[i].first << " with P = " << TGlobalParams::hotspots[i].second << endl;
 
-	if (rnd>=range_start && rnd < range_start + TGlobalParams::hotspots[i].second)
-	{
-	    if (local_id != TGlobalParams::hotspots[i].first)
-	    {
-		//cout << sc_time_stamp().to_double()/1000 << " PE " << local_id <<" That is ! " << endl;
-		p.dst_id = TGlobalParams::hotspots[i].first;
-	    }
-	    break;
-	}
-	else 
-	    range_start+=TGlobalParams::hotspots[i].second; // try next
+      if (rnd>=range_start && rnd < range_start + TGlobalParams::hotspots[i].second)
+      {
+        if (local_id != TGlobalParams::hotspots[i].first)
+        {
+          //cout << sc_time_stamp().to_double()/1000 << " PE " << local_id <<" That is ! " << endl;
+          p.dst_id = TGlobalParams::hotspots[i].first;
+        }
+        break;
+      }
+      else 
+        range_start+=TGlobalParams::hotspots[i].second; // try next
     }
   } while(p.dst_id==p.src_id);
 
@@ -291,7 +291,7 @@ TPacket TProcessingElement::trafficTranspose2()
 void TProcessingElement::setBit(int &x, int w, int v)
 {
   int mask = 1 << w;
-  
+
   if (v == 1)
     x = x | mask;
   else if (v == 0)
@@ -318,7 +318,7 @@ inline double TProcessingElement::log2ceil(double x)
 
 TPacket TProcessingElement::trafficBitReversal()
 {
-  
+
   int nbits = (int)log2ceil((double)(TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y));
   int dnode = 0;
   for (int i=0; i<nbits; i++)
@@ -338,7 +338,7 @@ TPacket TProcessingElement::trafficBitReversal()
 
 TPacket TProcessingElement::trafficShuffle()
 {
-  
+
   int nbits = (int)log2ceil((double)(TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y));
   int dnode = 0;
   for (int i=0; i<nbits-1; i++)
@@ -359,7 +359,7 @@ TPacket TProcessingElement::trafficShuffle()
 
 TPacket TProcessingElement::trafficButterfly()
 {
-  
+
   int nbits = (int)log2ceil((double)(TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y));
   int dnode = 0;
   for (int i=1; i<nbits-1; i++)
@@ -393,7 +393,7 @@ void TProcessingElement::fixRanges(const TCoord src, TCoord& dst)
 int TProcessingElement::getRandomSize()
 {
   return randInt(TGlobalParams::min_packet_size, 
-                 TGlobalParams::max_packet_size);
+      TGlobalParams::max_packet_size);
 }
 
 //---------------------------------------------------------------------------
