@@ -2,11 +2,11 @@
 
   TRouter.cpp -- Router implementation
 
-*****************************************************************************/
+ *****************************************************************************/
 /* Copyright 2005-2007  
-    Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
-    Maurizio Palesi <mpalesi@diit.unict.it>
-    Davide Patti <dpatti@diit.unict.it>
+   Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
+   Maurizio Palesi <mpalesi@diit.unict.it>
+   Davide Patti <dpatti@diit.unict.it>
 
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,52 +31,58 @@
 void TRouter::rxProcess()
 {
   if(reset.read())
+  {
+    // Clear outputs and indexes of receiving protocol
+    for(int i=0; i<DIRECTIONS+1; i++)
     {
-      // Clear outputs and indexes of receiving protocol
-      for(int i=0; i<DIRECTIONS+1; i++)
-	{
-	  ack_rx[i].write(0);
-	  current_level_rx[i] = 0;
-	}
-      reservation_table.clear();
-      routed_flits = 0;
-      local_drained = 0;
+      ack_rx[i].write(0);
+      current_level_rx[i] = 0;
     }
+    reservation_table.clear();
+    routed_flits = 0;
+    local_drained = 0;
+  }
   else
+  {
+    // For each channel decide if a new flit can be accepted
+    //
+    // This process simply sees a flow of incoming flits. All arbitration
+    // and wormhole related issues are addressed in the txProcess()
+
+    for(int i=0; i<DIRECTIONS+1; i++)
     {
-      // For each channel decide if a new flit can be accepted
+      // To accept a new flit, the following conditions must match:
       //
-      // This process simply sees a flow of incoming flits. All arbitration
-      // and wormhole related issues are addressed in the txProcess()
- 
-      for(int i=0; i<DIRECTIONS+1; i++)
-	{
-	  // To accept a new flit, the following conditions must match:
-	  //
-	  // 1) there is an incoming request
-	  // 2) there is a free slot in the input buffer of direction i
+      // 1) there is an incoming request
+      // 2) there is a free slot in the input buffer of direction i
 
-	  if ( (req_rx[i].read()==1-current_level_rx[i]) && !buffer[i].IsFull() )
-	    {
-	      TFlit received_flit = flit_rx[i].read();
+      if ( (req_rx[i].read()==1-current_level_rx[i]) && !buffer[i].IsFull() )
+      {
+        TFlit received_flit = flit_rx[i].read();
 
-	      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
-		{
-		  cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id <<"], Input[" << i << "], Received flit: " << received_flit << endl;
-		}
+        if(TGlobalParams::verbose_mode > VERBOSE_OFF)
+        {
+          cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id <<"], Input[" << i << "], Received flit: " << received_flit << endl;
+        }
 
-	      // Store the incoming flit in the circular buffer
-	      buffer[i].Push(received_flit);            
+        // Store the incoming flit in the circular buffer
+        buffer[i].Push(received_flit);            
 
-	      // Negate the old value for Alternating Bit Protocol (ABP)
-	      current_level_rx[i] = 1-current_level_rx[i];
+        // Negate the old value for Alternating Bit Protocol (ABP)
+        current_level_rx[i] = 1-current_level_rx[i];
 
-	      // Incoming flit
-	      stats.power.Incoming();
-	    }
-	  ack_rx[i].write(current_level_rx[i]);
-	}
+        // Incoming flit
+        stats.power.Incoming();
+
+        // If direction is LOCAL then update flit_sent statistics
+        if (i == DIRECTION_LOCAL) {
+          stats.sentFlit(sc_time_stamp().to_double()/1000, received_flit);
+        }
+
+      }
+      ack_rx[i].write(current_level_rx[i]);
     }
+  }
   stats.power.Standby();
 }
 
@@ -85,106 +91,106 @@ void TRouter::rxProcess()
 void TRouter::txProcess()
 {
   if (reset.read())
+  {
+    // Clear outputs and indexes of transmitting protocol
+    for(int i=0; i<DIRECTIONS+1; i++)
     {
-      // Clear outputs and indexes of transmitting protocol
-      for(int i=0; i<DIRECTIONS+1; i++)
-	{
-	  req_tx[i].write(0);
-	  current_level_tx[i] = 0;
-	}
+      req_tx[i].write(0);
+      current_level_tx[i] = 0;
     }
+  }
   else
+  {
+    // 1st phase: Reservation
+    for(int j=0; j<DIRECTIONS+1; j++)
     {
-      // 1st phase: Reservation
-      for(int j=0; j<DIRECTIONS+1; j++)
-	{
-	  int i = (start_from_port + j) % (DIRECTIONS + 1);
+      int i = (start_from_port + j) % (DIRECTIONS + 1);
 
-	  if ( !buffer[i].IsEmpty() )
-	    {
-	      TFlit flit = buffer[i].Front();
+      if ( !buffer[i].IsEmpty() )
+      {
+        TFlit flit = buffer[i].Front();
 
-	      if (flit.flit_type==FLIT_TYPE_HEAD) 
-		{
-		  // prepare data for routing
-		  TRouteData route_data;
-		  route_data.current_id = local_id;
-		  route_data.src_id = flit.src_id;
-		  route_data.dst_id = flit.dst_id;
-		  route_data.dir_in = i;
+        if (flit.flit_type==FLIT_TYPE_HEAD) 
+        {
+          // prepare data for routing
+          TRouteData route_data;
+          route_data.current_id = local_id;
+          route_data.src_id = flit.src_id;
+          route_data.dst_id = flit.dst_id;
+          route_data.dir_in = i;
 
-		  int o = route(route_data);
+          int o = route(route_data);
 
-		  if (reservation_table.isAvailable(o))
-		    {
-		      reservation_table.reserve(i, o);
-		      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
-			{
-			  cout << sc_time_stamp().to_double()/1000 
-			       << ": Router[" << local_id 
-			       << "], Input[" << i << "] (" << buffer[i].Size() << " flits)" 
-			       << ", reserved Output[" << o << "], flit: " << flit << endl;
-			}		      
-		    }
-		}
-	    }
-	}
-      start_from_port++;
+          if (reservation_table.isAvailable(o))
+          {
+            reservation_table.reserve(i, o);
+            if(TGlobalParams::verbose_mode > VERBOSE_OFF)
+            {
+              cout << sc_time_stamp().to_double()/1000 
+                << ": Router[" << local_id 
+                << "], Input[" << i << "] (" << buffer[i].Size() << " flits)" 
+                << ", reserved Output[" << o << "], flit: " << flit << endl;
+            }		      
+          }
+        }
+      }
+    }
+    start_from_port++;
 
-      // 2nd phase: Forwarding
-      for(int i=0; i<DIRECTIONS+1; i++)
-	{
-	  if ( !buffer[i].IsEmpty() )
-	    {
-	      TFlit flit = buffer[i].Front();
+    // 2nd phase: Forwarding
+    for(int i=0; i<DIRECTIONS+1; i++)
+    {
+      if ( !buffer[i].IsEmpty() )
+      {
+        TFlit flit = buffer[i].Front();
 
-	      int o = reservation_table.getOutputPort(i);
-	      if (o != NOT_RESERVED)
-		{
-		  if ( current_level_tx[o] == ack_tx[o].read() )
-		    {
-                      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
-			{
-			  cout << sc_time_stamp().to_double()/1000 
-			       << ": Router[" << local_id 
-			       << "], Input[" << i << "] forward to Output[" << o << "], flit: " << flit << endl;
-			}
+        int o = reservation_table.getOutputPort(i);
+        if (o != NOT_RESERVED)
+        {
+          if ( current_level_tx[o] == ack_tx[o].read() )
+          {
+            if(TGlobalParams::verbose_mode > VERBOSE_OFF)
+            {
+              cout << sc_time_stamp().to_double()/1000 
+                << ": Router[" << local_id 
+                << "], Input[" << i << "] forward to Output[" << o << "], flit: " << flit << endl;
+            }
 
-		      flit_tx[o].write(flit);
-		      current_level_tx[o] = 1 - current_level_tx[o];
-		      req_tx[o].write(current_level_tx[o]);
-		      buffer[i].Pop();
+            flit_tx[o].write(flit);
+            current_level_tx[o] = 1 - current_level_tx[o];
+            req_tx[o].write(current_level_tx[o]);
+            buffer[i].Pop();
 
-		      stats.power.Forward();
+            stats.power.Forward();
 
-		      if (flit.flit_type == FLIT_TYPE_TAIL) 
-			reservation_table.release(o);
-			
-		      // Update stats
-		      if (o == DIRECTION_LOCAL)
-			{
-			  stats.receivedFlit(sc_time_stamp().to_double()/1000, flit);
-			  if (TGlobalParams::max_volume_to_be_drained)
-			    {
-			      if (drained_volume >= TGlobalParams::max_volume_to_be_drained)
-				sc_stop();
-			      else
-			      {
-				drained_volume++;
-				local_drained++;
-			      }
-			    }
-			}
-		      else if (i != DIRECTION_LOCAL)
-			{
-			  // Increment routed flits counter
-			  routed_flits++;
-			}
-		    }
-		}
-	    }
-	}
-    } // else
+            if (flit.flit_type == FLIT_TYPE_TAIL) 
+              reservation_table.release(o);
+
+            // Update stats
+            if (o == DIRECTION_LOCAL)
+            {
+              stats.receivedFlit(sc_time_stamp().to_double()/1000, flit);
+              if (TGlobalParams::max_volume_to_be_drained)
+              {
+                if (drained_volume >= TGlobalParams::max_volume_to_be_drained)
+                  sc_stop();
+                else
+                {
+                  drained_volume++;
+                  local_drained++;
+                }
+              }
+            }
+            else if (i != DIRECTION_LOCAL)
+            {
+              // Increment routed flits counter
+              routed_flits++;
+            }
+          }
+        }
+      }
+    }
+  } // else
   stats.power.Standby();
 }
 
@@ -192,17 +198,17 @@ void TRouter::txProcess()
 
 TNoP_data TRouter::getCurrentNoPData() const 
 {
-    TNoP_data NoP_data;
+  TNoP_data NoP_data;
 
-    for (int j=0; j<DIRECTIONS; j++)
-    {
-	NoP_data.channel_status_neighbor[j].free_slots = free_slots_neighbor[j].read();
-	NoP_data.channel_status_neighbor[j].available = (reservation_table.isAvailable(j));
-    }
+  for (int j=0; j<DIRECTIONS; j++)
+  {
+    NoP_data.channel_status_neighbor[j].free_slots = free_slots_neighbor[j].read();
+    NoP_data.channel_status_neighbor[j].available = (reservation_table.isAvailable(j));
+  }
 
-    NoP_data.sender_id = local_id;
+  NoP_data.sender_id = local_id;
 
-    return NoP_data;
+  return NoP_data;
 }
 
 //---------------------------------------------------------------------------
@@ -217,21 +223,21 @@ void TRouter::bufferMonitor()
   {
 
     if (TGlobalParams::selection_strategy==SEL_BUFFER_LEVEL ||
-	TGlobalParams::selection_strategy==SEL_NOP)
+        TGlobalParams::selection_strategy==SEL_NOP)
     {
 
       // update current input buffers level to neighbors
       for (int i=0; i<DIRECTIONS+1; i++)
-	free_slots[i].write(buffer[i].getCurrentFreeSlots());
+        free_slots[i].write(buffer[i].getCurrentFreeSlots());
 
       // NoP selection: send neighbor info to each direction 'i'
       TNoP_data current_NoP_data = getCurrentNoPData();
 
       for (int i=0; i<DIRECTIONS; i++)
-	NoP_data_out[i].write(current_NoP_data);
+        NoP_data_out[i].write(current_NoP_data);
 
       if (TGlobalParams::verbose_mode == -57) 
-	  NoP_report();
+        NoP_report();
     }
   }
 }
@@ -246,7 +252,7 @@ vector<int> TRouter::routingFunction(const TRouteData& route_data)
   int dir_in = route_data.dir_in;
 
   switch (TGlobalParams::routing_algorithm)
-    {
+  {
     case ROUTING_XY:
       return routingXY(position, dst_coord);
 
@@ -273,7 +279,7 @@ vector<int> TRouter::routingFunction(const TRouteData& route_data)
 
     default:
       assert(false);
-    }
+  }
 
   // something weird happened, you shouldn't be here
   return (vector<int>)(0);
@@ -297,48 +303,48 @@ int TRouter::route(const TRouteData& route_data)
 
 void TRouter::NoP_report() const
 {
-    TNoP_data NoP_tmp;
-      cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id << "] NoP report: " << endl;
+  TNoP_data NoP_tmp;
+  cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id << "] NoP report: " << endl;
 
-      for (int i=0;i<DIRECTIONS; i++) 
-      {
-	  NoP_tmp = NoP_data_in[i].read();
-	  if (NoP_tmp.sender_id!=NOT_VALID)
-	    cout << NoP_tmp;
-      }
+  for (int i=0;i<DIRECTIONS; i++) 
+  {
+    NoP_tmp = NoP_data_in[i].read();
+    if (NoP_tmp.sender_id!=NOT_VALID)
+      cout << NoP_tmp;
+  }
 }
 //---------------------------------------------------------------------------
 
 int TRouter::NoPScore(const TNoP_data& nop_data, const vector<int>& nop_channels) const
 {
-    int score = 0;
+  int score = 0;
+
+  if (TGlobalParams::verbose_mode==-58)
+  {
+    cout << nop_data;
+    cout << "      On-Path channels: " << endl;
+  }
+
+  for (unsigned int i=0;i<nop_channels.size();i++)
+  {
+    int available;
+
+    if (nop_data.channel_status_neighbor[nop_channels[i]].available)
+      available = 1; 
+    else available = 0;
+
+    int free_slots = nop_data.channel_status_neighbor[nop_channels[i]].free_slots;
 
     if (TGlobalParams::verbose_mode==-58)
     {
-	cout << nop_data;
-	cout << "      On-Path channels: " << endl;
+      cout << "       channel " << nop_channels[i] << " -> score: ";
+      cout << " + " << available << " * (" << free_slots << ")" << endl;
     }
 
-    for (unsigned int i=0;i<nop_channels.size();i++)
-    {
-	int available;
+    score += available*free_slots;
+  }
 
-	if (nop_data.channel_status_neighbor[nop_channels[i]].available)
-	    available = 1; 
-	else available = 0;
-
-	int free_slots = nop_data.channel_status_neighbor[nop_channels[i]].free_slots;
-
-	if (TGlobalParams::verbose_mode==-58)
-	{
-	    cout << "       channel " << nop_channels[i] << " -> score: ";
-	    cout << " + " << available << " * (" << free_slots << ")" << endl;
-	}
-
-	score += available*free_slots;
-    }
-
-    return score;
+  return score;
 }
 //---------------------------------------------------------------------------
 
@@ -362,7 +368,7 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
     // get id of adjacent candidate
     int candidate_id = getNeighborId(current_id,directions[i]);
 
-  // apply routing function to the adjacent candidate node
+    // apply routing function to the adjacent candidate node
     TRouteData tmp_route_data;
     tmp_route_data.current_id = candidate_id;
     tmp_route_data.src_id = route_data.src_id;
@@ -371,7 +377,7 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
 
     if (TGlobalParams::verbose_mode==-58)
     {
-	cout << "\n    -> Adjacent candidate: " << candidate_id << " (direction " << directions[i] << ")" << endl;
+      cout << "\n    -> Adjacent candidate: " << candidate_id << " (direction " << directions[i] << ")" << endl;
     }
 
     vector<int> next_candidate_channels = routingFunction(tmp_route_data);
@@ -388,32 +394,32 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
   int max = score[0];
   for (unsigned int i = 0;i<directions.size();i++)
   {
-      if (score[i]>max)
-      {
-	  max_direction = directions[i];
-	  max = score[i];
-      }
+    if (score[i]>max)
+    {
+      max_direction = directions[i];
+      max = score[i];
+    }
   }
 
   // if multiple direction have the same score = max, choose randomly.
-  
+
   vector<int> equivalent_directions;
 
   for (unsigned int i = 0;i<directions.size();i++)
-      if (score[i]==max)
-	  equivalent_directions.push_back(directions[i]);
+    if (score[i]==max)
+      equivalent_directions.push_back(directions[i]);
 
   direction_selected =  equivalent_directions[rand() % equivalent_directions.size()]; 
 
   if (TGlobalParams::verbose_mode==-58)
   {
-      if (equivalent_directions.size()>1)
-      {
-	  cout << "\n    equivalent directions found! : ";
-	  for (unsigned int i =0;i<equivalent_directions.size();i++)
-	      cout  << " " << equivalent_directions[i];
-      }
-      cout << "\n CHOICE: node " << getNeighborId(current_id,direction_selected) << " (direction " << direction_selected << ")" << endl;
+    if (equivalent_directions.size()>1)
+    {
+      cout << "\n    equivalent directions found! : ";
+      for (unsigned int i =0;i<equivalent_directions.size();i++)
+        cout  << " " << equivalent_directions[i];
+    }
+    cout << "\n CHOICE: node " << getNeighborId(current_id,direction_selected) << " (direction " << direction_selected << ")" << endl;
   }
   return direction_selected; 
 }
@@ -425,21 +431,21 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
   vector<int>  best_dirs;
   int          max_free_slots = 0;
   for (unsigned int i=0; i<directions.size(); i++)
+  {
+    int free_slots = free_slots_neighbor[directions[i]].read();
+    bool available = reservation_table.isAvailable(directions[i]);
+    if (available)
     {
-      int free_slots = free_slots_neighbor[directions[i]].read();
-      bool available = reservation_table.isAvailable(directions[i]);
-      if (available)
-	{
-	  if (free_slots > max_free_slots) 
-	    {
-	      max_free_slots = free_slots;
-	      best_dirs.clear();
-	      best_dirs.push_back(directions[i]);
-	    }
-	  else if (free_slots == max_free_slots)
-	    best_dirs.push_back(directions[i]);
-	}
+      if (free_slots > max_free_slots) 
+      {
+        max_free_slots = free_slots;
+        best_dirs.clear();
+        best_dirs.push_back(directions[i]);
+      }
+      else if (free_slots == max_free_slots)
+        best_dirs.push_back(directions[i]);
     }
+  }
 
   if (best_dirs.size())
     return(best_dirs[rand() % best_dirs.size()]);
@@ -449,40 +455,40 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
   //-------------------------
   // TODO: unfair if multiple directions have same buffer level
   // TODO: to check when both available
-//   unsigned int max_free_slots = 0;
-//   int direction_choosen = NOT_VALID;
+  //   unsigned int max_free_slots = 0;
+  //   int direction_choosen = NOT_VALID;
 
-//   for (unsigned int i=0;i<directions.size();i++)
-//     {
-//       int free_slots = free_slots_neighbor[directions[i]].read();
-//       if ((free_slots >= max_free_slots) &&
-// 	  (reservation_table.isAvailable(directions[i])))
-// 	{
-// 	  direction_choosen = directions[i];
-// 	  max_free_slots = free_slots;
-// 	}
-//     }
+  //   for (unsigned int i=0;i<directions.size();i++)
+  //     {
+  //       int free_slots = free_slots_neighbor[directions[i]].read();
+  //       if ((free_slots >= max_free_slots) &&
+  // 	  (reservation_table.isAvailable(directions[i])))
+  // 	{
+  // 	  direction_choosen = directions[i];
+  // 	  max_free_slots = free_slots;
+  // 	}
+  //     }
 
-//   // No available channel 
-//   if (direction_choosen==NOT_VALID)
-//     direction_choosen = directions[rand() % directions.size()]; 
+  //   // No available channel 
+  //   if (direction_choosen==NOT_VALID)
+  //     direction_choosen = directions[rand() % directions.size()]; 
 
-//   if(TGlobalParams::verbose_mode>VERBOSE_OFF)
-//     {
-//       TChannelStatus tmp;
+  //   if(TGlobalParams::verbose_mode>VERBOSE_OFF)
+  //     {
+  //       TChannelStatus tmp;
 
-//       cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id << "] SELECTION between: " << endl;
-//       for (unsigned int i=0;i<directions.size();i++)
-// 	{
-// 	  tmp.free_slots = free_slots_neighbor[directions[i]].read();
-// 	  tmp.available = (reservation_table.isAvailable(directions[i]));
-// 	  cout << "    -> direction " << directions[i] << ", channel status: " << tmp << endl;
-// 	}
-//       cout << " direction choosen: " << direction_choosen << endl;
-//     }
+  //       cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id << "] SELECTION between: " << endl;
+  //       for (unsigned int i=0;i<directions.size();i++)
+  // 	{
+  // 	  tmp.free_slots = free_slots_neighbor[directions[i]].read();
+  // 	  tmp.available = (reservation_table.isAvailable(directions[i]));
+  // 	  cout << "    -> direction " << directions[i] << ", channel status: " << tmp << endl;
+  // 	}
+  //       cout << " direction choosen: " << direction_choosen << endl;
+  //     }
 
-//   assert(direction_choosen>=0);
-//   return direction_choosen;
+  //   assert(direction_choosen>=0);
+  //   return direction_choosen;
 }
 
 //---------------------------------------------------------------------------
@@ -498,10 +504,10 @@ int TRouter::selectionFunction(const vector<int>& directions, const TRouteData& 
 {
   // not so elegant but fast escape ;)
   if (directions.size()==1) return directions[0];
-  
+
   stats.power.Selection();
   switch (TGlobalParams::selection_strategy)
-    {
+  {
     case SEL_RANDOM:
       return selectionRandom(directions);
     case SEL_BUFFER_LEVEL:
@@ -510,8 +516,8 @@ int TRouter::selectionFunction(const vector<int>& directions, const TRouteData& 
       return selectionNoP(directions,route_data);
     default:
       assert(false);
-    }
-  
+  }
+
   return 0;	    
 }
 
@@ -520,7 +526,7 @@ int TRouter::selectionFunction(const vector<int>& directions, const TRouteData& 
 vector<int> TRouter::routingXY(const TCoord& current, const TCoord& destination)
 {
   vector<int> directions;
-  
+
   if (destination.x > current.x)
     directions.push_back(DIRECTION_EAST);
   else if (destination.x < current.x)
@@ -544,15 +550,15 @@ vector<int> TRouter::routingWestFirst(const TCoord& current, const TCoord& desti
     return routingXY(current, destination);
 
   if (destination.y < current.y)
-    {
-      directions.push_back(DIRECTION_NORTH);
-      directions.push_back(DIRECTION_EAST);
-    }
+  {
+    directions.push_back(DIRECTION_NORTH);
+    directions.push_back(DIRECTION_EAST);
+  }
   else
-    {
-      directions.push_back(DIRECTION_SOUTH);
-      directions.push_back(DIRECTION_EAST);
-    }
+  {
+    directions.push_back(DIRECTION_SOUTH);
+    directions.push_back(DIRECTION_EAST);
+  }
 
   return directions;
 }
@@ -568,15 +574,15 @@ vector<int> TRouter::routingNorthLast(const TCoord& current, const TCoord& desti
     return routingXY(current, destination);
 
   if (destination.x < current.x)
-    {
-      directions.push_back(DIRECTION_SOUTH);
-      directions.push_back(DIRECTION_WEST);
-    }
+  {
+    directions.push_back(DIRECTION_SOUTH);
+    directions.push_back(DIRECTION_WEST);
+  }
   else
-    {
-      directions.push_back(DIRECTION_SOUTH);
-      directions.push_back(DIRECTION_EAST);
-    }
+  {
+    directions.push_back(DIRECTION_SOUTH);
+    directions.push_back(DIRECTION_EAST);
+  }
 
   return directions;
 }
@@ -588,20 +594,20 @@ vector<int> TRouter::routingNegativeFirst(const TCoord& current, const TCoord& d
   vector<int> directions;
 
   if ( (destination.x <= current.x && destination.y <= current.y) ||
-       (destination.x >= current.x && destination.y >= current.y) )
+      (destination.x >= current.x && destination.y >= current.y) )
     return routingXY(current, destination);
 
   if (destination.x > current.x && 
       destination.y < current.y)
-    {
-      directions.push_back(DIRECTION_NORTH);
-      directions.push_back(DIRECTION_EAST);
-    }
+  {
+    directions.push_back(DIRECTION_NORTH);
+    directions.push_back(DIRECTION_EAST);
+  }
   else
-    {
-      directions.push_back(DIRECTION_SOUTH);
-      directions.push_back(DIRECTION_WEST);
-    }
+  {
+    directions.push_back(DIRECTION_SOUTH);
+    directions.push_back(DIRECTION_WEST);
+  }
 
   return directions;
 }
@@ -609,7 +615,7 @@ vector<int> TRouter::routingNegativeFirst(const TCoord& current, const TCoord& d
 //---------------------------------------------------------------------------
 
 vector<int> TRouter::routingOddEven(const TCoord& current, 
-				    const TCoord& source, const TCoord& destination)
+    const TCoord& source, const TCoord& destination)
 {
   vector<int> directions;
 
@@ -625,61 +631,61 @@ vector<int> TRouter::routingOddEven(const TCoord& current,
   e1 = -(d1 - c1);
 
   if (e0 == 0)
-    {
-      if (e1 > 0)
-	directions.push_back(DIRECTION_NORTH);
-      else
-	directions.push_back(DIRECTION_SOUTH);
-    }
+  {
+    if (e1 > 0)
+      directions.push_back(DIRECTION_NORTH);
+    else
+      directions.push_back(DIRECTION_SOUTH);
+  }
   else
+  {
+    if (e0 > 0)
     {
-      if (e0 > 0)
-	{
-	  if (e1 == 0)
-	    directions.push_back(DIRECTION_EAST);
-	  else
-	    {
-	      if ( (c0 % 2 == 1) || (c0 == s0) )
-		{
-		  if (e1 > 0)
-		    directions.push_back(DIRECTION_NORTH);
-		  else
-		    directions.push_back(DIRECTION_SOUTH);
-		}
-	      if ( (d0 % 2 == 1) || (e0 != 1) )
-		directions.push_back(DIRECTION_EAST);
-	    }
-	}
+      if (e1 == 0)
+        directions.push_back(DIRECTION_EAST);
       else
-	{
-	  directions.push_back(DIRECTION_WEST);
-	  if (c0 % 2 == 0)
-	    {
-	      if (e1 > 0)
-		directions.push_back(DIRECTION_NORTH);
-	      if (e1 < 0) 
-		directions.push_back(DIRECTION_SOUTH);
-	    }
-	}
+      {
+        if ( (c0 % 2 == 1) || (c0 == s0) )
+        {
+          if (e1 > 0)
+            directions.push_back(DIRECTION_NORTH);
+          else
+            directions.push_back(DIRECTION_SOUTH);
+        }
+        if ( (d0 % 2 == 1) || (e0 != 1) )
+          directions.push_back(DIRECTION_EAST);
+      }
     }
-  
+    else
+    {
+      directions.push_back(DIRECTION_WEST);
+      if (c0 % 2 == 0)
+      {
+        if (e1 > 0)
+          directions.push_back(DIRECTION_NORTH);
+        if (e1 < 0) 
+          directions.push_back(DIRECTION_SOUTH);
+      }
+    }
+  }
+
   if (!(directions.size() > 0 && directions.size() <= 2))
   {
-      cout << "\n STAMPACCHIO :";
-      cout << source << endl;
-      cout << destination << endl;
-      cout << current << endl;
+    cout << "\n STAMPACCHIO :";
+    cout << source << endl;
+    cout << destination << endl;
+    cout << current << endl;
 
   }
   assert(directions.size() > 0 && directions.size() <= 2);
-  
+
   return directions;
 }
 
 //---------------------------------------------------------------------------
 
 vector<int> TRouter::routingDyAD(const TCoord& current, 
-				 const TCoord& source, const TCoord& destination)
+    const TCoord& source, const TCoord& destination)
 {
   vector<int> directions;
 
@@ -687,7 +693,7 @@ vector<int> TRouter::routingDyAD(const TCoord& current,
 
   if (!inCongestion())
     directions.resize(1);
-  
+
   return directions;
 }
 
@@ -703,28 +709,28 @@ vector<int> TRouter::routingFullyAdaptive(const TCoord& current, const TCoord& d
 
   if (destination.x > current.x &&
       destination.y < current.y)
-    {
-      directions.push_back(DIRECTION_NORTH);
-      directions.push_back(DIRECTION_EAST);
-    }
+  {
+    directions.push_back(DIRECTION_NORTH);
+    directions.push_back(DIRECTION_EAST);
+  }
   else if (destination.x > current.x &&
-	   destination.y > current.y)
-    {
-      directions.push_back(DIRECTION_SOUTH);
-      directions.push_back(DIRECTION_EAST);
-    }
+      destination.y > current.y)
+  {
+    directions.push_back(DIRECTION_SOUTH);
+    directions.push_back(DIRECTION_EAST);
+  }
   else if (destination.x < current.x &&
-	   destination.y > current.y)
-    {
-      directions.push_back(DIRECTION_SOUTH);
-      directions.push_back(DIRECTION_WEST);
-    }
+      destination.y > current.y)
+  {
+    directions.push_back(DIRECTION_SOUTH);
+    directions.push_back(DIRECTION_WEST);
+  }
   else
-    {
-      directions.push_back(DIRECTION_NORTH);
-      directions.push_back(DIRECTION_WEST);
-    }
-  
+  {
+    directions.push_back(DIRECTION_NORTH);
+    directions.push_back(DIRECTION_WEST);
+  }
+
   return directions;
 }
 
@@ -733,25 +739,25 @@ vector<int> TRouter::routingFullyAdaptive(const TCoord& current, const TCoord& d
 vector<int> TRouter::routingTableBased(const int dir_in, const TCoord& current, const TCoord& destination)
 {
   TAdmissibleOutputs ao = routing_table.getAdmissibleOutputs(dir_in, coord2Id(destination));
-  
+
   if (ao.size() == 0)
-    {
-      cout << "dir: " << dir_in << ", (" << current.x << "," << current.y << ") --> "
-	   << "(" << destination.x << "," << destination.y << ")" << endl
-	   << coord2Id(current) << "->" << coord2Id(destination) << endl;
-    }
+  {
+    cout << "dir: " << dir_in << ", (" << current.x << "," << current.y << ") --> "
+      << "(" << destination.x << "," << destination.y << ")" << endl
+      << coord2Id(current) << "->" << coord2Id(destination) << endl;
+  }
 
   assert(ao.size() > 0);
 
   //-----
   /*
-  vector<int> aov = admissibleOutputsSet2Vector(ao);
-  cout << "dir: " << dir_in << ", (" << current.x << "," << current.y << ") --> "
-       << "(" << destination.x << "," << destination.y << "), outputs: ";
-  for (int i=0; i<aov.size(); i++)
-    cout << aov[i] << ", ";
-  cout << endl;
-  */
+     vector<int> aov = admissibleOutputsSet2Vector(ao);
+     cout << "dir: " << dir_in << ", (" << current.x << "," << current.y << ") --> "
+     << "(" << destination.x << "," << destination.y << "), outputs: ";
+     for (int i=0; i<aov.size(); i++)
+     cout << aov[i] << ", ";
+     cout << endl;
+     */
   //-----
 
   return admissibleOutputsSet2Vector(ao);
@@ -760,9 +766,9 @@ vector<int> TRouter::routingTableBased(const int dir_in, const TCoord& current, 
 //---------------------------------------------------------------------------
 
 void TRouter::configure(const int _id, 
-			const double _warm_up_time,
-			const unsigned int _max_buffer_size,
-			TGlobalRoutingTable& grt)
+    const double _warm_up_time,
+    const unsigned int _max_buffer_size,
+    TGlobalRoutingTable& grt)
 {
   local_id = _id;
   stats.configure(_id, _warm_up_time);
@@ -806,46 +812,46 @@ double TRouter::getPower()
 
 int TRouter::reflexDirection(int direction) const
 {
-    if (direction == DIRECTION_NORTH) return DIRECTION_SOUTH;
-    if (direction == DIRECTION_EAST) return DIRECTION_WEST;
-    if (direction == DIRECTION_WEST) return DIRECTION_EAST;
-    if (direction == DIRECTION_SOUTH) return DIRECTION_NORTH;
+  if (direction == DIRECTION_NORTH) return DIRECTION_SOUTH;
+  if (direction == DIRECTION_EAST) return DIRECTION_WEST;
+  if (direction == DIRECTION_WEST) return DIRECTION_EAST;
+  if (direction == DIRECTION_SOUTH) return DIRECTION_NORTH;
 
-    // you shouldn't be here
-    assert(false);
-    return NOT_VALID;
+  // you shouldn't be here
+  assert(false);
+  return NOT_VALID;
 }
 
 //---------------------------------------------------------------------------
 
 int TRouter::getNeighborId(int _id, int direction) const
 {
-    TCoord my_coord = id2Coord(_id);
+  TCoord my_coord = id2Coord(_id);
 
-    switch (direction)
-    {
-	case DIRECTION_NORTH:
-	    if (my_coord.y==0) return NOT_VALID;
-	    my_coord.y--;
-	    break;
-	case DIRECTION_SOUTH:
-	    if (my_coord.y==TGlobalParams::mesh_dim_y-1) return NOT_VALID;
-	    my_coord.y++;
-	    break;
-	case DIRECTION_EAST:
-	    if (my_coord.x==TGlobalParams::mesh_dim_x-1) return NOT_VALID;
-	    my_coord.x++;
-	    break;
-	case DIRECTION_WEST:
-	    if (my_coord.x==0) return NOT_VALID;
-	    my_coord.x--;
-	    break;
-	default:
-	    cout << "direction not valid : " << direction;
-	    assert(false);
-    }
+  switch (direction)
+  {
+    case DIRECTION_NORTH:
+      if (my_coord.y==0) return NOT_VALID;
+      my_coord.y--;
+      break;
+    case DIRECTION_SOUTH:
+      if (my_coord.y==TGlobalParams::mesh_dim_y-1) return NOT_VALID;
+      my_coord.y++;
+      break;
+    case DIRECTION_EAST:
+      if (my_coord.x==TGlobalParams::mesh_dim_x-1) return NOT_VALID;
+      my_coord.x++;
+      break;
+    case DIRECTION_WEST:
+      if (my_coord.x==0) return NOT_VALID;
+      my_coord.x--;
+      break;
+    default:
+      cout << "direction not valid : " << direction;
+      assert(false);
+  }
 
-    int neighbor_id = coord2Id(my_coord);
+  int neighbor_id = coord2Id(my_coord);
 
   return neighbor_id;
 }
@@ -855,11 +861,11 @@ int TRouter::getNeighborId(int _id, int direction) const
 bool TRouter::inCongestion()
 {
   for (int i=0; i<DIRECTIONS; i++)
-    {
-      int flits = TGlobalParams::buffer_depth - free_slots_neighbor[i];
-      if (flits > (int)(TGlobalParams::buffer_depth * TGlobalParams::dyad_threshold))
-	return true;
-    }
+  {
+    int flits = TGlobalParams::buffer_depth - free_slots_neighbor[i];
+    if (flits > (int)(TGlobalParams::buffer_depth * TGlobalParams::dyad_threshold))
+      return true;
+  }
 
   return false;
 }

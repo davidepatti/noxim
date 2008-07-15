@@ -208,6 +208,24 @@ unsigned int TGlobalStats::getReceivedFlits()
 
 //---------------------------------------------------------------------------
 
+unsigned int TGlobalStats::getSentFlits()
+{
+  unsigned int n = 0;
+
+  for (int y=0; y<TGlobalParams::mesh_dim_y; y++)
+    for (int x=0; x<TGlobalParams::mesh_dim_x; x++)
+    {
+       n += noc->t[x][y]->r->stats.getSentFlits();
+#ifdef TESTING
+       drained_total+= noc->t[x][y]->r->local_drained;
+#endif
+    }
+
+  return n;
+}
+
+//---------------------------------------------------------------------------
+
 double TGlobalStats::getThroughput()
 {
   int total_cycles = TGlobalParams::simulation_time - 
@@ -270,6 +288,7 @@ void TGlobalStats::showStats(std::ostream& out, bool detailed)
 {
   out << "% Total received packets: " << getReceivedPackets() << endl;
   out << "% Total received flits: " << getReceivedFlits() << endl;
+  out << "% Total sent flits: " << getSentFlits() << endl;
   out << "% Global average delay (cycles): " << getAverageDelay() << endl;
   out << "% Global average throughput (flits/cycle): " << getAverageThroughput() << endl;
   out << "% Throughput (flits/cycle/IP): " << getThroughput() << endl;

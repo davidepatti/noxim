@@ -73,6 +73,9 @@ public:
   // Returns the total number of received flits
   unsigned int getReceivedFlits();
 
+  // Returns the total number of sent flits
+  unsigned int getSentFlits();
+
   // Returns the maximum value of the accepted traffic
   double getThroughput();
 
