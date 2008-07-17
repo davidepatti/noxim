@@ -50,7 +50,9 @@ void TProcessingElement::rxProcess()
         cout << sc_time_stamp() << ": ProcessingElement[" << local_id << "] RECEIVING " << flit_tmp << endl;
       }
       current_level_rx = 1-current_level_rx;     // Negate the old value for Alternating Bit Protocol (ABP)
+      cout << sc_time_stamp() << ": ProcessingElement[" << local_id << "] Sending ack for " << flit_tmp << " current level: "<<current_level_rx<<endl;
     }
+    
     ack_rx.write(current_level_rx);
   }
 }
@@ -80,9 +82,11 @@ void TProcessingElement::txProcess()
 
     if(ack_tx.read() == current_level_tx)
     {
+
       if(!packet_queue.empty())
       {
         TFlit flit = nextFlit();                  // Generate a new flit
+        cout << sc_time_stamp().to_double()/1000 << ": ProcessingElement[" << local_id << "] received ack n: " << current_level_tx << endl;
         if(TGlobalParams::verbose_mode > VERBOSE_OFF)
         {
           cout << sc_time_stamp().to_double()/1000 << ": ProcessingElement[" << local_id << "] SENDING " << flit << endl;
