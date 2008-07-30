@@ -1,5 +1,5 @@
 ## Variable that points to SystemC installation path
-SYSTEMC = /opt/systemc-2.2
+SYSTEMC = systemc-2.2
 
 INCDIR = -I. -I.. -I$(SYSTEMC)/include
 LIBDIR = -L. -L.. -L$(SYSTEMC)/lib-$(TARGET_ARCH)

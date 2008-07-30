@@ -93,6 +93,8 @@ SC_MODULE(TRouter)
 
   double        getPower();  // Returns the total power dissipated by the router
 
+  int sucuni;
+
   // Constructor
 
   SC_CTOR(TRouter)

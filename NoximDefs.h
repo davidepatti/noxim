@@ -103,7 +103,7 @@ using namespace std;
 #define DEFAULT_DETAILED                         false
 #define DEFAULT_DYAD_THRESHOLD                     0.6
 #define DEFAULT_MAX_VOLUME_TO_BE_DRAINED             0
-
+#define DEFAULT_WITH_ACK                         false
 // TODO by Fafa - this MUST be removed!!!
 #define MAX_STATIC_DIM 20
 
@@ -133,6 +133,7 @@ struct TGlobalParams
   static vector<pair<int,double> > hotspots;
   static float dyad_threshold;
   static unsigned int max_volume_to_be_drained;
+  static bool with_ack;
 };
 
 
@@ -154,7 +155,7 @@ class TCoord
 // TFlitType -- Flit type enumeration
 enum TFlitType
 {
-  FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL
+  FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL, FLIT_TYPE_ACK
 };
 
 //---------------------------------------------------------------------------
@@ -178,6 +179,7 @@ struct TPacket
   double             timestamp;    // SC timestamp at packet generation
   int                size;
   int                flit_left;    // Number of remaining flits inside the packet
+  bool               seq_num;      // Sequence Number (ABP)
 
   TPacket() {;}
   TPacket(const int s, const int d, const double ts, const int sz) {
@@ -234,15 +236,16 @@ struct TFlit
 {
   int                src_id;
   int                dst_id;
-  TFlitType          flit_type;    // The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
+  TFlitType          flit_type;    // The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL, FLIT_TYPE_ACK)
   int                sequence_no;  // The sequence number of the flit inside the packet
   TPayload           payload;      // Optional payload
   double             timestamp;    // Unix timestamp at packet generation
   int                hop_no;       // Current number of hops from source to destination
+  bool               pkt_seq_num;  // The packet sequence number
 
   inline bool operator == (const TFlit& flit) const
   {
-    return (flit.src_id==src_id && flit.dst_id==dst_id && flit.flit_type==flit_type && flit.sequence_no==sequence_no && flit.payload==payload && flit.timestamp==timestamp && flit.hop_no==hop_no);
+    return (flit.src_id==src_id && flit.dst_id==dst_id && flit.flit_type==flit_type && flit.sequence_no==sequence_no && flit.payload==payload && flit.timestamp==timestamp && flit.hop_no==hop_no && flit.pkt_seq_num==pkt_seq_num);
   }
 };
 
@@ -263,8 +266,10 @@ inline ostream& operator << (ostream& os, const TFlit& flit)
 	case FLIT_TYPE_HEAD: os << "Flit Type is HEAD" << endl; break;
 	case FLIT_TYPE_BODY: os << "Flit Type is BODY" << endl; break;
 	case FLIT_TYPE_TAIL: os << "Flit Type is TAIL" << endl; break;
+	case FLIT_TYPE_ACK: os << "Flit Type is ACK" << endl; break;
       }
       os << "Sequence no. " << flit.sequence_no << endl;
+      os << "Packet Sequence no. " << flit.pkt_seq_num << endl;
       os << "Payload printing not implemented (yet)." << endl;
       os << "Unix timestamp at packet generation " << flit.timestamp << endl;
       os << "Total number of hops from source to destination is " << flit.hop_no << endl;
@@ -277,9 +282,10 @@ inline ostream& operator << (ostream& os, const TFlit& flit)
 	case FLIT_TYPE_HEAD: os << "H"; break;
 	case FLIT_TYPE_BODY: os << "B"; break;
 	case FLIT_TYPE_TAIL: os << "T"; break;
+	case FLIT_TYPE_ACK: os << "A"; break;
       }
       
-      os << ", seq: " << flit.sequence_no << ", " << flit.src_id << "-->" << flit.dst_id << "]"; 
+      os << ", seq: " << flit.sequence_no << ", pkt_seq: " << flit.pkt_seq_num << " " << flit.src_id << "-->" << flit.dst_id << "]"; 
     }
 
   return os;

@@ -59,6 +59,7 @@ SC_MODULE(TProcessingElement)
   bool                 current_level_tx;       // Current level for Alternating Bit Protocol (ABP)
   queue<TPacket>       packet_queue;           // Local queue of packets
   bool                 transmittedAtPreviousCycle;  // Used for distributions with memory
+  bool                 *pkt_seq_nums;       //pointer to the array of packet sequence numbers
 
   // Functions
 
@@ -72,7 +73,7 @@ SC_MODULE(TProcessingElement)
   TPacket              trafficBitReversal();              // Bit-reversal destination distribution
   TPacket              trafficShuffle();                  // Shuffle destination distribution
   TPacket              trafficButterfly();                // Butterfly destination distribution
-
+  TPacket              createAckPacket(int dst_id, bool pkt_seq_num); 
 
   TGlobalTrafficTable* traffic_table;                     // Reference to the Global traffic Table
   bool                 never_transmit;                    // true if the PE does not transmit any packet 
@@ -89,6 +90,7 @@ SC_MODULE(TProcessingElement)
 
   SC_CTOR(TProcessingElement)
   {
+    pkt_seq_nums = new bool[TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y];
     SC_METHOD(rxProcess);
     sensitive << reset;
     sensitive << clock.pos();

@@ -54,6 +54,7 @@ void TStats::receivedFlit(const double arrival_time,
 
       ch.src_id = flit.src_id;
       ch.total_received_flits = 0;
+      ch.total_sent_flits = 0;
       chist.push_back(ch);
 
       i = chist.size() - 1;
@@ -64,6 +65,34 @@ void TStats::receivedFlit(const double arrival_time,
 
   chist[i].total_received_flits++;
   chist[i].last_received_flit_time = arrival_time - warm_up_time;
+}
+
+//---------------------------------------------------------------------------
+
+void TStats::sentFlit(const double sent_time,
+			  const TFlit& flit)
+{
+  if (sent_time - DEFAULT_RESET_TIME < warm_up_time)
+    return;
+  
+  int i = searchCommHistory(flit.src_id);
+  
+  if (i == -1)
+    {
+      // first flit received from a given source
+      // initialize CommHist structure
+      CommHistory ch;
+
+      ch.src_id = flit.src_id;
+      ch.total_received_flits = 0;
+      ch.total_sent_flits = 0;
+      chist.push_back(ch);
+
+      i = chist.size() - 1;
+    }
+
+  chist[i].total_sent_flits++;
+  chist[i].last_sent_flit_time = sent_time - warm_up_time;
 }
 
 //---------------------------------------------------------------------------
@@ -193,6 +222,17 @@ unsigned int TStats::getReceivedFlits()
 
 //---------------------------------------------------------------------------
 
+unsigned int TStats::getSentFlits()
+{
+  int n = 0;
+
+  for (unsigned int i=0; i<chist.size(); i++)
+    n += chist[i].total_sent_flits;
+
+  return n;
+}
+
+//---------------------------------------------------------------------------
 unsigned int TStats::getTotalCommunications()
 {
   return chist.size();
