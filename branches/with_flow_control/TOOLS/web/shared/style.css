@@ -1,0 +1,16 @@
+FONT        {FONT-FAMILY:Tahoma, Helvetica}
+TH          {FONT-FAMILY:Tahoma, Helvetica; background:#F5E389; TEXT-ALIGN:center; FONT-WEIGHT:bold}
+TD          {FONT-FAMILY:Tahoma, Helvetica; background:#FFFDBD; TEXT-ALIGN:center}
+BODY        {FONT-FAMILY:Tahoma, Helvetica}
+P           {FONT-FAMILY:Tahoma, Helvetica}
+DIV         {FONT-FAMILY:Tahoma, Helvetica}
+INPUT       {FONT-FAMILY:Tahoma, Helvetica}
+TEXTAREA    {FONT-FAMILY:Tahoma, Helvetica}
+FORM        {FONT-FAMILY:Tahoma, Helvetica}
+A           {COLOR:gray}
+H1          {BACKGROUND:black; COLOR:#FFAA00; TEXT-ALIGN:center; MARGIN:10}
+H2          {BACKGROUND:#D3D3D3; TEXT-ALIGN:center; MARGIN:20}
+H3          {TEXT-ALIGN:left; MARGIN-LEFT:36pt; MARGIN-RIGHT:24pt}
+H4          {TEXT-ALIGN:left; MARGIN-LEFT:48pt; MARGIN-RIGHT:24pt}
+.subTitle   {FONT-SIZE:12px; FONT-WEIGHT:bold; FONT-STYLE:italic; TEXT-ALIGN:center; MARGIN-LEFT:24pt; MARGIN-RIGHT:24pt}
+LI          {TEXT-ALIGN:justify; MARGIN-LEFT:24pt; MARGIN-RIGHT:24pt}
