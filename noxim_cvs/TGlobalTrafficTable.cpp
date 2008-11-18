@@ -45,7 +45,7 @@ bool TGlobalTrafficTable::load(const char* fname)
   // Cycle reading file
   while (!fin.eof())
     {
-      char line[128];
+      char line[512];
       fin.getline(line, sizeof(line)-1);
 
       if (line[0] != '\0')
