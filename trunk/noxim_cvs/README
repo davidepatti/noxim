@@ -5,7 +5,7 @@ Noxim
 To compile (first time):
 
 1) touch Makefile.deps
-2) make depend
+2) make depend (don't mind about warning messages)
 3) make
 
 Note 1: You don't need to repeat steps 1) and 2) after the first
@@ -16,3 +16,8 @@ SC_SIGNAL_WRITE_CHECK enviroment variable before compiling.
 
 bash: export SC_SIGNAL_WRITE_CHECK=DISABLE
 csh: setenv SC_SIGNAL_WRITE_CHECK DISABLE
+
+Alternatively, under bash, you can type
+
+source sourceme
+
