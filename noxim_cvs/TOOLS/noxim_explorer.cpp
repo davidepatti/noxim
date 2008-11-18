@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <cassert>
+#include <cstdlib>
 #include <sys/time.h>
 
 using namespace std;
