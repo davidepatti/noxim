@@ -1,0 +1,28 @@
+TODO
+---------------------------------------
+- processing element traffic generation
+- energy per communication is computed assuming minimal routing. This assumption should be removed to deal with either non-homogeneous networks or non-minimal routing algorithms. An additional assumption is that we consider fixed packet size. Actually, the packet size is computed as the average between the minimum packet size and the maximum packet size.
+- Virtual Channels
+- Link Capacity
+- Router Latency
+- Trace-base traffic generators
+- Topologies
+
+
+DONE
+---------------------------------------
+- code cleanup: add "const" qualifiers where needed
+- processing element traffic generation
+- design space explorer (in progress)
+- power/energy model
+- implement all neighbors-on-path subspecies (in progress)
+- multiple verbosity levels (2006.01.11)
+- add selection strategies based on buffer level (2006.01.10)
+- update current channel status on router (2006.01.10)
+- solve mesh dimension related bugs
+- web interface to choose arguments and run simulation (2005.12.14)
+- noc parameters from command line (2005.12.12)
+- a really working Makefile
+- create a todo file (5/12/2005)
+- power/energy model
+- design space explorer (TOOLS/noxim_explorer)
