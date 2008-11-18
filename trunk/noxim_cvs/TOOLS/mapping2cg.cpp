@@ -2,6 +2,7 @@
 #include <vector>
 #include <fstream>
 #include <cassert>
+#include <cstdlib>
 
 using namespace std;
 
