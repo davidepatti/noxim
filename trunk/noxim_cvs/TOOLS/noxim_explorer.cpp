@@ -821,12 +821,17 @@ bool RunSimulations(const TConfigurationSpace& conf_space,
       for (uint j=0; j<aggr_conf_space.size(); j++)
 	{
 	  string aggr_cmd_line = Configuration2CmdLine(aggr_conf_space[j]);
-
+	  /*
 	  string cmd = eparams.simulator + " "
 	    + def_cmd_line + " "
 	    + conf_cmd_line + " "
 	    + aggr_cmd_line;
-	  
+	  */
+	  string cmd = eparams.simulator + " "
+            + aggr_cmd_line + " "
+	    + def_cmd_line + " "
+	    + conf_cmd_line;
+
 	  if (!RunSimulations(start_time,
 			      sim_counter, cmd, eparams.tmp_dir, eparams.repetitions,
 			      aggr_conf_space[j], fout, error_msg))
