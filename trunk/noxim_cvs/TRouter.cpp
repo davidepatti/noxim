@@ -229,9 +229,6 @@ void TRouter::bufferMonitor()
 
       for (int i=0; i<DIRECTIONS; i++)
 	NoP_data_out[i].write(current_NoP_data);
-
-      if (TGlobalParams::verbose_mode == -57) 
-	  NoP_report();
     }
   }
 }
@@ -313,12 +310,6 @@ int TRouter::NoPScore(const TNoP_data& nop_data, const vector<int>& nop_channels
 {
     int score = 0;
 
-    if (TGlobalParams::verbose_mode==-58)
-    {
-	cout << nop_data;
-	cout << "      On-Path channels: " << endl;
-    }
-
     for (unsigned int i=0;i<nop_channels.size();i++)
     {
 	int available;
@@ -328,12 +319,6 @@ int TRouter::NoPScore(const TNoP_data& nop_data, const vector<int>& nop_channels
 	else available = 0;
 
 	int free_slots = nop_data.channel_status_neighbor[nop_channels[i]].free_slots;
-
-	if (TGlobalParams::verbose_mode==-58)
-	{
-	    cout << "       channel " << nop_channels[i] << " -> score: ";
-	    cout << " + " << available << " * (" << free_slots << ")" << endl;
-	}
 
 	score += available*free_slots;
     }
@@ -350,13 +335,6 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
 
   int current_id = route_data.current_id;
 
-  if (TGlobalParams::verbose_mode==-58)
-  {
-    cout << endl;
-    cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id << "] NoP SELECTION ----------------" << endl;
-    cout << "      Packet: " << route_data.src_id << " --> " << route_data.dst_id << endl;
-  }
-
   for (uint i=0; i<directions.size(); i++)
   {
     // get id of adjacent candidate
@@ -369,10 +347,6 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
     tmp_route_data.dst_id = route_data.dst_id;
     tmp_route_data.dir_in = reflexDirection(directions[i]);
 
-    if (TGlobalParams::verbose_mode==-58)
-    {
-	cout << "\n    -> Adjacent candidate: " << candidate_id << " (direction " << directions[i] << ")" << endl;
-    }
 
     vector<int> next_candidate_channels = routingFunction(tmp_route_data);
 
@@ -405,16 +379,6 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
 
   direction_selected =  equivalent_directions[rand() % equivalent_directions.size()]; 
 
-  if (TGlobalParams::verbose_mode==-58)
-  {
-      if (equivalent_directions.size()>1)
-      {
-	  cout << "\n    equivalent directions found! : ";
-	  for (unsigned int i =0;i<equivalent_directions.size();i++)
-	      cout  << " " << equivalent_directions[i];
-      }
-      cout << "\n CHOICE: node " << getNeighborId(current_id,direction_selected) << " (direction " << direction_selected << ")" << endl;
-  }
   return direction_selected; 
 }
 

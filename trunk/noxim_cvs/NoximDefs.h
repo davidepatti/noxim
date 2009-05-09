@@ -57,11 +57,13 @@ using namespace std;
 #define ROUTING_DYAD           5
 #define ROUTING_FULLY_ADAPTIVE 8
 #define ROUTING_TABLE_BASED    9
+#define INVALID_ROUTING        -1
 
 // Selection strategies
 #define SEL_RANDOM             0
 #define SEL_BUFFER_LEVEL       1
 #define SEL_NOP                2
+#define INVALID_SELECTION      -1
 
 // Traffic distribution
 #define TRAFFIC_RANDOM         0
@@ -72,6 +74,7 @@ using namespace std;
 #define TRAFFIC_BIT_REVERSAL   5
 #define TRAFFIC_SHUFFLE        6
 #define TRAFFIC_BUTTERFLY      7
+#define INVALID_TRAFFIC        -1
 
 // Verbosity levels
 #define VERBOSE_OFF            0

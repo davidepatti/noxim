@@ -203,11 +203,14 @@ bool ExpandInterval(const string& sint,
   iss >> max;
   iss >> step;
 
+  string param_suffix;
+  getline(iss, param_suffix);
+
   for (double v=min; v<=max; v+=step)
     {
       ostringstream oss;
       oss << v;
-      ps.push_back(oss.str());
+      ps.push_back(oss.str() + param_suffix);
     }
 
   return true;
@@ -252,8 +255,7 @@ bool ManageParameter(ifstream& fin,
 {
   bool err;
 
-  if (parameter == "pir" ||
-      parameter == "por")
+  if (parameter == "pir")
     err = ManageCompressedParameterSet(fin, parameter, params_space, error_msg);
   else
     err = ManagePlainParameterSet(fin, parameter, params_space, error_msg);
@@ -281,8 +283,7 @@ bool ParseConfigurationFile(const string& fname,
 
       if ( GetNextParameter(fin, parameter) )
 	{
-	  if (!ManageParameter(fin, parameter, params_space,
-			       error_msg))
+	  if (!ManageParameter(fin, parameter, params_space, error_msg))
 	    return false;
 	}
     }
@@ -615,7 +616,9 @@ bool RunSimulation(const string& cmd_base,
 		   string& error_msg)
 {
   string tmp_fname = tmp_dir + TMP_FILE_NAME;
-  string cmd = cmd_base + " >& " + tmp_fname;
+  //  string cmd = cmd_base + " >& " + tmp_fname; // this works only with csh and bash
+  string cmd = cmd_base + " >" + tmp_fname + " 2>&1"; // this works with sh, csh, and bash!
+
   cout << cmd << endl;
   system(cmd.c_str());
   if (!ReadResults(tmp_fname, sres, error_msg))
