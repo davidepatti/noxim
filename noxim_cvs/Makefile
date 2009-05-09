@@ -9,7 +9,8 @@ CFLAGS = $(OPT) $(OTHER)
 MODULE = noxim
 SRCS = TNoC.cpp TRouter.cpp TProcessingElement.cpp TBuffer.cpp TStats.cpp \
 	TGlobalStats.cpp TGlobalRoutingTable.cpp TLocalRoutingTable.cpp \
-	TGlobalTrafficTable.cpp TReservationTable.cpp TPower.cpp main.cpp
+	TGlobalTrafficTable.cpp TReservationTable.cpp TPower.cpp \
+        CmdLineParser.cpp main.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 include ./Makefile.defs
