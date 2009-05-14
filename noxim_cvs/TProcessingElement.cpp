@@ -44,10 +44,27 @@ void TProcessingElement::rxProcess()
   {
     if(req_rx.read()==1-current_level_rx)
     {
-      TFlit flit_tmp = flit_rx.read();
+      TFlit flit = flit_rx.read();
+      
+      // checks if the incoming packets claims for an ack
+      if (flit.flit_type == FLIT_TYPE_TAIL && flit.claims_ack)
+      {
+	TAck ack(flit.src_id, flit.dst_id, 2); // ack is 2 flits long (head+tail)
+	acks_to_send.push(ack);
+      }
+
+      // checks if the incoming packet is an ack
+      if (flit.flit_type == FLIT_TYPE_TAIL && flit.ack)
+      {
+	// removes the ack from the set of the acks it is waiting for
+	set<int>::iterator i = acks_to_receive.find(flit.src_id);
+	assert(i != acks_to_receive.end());
+	acks_to_receive.erase(i);
+      }
+
       if(TGlobalParams::verbose_mode > VERBOSE_OFF)
       {
-        cout << sc_simulation_time() << ": ProcessingElement[" << local_id << "] RECEIVING " << flit_tmp << endl;
+        cout << sc_simulation_time() << ": ProcessingElement[" << local_id << "] RECEIVING " << flit << endl;
       }
       current_level_rx = 1-current_level_rx;     // Negate the old value for Alternating Bit Protocol (ABP)
     }
@@ -67,23 +84,38 @@ void TProcessingElement::txProcess()
   }
   else
   {
-    TPacket packet;
-
-    if (canShot(packet))
+    // acks have the priority on packets to be sent
+    while (!acks_to_send.empty())
     {
+      TAck ack = acks_to_send.front(); 
+      acks_to_send.pop();
+      TPacket packet = ack.makePacket(sc_time_stamp().to_double()/1000);
       packet_queue.push(packet);
+    }
+
+    // now data packets can be sent
+    vector<TPacket> communication;
+    if (canShot(communication))
+    {
+      for (vector<TPacket>::iterator i=communication.begin(); i!=communication.end(); i++)
+      {
+	packet_queue.push(*i);
+	if (i->claims_ack)
+	  acks_to_receive.insert(i->dst_id);
+      }
+      
       transmittedAtPreviousCycle = true;
     }
     else
       transmittedAtPreviousCycle = false;
 
 
-    if(ack_tx.read() == current_level_tx)
+    if (ack_tx.read() == current_level_tx)
     {
-      if(!packet_queue.empty())
+      if (!packet_queue.empty())
       {
         TFlit flit = nextFlit();                  // Generate a new flit
-        if(TGlobalParams::verbose_mode > VERBOSE_OFF)
+        if (TGlobalParams::verbose_mode > VERBOSE_OFF)
         {
           cout << sc_time_stamp().to_double()/1000 << ": ProcessingElement[" << local_id << "] SENDING " << flit << endl;
         }
@@ -108,16 +140,19 @@ TFlit TProcessingElement::nextFlit()
   flit.sequence_no = packet.size - packet.flit_left;
   flit.hop_no      = 0;
   //  flit.payload     = DEFAULT_PAYLOAD;
+  flit.ack         = packet.ack;
+  flit.claims_ack  = packet.claims_ack;
 
-  if(packet.size == packet.flit_left)
+
+  if (packet.size == packet.flit_left)
     flit.flit_type = FLIT_TYPE_HEAD;
-  else if(packet.flit_left == 1)
+  else if (packet.flit_left == 1)
     flit.flit_type = FLIT_TYPE_TAIL;
   else
     flit.flit_type = FLIT_TYPE_BODY;
   
   packet_queue.front().flit_left--;
-  if(packet_queue.front().flit_left == 0)
+  if (packet_queue.front().flit_left == 0)
     packet_queue.pop();
 
   return flit;
@@ -125,13 +160,16 @@ TFlit TProcessingElement::nextFlit()
 
 //---------------------------------------------------------------------------
 
-bool TProcessingElement::canShot(TPacket& packet)
+// bool TProcessingElement::canShot(TPacket& packet)
+bool TProcessingElement::canShot(vector<TPacket>& comm)
 {
-  bool   shot;
-  double threshold;
+  bool    shot;
+  TPacket packet;
 
   if (TGlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED)
     {
+      double  threshold;
+
       if (!transmittedAtPreviousCycle)
 	threshold = TGlobalParams::packet_injection_rate;
       else
@@ -189,12 +227,21 @@ bool TProcessingElement::canShot(TPacket& packet)
 	    {
 	      if (prob < dst_prob[i].second) 
 		{
-		  packet.make(local_id, dst_prob[i].first, now, getRandomSize());
+		  packet.make(local_id, dst_prob[i].first, now, getRandomPacketSize());
 		  break;
 		}
 	    }
 	}
     }
+
+  // convert packet to communication
+  int comm_size = getRandomCommunicationSize();
+  bool blocking = (rand()/(double)RAND_MAX) < TGlobalParams::comm_blocking_probability;
+  comm = packet.makeCommunication(comm_size, blocking);
+
+  // do not shot to a destination dst if we are waiting an ack from dst.
+  // This event is discovered simply by looking into the acks_to_receive set.
+  shot = shot && (acks_to_receive.find(packet.dst_id) == acks_to_receive.end());
 
   return shot;
 }
@@ -237,7 +284,7 @@ TPacket TProcessingElement::trafficRandom()
   } while(p.dst_id==p.src_id);
 
   p.timestamp = sc_time_stamp().to_double()/1000;
-  p.size = p.flit_left = getRandomSize();
+  p.size = p.flit_left = getRandomPacketSize();
 
   return p;
 }
@@ -259,7 +306,7 @@ TPacket TProcessingElement::trafficTranspose1()
   p.dst_id = coord2Id(dst);
 
   p.timestamp = sc_time_stamp().to_double()/1000;
-  p.size = p.flit_left = getRandomSize();
+  p.size = p.flit_left = getRandomPacketSize();
 
   return p;
 }
@@ -281,7 +328,7 @@ TPacket TProcessingElement::trafficTranspose2()
   p.dst_id = coord2Id(dst);
 
   p.timestamp = sc_time_stamp().to_double()/1000;
-  p.size = p.flit_left = getRandomSize();
+  p.size = p.flit_left = getRandomPacketSize();
 
   return p;
 }
@@ -329,7 +376,7 @@ TPacket TProcessingElement::trafficBitReversal()
   p.dst_id = dnode;
 
   p.timestamp = sc_time_stamp().to_double()/1000;
-  p.size = p.flit_left = getRandomSize();
+  p.size = p.flit_left = getRandomPacketSize();
 
   return p;
 }
@@ -350,7 +397,7 @@ TPacket TProcessingElement::trafficShuffle()
   p.dst_id = dnode;
 
   p.timestamp = sc_time_stamp().to_double()/1000;
-  p.size = p.flit_left = getRandomSize();
+  p.size = p.flit_left = getRandomPacketSize();
 
   return p;
 }
@@ -372,7 +419,7 @@ TPacket TProcessingElement::trafficButterfly()
   p.dst_id = dnode;
 
   p.timestamp = sc_time_stamp().to_double()/1000;
-  p.size = p.flit_left = getRandomSize();
+  p.size = p.flit_left = getRandomPacketSize();
 
   return p;
 }
@@ -390,10 +437,18 @@ void TProcessingElement::fixRanges(const TCoord src, TCoord& dst)
 
 //---------------------------------------------------------------------------
 
-int TProcessingElement::getRandomSize()
+int TProcessingElement::getRandomPacketSize()
 {
   return randInt(TGlobalParams::min_packet_size, 
                  TGlobalParams::max_packet_size);
+}
+
+//---------------------------------------------------------------------------
+
+int TProcessingElement::getRandomCommunicationSize()
+{
+  return randInt(TGlobalParams::min_communication_size, 
+                 TGlobalParams::max_communication_size);
 }
 
 //---------------------------------------------------------------------------

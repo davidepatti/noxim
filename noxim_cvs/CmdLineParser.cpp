@@ -34,6 +34,7 @@ void showHelp(char selfname[])
   cout << "\t-dimy N\t\tSet the mesh Y dimension to the specified integer value (default " << DEFAULT_MESH_DIM_Y << ")" << endl;
   cout << "\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value [flits] (default " << DEFAULT_BUFFER_DEPTH << ")" << endl;
   cout << "\t-size Nmin Nmax\tSet the minimum and maximum packet size to the specified integer values [flits] (default min=" << DEFAULT_MIN_PACKET_SIZE << ", max=" << DEFAULT_MAX_PACKET_SIZE << ")" << endl;
+  cout << "\t-comm Nmin Nmax Pb\tSet the minimum and the maximum number of packets per communication and the blocking probability (i.e., probability that a new communication do not initiate until the source receive the ack), (default Nmin=" << DEFAULT_MIN_COMM_SIZE << ", Nmax=" << DEFAULT_MAX_COMM_SIZE << ", Pb=" << DEFAULT_PB_COMM << ")" << endl;
   cout << "\t-routing TYPE\tSet the routing algorithm to TYPE where TYPE is one of the following (default " << DEFAULT_ROUTING_ALGORITHM << "):" << endl;
   cout << "\t\txy\t\tXY routing algorithm" << endl;
   cout << "\t\twestfirst\tWest-First routing algorithm" << endl;
@@ -75,6 +76,7 @@ void showHelp(char selfname[])
 
 void showConfig()
 {
+  // Not all information are shown... 
   cout << "Using the following configuration: " << endl;
   cout << "- verbose_mode = " << TGlobalParams::verbose_mode << endl;
   cout << "- trace_mode = " << TGlobalParams::trace_mode << endl;
@@ -124,6 +126,26 @@ void checkInputParameters()
   if (TGlobalParams::min_packet_size > TGlobalParams::max_packet_size)
   {
     cerr << "Error: min packet size must be less than max packet size" << endl;
+    exit(1);
+  }
+
+  if (TGlobalParams::min_communication_size < 1 || 
+      TGlobalParams::max_communication_size < 1)
+  {
+    cerr << "Error: communication size must be >= 1" << endl;
+    exit(1);
+  }
+
+  if (TGlobalParams::comm_blocking_probability < 0.0 || 
+      TGlobalParams::comm_blocking_probability > 1.0)
+  {
+    cerr << "Error: communication blocking probability must be in [0.0, 1.0] range" << endl;
+    exit(1);
+  }
+
+  if (TGlobalParams::min_communication_size > TGlobalParams::max_communication_size)
+  {
+    cerr << "Error: min communication  size must be less than max communication size" << endl;
     exit(1);
   }
 
@@ -217,6 +239,12 @@ void parseCmdLine(int arg_num, char *arg_vet[])
       {
 	TGlobalParams::min_packet_size = atoi(arg_vet[++i]);
 	TGlobalParams::max_packet_size = atoi(arg_vet[++i]);
+      }
+      else if (!strcmp(arg_vet[i], "-comm"))
+      {
+	TGlobalParams::min_communication_size = atoi(arg_vet[++i]);
+	TGlobalParams::max_communication_size = atoi(arg_vet[++i]);
+	TGlobalParams::comm_blocking_probability = atof(arg_vet[++i]);
       }
       else if (!strcmp(arg_vet[i], "-routing"))
       {

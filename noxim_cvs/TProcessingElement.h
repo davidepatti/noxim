@@ -27,6 +27,7 @@
 
 //---------------------------------------------------------------------------
 
+#include <set>
 #include <queue>
 #include <systemc.h>
 #include "NoximDefs.h"
@@ -54,17 +55,21 @@ SC_MODULE(TProcessingElement)
 
   // Registers
 
-  int                  local_id;                     // Unique identification number
-  bool                 current_level_rx;       // Current level for Alternating Bit Protocol (ABP)
-  bool                 current_level_tx;       // Current level for Alternating Bit Protocol (ABP)
-  queue<TPacket>       packet_queue;           // Local queue of packets
+  int                  local_id;              // Unique identification number
+  bool                 current_level_rx;      // Current level for Alternating Bit Protocol (ABP)
+  bool                 current_level_tx;      // Current level for Alternating Bit Protocol (ABP)
+  queue<TPacket>       packet_queue;          // Local queue of packets
   bool                 transmittedAtPreviousCycle;  // Used for distributions with memory
+  queue<TAck>          acks_to_send;          // Queue of the acks to be sent by the destination
+  set<int>             acks_to_receive;       // Set of the acks to be received by the source
+                                              //  (this node) from the destination (the element of
+                                              //  the set)
 
   // Functions
 
   void                 rxProcess();                       // The receiving process
   void                 txProcess();                       // The transmitting process
-  bool                 canShot(TPacket& packet);          // True when the packet must be shot
+  bool                 canShot(vector<TPacket>& comm);    // True when the communication must be shot
   TFlit                nextFlit();                        // Take the next flit of the current packet
   TPacket              trafficRandom();                   // Random destination distribution
   TPacket              trafficTranspose1();               // Transpose 1 destination distribution
@@ -80,7 +85,8 @@ SC_MODULE(TProcessingElement)
 
   void                 fixRanges(const TCoord, TCoord&);  // Fix the ranges of the destination
   int                  randInt(int min, int max);         // Extracts a random integer number between min and max
-  int                  getRandomSize();                   // Returns a random size in flits for the packet
+  int                  getRandomPacketSize();             // Returns a random size in flits for the packet
+  int                  getRandomCommunicationSize();      // Returns a random size in flits for the communication
   void                 setBit(int &x, int w, int v);
   int                  getBit(int x, int w);
   double               log2ceil(double x);
