@@ -93,6 +93,9 @@ using namespace std;
 #define DEFAULT_BUFFER_DEPTH                         4
 #define DEFAULT_MAX_PACKET_SIZE                     10
 #define DEFAULT_MIN_PACKET_SIZE                      2
+#define DEFAULT_MIN_COMM_SIZE                        1
+#define DEFAULT_MAX_COMM_SIZE                        1
+#define DEFAULT_PB_COMM                            0.0
 #define DEFAULT_ROUTING_ALGORITHM           ROUTING_XY
 #define DEFAULT_ROUTING_TABLE_FILENAME              ""
 #define DEFAULT_SELECTION_STRATEGY          SEL_RANDOM
@@ -122,6 +125,9 @@ struct TGlobalParams
   static int buffer_depth;
   static int min_packet_size;
   static int max_packet_size;
+  static int min_communication_size;
+  static int max_communication_size;
+  static float comm_blocking_probability;
   static int routing_algorithm;
   static char routing_table_filename[128];
   static int selection_strategy;
@@ -182,13 +188,79 @@ struct TPacket
   int                size;
   int                flit_left;    // Number of remaining flits inside the packet
 
-  TPacket() {;}
-  TPacket(const int s, const int d, const double ts, const int sz) {
+  bool               ack;          // True if it is an ack
+  bool               claims_ack;   // True if the destination has to send an ack
+
+  int                comm_id;      // Id of the communication the packet belongs to
+  int                comm_size;    // Number of packets which form the communication
+  int                packet_seqno; // Sequence number of the packet
+
+  TPacket() 
+  {
+    ack = claims_ack = false;
+  }
+
+  TPacket(const int s, const int d, const double ts, const int sz) 
+  {
     make(s, d, ts, sz);
   }
 
-  void make(const int s, const int d, const double ts, const int sz) {
+  void make(const int s, const int d, const double ts, const int sz) 
+  {
     src_id = s; dst_id = d; timestamp = ts; size = sz; flit_left = sz;
+    ack = false;
+    claims_ack = false;
+  }
+
+  vector<TPacket> makeCommunication(const int csize, const bool blocking) 
+  {
+    vector<TPacket> comm;
+    TPacket         pkt = *this;
+
+    int cid = rand(); // not very safe as it is possible that two
+		      // communications have the same id
+    for (int i=0; i<csize-1; i++) 
+    {
+      pkt.comm_id = cid;
+      pkt.comm_size = csize;
+      pkt.packet_seqno = i+1;
+      comm.push_back(pkt);
+    }
+    pkt.claims_ack = blocking;
+    comm.push_back(pkt);
+    return comm;
+  }
+};
+
+//---------------------------------------------------------------------------
+// TAck -- Ack definition
+struct TAck
+{
+  int    request_from; // id of the node requesting the ack
+  int    ack_from;     // id of the node responding to the request
+  int    size;         // size of the packet that transport the ack
+                       //  it must be >= 2
+
+  TAck() {;}
+
+  TAck(const int rf, const int af, const int sz) {
+    make(rf, af, sz);
+  }
+
+  void make(const int rf, const int af, const int sz) {
+    request_from = rf;
+    ack_from     = af;
+    size         = sz;
+  }
+
+  TPacket makePacket(const double ts) {
+    TPacket packet(ack_from, request_from, ts, size);
+    packet.ack = true;
+    // it does not need to set the communication related fields
+    // (comm_id, comm_size, seqno) as an ack is just 1 packet. A
+    // router which receive an ack does not consider the communication
+    // related fields.
+    return packet;
   }
 };
 
@@ -242,6 +314,8 @@ struct TFlit
   TPayload           payload;      // Optional payload
   double             timestamp;    // Unix timestamp at packet generation
   int                hop_no;       // Current number of hops from source to destination
+  bool               ack;          // True if it is an ack
+  bool               claims_ack;   // True if the destination has to send an ack
 
   inline bool operator == (const TFlit& flit) const
   {
