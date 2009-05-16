@@ -632,6 +632,19 @@ bool RunSimulation(const string& cmd_base,
 
 //---------------------------------------------------------------------------
 
+string ExtractFirstField(const string& s)
+{
+  istringstream iss(s);
+
+  string sfirst;
+
+  iss >> sfirst;
+
+  return sfirst;
+}
+
+//---------------------------------------------------------------------------
+
 bool RunSimulations(double start_time,
 		    pair<uint,uint>& sim_counter,
 		    const string& cmd, const string& tmp_dir, const int repetitions,
@@ -658,7 +671,8 @@ bool RunSimulations(double start_time,
       // Print aggragated parameters
       fout << "  ";
       for (uint i=0; i<aggr_conf.size(); i++)
-	fout << setw(MATRIX_COLUMN_WIDTH) << aggr_conf[i].second;
+	fout << setw(MATRIX_COLUMN_WIDTH) << ExtractFirstField(aggr_conf[i].second); // this fix the problem with pir
+      // fout << setw(MATRIX_COLUMN_WIDTH) << aggr_conf[i].second;
 
       // Print results;
       fout << setw(MATRIX_COLUMN_WIDTH) << sres.avg_delay
