@@ -4,14 +4,10 @@ Noxim
 
 To compile (first time):
 
-1) touch Makefile.deps
-2) make depend (don't mind about warning messages)
-3) make
+1) Edit Makefile.defs according to your systemc path installation
+2) make (don't mind about warning messages)
 
-Note 1: You don't need to repeat steps 1) and 2) after the first
-compilation.
-
-Note 2: If you are using SystemC 2.2, please set to DISABLE the
+Note 1: If you are using SystemC 2.2, please set to DISABLE the
 SC_SIGNAL_WRITE_CHECK enviroment variable before compiling.
 
 bash: export SC_SIGNAL_WRITE_CHECK=DISABLE
