@@ -1,5 +1,5 @@
 ## Variable that points to SystemC installation path
-SYSTEMC = /opt/systemc-2.2
+SYSTEMC = /usr/local/systemc-2.2
 
 INCDIR = -I. -I.. -I$(SYSTEMC)/include
 LIBDIR = -L. -L.. -L$(SYSTEMC)/lib-$(TARGET_ARCH)
@@ -18,8 +18,7 @@ $(EXE): $(OBJS) $(SYSTEMC)/lib-$(TARGET_ARCH)/libsystemc.a
 	$(CC) $(CFLAGS) $(INCDIR) -c $<
 
 clean:
-	rm -f Makefile.deps $(OBJS) *~ $(EXE) core *~ *.o
-	touch Makefile.deps
+	rm -f $(OBJS) *~ $(EXE) core *~ *.o
 
 depend: 
 	makedepend $(SRCS) -Y -f Makefile.deps
