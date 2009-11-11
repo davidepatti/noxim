@@ -123,7 +123,6 @@ SC_MODULE(TTile)
     pe->req_tx(req_tx_local);
     pe->ack_tx(ack_tx_local);
 
-    pe->free_slots(free_slots_local);
     pe->free_slots_neighbor(free_slots_neighbor_local);
 
   }
