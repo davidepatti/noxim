@@ -1,0 +1,9 @@
+
+Noxim 
+----------------------------------
+
+To compile (first time):
+
+1) Edit Makefile.defs according to your systemc path installation
+2) make (don't mind about warning messages)
+
