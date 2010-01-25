@@ -51,6 +51,10 @@ void TProcessingElement::rxProcess()
       {
 	TAck ack(flit.src_id, flit.dst_id, 2); // ack is 2 flits long (head+tail)
 	acks_to_send.push(ack);
+	/*
+	if (local_id == 30 && flit.src_id==12 && flit.dst_id==30)
+	  cout << local_id << ": acks_to_send.push @ " << sc_time_stamp().to_double()/1000 << endl;
+	*/
       }
 
       // checks if the incoming packet is an ack
@@ -60,6 +64,10 @@ void TProcessingElement::rxProcess()
 	set<int>::iterator i = acks_to_receive.find(flit.src_id);
 	assert(i != acks_to_receive.end());
 	acks_to_receive.erase(i);
+	/*
+	if (flit.src_id == 30)
+	  cout << local_id << ": received ack from 30, ts=" << flit.timestamp << " @ " << sc_time_stamp().to_double()/1000 << endl;
+	*/
       }
 
       if(TGlobalParams::verbose_mode > VERBOSE_OFF)
@@ -84,13 +92,17 @@ void TProcessingElement::txProcess()
   }
   else
   {
-    // acks have the priority on packets to be sent
+    // acks have priority over packets to be sent
     while (!acks_to_send.empty())
     {
       TAck ack = acks_to_send.front(); 
       acks_to_send.pop();
       TPacket packet = ack.makePacket(sc_time_stamp().to_double()/1000);
       packet_queue.push(packet);
+      /*
+      if (packet.src_id == 30 && packet.dst_id == 12)
+	cout << local_id << ": packet_queue.push ack(30->12) " << " @ " << sc_time_stamp().to_double()/1000 << endl;
+      */
     }
 
     // now data packets can be sent
@@ -99,11 +111,14 @@ void TProcessingElement::txProcess()
     {
       for (vector<TPacket>::iterator i=communication.begin(); i!=communication.end(); i++)
       {
+	/*
+	if (i->src_id == 12 && i->dst_id == 30) 
+	  cout << local_id << ": Injected 12->30, ts=" << i->timestamp << " @ " << sc_time_stamp().to_double()/1000 << endl;
+	*/
 	packet_queue.push(*i);
 	if (i->claims_ack)
 	  acks_to_receive.insert(i->dst_id);
       }
-      
       transmittedAtPreviousCycle = true;
     }
     else
@@ -134,15 +149,17 @@ TFlit TProcessingElement::nextFlit()
   TFlit   flit;
   TPacket packet = packet_queue.front();
 
-  flit.src_id      = packet.src_id;
-  flit.dst_id      = packet.dst_id;
-  flit.timestamp   = packet.timestamp;
-  flit.sequence_no = packet.size - packet.flit_left;
-  flit.hop_no      = 0;
+  flit.src_id       = packet.src_id;
+  flit.dst_id       = packet.dst_id;
+  flit.timestamp    = packet.timestamp;
+  flit.sequence_no  = packet.size - packet.flit_left;
+  flit.hop_no       = 0;
   //  flit.payload     = DEFAULT_PAYLOAD;
-  flit.ack         = packet.ack;
-  flit.claims_ack  = packet.claims_ack;
-
+  flit.ack          = packet.ack;
+  flit.claims_ack   = packet.claims_ack;
+  flit.comm_id      = packet.comm_id;
+  flit.comm_size    = packet.comm_size;
+  flit.packet_seqno = packet.packet_seqno;
 
   if (packet.size == packet.flit_left)
     flit.flit_type = FLIT_TYPE_HEAD;
@@ -233,17 +250,77 @@ bool TProcessingElement::canShot(vector<TPacket>& comm)
 	    }
 	}
     }
+ 
 
-  // convert packet to communication
-  int comm_size = getRandomCommunicationSize();
-  bool blocking = (rand()/(double)RAND_MAX) < TGlobalParams::comm_blocking_probability;
-  comm = packet.makeCommunication(comm_size, blocking);
+  if (shot) {
+    // The packet is ready to be shot but we mush check if this node
+    // is not waiting an ack from the destination of this packet
+    bool ack_received = (acks_to_receive.find(packet.dst_id) == acks_to_receive.end());
+    if (!ack_received)
+    {
+      packet_queue_waiting_for_ack[packet.dst_id].push(packet);
+      shot = false;
+      /*
+      if (packet.src_id == 12 && packet.dst_id == 30) 
+	cout << local_id << ": " << "packet_queue_waiting_for_ack, ts=" << packet.timestamp << " @ " << sc_time_stamp().to_double()/1000 << endl;
+      */
+    }
+  } 
 
-  // do not shot to a destination dst if we are waiting an ack from dst.
-  // This event is discovered simply by looking into the acks_to_receive set.
-  shot = shot && (acks_to_receive.find(packet.dst_id) == acks_to_receive.end());
+  if (!shot) // Note: do not use the else as shot is modified inside the above if
+  {
+    // Check if there is a packet in the packet_queue_waiting_for_ack
+    // that can be sent because the ack has been received. In case
+    // there are multiple packets in this state, select one randomly
+    shot = getRndPacketFromPQWFA(packet);
+  }
+
+  if (shot)
+  {
+    //    packet = packet_queue_waiting_for_ack[packet.dst_id].front();
+    //    packet_queue_waiting_for_ack[packet.dst_id].pop();
+
+    // convert packet to communication
+    int comm_size = getRandomCommunicationSize();
+    bool blocking = (rand()/(double)RAND_MAX) < TGlobalParams::comm_blocking_probability;
+    comm = packet.makeCommunication(vcomms_id[packet.dst_id], comm_size, blocking);
+    vcomms_id[packet.dst_id]++;
+  } 
+  else {
+    /*
+    if (packet.src_id == 12 && packet.dst_id == 30) 
+      cout << local_id << ": " << "cannot send waiting ack from " << packet.dst_id <<", ts=" << packet.timestamp << " @ " << sc_time_stamp().to_double()/1000 << endl;
+    */
+  }
 
   return shot;
+}
+
+//---------------------------------------------------------------------------
+
+bool TProcessingElement::getRndPacketFromPQWFA(TPacket& packet)
+{
+  vector<map<int,queue<TPacket> >::iterator> vi;
+
+  for (map<int,queue<TPacket> >::iterator i=packet_queue_waiting_for_ack.begin();
+       i!=packet_queue_waiting_for_ack.end(); i++)
+  {
+    if (!i->second.empty())
+    {
+      TPacket pkt = i->second.front();
+      bool ack_received = (acks_to_receive.find(pkt.dst_id) == acks_to_receive.end());
+      if (ack_received)
+	vi.push_back(i);
+    }
+  }
+
+  if (vi.empty())
+    return false;
+  
+  int idx_rnd = rand() % vi.size();
+  packet = vi[idx_rnd]->second.front();    
+  vi[idx_rnd]->second.pop();
+  return true;
 }
 
 //---------------------------------------------------------------------------

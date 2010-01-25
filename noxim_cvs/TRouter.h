@@ -34,6 +34,8 @@
 #include "TGlobalRoutingTable.h"
 #include "TLocalRoutingTable.h"
 #include "TReservationTable.h"
+#include "TInOrderCAM.h"
+#include "TBlockOOO.h"
 
 extern unsigned int drained_volume;
 
@@ -73,10 +75,12 @@ SC_MODULE(TRouter)
   bool               current_level_rx[DIRECTIONS+1];  // Current level for Alternating Bit Protocol (ABP)
   bool               current_level_tx[DIRECTIONS+1];  // Current level for Alternating Bit Protocol (ABP)
   TStats             stats;                           // Statistics
-  TLocalRoutingTable routing_table;                          // Routing table
-  TReservationTable  reservation_table;                       // Switch reservation table
+  TLocalRoutingTable routing_table;                   // Routing table
+  TReservationTable  reservation_table;               // Switch reservation table
   int                start_from_port;                 // Port from which to start the reservation cycle
   unsigned long      routed_flits;
+  TInOrderCAM        inorderCAM;
+  TBlockOOO          block_ooo;
 
   // Functions
 
@@ -108,6 +112,8 @@ SC_MODULE(TRouter)
     SC_METHOD(bufferMonitor);
     sensitive << reset;
     sensitive << clock.pos();
+
+    inorderCAM.setCAMCapacity(TGlobalParams::inorder_CAM_capacity);
   }
 
  private:

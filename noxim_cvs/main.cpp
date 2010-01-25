@@ -57,12 +57,19 @@ float TGlobalParams::probability_of_retransmission    = DEFAULT_PROBABILITY_OF_R
 int   TGlobalParams::traffic_distribution             = DEFAULT_TRAFFIC_DISTRIBUTION;
 char  TGlobalParams::traffic_table_filename[128]      = DEFAULT_TRAFFIC_TABLE_FILENAME;
 int   TGlobalParams::simulation_time                  = DEFAULT_SIMULATION_TIME;
+bool TGlobalParams::in_order_packets_delivery_cam     = DEFAULT_IN_ORDER_PACKETS_DELIVERY_CAM;
+unsigned int TGlobalParams::inorder_CAM_capacity      = DEFAULT_INORDER_CAM_CAPACITY;
+bool TGlobalParams::in_order_packets_delivery_blocking= DEFAULT_IN_ORDER_PACKETS_DELIVERY_BLOCKING;
 int   TGlobalParams::stats_warm_up_time               = DEFAULT_STATS_WARM_UP_TIME;
 int   TGlobalParams::rnd_generator_seed               = time(NULL);
 bool  TGlobalParams::detailed                         = DEFAULT_DETAILED;
 float TGlobalParams::dyad_threshold                   = DEFAULT_DYAD_THRESHOLD;
 unsigned int TGlobalParams::max_volume_to_be_drained  = DEFAULT_MAX_VOLUME_TO_BE_DRAINED;
 vector<pair<int,double> > TGlobalParams::hotspots;
+
+// tmp - to be removed
+unsigned int TGlobalParams::tmp_cam_accesses = 0;
+unsigned int TGlobalParams::tmp_cam_hits = 0;
 
 //---------------------------------------------------------------------------
 
@@ -168,6 +175,9 @@ int sc_main(int arg_num, char* arg_vet[])
     for (int x=0; x<MESH_DIM_X; x++)
       n->t[x][y]->r->stats.showStats();
   */
+
+  // tmp - to be removed
+  cout << "% CAM miss rate (%): " << 100.0*(TGlobalParams::tmp_cam_accesses-TGlobalParams::tmp_cam_hits)/TGlobalParams::tmp_cam_accesses << endl;
 
   return 0;
 }

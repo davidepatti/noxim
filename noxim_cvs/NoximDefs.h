@@ -85,30 +85,33 @@ using namespace std;
 //---------------------------------------------------------------------------
 
 // Default configuration can be overridden with command-line arguments
-#define DEFAULT_VERBOSE_MODE               VERBOSE_OFF
-#define DEFAULT_TRACE_MODE                       false
-#define DEFAULT_TRACE_FILENAME                      ""
-#define DEFAULT_MESH_DIM_X                           4
-#define DEFAULT_MESH_DIM_Y                           4
-#define DEFAULT_BUFFER_DEPTH                         4
-#define DEFAULT_MAX_PACKET_SIZE                     10
-#define DEFAULT_MIN_PACKET_SIZE                      2
-#define DEFAULT_MIN_COMM_SIZE                        1
-#define DEFAULT_MAX_COMM_SIZE                        1
-#define DEFAULT_PB_COMM                            0.0
-#define DEFAULT_ROUTING_ALGORITHM           ROUTING_XY
-#define DEFAULT_ROUTING_TABLE_FILENAME              ""
-#define DEFAULT_SELECTION_STRATEGY          SEL_RANDOM
-#define DEFAULT_PACKET_INJECTION_RATE             0.01
-#define DEFAULT_PROBABILITY_OF_RETRANSMISSION     0.01
-#define DEFAULT_TRAFFIC_DISTRIBUTION   TRAFFIC_RANDOM
-#define DEFAULT_TRAFFIC_TABLE_FILENAME              ""
-#define DEFAULT_RESET_TIME                        1000
-#define DEFAULT_SIMULATION_TIME                  10000
-#define DEFAULT_STATS_WARM_UP_TIME  DEFAULT_RESET_TIME
-#define DEFAULT_DETAILED                         false
-#define DEFAULT_DYAD_THRESHOLD                     0.6
-#define DEFAULT_MAX_VOLUME_TO_BE_DRAINED             0
+#define DEFAULT_VERBOSE_MODE                 VERBOSE_OFF
+#define DEFAULT_TRACE_MODE                         false
+#define DEFAULT_TRACE_FILENAME                        ""
+#define DEFAULT_MESH_DIM_X                             4
+#define DEFAULT_MESH_DIM_Y                             4
+#define DEFAULT_BUFFER_DEPTH                           4
+#define DEFAULT_MAX_PACKET_SIZE                       10
+#define DEFAULT_MIN_PACKET_SIZE                        2
+#define DEFAULT_MIN_COMM_SIZE                          1
+#define DEFAULT_MAX_COMM_SIZE                          1
+#define DEFAULT_PB_COMM                              0.0
+#define DEFAULT_ROUTING_ALGORITHM             ROUTING_XY
+#define DEFAULT_ROUTING_TABLE_FILENAME                ""
+#define DEFAULT_SELECTION_STRATEGY            SEL_RANDOM
+#define DEFAULT_PACKET_INJECTION_RATE               0.01
+#define DEFAULT_PROBABILITY_OF_RETRANSMISSION       0.01
+#define DEFAULT_TRAFFIC_DISTRIBUTION      TRAFFIC_RANDOM
+#define DEFAULT_TRAFFIC_TABLE_FILENAME                ""
+#define DEFAULT_RESET_TIME                          1000
+#define DEFAULT_SIMULATION_TIME                    10000
+#define DEFAULT_STATS_WARM_UP_TIME    DEFAULT_RESET_TIME
+#define DEFAULT_DETAILED                           false
+#define DEFAULT_DYAD_THRESHOLD                       0.6
+#define DEFAULT_MAX_VOLUME_TO_BE_DRAINED               0
+#define DEFAULT_IN_ORDER_PACKETS_DELIVERY_CAM      false
+#define DEFAULT_INORDER_CAM_CAPACITY                   8
+#define DEFAULT_IN_ORDER_PACKETS_DELIVERY_BLOCKING false
 
 // TODO by Fafa - this MUST be removed!!!
 #define MAX_STATIC_DIM 20
@@ -142,6 +145,13 @@ struct TGlobalParams
   static vector<pair<int,double> > hotspots;
   static float dyad_threshold;
   static unsigned int max_volume_to_be_drained;
+  static bool in_order_packets_delivery_cam;
+  static unsigned int inorder_CAM_capacity;
+  static bool in_order_packets_delivery_blocking;
+
+  // tmp - to be removed
+  static unsigned int tmp_cam_accesses;
+  static unsigned int tmp_cam_hits;
 };
 
 
@@ -212,22 +222,26 @@ struct TPacket
     claims_ack = false;
   }
 
-  vector<TPacket> makeCommunication(const int csize, const bool blocking) 
+  vector<TPacket> makeCommunication(const int cid, const int csize, const bool blocking) 
   {
     vector<TPacket> comm;
     TPacket         pkt = *this;
 
-    int cid = rand(); // not very safe as it is possible that two
-		      // communications have the same id
-    for (int i=0; i<csize-1; i++) 
+    int comm_id = cid + (src_id << 24 | dst_id << 16);
+                        // communication id must be unique. 
+                        // Update cid with source destination id
+                        // comm_id: <src>|<dst>|<incremental number (cid)>
+                        // NOTE: Valid if src_id and dst_id are 8 bits (16x16 mesh)
+
+    for (int i=0; i<csize; i++) 
     {
-      pkt.comm_id = cid;
+      pkt.comm_id = comm_id;
       pkt.comm_size = csize;
       pkt.packet_seqno = i+1;
+      if (i==csize-1)
+	pkt.claims_ack = blocking;
       comm.push_back(pkt);
     }
-    pkt.claims_ack = blocking;
-    comm.push_back(pkt);
     return comm;
   }
 };
@@ -268,10 +282,13 @@ struct TAck
 // TRouteData -- data required to perform routing
 struct TRouteData
 {
-    int current_id;
-    int src_id;
-    int dst_id;
-    int dir_in; // direction from which the packet comes from
+  int current_id;
+  int comm_size;    // Number of packets which form the communication
+  int comm_id;      // communication_id
+  int packet_seqno; // packet sequence number
+  int src_id;
+  int dst_id;
+  int dir_in;       // direction from which the packet comes from
 };
 
 //---------------------------------------------------------------------------
@@ -317,9 +334,14 @@ struct TFlit
   bool               ack;          // True if it is an ack
   bool               claims_ack;   // True if the destination has to send an ack
 
+  // Communication and packet related info
+  int                comm_id;      // Id of the communication the packet belongs to
+  int                comm_size;    // Number of packets which form the communication
+  int                packet_seqno; // Sequence number of the packet
+
   inline bool operator == (const TFlit& flit) const
   {
-    return (flit.src_id==src_id && flit.dst_id==dst_id && flit.flit_type==flit_type && flit.sequence_no==sequence_no && flit.payload==payload && flit.timestamp==timestamp && flit.hop_no==hop_no);
+    return (flit.src_id==src_id && flit.dst_id==dst_id && flit.flit_type==flit_type && flit.sequence_no==sequence_no && flit.payload==payload && flit.timestamp==timestamp && flit.hop_no==hop_no && flit.comm_id==comm_id && flit.comm_size==comm_size && flit.packet_seqno==packet_seqno);
   }
 };
 

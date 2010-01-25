@@ -266,24 +266,78 @@ double TGlobalStats::getPower()
 
 //---------------------------------------------------------------------------
 
+int TGlobalStats::getTotalRXPkts()
+{
+  int total_rx_pkts  = 0;
+
+  for (int y=0; y<TGlobalParams::mesh_dim_y; y++)
+    for (int x=0; x<TGlobalParams::mesh_dim_x; x++)
+    {
+      map<int,int> rx_pkts;
+      map<int,int> ooo_pkts;
+      noc->t[x][y]->r->stats.getOOOStats(rx_pkts, ooo_pkts);
+      for (int src=0; src<TGlobalParams::mesh_dim_y*TGlobalParams::mesh_dim_x; src++)
+	total_rx_pkts  += rx_pkts[src];
+    }
+  
+  return total_rx_pkts;
+}
+
+//---------------------------------------------------------------------------
+
+int TGlobalStats::getTotalOOOPkts()
+{
+  int total_ooo_pkts = 0;
+
+  for (int y=0; y<TGlobalParams::mesh_dim_y; y++)
+    for (int x=0; x<TGlobalParams::mesh_dim_x; x++)
+    {
+      map<int,int> rx_pkts;
+      map<int,int> ooo_pkts;
+      noc->t[x][y]->r->stats.getOOOStats(rx_pkts, ooo_pkts);
+      for (int src=0; src<TGlobalParams::mesh_dim_y*TGlobalParams::mesh_dim_x; src++)
+	total_ooo_pkts += ooo_pkts[src];
+    }
+
+  return total_ooo_pkts;
+}
+
+//---------------------------------------------------------------------------
+
+double TGlobalStats::getOOO()
+{
+  int total_rx_pkts  = getTotalRXPkts();
+  int total_ooo_pkts = getTotalOOOPkts();
+  
+  return (double)total_ooo_pkts/(double)total_rx_pkts;
+}
+
+//---------------------------------------------------------------------------
+
 void TGlobalStats::showStats(std::ostream& out, bool detailed)
 {
+  unsigned int rf = getReceivedFlits();
+
   out << "% Total received packets: " << getReceivedPackets() << endl;
-  out << "% Total received flits: " << getReceivedFlits() << endl;
+  out << "% Total received flits: " << rf << endl;
   out << "% Global average delay (cycles): " << getAverageDelay() << endl;
   out << "% Global average throughput (flits/cycle): " << getAverageThroughput() << endl;
   out << "% Throughput (flits/cycle/IP): " << getThroughput() << endl;
   out << "% Max delay (cycles): " << getMaxDelay() << endl;
-  out << "% Total energy (J): " << getPower() << endl;
+  out << "% Energy per flit (J/flit): " << getPower()/rf << endl;
+  out << "% OOO packets (%): " << 100.0*getOOO() << endl;
 
   if (detailed)
     {
       out << endl << "detailed = [" << endl;
       for (int y=0; y<TGlobalParams::mesh_dim_y; y++)
 	for (int x=0; x<TGlobalParams::mesh_dim_x; x++)
+	{
 	  noc->t[x][y]->r->stats.showStats(y*TGlobalParams::mesh_dim_x+x,
 					   out, 
 					   true);
+	  noc->t[x][y]->r->stats.showOOOStats();
+	}
       out << "];" << endl;
 
       // show MaxDelay matrix
@@ -310,6 +364,62 @@ void TGlobalStats::showStats(std::ostream& out, bool detailed)
 	    out << setw(10) << rf_mtx[y][x];
 	  out << endl;
 	}
+      out << "];" << endl;
+
+
+
+      // show OOO stats
+      out << endl << "rx_pkts = [" << endl;
+      for (int y=0; y<TGlobalParams::mesh_dim_y; y++)
+	for (int x=0; x<TGlobalParams::mesh_dim_x; x++)
+	{
+	  map<int,int> rx_pkts;
+	  map<int,int> ooo_pkts;
+	  noc->t[x][y]->r->stats.getOOOStats(rx_pkts, ooo_pkts);
+	  for (int src=0; src<TGlobalParams::mesh_dim_y*TGlobalParams::mesh_dim_x; src++)
+	    out << rx_pkts[src] << " ";
+	  out << endl;
+	}
+      out << "];" << endl;
+
+      out << endl << "ooo_pkts = [" << endl;
+      for (int y=0; y<TGlobalParams::mesh_dim_y; y++)
+	for (int x=0; x<TGlobalParams::mesh_dim_x; x++)
+	{
+	  map<int,int> rx_pkts;
+	  map<int,int> ooo_pkts;
+	  noc->t[x][y]->r->stats.getOOOStats(rx_pkts, ooo_pkts);
+	  for (int src=0; src<TGlobalParams::mesh_dim_y*TGlobalParams::mesh_dim_x; src++)
+	    out << ooo_pkts[src] << " ";
+	  out << endl;
+	}
+      out << "];" << endl;
+
+      out << endl << "perc_ooo_vs_dist = [ ";
+      //      int total_rx_pkts  = getTotalRXPkts();
+      for (int dist=1; dist<=TGlobalParams::mesh_dim_y+TGlobalParams::mesh_dim_x-2; dist++)
+      {
+	int n = 0;
+	int rp = 0;
+	for (int src=0; src<TGlobalParams::mesh_dim_y*TGlobalParams::mesh_dim_x; src++)
+	  for (int dst=0; dst<TGlobalParams::mesh_dim_y*TGlobalParams::mesh_dim_x; dst++)
+	    if (src != dst)
+	    {
+	      TCoord coord_src = id2Coord(src);
+	      TCoord coord_dst = id2Coord(dst);
+	      int hops = abs(coord_src.x - coord_dst.x) + abs(coord_src.y - coord_dst.y);
+	      if (dist == hops)
+	      {
+		map<int,int> rx_pkts;
+		map<int,int> ooo_pkts;
+		noc->t[coord_dst.x][coord_dst.y]->r->stats.getOOOStats(rx_pkts, ooo_pkts);
+		n += ooo_pkts[src];
+		rp += rx_pkts[src];
+	      }
+	    }
+	// 	out << 100.0*n/total_rx_pkts << " ";
+	out << 100.0*n/rp << " ";
+      }
       out << "];" << endl;
     }
 }

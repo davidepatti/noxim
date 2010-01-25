@@ -62,6 +62,8 @@ void showHelp(char selfname[])
   cout << "\t\tshuffle\t\tShuffle traffic distribution" << endl;
   cout << "\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file" << endl;
   cout << "\t-hs ID P\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)" << endl;
+  cout << "\t-io_cam size\tIn-order packet delivery with the specified CAM size (default " << DEFAULT_INORDER_CAM_CAPACITY << ")" << endl;
+  cout << "\t-io_block\tIn-order packet delivery using the approach by Murali et al. DAC'06 (default " << DEFAULT_IN_ORDER_PACKETS_DELIVERY_BLOCKING << ") [WARNING: works only if routing paths are reconvergent]" << endl;
   cout << "\t-warmup N\tStart to collect statistics after N cycles (default " << DEFAULT_STATS_WARM_UP_TIME << ")" << endl;
   cout << "\t-seed N\t\tSet the seed of the random generator (default time())" << endl;
   cout << "\t-detailed\tShow detailed statistics" << endl;
@@ -77,7 +79,7 @@ void showHelp(char selfname[])
 void showConfig()
 {
   // Not all information are shown... 
-  cout << "Using the following configuration: " << endl;
+  cout << "Using the following configuration (WARNING it is not updated): " << endl;
   cout << "- verbose_mode = " << TGlobalParams::verbose_mode << endl;
   cout << "- trace_mode = " << TGlobalParams::trace_mode << endl;
   //  cout << "- trace_filename = " << TGlobalParams::trace_filename << endl;
@@ -164,7 +166,7 @@ void checkInputParameters()
   if (TGlobalParams::packet_injection_rate <= 0.0 ||
       TGlobalParams::packet_injection_rate > 1.0)
   {
-    cerr << "Error: packet injection rate mmust be in the interval ]0,1]" << endl;
+    cerr << "Error: packet injection rate must be in the interval ]0,1]" << endl;
     exit(1);
   }
    
@@ -186,6 +188,20 @@ void checkInputParameters()
       cerr << "Error: hotspot percentage must be in the interval [0,1]" << endl;
       exit(1);
     }
+  }
+
+  if (TGlobalParams::in_order_packets_delivery_cam &&
+      TGlobalParams::inorder_CAM_capacity <= 0)
+  {
+    cerr << "Error: CAM size must be >=1" << endl;
+    exit(1);
+  }
+
+  if (TGlobalParams::in_order_packets_delivery_cam &&
+      TGlobalParams::in_order_packets_delivery_blocking)
+  {
+    cerr << "Error: io_cam and io_block cannot be used in conjunction" << endl;
+    exit(1);
   }
 
   if (TGlobalParams::stats_warm_up_time < 0)
@@ -270,7 +286,7 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 	{
           TGlobalParams::routing_algorithm = ROUTING_TABLE_BASED;
           strcpy(TGlobalParams::routing_table_filename, arg_vet[++i]);
-          TGlobalParams::packet_injection_rate = 0; // ??? why ???
+          // TGlobalParams::packet_injection_rate = 0; // ??? why ???
         }
         else
 	  TGlobalParams::routing_algorithm = INVALID_ROUTING;
@@ -338,6 +354,13 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 	pair<int,double> t(node,percentage);
 	TGlobalParams::hotspots.push_back(t);
       }
+      else if (!strcmp(arg_vet[i], "-io_cam"))
+      {
+	TGlobalParams::in_order_packets_delivery_cam = true;
+	TGlobalParams::inorder_CAM_capacity = atoi(arg_vet[++i]);
+      }
+      else if (!strcmp(arg_vet[i], "-io_block"))
+	TGlobalParams::in_order_packets_delivery_blocking = true;
       else if (!strcmp(arg_vet[i], "-warmup"))
 	TGlobalParams::stats_warm_up_time = atoi(arg_vet[++i]);
       else if (!strcmp(arg_vet[i], "-seed"))
