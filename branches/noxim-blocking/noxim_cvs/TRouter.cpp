@@ -59,7 +59,12 @@ void TRouter::rxProcess()
 	  if ( (req_rx[i].read()==1-current_level_rx[i]) && !buffer[i].IsFull() )
 	    {
 	      TFlit received_flit = flit_rx[i].read();
-
+	      /*
+	      if (received_flit.src_id == 12 && received_flit.dst_id == 30)
+		cout << local_id << ": received flit 12->30, type=" << received_flit.flit_type << ", ack/cack=" << received_flit.ack << "/" << received_flit.claims_ack << ", sn=" << received_flit.packet_seqno << ", ts=" << received_flit.timestamp << " @ " << sc_time_stamp().to_double()/1000 << endl;
+	      if (received_flit.src_id == 30 && received_flit.dst_id == 12 && received_flit.ack)
+		cout << local_id << ": ack(30->12), ts=" << received_flit.timestamp << " @ " << sc_time_stamp().to_double()/1000 << endl;
+	      */
 	      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
 		{
 		  cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id <<"], Input[" << i << "], Received flit: " << received_flit << endl;
@@ -109,9 +114,36 @@ void TRouter::txProcess()
 		  // prepare data for routing
 		  TRouteData route_data;
 		  route_data.current_id = local_id;
+		  route_data.comm_id = flit.comm_id;
+		  route_data.comm_size = flit.comm_size;
+		  route_data.packet_seqno = flit.packet_seqno;
 		  route_data.src_id = flit.src_id;
 		  route_data.dst_id = flit.dst_id;
 		  route_data.dir_in = i;
+
+		  if (!flit.ack &&
+		      TGlobalParams::in_order_packets_delivery_blocking)
+		  {
+		    stats.power.InOrderStrategy();
+		    if (local_id == route_data.dst_id) // is a terminal node for the current communication?
+		    {
+		      int expected_packet_seqno = block_ooo.expectPacketSeqNo(route_data.comm_id);
+		      // The following instrunctions are quite
+		      // difficult to understand. The packet is
+		      // blocked iff its seqid is strictly greater
+		      // than the expected seqid. We do not use the !=
+		      // as it is possible that a packet is blocked
+		      // for other causes (contantion for the output
+		      // channel). The second condition is because the
+		      // expected packet seqno must be incremented
+		      // only once if the packet has been blocked for
+		      // wormhole dependent issues.
+		      if (expected_packet_seqno < route_data.packet_seqno)
+			continue;
+		      if (expected_packet_seqno == route_data.packet_seqno)
+			block_ooo.update(route_data.comm_id);
+		    }
+		  }
 
 		  int o = route(route_data);
 
@@ -124,7 +156,7 @@ void TRouter::txProcess()
 			       << ": Router[" << local_id 
 			       << "], Input[" << i << "] (" << buffer[i].Size() << " flits)" 
 			       << ", reserved Output[" << o << "], flit: " << flit << endl;
-			}		      
+			}	
 		    }
 		}
 	    }
@@ -155,6 +187,11 @@ void TRouter::txProcess()
 		      req_tx[o].write(current_level_tx[o]);
 		      buffer[i].Pop();
 
+		      if (TGlobalParams::in_order_packets_delivery_cam && 
+			  flit.flit_type == FLIT_TYPE_HEAD && 
+			  flit.packet_seqno == flit.comm_size)
+			inorderCAM.removeEntry(flit.comm_id);
+
 		      stats.power.Forward();
 
 		      if (flit.flit_type == FLIT_TYPE_TAIL) 
@@ -164,6 +201,7 @@ void TRouter::txProcess()
 		      if (o == DIRECTION_LOCAL)
 			{
 			  stats.receivedFlit(sc_time_stamp().to_double()/1000, flit);
+
 			  if (TGlobalParams::max_volume_to_be_drained)
 			    {
 			      if (drained_volume >= TGlobalParams::max_volume_to_be_drained)
@@ -280,6 +318,8 @@ vector<int> TRouter::routingFunction(const TRouteData& route_data)
 
 int TRouter::route(const TRouteData& route_data)
 {
+  int output;
+
   stats.power.Routing();
 
   if (route_data.dst_id == local_id)
@@ -287,7 +327,49 @@ int TRouter::route(const TRouteData& route_data)
 
   vector<int> candidate_channels = routingFunction(route_data);
 
-  return selectionFunction(candidate_channels,route_data);
+  /*
+  if (local_id == 27) 
+    inorderCAM.showCAM();
+  */
+
+  if (TGlobalParams::in_order_packets_delivery_cam && 
+      route_data.comm_size > 1)
+  {
+    stats.power.InOrderStrategy();
+    if (route_data.packet_seqno == 1) 
+    {
+      TGlobalParams::tmp_cam_accesses++;
+      // Fist packet of the message (longer than 1 packet)
+      if (inorderCAM.isCacheable(route_data.comm_id)) // if (!inorderCAM.isFull())
+      {
+	TGlobalParams::tmp_cam_hits++;
+	// CAM is not full
+	output = selectionFunction(candidate_channels, route_data);
+	inorderCAM.insertEntry(route_data.comm_id, output);
+      }
+      else
+      {
+	// CAM is full, use a deterministic selection policy
+	int i = route_data.comm_id % candidate_channels.size();
+	output = candidate_channels[i];
+      }
+    }
+    else
+    {
+      // Middle packet
+      output = inorderCAM.getOutputPort(route_data.comm_id);
+      if (output == -1) 
+      {
+	// comm is not registered, use deterministic routing
+	int i = route_data.comm_id % candidate_channels.size();
+	output = candidate_channels[i];	
+      }
+    }
+  }
+  else
+    output = selectionFunction(candidate_channels, route_data);
+
+  return output;
 }
 
 //---------------------------------------------------------------------------
@@ -343,10 +425,12 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
   // apply routing function to the adjacent candidate node
     TRouteData tmp_route_data;
     tmp_route_data.current_id = candidate_id;
+    tmp_route_data.comm_id = route_data.comm_id;
+    tmp_route_data.comm_size = route_data.comm_size;
+    tmp_route_data.packet_seqno = route_data.packet_seqno;
     tmp_route_data.src_id = route_data.src_id;
     tmp_route_data.dst_id = route_data.dst_id;
     tmp_route_data.dir_in = reflexDirection(directions[i]);
-
 
     vector<int> next_candidate_channels = routingFunction(tmp_route_data);
 
@@ -386,6 +470,24 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
 
 int TRouter::selectionBufferLevel(const vector<int>& directions)
 {
+
+  vector<int>  best_dirs;
+  int          max_free_slots = 0;
+  for (unsigned int i=0; i<directions.size(); i++)
+    {
+      int free_slots = free_slots_neighbor[directions[i]].read();
+      if (free_slots > max_free_slots) 
+      {
+	max_free_slots = free_slots;
+	best_dirs.clear();
+	best_dirs.push_back(directions[i]);
+      }
+      else if (free_slots == max_free_slots)
+	best_dirs.push_back(directions[i]);
+    }
+  return(best_dirs[rand() % best_dirs.size()]);
+    
+  /*
   vector<int>  best_dirs;
   int          max_free_slots = 0;
   for (unsigned int i=0; i<directions.size(); i++)
@@ -409,44 +511,7 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
     return(best_dirs[rand() % best_dirs.size()]);
   else
     return(directions[rand() % directions.size()]);
-
-  //-------------------------
-  // TODO: unfair if multiple directions have same buffer level
-  // TODO: to check when both available
-//   unsigned int max_free_slots = 0;
-//   int direction_choosen = NOT_VALID;
-
-//   for (unsigned int i=0;i<directions.size();i++)
-//     {
-//       int free_slots = free_slots_neighbor[directions[i]].read();
-//       if ((free_slots >= max_free_slots) &&
-// 	  (reservation_table.isAvailable(directions[i])))
-// 	{
-// 	  direction_choosen = directions[i];
-// 	  max_free_slots = free_slots;
-// 	}
-//     }
-
-//   // No available channel 
-//   if (direction_choosen==NOT_VALID)
-//     direction_choosen = directions[rand() % directions.size()]; 
-
-//   if(TGlobalParams::verbose_mode>VERBOSE_OFF)
-//     {
-//       TChannelStatus tmp;
-
-//       cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id << "] SELECTION between: " << endl;
-//       for (unsigned int i=0;i<directions.size();i++)
-// 	{
-// 	  tmp.free_slots = free_slots_neighbor[directions[i]].read();
-// 	  tmp.available = (reservation_table.isAvailable(directions[i]));
-// 	  cout << "    -> direction " << directions[i] << ", channel status: " << tmp << endl;
-// 	}
-//       cout << " direction choosen: " << direction_choosen << endl;
-//     }
-
-//   assert(direction_choosen>=0);
-//   return direction_choosen;
+  */
 }
 
 //---------------------------------------------------------------------------
@@ -627,14 +692,6 @@ vector<int> TRouter::routingOddEven(const TCoord& current,
 	}
     }
   
-  if (!(directions.size() > 0 && directions.size() <= 2))
-  {
-      cout << "\n STAMPACCHIO :";
-      cout << source << endl;
-      cout << destination << endl;
-      cout << current << endl;
-
-  }
   assert(directions.size() > 0 && directions.size() <= 2);
   
   return directions;

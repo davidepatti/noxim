@@ -29,6 +29,7 @@
 
 #include <set>
 #include <queue>
+#include <map>
 #include <systemc.h>
 #include "NoximDefs.h"
 #include "TGlobalTrafficTable.h"
@@ -64,6 +65,13 @@ SC_MODULE(TProcessingElement)
   set<int>             acks_to_receive;       // Set of the acks to be received by the source
                                               //  (this node) from the destination (the element of
                                               //  the set)
+  map<int,int>         vcomms_id;             // For a destination d, vcomms_id[d] stores the id 
+                                              //  of the next communication
+
+  map<int,queue<TPacket> > packet_queue_waiting_for_ack; // for a destination d, packet_queue_waiting_for_ack[d]
+                                              // gives the queue of packets that have to be transmitted
+                                              // and are blocked due to the fact that the ack
+                                              // has not been received yet
 
   // Functions
 
@@ -90,6 +98,10 @@ SC_MODULE(TProcessingElement)
   void                 setBit(int &x, int w, int v);
   int                  getBit(int x, int w);
   double               log2ceil(double x);
+  bool                 getRndPacketFromPQWFA(TPacket& packet); // Extracts a random packet from 
+                                                               // packet_queue_waiting_for_ack which 
+                                                               // can be sent because the ack has been 
+                                                               // received
 
   // Constructor
 

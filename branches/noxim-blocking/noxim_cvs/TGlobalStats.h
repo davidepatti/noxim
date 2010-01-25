@@ -82,6 +82,10 @@ public:
   // Returns the total power
   double getPower();
 
+  double getOOO();
+  int getTotalRXPkts();
+  int getTotalOOOPkts();
+
   // Shows global statistics
   void showStats(std::ostream& out = std::cout, bool detailed = false);
 

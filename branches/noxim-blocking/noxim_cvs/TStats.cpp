@@ -41,7 +41,25 @@ void TStats::configure(const int node_id, const double _warm_up_time)
 void TStats::receivedFlit(const double arrival_time,
 			  const TFlit& flit)
 {
+  // Out-of-order packet delivery analysis... warm_up_time is not a
+  // matter to collect this kind of statistics
+  // NOTE: it works only for communications 1 packet long
+  if (flit.flit_type == FLIT_TYPE_TAIL && !flit.ack)
+  {
+    int cid = flit.comm_id & 0x0000ffff;
+    //    cout << flit.src_id << "-->" << id << ": comm_id=" << cid << ", expected: " << expected_vcomms_id[flit.src_id] << endl;
+    //    if (flit.comm_id != expected_vcomms_id[flit.src_id])
+    if (cid != expected_vcomms_id[flit.src_id])
+      ooo_counters[flit.src_id]++;
+    expected_vcomms_id[flit.src_id]++;
+  }
+
   if (arrival_time - DEFAULT_RESET_TIME < warm_up_time)
+    return;
+
+  // Uncomment the following two lines if you don't want ack packets
+  // contribute to delay statistics
+  if (flit.ack)
     return;
 
   int i = searchCommHistory(flit.src_id);
@@ -274,6 +292,29 @@ void TStats::showStats(int curr_node,
   
   out << "% Aggregated average delay (cycles): " << getAverageDelay() << endl;
   out << "% Aggregated average throughput (flits/cycle): " << getAverageThroughput() << endl;
+}
+
+//---------------------------------------------------------------------------
+
+void TStats::showOOOStats()
+{
+  for (map<int,int>::iterator i=expected_vcomms_id.begin();
+       i!=expected_vcomms_id.end(); i++)
+  {
+    cout << "% " 
+	 << i->first << "->" << id
+	 << ", received: " << i->second
+   	 << ", out-of-order: " << ooo_counters[i->first]
+    	 << endl;
+  }
+}
+
+//---------------------------------------------------------------------------
+
+void TStats::getOOOStats(map<int,int>& rx_pkts, map<int,int>& ooo_pkts)
+{
+  rx_pkts  = expected_vcomms_id;
+  ooo_pkts = ooo_counters;
 }
 
 //---------------------------------------------------------------------------

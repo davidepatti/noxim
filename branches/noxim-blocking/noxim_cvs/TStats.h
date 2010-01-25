@@ -28,6 +28,7 @@
 //---------------------------------------------------------------------------
 
 #include <vector>
+#include <map>
 #include "NoximDefs.h"
 #include "TPower.h"
 
@@ -41,7 +42,6 @@ struct CommHistory
   vector<double> delays;
   unsigned int   total_received_flits;
   double         last_received_flit_time;
-
 };
 
 //---------------------------------------------------------------------------
@@ -98,6 +98,10 @@ public:
   // Shows statistics for the current node
   void showStats(int curr_node, std::ostream& out = std::cout, bool header = false);
 
+  //-------------
+  void showOOOStats();
+  void getOOOStats(map<int,int>& rx_pkts, map<int,int>& ooo_pkts);
+  //-------------
 
 public:
   
@@ -109,6 +113,12 @@ private:
   int                 id;
   vector<CommHistory> chist;  
   double              warm_up_time;
+
+  // data structures to monitor in-order packet delivery
+  map<int,int>        expected_vcomms_id; // For a source s, expected_vcomms_id[s]
+                                          //  stores the expected communication id
+  map<int,int>        ooo_counters;       // out-of-order counter
+  //------------------
 
   int searchCommHistory(int src_id);
 };

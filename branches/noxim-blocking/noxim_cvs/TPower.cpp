@@ -36,7 +36,12 @@ TPower::TPower()
 
   pwr_standby  = PWR_STANDBY;
   pwr_forward  = PWR_FORWARD_FLIT;
+
   pwr_incoming = PWR_INCOMING;
+  if (TGlobalParams::buffer_depth == 4)
+    pwr_incoming = PWR_FIFO4;
+  else
+    cerr << "Warning: Using power numbers for 4-flits FIFO" << endl;
 
   if (TGlobalParams::routing_algorithm == ROUTING_XY) pwr_routing = PWR_ROUTING_XY;
   else if (TGlobalParams::routing_algorithm == ROUTING_XY) pwr_routing = PWR_ROUTING_XY;
@@ -53,6 +58,32 @@ TPower::TPower()
   else if (TGlobalParams::selection_strategy == SEL_BUFFER_LEVEL) pwr_selection = PWR_SEL_BUFFER_LEVEL;
   else if (TGlobalParams::selection_strategy == SEL_NOP) pwr_selection = PWR_SEL_NOP;
   else assert(false);
+
+  if (TGlobalParams::in_order_packets_delivery_cam)
+  {
+    pwr_io = PWR_IO_CAM;
+    switch (TGlobalParams::inorder_CAM_capacity)
+    {
+      case 2: 
+	pwr_io = PWR_CAM2;
+	break;
+      case 4: 
+	pwr_io = PWR_CAM4;
+	break;
+      case 8: 
+	pwr_io = PWR_CAM8;
+	break;
+      case 16: 
+	pwr_io = PWR_CAM16;
+	break;
+      default:
+	cerr << "Warning: Using power numbers for 2-entries CAM" << endl;
+    }
+  }
+  else if (TGlobalParams::in_order_packets_delivery_blocking)
+    pwr_io = PWR_IO_BLOCKING;
+  else
+    pwr_io = 0.0;
 }
 
 // ---------------------------------------------------------------------------
@@ -88,6 +119,13 @@ void TPower::Forward()
 void TPower::Incoming()
 {
   pwr += pwr_incoming;
+}
+
+// ---------------------------------------------------------------------------
+
+void TPower::InOrderStrategy()
+{
+  pwr += pwr_io;
 }
 
 // ---------------------------------------------------------------------------

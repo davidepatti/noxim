@@ -32,7 +32,8 @@ using namespace std;
 #define AVG_THROUGHPUT_LABEL "% Global average throughput (flits/cycle):"
 #define THROUGHPUT_LABEL     "% Throughput (flits/cycle/IP):"
 #define MAX_DELAY_LABEL      "% Max delay (cycles):"
-#define TOTAL_ENERGY_LABEL   "% Total energy (J):"
+#define TOTAL_ENERGY_LABEL   "% Energy per flit (J/flit):" // "% Total energy (J):"
+#define OOO_PACKETS_LABEL    "% OOO packets (%):"
 
 #define MATLAB_VAR_NAME      "data"
 #define MATRIX_COLUMN_WIDTH  15
@@ -66,6 +67,7 @@ struct TSimulationResults
   double       avg_throughput;
   double       max_delay;
   double       total_energy;
+  double       ooo_packets;
   unsigned int rpackets;
   unsigned int rflits;
 };
@@ -597,9 +599,18 @@ bool ReadResults(const string& fname,
 	  iss >> sres.total_energy;
 	  continue;
 	}
+
+      pos = line.find(OOO_PACKETS_LABEL);
+      if (pos != string::npos) 
+	{
+	  nread++;
+	  istringstream iss(line.substr(pos + string(OOO_PACKETS_LABEL).size()));
+	  iss >> sres.ooo_packets;
+	  continue;
+	}
     }
 
-  if (nread != 7)
+  if (nread != 8)
     {
       error_msg = "Output file " + fname + " corrupted";
       return false;
@@ -632,6 +643,19 @@ bool RunSimulation(const string& cmd_base,
 
 //---------------------------------------------------------------------------
 
+string ExtractFirstField(const string& s)
+{
+  istringstream iss(s);
+
+  string sfirst;
+
+  iss >> sfirst;
+
+  return sfirst;
+}
+
+//---------------------------------------------------------------------------
+
 bool RunSimulations(double start_time,
 		    pair<uint,uint>& sim_counter,
 		    const string& cmd, const string& tmp_dir, const int repetitions,
@@ -658,7 +682,7 @@ bool RunSimulations(double start_time,
       // Print aggragated parameters
       fout << "  ";
       for (uint i=0; i<aggr_conf.size(); i++)
-	fout << setw(MATRIX_COLUMN_WIDTH) << aggr_conf[i].second;
+	fout << setw(MATRIX_COLUMN_WIDTH) << ExtractFirstField(aggr_conf[i].second); // this fix the problem with pir
 
       // Print results;
       fout << setw(MATRIX_COLUMN_WIDTH) << sres.avg_delay
@@ -667,6 +691,7 @@ bool RunSimulations(double start_time,
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.total_energy
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.rpackets
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.rflits 
+	   << setw(MATRIX_COLUMN_WIDTH) << sres.ooo_packets
 	   << endl;
     }
 
@@ -689,7 +714,8 @@ bool PrintMatlabVariableBegin(const TParametersSpace& aggragated_params_space,
        << setw(MATRIX_COLUMN_WIDTH) << "max_delay"
        << setw(MATRIX_COLUMN_WIDTH) << "total_energy"
        << setw(MATRIX_COLUMN_WIDTH) << "rpackets"
-       << setw(MATRIX_COLUMN_WIDTH) << "rflits";
+       << setw(MATRIX_COLUMN_WIDTH) << "rflits"
+       << setw(MATRIX_COLUMN_WIDTH) << "ooopkts";
 
   fout << endl;
 
@@ -707,11 +733,11 @@ bool GenMatlabCode(const string& var_name,
        << "for i = 1:rows/" << repetitions << "," << endl
        << "   ifirst = (i - 1) * " << repetitions << " + 1;" << endl
        << "   ilast  = ifirst + " << repetitions << " - 1;" << endl
-       << "   tmp = " << MATLAB_VAR_NAME << "(ifirst:ilast, cols-6+" << column << ");" << endl
+       << "   tmp = " << MATLAB_VAR_NAME << "(ifirst:ilast, cols-7+" << column << ");" << endl
        << "   avg = mean(tmp);" << endl
        << "   [h sig ci] = ttest(tmp, 0.1);" << endl
        << "   ci = (ci(2)-ci(1))/2;" << endl
-       << "   " << var_name << " = [" << var_name << "; " << MATLAB_VAR_NAME << "(ifirst, 1:cols-6), avg ci];" << endl
+       << "   " << var_name << " = [" << var_name << "; " << MATLAB_VAR_NAME << "(ifirst, 1:cols-7), avg ci];" << endl
        << "end" << endl
        << endl;
 
@@ -773,6 +799,10 @@ bool PrintMatlabVariableEnd(const int repetitions,
 
   if (!GenMatlabCode(string(MATLAB_VAR_NAME) + "_totalenergy", 4,
 		     repetitions, 4, fout, error_msg))
+    return false;
+
+  if (!GenMatlabCode(string(MATLAB_VAR_NAME) + "_ooopkts", 5,
+		     repetitions, 7, fout, error_msg))
     return false;
 
   if (!GenMatlabCodeSaturationAnalysis(string(MATLAB_VAR_NAME), fout, error_msg))
