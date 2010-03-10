@@ -1,9 +1,13 @@
+Noxim - the NoC Simulator
+=========================
 
-Noxim 
-----------------------------------
+Welcome to Noxim, the Network-on-Chip Simulator developed at the University of Catania (Italy).
 
-To compile (first time):
+For further informations please refer to the following files:
 
-1) Edit Makefile.defs according to your systemc path installation
-2) make (don't mind about warning messages)
+- README: this index file!
+- INSTALL: instructions to install the tool
+- AUTHORS: authors of the tool
+- CHANGE: history of the main modifications made to the code
+- COPYING: license under which you are allowed to use the source files
 
