@@ -1,61 +1,43 @@
-/*****************************************************************************
-
-  TNoC.cpp -- Network-on-Chip (NoC) implementation
-
- *****************************************************************************/
-/* Copyright 2005-2007  
-    Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
-    Maurizio Palesi <mpalesi@diit.unict.it>
-    Davide Patti <dpatti@diit.unict.it>
-
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+/*
+ * Noxim - the NoC Simulator
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * (C) 2005-2010 by the University of Catania
+ * For the complete list of authors refer to file ../doc/AUTHORS.txt
+ * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * This file contains the implementation of the Network-on-Chip
  */
-#include "TNoC.h"
-#include "TGlobalRoutingTable.h"
-#include "TGlobalTrafficTable.h"
 
-//---------------------------------------------------------------------------
+#include "NoximNoC.h"
 
-void TNoC::buildMesh()
+void NoximNoC::buildMesh()
 {
   // Check for routing table availability
-  if (TGlobalParams::routing_algorithm == ROUTING_TABLE_BASED)
-    assert(grtable.load(TGlobalParams::routing_table_filename));
+  if (NoximGlobalParams::routing_algorithm == ROUTING_TABLE_BASED)
+    assert(grtable.load(NoximGlobalParams::routing_table_filename));
 
   // Check for traffic table availability
-  if (TGlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
-    assert(gttable.load(TGlobalParams::traffic_table_filename));
+  if (NoximGlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
+    assert(gttable.load(NoximGlobalParams::traffic_table_filename));
 
   // Create the mesh as a matrix of tiles
-  for(int i=0; i<TGlobalParams::mesh_dim_x; i++)
+  for(int i=0; i<NoximGlobalParams::mesh_dim_x; i++)
     {
-      for(int j=0; j<TGlobalParams::mesh_dim_y; j++)
+      for(int j=0; j<NoximGlobalParams::mesh_dim_y; j++)
 	{
 	  // Create the single Tile with a proper name
 	  char tile_name[20];
 	  sprintf(tile_name, "Tile[%02d][%02d]", i, j);
-	  t[i][j] = new TTile(tile_name);
+	  t[i][j] = new NoximTile(tile_name);
 
 	  // Tell to the router its coordinates
-	  t[i][j]->r->configure(j * TGlobalParams::mesh_dim_x + i,
-				TGlobalParams::stats_warm_up_time,
-				TGlobalParams::buffer_depth,
+	  t[i][j]->r->configure(j * NoximGlobalParams::mesh_dim_x + i,
+				NoximGlobalParams::stats_warm_up_time,
+				NoximGlobalParams::buffer_depth,
 				grtable);
 
 	  // Tell to the PE its coordinates
-	  t[i][j]->pe->local_id = j * TGlobalParams::mesh_dim_x + i;
+	  t[i][j]->pe->local_id = j * NoximGlobalParams::mesh_dim_x + i;
           t[i][j]->pe->traffic_table = &gttable;  // Needed to choose destination
           t[i][j]->pe->never_transmit = (gttable.occurrencesAsSource(t[i][j]->pe->local_id) == 0);
 
@@ -122,9 +104,8 @@ void TNoC::buildMesh()
 	}
     }
 
-
-  // dummy TNoP_data structure
-  TNoP_data tmp_NoP;
+  // dummy NoximNoP_data structure
+  NoximNoP_data tmp_NoP;
 
   tmp_NoP.sender_id = NOT_VALID;
 
@@ -135,61 +116,56 @@ void TNoC::buildMesh()
   }
 
   // Clear signals for borderline nodes
-  for(int i=0; i<=TGlobalParams::mesh_dim_x; i++)
+  for(int i=0; i<=NoximGlobalParams::mesh_dim_x; i++)
     {
       req_to_south[i][0] = 0;
       ack_to_north[i][0] = 0;
-      req_to_north[i][TGlobalParams::mesh_dim_y] = 0;
-      ack_to_south[i][TGlobalParams::mesh_dim_y] = 0;
+      req_to_north[i][NoximGlobalParams::mesh_dim_y] = 0;
+      ack_to_south[i][NoximGlobalParams::mesh_dim_y] = 0;
 
       free_slots_to_south[i][0].write(NOT_VALID);
-      free_slots_to_north[i][TGlobalParams::mesh_dim_y].write(NOT_VALID);
+      free_slots_to_north[i][NoximGlobalParams::mesh_dim_y].write(NOT_VALID);
 
       NoP_data_to_south[i][0].write(tmp_NoP);
-      NoP_data_to_north[i][TGlobalParams::mesh_dim_y].write(tmp_NoP);
+      NoP_data_to_north[i][NoximGlobalParams::mesh_dim_y].write(tmp_NoP);
 
     }
 
-  for(int j=0; j<=TGlobalParams::mesh_dim_y; j++)
+  for(int j=0; j<=NoximGlobalParams::mesh_dim_y; j++)
     {
       req_to_east[0][j] = 0;
       ack_to_west[0][j] = 0;
-      req_to_west[TGlobalParams::mesh_dim_x][j] = 0;
-      ack_to_east[TGlobalParams::mesh_dim_x][j] = 0;
+      req_to_west[NoximGlobalParams::mesh_dim_x][j] = 0;
+      ack_to_east[NoximGlobalParams::mesh_dim_x][j] = 0;
 
       free_slots_to_east[0][j].write(NOT_VALID);
-      free_slots_to_west[TGlobalParams::mesh_dim_x][j].write(NOT_VALID);
+      free_slots_to_west[NoximGlobalParams::mesh_dim_x][j].write(NOT_VALID);
 
       NoP_data_to_east[0][j].write(tmp_NoP);
-      NoP_data_to_west[TGlobalParams::mesh_dim_x][j].write(tmp_NoP);
+      NoP_data_to_west[NoximGlobalParams::mesh_dim_x][j].write(tmp_NoP);
 
     }
 
   // invalidate reservation table entries for non-exhistent channels
-  for(int i=0; i<TGlobalParams::mesh_dim_x; i++)
+  for(int i=0; i<NoximGlobalParams::mesh_dim_x; i++)
     {
       t[i][0]->r->reservation_table.invalidate(DIRECTION_NORTH);
-      t[i][TGlobalParams::mesh_dim_y-1]->r->reservation_table.invalidate(DIRECTION_SOUTH);
+      t[i][NoximGlobalParams::mesh_dim_y-1]->r->reservation_table.invalidate(DIRECTION_SOUTH);
     }
-  for(int j=0; j<TGlobalParams::mesh_dim_y; j++)
+  for(int j=0; j<NoximGlobalParams::mesh_dim_y; j++)
     {
       t[0][j]->r->reservation_table.invalidate(DIRECTION_WEST);
-      t[TGlobalParams::mesh_dim_x-1][j]->r->reservation_table.invalidate(DIRECTION_EAST);
+      t[NoximGlobalParams::mesh_dim_x-1][j]->r->reservation_table.invalidate(DIRECTION_EAST);
     }
-
 }
 
-//---------------------------------------------------------------------------
-
-TTile* TNoC::searchNode(const int id) const
+NoximTile* NoximNoC::searchNode(const int id) const
 {
-  for (int i=0; i<TGlobalParams::mesh_dim_x; i++)
-    for (int j=0; j<TGlobalParams::mesh_dim_y; j++)
+  for (int i=0; i<NoximGlobalParams::mesh_dim_x; i++)
+    for (int j=0; j<NoximGlobalParams::mesh_dim_y; j++)
       if (t[i][j]->r->local_id == id)
 	return t[i][j];
 
   return false;
 }
-
-//---------------------------------------------------------------------------
 

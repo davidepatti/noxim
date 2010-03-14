@@ -1,34 +1,16 @@
-/*****************************************************************************
-
-  TRouter.cpp -- Router implementation
-
-*****************************************************************************/
-/* Copyright 2005-2007  
-    Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
-    Maurizio Palesi <mpalesi@diit.unict.it>
-    Davide Patti <dpatti@diit.unict.it>
-
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+/*
+ * Noxim - the NoC Simulator
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * (C) 2005-2010 by the University of Catania
+ * For the complete list of authors refer to file ../doc/AUTHORS.txt
+ * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * This file contains the implementation of the router
  */
-#include "TRouter.h"
 
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
+#include "NoximRouter.h"
 
-
-void TRouter::rxProcess()
+void NoximRouter::rxProcess()
 {
   if(reset.read())
     {
@@ -58,9 +40,9 @@ void TRouter::rxProcess()
 
 	  if ( (req_rx[i].read()==1-current_level_rx[i]) && !buffer[i].IsFull() )
 	    {
-	      TFlit received_flit = flit_rx[i].read();
+	      NoximFlit received_flit = flit_rx[i].read();
 
-	      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
+	      if(NoximGlobalParams::verbose_mode > VERBOSE_OFF)
 		{
 		  cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id <<"], Input[" << i << "], Received flit: " << received_flit << endl;
 		}
@@ -80,9 +62,7 @@ void TRouter::rxProcess()
   stats.power.Standby();
 }
 
-//---------------------------------------------------------------------------
-
-void TRouter::txProcess()
+void NoximRouter::txProcess()
 {
   if (reset.read())
     {
@@ -102,12 +82,12 @@ void TRouter::txProcess()
 
 	  if ( !buffer[i].IsEmpty() )
 	    {
-	      TFlit flit = buffer[i].Front();
+	      NoximFlit flit = buffer[i].Front();
 
 	      if (flit.flit_type==FLIT_TYPE_HEAD) 
 		{
 		  // prepare data for routing
-		  TRouteData route_data;
+		  NoximRouteData route_data;
 		  route_data.current_id = local_id;
 		  route_data.src_id = flit.src_id;
 		  route_data.dst_id = flit.dst_id;
@@ -118,7 +98,7 @@ void TRouter::txProcess()
 		  if (reservation_table.isAvailable(o))
 		    {
 		      reservation_table.reserve(i, o);
-		      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
+		      if(NoximGlobalParams::verbose_mode > VERBOSE_OFF)
 			{
 			  cout << sc_time_stamp().to_double()/1000 
 			       << ": Router[" << local_id 
@@ -136,14 +116,14 @@ void TRouter::txProcess()
 	{
 	  if ( !buffer[i].IsEmpty() )
 	    {
-	      TFlit flit = buffer[i].Front();
+	      NoximFlit flit = buffer[i].Front();
 
 	      int o = reservation_table.getOutputPort(i);
 	      if (o != NOT_RESERVED)
 		{
 		  if ( current_level_tx[o] == ack_tx[o].read() )
 		    {
-                      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
+                      if(NoximGlobalParams::verbose_mode > VERBOSE_OFF)
 			{
 			  cout << sc_time_stamp().to_double()/1000 
 			       << ": Router[" << local_id 
@@ -164,9 +144,9 @@ void TRouter::txProcess()
 		      if (o == DIRECTION_LOCAL)
 			{
 			  stats.receivedFlit(sc_time_stamp().to_double()/1000, flit);
-			  if (TGlobalParams::max_volume_to_be_drained)
+			  if (NoximGlobalParams::max_volume_to_be_drained)
 			    {
-			      if (drained_volume >= TGlobalParams::max_volume_to_be_drained)
+			      if (drained_volume >= NoximGlobalParams::max_volume_to_be_drained)
 				sc_stop();
 			      else
 			      {
@@ -188,11 +168,9 @@ void TRouter::txProcess()
   stats.power.Standby();
 }
 
-//---------------------------------------------------------------------------
-
-TNoP_data TRouter::getCurrentNoPData() const 
+NoximNoP_data NoximRouter::getCurrentNoPData() const 
 {
-    TNoP_data NoP_data;
+    NoximNoP_data NoP_data;
 
     for (int j=0; j<DIRECTIONS; j++)
     {
@@ -205,9 +183,7 @@ TNoP_data TRouter::getCurrentNoPData() const
     return NoP_data;
 }
 
-//---------------------------------------------------------------------------
-
-void TRouter::bufferMonitor()
+void NoximRouter::bufferMonitor()
 {
   if (reset.read())
   {
@@ -216,8 +192,8 @@ void TRouter::bufferMonitor()
   else
   {
 
-    if (TGlobalParams::selection_strategy==SEL_BUFFER_LEVEL ||
-	TGlobalParams::selection_strategy==SEL_NOP)
+    if (NoximGlobalParams::selection_strategy==SEL_BUFFER_LEVEL ||
+	NoximGlobalParams::selection_strategy==SEL_NOP)
     {
 
       // update current input buffers level to neighbors
@@ -225,7 +201,7 @@ void TRouter::bufferMonitor()
 	free_slots[i].write(buffer[i].getCurrentFreeSlots());
 
       // NoP selection: send neighbor info to each direction 'i'
-      TNoP_data current_NoP_data = getCurrentNoPData();
+      NoximNoP_data current_NoP_data = getCurrentNoPData();
 
       for (int i=0; i<DIRECTIONS; i++)
 	NoP_data_out[i].write(current_NoP_data);
@@ -233,16 +209,14 @@ void TRouter::bufferMonitor()
   }
 }
 
-//---------------------------------------------------------------------------
-
-vector<int> TRouter::routingFunction(const TRouteData& route_data) 
+vector<int> NoximRouter::routingFunction(const NoximRouteData& route_data) 
 {
-  TCoord position  = id2Coord(route_data.current_id);
-  TCoord src_coord = id2Coord(route_data.src_id);
-  TCoord dst_coord = id2Coord(route_data.dst_id);
+  NoximCoord position  = id2Coord(route_data.current_id);
+  NoximCoord src_coord = id2Coord(route_data.src_id);
+  NoximCoord dst_coord = id2Coord(route_data.dst_id);
   int dir_in = route_data.dir_in;
 
-  switch (TGlobalParams::routing_algorithm)
+  switch (NoximGlobalParams::routing_algorithm)
     {
     case ROUTING_XY:
       return routingXY(position, dst_coord);
@@ -276,9 +250,7 @@ vector<int> TRouter::routingFunction(const TRouteData& route_data)
   return (vector<int>)(0);
 }
 
-//---------------------------------------------------------------------------
-
-int TRouter::route(const TRouteData& route_data)
+int NoximRouter::route(const NoximRouteData& route_data)
 {
   stats.power.Routing();
 
@@ -290,11 +262,9 @@ int TRouter::route(const TRouteData& route_data)
   return selectionFunction(candidate_channels,route_data);
 }
 
-//---------------------------------------------------------------------------
-
-void TRouter::NoP_report() const
+void NoximRouter::NoP_report() const
 {
-    TNoP_data NoP_tmp;
+    NoximNoP_data NoP_tmp;
       cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id << "] NoP report: " << endl;
 
       for (int i=0;i<DIRECTIONS; i++) 
@@ -306,7 +276,7 @@ void TRouter::NoP_report() const
 }
 //---------------------------------------------------------------------------
 
-int TRouter::NoPScore(const TNoP_data& nop_data, const vector<int>& nop_channels) const
+int NoximRouter::NoPScore(const NoximNoP_data& nop_data, const vector<int>& nop_channels) const
 {
     int score = 0;
 
@@ -325,9 +295,8 @@ int TRouter::NoPScore(const TNoP_data& nop_data, const vector<int>& nop_channels
 
     return score;
 }
-//---------------------------------------------------------------------------
 
-int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route_data)
+int NoximRouter::selectionNoP(const vector<int>& directions, const NoximRouteData& route_data)
 {
   vector<int> neighbors_on_path;
   vector<int> score;
@@ -341,7 +310,7 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
     int candidate_id = getNeighborId(current_id,directions[i]);
 
   // apply routing function to the adjacent candidate node
-    TRouteData tmp_route_data;
+    NoximRouteData tmp_route_data;
     tmp_route_data.current_id = candidate_id;
     tmp_route_data.src_id = route_data.src_id;
     tmp_route_data.dst_id = route_data.dst_id;
@@ -351,7 +320,7 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
     vector<int> next_candidate_channels = routingFunction(tmp_route_data);
 
     // select useful data from Neighbor-on-Path input 
-    TNoP_data nop_tmp = NoP_data_in[directions[i]].read();
+    NoximNoP_data nop_tmp = NoP_data_in[directions[i]].read();
 
     // store the score of node in the direction[i]
     score.push_back(NoPScore(nop_tmp,next_candidate_channels));
@@ -382,9 +351,7 @@ int TRouter::selectionNoP(const vector<int>& directions, const TRouteData& route
   return direction_selected; 
 }
 
-//---------------------------------------------------------------------------
-
-int TRouter::selectionBufferLevel(const vector<int>& directions)
+int NoximRouter::selectionBufferLevel(const vector<int>& directions)
 {
   vector<int>  best_dirs;
   int          max_free_slots = 0;
@@ -431,9 +398,9 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
 //   if (direction_choosen==NOT_VALID)
 //     direction_choosen = directions[rand() % directions.size()]; 
 
-//   if(TGlobalParams::verbose_mode>VERBOSE_OFF)
+//   if(NoximGlobalParams::verbose_mode>VERBOSE_OFF)
 //     {
-//       TChannelStatus tmp;
+//       NoximChannelStatus tmp;
 
 //       cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id << "] SELECTION between: " << endl;
 //       for (unsigned int i=0;i<directions.size();i++)
@@ -449,22 +416,18 @@ int TRouter::selectionBufferLevel(const vector<int>& directions)
 //   return direction_choosen;
 }
 
-//---------------------------------------------------------------------------
-
-int TRouter::selectionRandom(const vector<int>& directions)
+int NoximRouter::selectionRandom(const vector<int>& directions)
 {
   return directions[rand() % directions.size()]; 
 }
 
-//---------------------------------------------------------------------------
-
-int TRouter::selectionFunction(const vector<int>& directions, const TRouteData& route_data)
+int NoximRouter::selectionFunction(const vector<int>& directions, const NoximRouteData& route_data)
 {
   // not so elegant but fast escape ;)
   if (directions.size()==1) return directions[0];
   
   stats.power.Selection();
-  switch (TGlobalParams::selection_strategy)
+  switch (NoximGlobalParams::selection_strategy)
     {
     case SEL_RANDOM:
       return selectionRandom(directions);
@@ -479,9 +442,7 @@ int TRouter::selectionFunction(const vector<int>& directions, const TRouteData& 
   return 0;	    
 }
 
-//---------------------------------------------------------------------------
-
-vector<int> TRouter::routingXY(const TCoord& current, const TCoord& destination)
+vector<int> NoximRouter::routingXY(const NoximCoord& current, const NoximCoord& destination)
 {
   vector<int> directions;
   
@@ -497,9 +458,7 @@ vector<int> TRouter::routingXY(const TCoord& current, const TCoord& destination)
   return directions;
 }
 
-//---------------------------------------------------------------------------
-
-vector<int> TRouter::routingWestFirst(const TCoord& current, const TCoord& destination)
+vector<int> NoximRouter::routingWestFirst(const NoximCoord& current, const NoximCoord& destination)
 {
   vector<int> directions;
 
@@ -521,9 +480,7 @@ vector<int> TRouter::routingWestFirst(const TCoord& current, const TCoord& desti
   return directions;
 }
 
-//---------------------------------------------------------------------------
-
-vector<int> TRouter::routingNorthLast(const TCoord& current, const TCoord& destination)
+vector<int> NoximRouter::routingNorthLast(const NoximCoord& current, const NoximCoord& destination)
 {
   vector<int> directions;
 
@@ -545,9 +502,7 @@ vector<int> TRouter::routingNorthLast(const TCoord& current, const TCoord& desti
   return directions;
 }
 
-//---------------------------------------------------------------------------
-
-vector<int> TRouter::routingNegativeFirst(const TCoord& current, const TCoord& destination)
+vector<int> NoximRouter::routingNegativeFirst(const NoximCoord& current, const NoximCoord& destination)
 {
   vector<int> directions;
 
@@ -570,10 +525,8 @@ vector<int> TRouter::routingNegativeFirst(const TCoord& current, const TCoord& d
   return directions;
 }
 
-//---------------------------------------------------------------------------
-
-vector<int> TRouter::routingOddEven(const TCoord& current, 
-				    const TCoord& source, const TCoord& destination)
+vector<int> NoximRouter::routingOddEven(const NoximCoord& current, 
+				    const NoximCoord& source, const NoximCoord& destination)
 {
   vector<int> directions;
 
@@ -629,7 +582,7 @@ vector<int> TRouter::routingOddEven(const TCoord& current,
   
   if (!(directions.size() > 0 && directions.size() <= 2))
   {
-      cout << "\n STAMPACCHIO :";
+      cout << "\n PICCININI, CECCONI & ... :";  // STAMPACCHIA
       cout << source << endl;
       cout << destination << endl;
       cout << current << endl;
@@ -640,10 +593,8 @@ vector<int> TRouter::routingOddEven(const TCoord& current,
   return directions;
 }
 
-//---------------------------------------------------------------------------
-
-vector<int> TRouter::routingDyAD(const TCoord& current, 
-				 const TCoord& source, const TCoord& destination)
+vector<int> NoximRouter::routingDyAD(const NoximCoord& current, 
+				 const NoximCoord& source, const NoximCoord& destination)
 {
   vector<int> directions;
 
@@ -655,9 +606,7 @@ vector<int> TRouter::routingDyAD(const TCoord& current,
   return directions;
 }
 
-//---------------------------------------------------------------------------
-
-vector<int> TRouter::routingFullyAdaptive(const TCoord& current, const TCoord& destination)
+vector<int> NoximRouter::routingFullyAdaptive(const NoximCoord& current, const NoximCoord& destination)
 {
   vector<int> directions;
 
@@ -692,11 +641,9 @@ vector<int> TRouter::routingFullyAdaptive(const TCoord& current, const TCoord& d
   return directions;
 }
 
-//---------------------------------------------------------------------------
-
-vector<int> TRouter::routingTableBased(const int dir_in, const TCoord& current, const TCoord& destination)
+vector<int> NoximRouter::routingTableBased(const int dir_in, const NoximCoord& current, const NoximCoord& destination)
 {
-  TAdmissibleOutputs ao = routing_table.getAdmissibleOutputs(dir_in, coord2Id(destination));
+  NoximAdmissibleOutputs ao = routing_table.getAdmissibleOutputs(dir_in, coord2Id(destination));
   
   if (ao.size() == 0)
     {
@@ -721,12 +668,10 @@ vector<int> TRouter::routingTableBased(const int dir_in, const TCoord& current, 
   return admissibleOutputsSet2Vector(ao);
 }
 
-//---------------------------------------------------------------------------
-
-void TRouter::configure(const int _id, 
+void NoximRouter::configure(const int _id, 
 			const double _warm_up_time,
 			const unsigned int _max_buffer_size,
-			TGlobalRoutingTable& grt)
+			NoximGlobalRoutingTable& grt)
 {
   local_id = _id;
   stats.configure(_id, _warm_up_time);
@@ -740,16 +685,12 @@ void TRouter::configure(const int _id,
     buffer[i].SetMaxBufferSize(_max_buffer_size);
 }
 
-//---------------------------------------------------------------------------
-
-unsigned long TRouter::getRoutedFlits()
+unsigned long NoximRouter::getRoutedFlits()
 { 
   return routed_flits; 
 }
 
-//---------------------------------------------------------------------------
-
-unsigned int TRouter::getFlitsCount()
+unsigned int NoximRouter::getFlitsCount()
 {
   unsigned count = 0;
 
@@ -759,16 +700,12 @@ unsigned int TRouter::getFlitsCount()
   return count;
 }
 
-//---------------------------------------------------------------------------
-
-double TRouter::getPower()
+double NoximRouter::getPower()
 {
   return stats.power.getPower();
 }
 
-//---------------------------------------------------------------------------
-
-int TRouter::reflexDirection(int direction) const
+int NoximRouter::reflexDirection(int direction) const
 {
     if (direction == DIRECTION_NORTH) return DIRECTION_SOUTH;
     if (direction == DIRECTION_EAST) return DIRECTION_WEST;
@@ -780,11 +717,9 @@ int TRouter::reflexDirection(int direction) const
     return NOT_VALID;
 }
 
-//---------------------------------------------------------------------------
-
-int TRouter::getNeighborId(int _id, int direction) const
+int NoximRouter::getNeighborId(int _id, int direction) const
 {
-    TCoord my_coord = id2Coord(_id);
+    NoximCoord my_coord = id2Coord(_id);
 
     switch (direction)
     {
@@ -793,11 +728,11 @@ int TRouter::getNeighborId(int _id, int direction) const
 	    my_coord.y--;
 	    break;
 	case DIRECTION_SOUTH:
-	    if (my_coord.y==TGlobalParams::mesh_dim_y-1) return NOT_VALID;
+	    if (my_coord.y==NoximGlobalParams::mesh_dim_y-1) return NOT_VALID;
 	    my_coord.y++;
 	    break;
 	case DIRECTION_EAST:
-	    if (my_coord.x==TGlobalParams::mesh_dim_x-1) return NOT_VALID;
+	    if (my_coord.x==NoximGlobalParams::mesh_dim_x-1) return NOT_VALID;
 	    my_coord.x++;
 	    break;
 	case DIRECTION_WEST:
@@ -814,18 +749,15 @@ int TRouter::getNeighborId(int _id, int direction) const
   return neighbor_id;
 }
 
-//---------------------------------------------------------------------------
-
-bool TRouter::inCongestion()
+bool NoximRouter::inCongestion()
 {
   for (int i=0; i<DIRECTIONS; i++)
     {
-      int flits = TGlobalParams::buffer_depth - free_slots_neighbor[i];
-      if (flits > (int)(TGlobalParams::buffer_depth * TGlobalParams::dyad_threshold))
+      int flits = NoximGlobalParams::buffer_depth - free_slots_neighbor[i];
+      if (flits > (int)(NoximGlobalParams::buffer_depth * NoximGlobalParams::dyad_threshold))
 	return true;
     }
 
   return false;
 }
 
-//---------------------------------------------------------------------------
