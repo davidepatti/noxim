@@ -1,38 +1,23 @@
-/*****************************************************************************
-
-  NoximDefs.h -- Common constants and structs definitions
-
- *****************************************************************************/
-/* Copyright 2005-2007  
-    Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
-    Maurizio Palesi <mpalesi@diit.unict.it>
-    Davide Patti <dpatti@diit.unict.it>
-
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+/*
+ * Noxim - the NoC Simulator
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * (C) 2005-2010 by the University of Catania
+ * For the complete list of authors refer to file ../doc/AUTHORS.txt
+ * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * This file contains the declaration of the top-level of Noxim
  */
-#ifndef __NOXIM_DEFS_H__
-#define __NOXIM_DEFS_H__
 
-//---------------------------------------------------------------------------
+#ifndef __NOXIMMAIN_H__
+#define __NOXIMMAIN_H__
 
 #include <cassert>
 #include <systemc.h>
 #include <vector>
-
+//#include "NoximNoC.h"
+//#include "NoximGlobalStats.h"
+//#include "NoximCmdLineParser.h"
 using namespace std;
-
 
 // Define the directions as numbers
 #define DIRECTIONS             4
@@ -82,8 +67,6 @@ using namespace std;
 #define VERBOSE_MEDIUM         2
 #define VERBOSE_HIGH           3
 
-//---------------------------------------------------------------------------
-
 // Default configuration can be overridden with command-line arguments
 #define DEFAULT_VERBOSE_MODE               VERBOSE_OFF
 #define DEFAULT_TRACE_MODE                       false
@@ -110,9 +93,8 @@ using namespace std;
 // TODO by Fafa - this MUST be removed!!!
 #define MAX_STATIC_DIM 20
 
-//---------------------------------------------------------------------------
-// TGlobalParams -- used to forward configuration to every sub-block
-struct TGlobalParams
+// NoximGlobalParams -- used to forward configuration to every sub-block
+struct NoximGlobalParams
 {
   static int verbose_mode;
   static int trace_mode;
@@ -138,43 +120,38 @@ struct TGlobalParams
   static unsigned int max_volume_to_be_drained;
 };
 
-
-//---------------------------------------------------------------------------
-// TCoord -- XY coordinates type of the Tile inside the Mesh
-class TCoord
+// NoximCoord -- XY coordinates type of the Tile inside the Mesh
+class NoximCoord
 {
  public:
   int                x;            // X coordinate
   int                y;            // Y coordinate
 
-  inline bool operator == (const TCoord& coord) const
+  inline bool operator == (const NoximCoord& coord) const
   {
     return (coord.x==x && coord.y==y);
   }
 };
 
-//---------------------------------------------------------------------------
-// TFlitType -- Flit type enumeration
-enum TFlitType
+// NoximFlitType -- Flit type enumeration
+enum NoximFlitType
 {
   FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL
 };
 
-//---------------------------------------------------------------------------
-// TPayload -- Payload definition
-struct TPayload
+// NoximPayload -- Payload definition
+struct NoximPayload
 {
   sc_uint<32>        data;         // Bus for the data to be exchanged
 
-  inline bool operator == (const TPayload& payload) const
+  inline bool operator == (const NoximPayload& payload) const
   {
     return (payload.data==data);
   }
 };
 
-//---------------------------------------------------------------------------
-// TPacket -- Packet definition
-struct TPacket
+// NoximPacket -- Packet definition
+struct NoximPacket
 {
   int                src_id;
   int                dst_id;
@@ -182,8 +159,8 @@ struct TPacket
   int                size;
   int                flit_left;    // Number of remaining flits inside the packet
 
-  TPacket() {;}
-  TPacket(const int s, const int d, const double ts, const int sz) {
+  NoximPacket() {;}
+  NoximPacket(const int s, const int d, const double ts, const int sz) {
     make(s, d, ts, sz);
   }
 
@@ -192,9 +169,8 @@ struct TPacket
   }
 };
 
-//---------------------------------------------------------------------------
-// TRouteData -- data required to perform routing
-struct TRouteData
+// NoximRouteData -- data required to perform routing
+struct NoximRouteData
 {
     int current_id;
     int src_id;
@@ -202,26 +178,23 @@ struct TRouteData
     int dir_in; // direction from which the packet comes from
 };
 
-//---------------------------------------------------------------------------
-struct TChannelStatus
+struct NoximChannelStatus
 {
     int free_slots;  // occupied buffer slots
     bool available; // 
-    inline bool operator == (const TChannelStatus& bs) const
+    inline bool operator == (const NoximChannelStatus& bs) const
     {
 	return (free_slots == bs.free_slots && available == bs.available);
     };
 };
 
-//---------------------------------------------------------------------------
-
-// TNoP_data -- NoP Data definition
-struct TNoP_data
+// NoximNoP_data -- NoP Data definition
+struct NoximNoP_data
 {
     int sender_id;
-    TChannelStatus channel_status_neighbor[DIRECTIONS]; 
+    NoximChannelStatus channel_status_neighbor[DIRECTIONS]; 
 
-    inline bool operator == (const TNoP_data& nop_data) const
+    inline bool operator == (const NoximNoP_data& nop_data) const
     {
 	return ( sender_id==nop_data.sender_id  &&
 		nop_data.channel_status_neighbor[0]==channel_status_neighbor[0] &&
@@ -231,31 +204,29 @@ struct TNoP_data
     };
 };
 
-//---------------------------------------------------------------------------
-// TFlit -- Flit definition
-struct TFlit
+// NoximFlit -- Flit definition
+struct NoximFlit
 {
   int                src_id;
   int                dst_id;
-  TFlitType          flit_type;    // The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
+  NoximFlitType      flit_type;    // The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
   int                sequence_no;  // The sequence number of the flit inside the packet
-  TPayload           payload;      // Optional payload
+  NoximPayload       payload;      // Optional payload
   double             timestamp;    // Unix timestamp at packet generation
   int                hop_no;       // Current number of hops from source to destination
 
-  inline bool operator == (const TFlit& flit) const
+  inline bool operator == (const NoximFlit& flit) const
   {
     return (flit.src_id==src_id && flit.dst_id==dst_id && flit.flit_type==flit_type && flit.sequence_no==sequence_no && flit.payload==payload && flit.timestamp==timestamp && flit.hop_no==hop_no);
   }
 };
 
-// output redefinitions *******************************************
+// Output overloading
 
-//---------------------------------------------------------------------------
-inline ostream& operator << (ostream& os, const TFlit& flit)
+inline ostream& operator << (ostream& os, const NoximFlit& flit)
 {
 
-  if (TGlobalParams::verbose_mode==VERBOSE_HIGH)
+  if (NoximGlobalParams::verbose_mode==VERBOSE_HIGH)
   {
 
       os << "### FLIT ###" << endl;
@@ -287,9 +258,8 @@ inline ostream& operator << (ostream& os, const TFlit& flit)
 
   return os;
 }
-//---------------------------------------------------------------------------
 
-inline ostream& operator << (ostream& os, const TChannelStatus& status)
+inline ostream& operator << (ostream& os, const NoximChannelStatus& status)
 {
   char msg;
   if (status.available) msg = 'A'; 
@@ -298,9 +268,8 @@ inline ostream& operator << (ostream& os, const TChannelStatus& status)
   os << msg << "(" << status.free_slots << ")"; 
   return os;
 }
-//---------------------------------------------------------------------------
 
-inline ostream& operator << (ostream& os, const TNoP_data& NoP_data)
+inline ostream& operator << (ostream& os, const NoximNoP_data& NoP_data)
 {
   os << "      NoP data from [" << NoP_data.sender_id << "] [ ";
 
@@ -311,20 +280,16 @@ inline ostream& operator << (ostream& os, const TNoP_data& NoP_data)
   return os;
 }
 
-//---------------------------------------------------------------------------
-
-inline ostream& operator << (ostream& os, const TCoord& coord)
+inline ostream& operator << (ostream& os, const NoximCoord& coord)
 {
   os << "(" << coord.x << "," << coord.y << ")";
 
   return os;
 }
 
+// Trace overloading
 
-// trace redefinitions *******************************************
-//
-//---------------------------------------------------------------------------
-inline void sc_trace(sc_trace_file*& tf, const TFlit& flit, string& name)
+inline void sc_trace(sc_trace_file*& tf, const NoximFlit& flit, string& name)
 {
   sc_trace(tf, flit.src_id, name+".src_id");
   sc_trace(tf, flit.dst_id, name+".dst_id");
@@ -332,47 +297,40 @@ inline void sc_trace(sc_trace_file*& tf, const TFlit& flit, string& name)
   sc_trace(tf, flit.timestamp, name+".timestamp");
   sc_trace(tf, flit.hop_no, name+".hop_no");
 }
-//---------------------------------------------------------------------------
 
-inline void sc_trace(sc_trace_file*& tf, const TNoP_data& NoP_data, string& name)
+inline void sc_trace(sc_trace_file*& tf, const NoximNoP_data& NoP_data, string& name)
 {
   sc_trace(tf, NoP_data.sender_id, name+".sender_id");
 }
 
-//---------------------------------------------------------------------------
-inline void sc_trace(sc_trace_file*& tf, const TChannelStatus& bs, string& name)
+inline void sc_trace(sc_trace_file*& tf, const NoximChannelStatus& bs, string& name)
 {
   sc_trace(tf, bs.free_slots, name+".free_slots");
   sc_trace(tf, bs.available, name+".available");
 }
 
-// misc common functions **************************************
-//---------------------------------------------------------------------------
-inline TCoord id2Coord(int id) 
+// Misc common functions
+
+inline NoximCoord id2Coord(int id) 
 {
-  TCoord coord;
+  NoximCoord coord;
 
-  coord.x = id % TGlobalParams::mesh_dim_x;
-  coord.y = id / TGlobalParams::mesh_dim_x;
+  coord.x = id % NoximGlobalParams::mesh_dim_x;
+  coord.y = id / NoximGlobalParams::mesh_dim_x;
 
-  assert(coord.x < TGlobalParams::mesh_dim_x);
-  assert(coord.y < TGlobalParams::mesh_dim_y);
+  assert(coord.x < NoximGlobalParams::mesh_dim_x);
+  assert(coord.y < NoximGlobalParams::mesh_dim_y);
 
   return coord;
 }
 
-//---------------------------------------------------------------------------
-inline int coord2Id(const TCoord& coord) 
+inline int coord2Id(const NoximCoord& coord) 
 {
-  int id = (coord.y * TGlobalParams::mesh_dim_x) + coord.x;
+  int id = (coord.y * NoximGlobalParams::mesh_dim_x) + coord.x;
 
-  assert(id < TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y);
+  assert(id < NoximGlobalParams::mesh_dim_x * NoximGlobalParams::mesh_dim_y);
 
   return id;
 }
 
-
 #endif  // NOXIMDEFS_H
-
-
-

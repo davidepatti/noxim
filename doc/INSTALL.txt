@@ -84,19 +84,21 @@ Build SystemC
 
 If SystemC is installed correctly, then you just have to compile Noxim.
 
-Just extract the source files and move to the top-most directory containing,
-amongst other things, the README file.
+1) Extract the source files and go to the "bin" directory.
 
-In that directory edit the file Makefile.defs (NOT Makefile.deps!) to modify
-the "SYSTEMC" environment variable (it should be on the second line) according
-to your SystemC installation path.
+2) In that directory edit the file Makefile.defs (NOT Makefile.deps!) to modify
+the "SYSTEMC" environment variable according to your SystemC installation path.
 
-Then just run "make".
+3) Just run "make".
 
 You may ignore warning messages (if any), so if you don't get any error you are
 ready to run Noxim for the first time using the command:
 
     ./noxim
 
-That's all!
+If everything works fine, it is now safe for you to copy or move this executable
+elsewhere; if you are a maniac of cleaning please note that "make clean" will
+also delete the executable... so move it before cleaning!
+
+That's all, folks!
 

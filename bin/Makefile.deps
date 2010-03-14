@@ -1,0 +1,50 @@
+# DO NOT DELETE
+
+../src/NoximNoC.o: ../src/NoximNoC.h ../src/NoximTile.h ../src/NoximRouter.h
+../src/NoximNoC.o: ../src/NoximMain.h ../src/NoximBuffer.h
+../src/NoximNoC.o: ../src/NoximStats.h ../src/NoximPower.h
+../src/NoximNoC.o: ../src/NoximGlobalRoutingTable.h
+../src/NoximNoC.o: ../src/NoximLocalRoutingTable.h
+../src/NoximNoC.o: ../src/NoximReservationTable.h
+../src/NoximNoC.o: ../src/NoximProcessingElement.h
+../src/NoximNoC.o: ../src/NoximGlobalTrafficTable.h
+../src/NoximRouter.o: ../src/NoximRouter.h ../src/NoximMain.h
+../src/NoximRouter.o: ../src/NoximBuffer.h ../src/NoximStats.h
+../src/NoximRouter.o: ../src/NoximPower.h ../src/NoximGlobalRoutingTable.h
+../src/NoximRouter.o: ../src/NoximLocalRoutingTable.h
+../src/NoximRouter.o: ../src/NoximReservationTable.h
+../src/NoximProcessingElement.o: ../src/NoximProcessingElement.h
+../src/NoximProcessingElement.o: ../src/NoximMain.h
+../src/NoximProcessingElement.o: ../src/NoximGlobalTrafficTable.h
+../src/NoximBuffer.o: ../src/NoximBuffer.h ../src/NoximMain.h
+../src/NoximStats.o: ../src/NoximStats.h ../src/NoximMain.h
+../src/NoximStats.o: ../src/NoximPower.h
+../src/NoximGlobalStats.o: ../src/NoximGlobalStats.h ../src/NoximNoC.h
+../src/NoximGlobalStats.o: ../src/NoximTile.h ../src/NoximRouter.h
+../src/NoximGlobalStats.o: ../src/NoximMain.h ../src/NoximBuffer.h
+../src/NoximGlobalStats.o: ../src/NoximStats.h ../src/NoximPower.h
+../src/NoximGlobalStats.o: ../src/NoximGlobalRoutingTable.h
+../src/NoximGlobalStats.o: ../src/NoximLocalRoutingTable.h
+../src/NoximGlobalStats.o: ../src/NoximReservationTable.h
+../src/NoximGlobalStats.o: ../src/NoximProcessingElement.h
+../src/NoximGlobalStats.o: ../src/NoximGlobalTrafficTable.h
+../src/NoximGlobalRoutingTable.o: ../src/NoximGlobalRoutingTable.h
+../src/NoximGlobalRoutingTable.o: ../src/NoximMain.h
+../src/NoximLocalRoutingTable.o: ../src/NoximLocalRoutingTable.h
+../src/NoximLocalRoutingTable.o: ../src/NoximMain.h
+../src/NoximLocalRoutingTable.o: ../src/NoximGlobalRoutingTable.h
+../src/NoximGlobalTrafficTable.o: ../src/NoximGlobalTrafficTable.h
+../src/NoximGlobalTrafficTable.o: ../src/NoximMain.h
+../src/NoximReservationTable.o: ../src/NoximReservationTable.h
+../src/NoximReservationTable.o: ../src/NoximMain.h
+../src/NoximPower.o: ../src/NoximPower.h ../src/NoximMain.h
+../src/NoximCmdLineParser.o: ../src/NoximCmdLineParser.h ../src/NoximMain.h
+../src/NoximMain.o: ../src/NoximMain.h ../src/NoximNoC.h ../src/NoximTile.h
+../src/NoximMain.o: ../src/NoximRouter.h ../src/NoximBuffer.h
+../src/NoximMain.o: ../src/NoximStats.h ../src/NoximPower.h
+../src/NoximMain.o: ../src/NoximGlobalRoutingTable.h
+../src/NoximMain.o: ../src/NoximLocalRoutingTable.h
+../src/NoximMain.o: ../src/NoximReservationTable.h
+../src/NoximMain.o: ../src/NoximProcessingElement.h
+../src/NoximMain.o: ../src/NoximGlobalTrafficTable.h
+../src/NoximMain.o: ../src/NoximGlobalStats.h ../src/NoximCmdLineParser.h

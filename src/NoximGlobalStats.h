@@ -1,49 +1,34 @@
-/*****************************************************************************
-
-  TGlobalStats.h -- Global Statistics definition
-
- *****************************************************************************/
-/* Copyright 2005-2007  
-    Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
-    Maurizio Palesi <mpalesi@diit.unict.it>
-    Davide Patti <dpatti@diit.unict.it>
-
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+/*
+ * Noxim - the NoC Simulator
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * (C) 2005-2010 by the University of Catania
+ * For the complete list of authors refer to file ../doc/AUTHORS.txt
+ * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * This file contains the declaration of the global statistics
  */
-#ifndef __TGLOBAL_STATS_H__
-#define __TGLOBAL_STATS_H__
 
-//---------------------------------------------------------------------------
+#ifndef __NOXIMGLOBALSTATS_H__
+#define __NOXIMGLOBALSTATS_H__
 
 #include <iostream>
 #include <vector>
-#include "TNoC.h"
-#include "TTile.h"
+#include <iomanip>
+#include "NoximNoC.h"
+#include "NoximTile.h"
+using namespace std;
 
-//---------------------------------------------------------------------------
-
-class TGlobalStats
+class NoximGlobalStats
 {
+
 public:
-  TGlobalStats(const TNoC* _noc);
+
+  NoximGlobalStats(const NoximNoC* _noc);
   
   // Returns the aggragated average delay (cycles)
   double getAverageDelay();
   
-  // Returns the aggragated average delay (cycles) for communication
-  // src_id->dst_id
+  // Returns the aggragated average delay (cycles) for communication src_id->dst_id
   double getAverageDelay(const int src_id, const int dst_id);
 
   // Returns the max delay
@@ -90,7 +75,7 @@ public:
 #endif
 
 private:
-  const TNoC* noc;
+  const NoximNoC* noc;
 };
 
 #endif

@@ -1,39 +1,21 @@
-/*****************************************************************************
-
-  TProcessingElement.cpp -- Processing Element (PE) implementation
-
- *****************************************************************************/
-/* Copyright 2005-2007  
-    Maurizio Palesi <mpalesi@diit.unict.it>
-    Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
-    Davide Patti <dpatti@diit.unict.it>
-
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+/*
+ * Noxim - the NoC Simulator
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * (C) 2005-2010 by the University of Catania
+ * For the complete list of authors refer to file ../doc/AUTHORS.txt
+ * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * This file contains the implementation of the processing element
  */
-#include "TProcessingElement.h"
 
-//---------------------------------------------------------------------------
+#include "NoximProcessingElement.h"
 
-int TProcessingElement::randInt(int min, int max)
+int NoximProcessingElement::randInt(int min, int max)
 {
   return min + (int)((double)(max-min+1) * rand()/(RAND_MAX+1.0));
 }
 
-//---------------------------------------------------------------------------
-
-void TProcessingElement::rxProcess()
+void NoximProcessingElement::rxProcess()
 {
   if(reset.read())
   {
@@ -44,8 +26,8 @@ void TProcessingElement::rxProcess()
   {
     if(req_rx.read()==1-current_level_rx)
     {
-      TFlit flit_tmp = flit_rx.read();
-      if(TGlobalParams::verbose_mode > VERBOSE_OFF)
+      NoximFlit flit_tmp = flit_rx.read();
+      if(NoximGlobalParams::verbose_mode > VERBOSE_OFF)
       {
         cout << sc_simulation_time() << ": ProcessingElement[" << local_id << "] RECEIVING " << flit_tmp << endl;
       }
@@ -55,9 +37,7 @@ void TProcessingElement::rxProcess()
   }
 }
 
-//---------------------------------------------------------------------------
-
-void TProcessingElement::txProcess()
+void NoximProcessingElement::txProcess()
 {
   if(reset.read())
   {
@@ -67,7 +47,7 @@ void TProcessingElement::txProcess()
   }
   else
   {
-    TPacket packet;
+    NoximPacket packet;
 
     if (canShot(packet))
     {
@@ -82,8 +62,8 @@ void TProcessingElement::txProcess()
     {
       if(!packet_queue.empty())
       {
-        TFlit flit = nextFlit();                  // Generate a new flit
-        if(TGlobalParams::verbose_mode > VERBOSE_OFF)
+        NoximFlit flit = nextFlit();                  // Generate a new flit
+        if(NoximGlobalParams::verbose_mode > VERBOSE_OFF)
         {
           cout << sc_time_stamp().to_double()/1000 << ": ProcessingElement[" << local_id << "] SENDING " << flit << endl;
         }
@@ -95,12 +75,10 @@ void TProcessingElement::txProcess()
   }
 }
 
-//---------------------------------------------------------------------------
-
-TFlit TProcessingElement::nextFlit()
+NoximFlit NoximProcessingElement::nextFlit()
 {
-  TFlit   flit;
-  TPacket packet = packet_queue.front();
+  NoximFlit   flit;
+  NoximPacket packet = packet_queue.front();
 
   flit.src_id      = packet.src_id;
   flit.dst_id      = packet.dst_id;
@@ -123,24 +101,22 @@ TFlit TProcessingElement::nextFlit()
   return flit;
 }
 
-//---------------------------------------------------------------------------
-
-bool TProcessingElement::canShot(TPacket& packet)
+bool NoximProcessingElement::canShot(NoximPacket& packet)
 {
   bool   shot;
   double threshold;
 
-  if (TGlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED)
+  if (NoximGlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED)
     {
       if (!transmittedAtPreviousCycle)
-	threshold = TGlobalParams::packet_injection_rate;
+	threshold = NoximGlobalParams::packet_injection_rate;
       else
-	threshold = TGlobalParams::probability_of_retransmission;
+	threshold = NoximGlobalParams::probability_of_retransmission;
 
       shot = (((double)rand())/RAND_MAX < threshold);
       if (shot)
 	{
-	  switch(TGlobalParams::traffic_distribution)
+	  switch(NoximGlobalParams::traffic_distribution)
 	    {
 	    case TRAFFIC_RANDOM:
 	      packet = trafficRandom();
@@ -199,18 +175,16 @@ bool TProcessingElement::canShot(TPacket& packet)
   return shot;
 }
 
-//---------------------------------------------------------------------------
-
-TPacket TProcessingElement::trafficRandom()
+NoximPacket NoximProcessingElement::trafficRandom()
 {
-  TPacket p;
+  NoximPacket p;
   p.src_id = local_id;
   double rnd = rand()/(double)RAND_MAX;
   double range_start = 0.0;
 
   //cout << "\n " << sc_time_stamp().to_double()/1000 << " PE " << local_id << " rnd = " << rnd << endl;
 
-  int max_id = (TGlobalParams::mesh_dim_x * TGlobalParams::mesh_dim_y)-1;
+  int max_id = (NoximGlobalParams::mesh_dim_x * NoximGlobalParams::mesh_dim_y)-1;
 
   // Random destination distribution
   do
@@ -218,21 +192,21 @@ TPacket TProcessingElement::trafficRandom()
     p.dst_id = randInt(0, max_id);
 
     // check for hotspot destination
-    for (uint i = 0; i<TGlobalParams::hotspots.size(); i++)
+    for (uint i = 0; i<NoximGlobalParams::hotspots.size(); i++)
     {
-	//cout << sc_time_stamp().to_double()/1000 << " PE " << local_id << " Checking node " << TGlobalParams::hotspots[i].first << " with P = " << TGlobalParams::hotspots[i].second << endl;
+	//cout << sc_time_stamp().to_double()/1000 << " PE " << local_id << " Checking node " << NoximGlobalParams::hotspots[i].first << " with P = " << NoximGlobalParams::hotspots[i].second << endl;
 
-	if (rnd>=range_start && rnd < range_start + TGlobalParams::hotspots[i].second)
+	if (rnd>=range_start && rnd < range_start + NoximGlobalParams::hotspots[i].second)
 	{
-	    if (local_id != TGlobalParams::hotspots[i].first)
+	    if (local_id != NoximGlobalParams::hotspots[i].first)
 	    {
 		//cout << sc_time_stamp().to_double()/1000 << " PE " << local_id <<" That is ! " << endl;
-		p.dst_id = TGlobalParams::hotspots[i].first;
+		p.dst_id = NoximGlobalParams::hotspots[i].first;
 	    }
 	    break;
 	}
 	else 
-	    range_start+=TGlobalParams::hotspots[i].second; // try next
+	    range_start+=NoximGlobalParams::hotspots[i].second; // try next
     }
   } while(p.dst_id==p.src_id);
 
@@ -242,19 +216,17 @@ TPacket TProcessingElement::trafficRandom()
   return p;
 }
 
-//---------------------------------------------------------------------------
-
-TPacket TProcessingElement::trafficTranspose1()
+NoximPacket NoximProcessingElement::trafficTranspose1()
 {
-  TPacket p;
+  NoximPacket p;
   p.src_id = local_id;
-  TCoord src,dst;
+  NoximCoord src,dst;
 
   // Transpose 1 destination distribution
   src.x = id2Coord(p.src_id).x;
   src.y = id2Coord(p.src_id).y;
-  dst.x = TGlobalParams::mesh_dim_x-1-src.y;
-  dst.y = TGlobalParams::mesh_dim_y-1-src.x;
+  dst.x = NoximGlobalParams::mesh_dim_x-1-src.y;
+  dst.y = NoximGlobalParams::mesh_dim_y-1-src.x;
   fixRanges(src, dst);
   p.dst_id = coord2Id(dst);
 
@@ -264,13 +236,11 @@ TPacket TProcessingElement::trafficTranspose1()
   return p;
 }
 
-//---------------------------------------------------------------------------
-
-TPacket TProcessingElement::trafficTranspose2()
+NoximPacket NoximProcessingElement::trafficTranspose2()
 {
-  TPacket p;
+  NoximPacket p;
   p.src_id = local_id;
-  TCoord src,dst;
+  NoximCoord src,dst;
 
   // Transpose 2 destination distribution
   src.x = id2Coord(p.src_id).x;
@@ -286,9 +256,7 @@ TPacket TProcessingElement::trafficTranspose2()
   return p;
 }
 
-//---------------------------------------------------------------------------
-
-void TProcessingElement::setBit(int &x, int w, int v)
+void NoximProcessingElement::setBit(int &x, int w, int v)
 {
   int mask = 1 << w;
   
@@ -300,31 +268,25 @@ void TProcessingElement::setBit(int &x, int w, int v)
     assert(false);    
 }
 
-//---------------------------------------------------------------------------
-
-int TProcessingElement::getBit(int x, int w)
+int NoximProcessingElement::getBit(int x, int w)
 {
   return (x >> w) & 1;
 }
 
-//---------------------------------------------------------------------------
-
-inline double TProcessingElement::log2ceil(double x)
+inline double NoximProcessingElement::log2ceil(double x)
 {
   return ceil(log(x)/log(2.0));
 }
 
-//---------------------------------------------------------------------------
-
-TPacket TProcessingElement::trafficBitReversal()
+NoximPacket NoximProcessingElement::trafficBitReversal()
 {
   
-  int nbits = (int)log2ceil((double)(TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y));
+  int nbits = (int)log2ceil((double)(NoximGlobalParams::mesh_dim_x*NoximGlobalParams::mesh_dim_y));
   int dnode = 0;
   for (int i=0; i<nbits; i++)
     setBit(dnode, i, getBit(local_id, nbits-i-1));
 
-  TPacket p;
+  NoximPacket p;
   p.src_id = local_id;
   p.dst_id = dnode;
 
@@ -334,18 +296,16 @@ TPacket TProcessingElement::trafficBitReversal()
   return p;
 }
 
-//---------------------------------------------------------------------------
-
-TPacket TProcessingElement::trafficShuffle()
+NoximPacket NoximProcessingElement::trafficShuffle()
 {
   
-  int nbits = (int)log2ceil((double)(TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y));
+  int nbits = (int)log2ceil((double)(NoximGlobalParams::mesh_dim_x*NoximGlobalParams::mesh_dim_y));
   int dnode = 0;
   for (int i=0; i<nbits-1; i++)
     setBit(dnode, i+1, getBit(local_id, i));
   setBit(dnode, 0, getBit(local_id, nbits-1));
 
-  TPacket p;
+  NoximPacket p;
   p.src_id = local_id;
   p.dst_id = dnode;
 
@@ -355,19 +315,17 @@ TPacket TProcessingElement::trafficShuffle()
   return p;
 }
 
-//---------------------------------------------------------------------------
-
-TPacket TProcessingElement::trafficButterfly()
+NoximPacket NoximProcessingElement::trafficButterfly()
 {
   
-  int nbits = (int)log2ceil((double)(TGlobalParams::mesh_dim_x*TGlobalParams::mesh_dim_y));
+  int nbits = (int)log2ceil((double)(NoximGlobalParams::mesh_dim_x*NoximGlobalParams::mesh_dim_y));
   int dnode = 0;
   for (int i=1; i<nbits-1; i++)
     setBit(dnode, i, getBit(local_id, i));
   setBit(dnode, 0, getBit(local_id, nbits-1));
   setBit(dnode, nbits-1, getBit(local_id, 0));
 
-  TPacket p;
+  NoximPacket p;
   p.src_id = local_id;
   p.dst_id = dnode;
 
@@ -377,23 +335,18 @@ TPacket TProcessingElement::trafficButterfly()
   return p;
 }
 
-//---------------------------------------------------------------------------
-
-void TProcessingElement::fixRanges(const TCoord src, TCoord& dst)
+void NoximProcessingElement::fixRanges(const NoximCoord src, NoximCoord& dst)
 {
   // Fix ranges
   if(dst.x<0) dst.x=0;
   if(dst.y<0) dst.y=0;
-  if(dst.x>=TGlobalParams::mesh_dim_x) dst.x=TGlobalParams::mesh_dim_x-1;
-  if(dst.y>=TGlobalParams::mesh_dim_y) dst.y=TGlobalParams::mesh_dim_y-1;
+  if(dst.x>=NoximGlobalParams::mesh_dim_x) dst.x=NoximGlobalParams::mesh_dim_x-1;
+  if(dst.y>=NoximGlobalParams::mesh_dim_y) dst.y=NoximGlobalParams::mesh_dim_y-1;
 }
 
-//---------------------------------------------------------------------------
-
-int TProcessingElement::getRandomSize()
+int NoximProcessingElement::getRandomSize()
 {
-  return randInt(TGlobalParams::min_packet_size, 
-                 TGlobalParams::max_packet_size);
+  return randInt(NoximGlobalParams::min_packet_size, 
+                 NoximGlobalParams::max_packet_size);
 }
 
-//---------------------------------------------------------------------------

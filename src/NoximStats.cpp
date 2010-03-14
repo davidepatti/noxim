@@ -1,45 +1,25 @@
-/*****************************************************************************
-
-  TStats.cpp -- Statistics implementation
-
- *****************************************************************************/
-/* Copyright 2005-2007  
-    Fabrizio Fazzino <fabrizio.fazzino@diit.unict.it>
-    Maurizio Palesi <mpalesi@diit.unict.it>
-    Davide Patti <dpatti@diit.unict.it>
-
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+/*
+ * Noxim - the NoC Simulator
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * (C) 2005-2010 by the University of Catania
+ * For the complete list of authors refer to file ../doc/AUTHORS.txt
+ * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * This file contains the implementation of the statistics
  */
-#include <iostream>
-#include <iomanip>
-#include "TStats.h"
+
+#include "NoximStats.h"
+
 // TODO: nan in averageDelay
 
-
-//---------------------------------------------------------------------------
-
-void TStats::configure(const int node_id, const double _warm_up_time)
+void NoximStats::configure(const int node_id, const double _warm_up_time)
 {
   id = node_id;
   warm_up_time = _warm_up_time;
 }
 
-//---------------------------------------------------------------------------
-
-void TStats::receivedFlit(const double arrival_time,
-			  const TFlit& flit)
+void NoximStats::receivedFlit(const double arrival_time,
+			  const NoximFlit& flit)
 {
   if (arrival_time - DEFAULT_RESET_TIME < warm_up_time)
     return;
@@ -66,9 +46,7 @@ void TStats::receivedFlit(const double arrival_time,
   chist[i].last_received_flit_time = arrival_time - warm_up_time;
 }
 
-//---------------------------------------------------------------------------
-
-double TStats::getAverageDelay(const int src_id)
+double NoximStats::getAverageDelay(const int src_id)
 {
   double sum = 0.0;
   
@@ -82,9 +60,7 @@ double TStats::getAverageDelay(const int src_id)
   return sum/(double)chist[i].delays.size();
 }
 
-//---------------------------------------------------------------------------
-
-double TStats::getAverageDelay()
+double NoximStats::getAverageDelay()
 {
   double avg = 0.0;
 
@@ -98,9 +74,7 @@ double TStats::getAverageDelay()
   return avg/(double)getReceivedPackets();
 }
 
-//---------------------------------------------------------------------------
-
-double TStats::getMaxDelay(const int src_id)
+double NoximStats::getMaxDelay(const int src_id)
 {
   double maxd = -1.0;
   
@@ -117,9 +91,7 @@ double TStats::getMaxDelay(const int src_id)
   return maxd;
 }
 
-//---------------------------------------------------------------------------
-
-double TStats::getMaxDelay()
+double NoximStats::getMaxDelay()
 {
   double maxd = -1.0;
 
@@ -137,9 +109,7 @@ double TStats::getMaxDelay()
   return maxd;
 }
 
-//---------------------------------------------------------------------------
-
-double TStats::getAverageThroughput(const int src_id)
+double NoximStats::getAverageThroughput(const int src_id)
 {
   int i = searchCommHistory(src_id);
 
@@ -151,9 +121,7 @@ double TStats::getAverageThroughput(const int src_id)
     return (double)chist[i].total_received_flits/(double)chist[i].last_received_flit_time;
 }
 
-//---------------------------------------------------------------------------
-
-double TStats::getAverageThroughput()
+double NoximStats::getAverageThroughput()
 {
   double sum = 0.0;
 
@@ -167,9 +135,7 @@ double TStats::getAverageThroughput()
   return sum;
 }
 
-//---------------------------------------------------------------------------
-
-unsigned int TStats::getReceivedPackets()
+unsigned int NoximStats::getReceivedPackets()
 {
   int n = 0;
 
@@ -179,9 +145,7 @@ unsigned int TStats::getReceivedPackets()
   return n;
 }
 
-//---------------------------------------------------------------------------
-
-unsigned int TStats::getReceivedFlits()
+unsigned int NoximStats::getReceivedFlits()
 {
   int n = 0;
 
@@ -191,36 +155,30 @@ unsigned int TStats::getReceivedFlits()
   return n;
 }
 
-//---------------------------------------------------------------------------
-
-unsigned int TStats::getTotalCommunications()
+unsigned int NoximStats::getTotalCommunications()
 {
   return chist.size();
 }
 
-//---------------------------------------------------------------------------
-
-double TStats::getCommunicationEnergy(int src_id, int dst_id)
+double NoximStats::getCommunicationEnergy(int src_id, int dst_id)
 {
   // Assumptions: minimal path routing, constant packet size
 
-  TCoord src_coord = id2Coord(src_id);
-  TCoord dst_coord = id2Coord(dst_id);
+  NoximCoord src_coord = id2Coord(src_id);
+  NoximCoord dst_coord = id2Coord(dst_id);
 
   int hops = abs(src_coord.x - dst_coord.x) + abs(src_coord.y - dst_coord.y);
 
   double energy = 
     hops * (
-	    (power.getPwrForward() + power.getPwrIncoming()) * (TGlobalParams::min_packet_size + TGlobalParams::max_packet_size)/2 +
+	    (power.getPwrForward() + power.getPwrIncoming()) * (NoximGlobalParams::min_packet_size + NoximGlobalParams::max_packet_size)/2 +
 	    power.getPwrRouting() + power.getPwrSelection()
 	    );
     
   return energy;
 }
 
-//---------------------------------------------------------------------------
-
-int TStats::searchCommHistory(int src_id)
+int NoximStats::searchCommHistory(int src_id)
 {
   for (unsigned int i=0; i<chist.size(); i++)
     if (chist[i].src_id == src_id)
@@ -229,9 +187,7 @@ int TStats::searchCommHistory(int src_id)
   return -1;
 }
 
-//---------------------------------------------------------------------------
-
-void TStats::showStats(int curr_node,
+void NoximStats::showStats(int curr_node,
 		       std::ostream& out,
 		       bool header)
 {
@@ -276,4 +232,3 @@ void TStats::showStats(int curr_node,
   out << "% Aggregated average throughput (flits/cycle): " << getAverageThroughput() << endl;
 }
 
-//---------------------------------------------------------------------------
