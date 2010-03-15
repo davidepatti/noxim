@@ -94,243 +94,254 @@ using namespace std;
 #define MAX_STATIC_DIM 20
 
 // NoximGlobalParams -- used to forward configuration to every sub-block
-struct NoximGlobalParams
-{
-  static int verbose_mode;
-  static int trace_mode;
-  static char trace_filename[128];
-  static int mesh_dim_x;
-  static int mesh_dim_y;
-  static int buffer_depth;
-  static int min_packet_size;
-  static int max_packet_size;
-  static int routing_algorithm;
-  static char routing_table_filename[128];
-  static int selection_strategy;
-  static float packet_injection_rate;
-  static float probability_of_retransmission;
-  static int traffic_distribution;
-  static char traffic_table_filename[128];
-  static int simulation_time;
-  static int stats_warm_up_time;
-  static int rnd_generator_seed;
-  static bool detailed;
-  static vector<pair<int,double> > hotspots;
-  static float dyad_threshold;
-  static unsigned int max_volume_to_be_drained;
+struct NoximGlobalParams {
+    static int verbose_mode;
+    static int trace_mode;
+    static char trace_filename[128];
+    static int mesh_dim_x;
+    static int mesh_dim_y;
+    static int buffer_depth;
+    static int min_packet_size;
+    static int max_packet_size;
+    static int routing_algorithm;
+    static char routing_table_filename[128];
+    static int selection_strategy;
+    static float packet_injection_rate;
+    static float probability_of_retransmission;
+    static int traffic_distribution;
+    static char traffic_table_filename[128];
+    static int simulation_time;
+    static int stats_warm_up_time;
+    static int rnd_generator_seed;
+    static bool detailed;
+    static vector < pair < int, double >>hotspots;
+    static float dyad_threshold;
+    static unsigned int max_volume_to_be_drained;
 };
 
 // NoximCoord -- XY coordinates type of the Tile inside the Mesh
-class NoximCoord
-{
- public:
-  int                x;            // X coordinate
-  int                y;            // Y coordinate
+class NoximCoord {
+  public:
+    int x;			// X coordinate
+    int y;			// Y coordinate
 
-  inline bool operator == (const NoximCoord& coord) const
-  {
-    return (coord.x==x && coord.y==y);
-  }
-};
+    inline bool operator ==(const NoximCoord & coord) const {
+	return (coord.x == x && coord.y == y);
+}};
 
 // NoximFlitType -- Flit type enumeration
-enum NoximFlitType
-{
-  FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL
+enum NoximFlitType {
+    FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL
 };
 
 // NoximPayload -- Payload definition
-struct NoximPayload
-{
-  sc_uint<32>        data;         // Bus for the data to be exchanged
+struct NoximPayload {
+    sc_uint < 32 > data;	// Bus for the data to be exchanged
 
-  inline bool operator == (const NoximPayload& payload) const
-  {
-    return (payload.data==data);
-  }
-};
+    inline bool operator ==(const NoximPayload & payload) const {
+	return (payload.data == data);
+}};
 
 // NoximPacket -- Packet definition
-struct NoximPacket
-{
-  int                src_id;
-  int                dst_id;
-  double             timestamp;    // SC timestamp at packet generation
-  int                size;
-  int                flit_left;    // Number of remaining flits inside the packet
+struct NoximPacket {
+    int src_id;
+    int dst_id;
+    double timestamp;		// SC timestamp at packet generation
+    int size;
+    int flit_left;		// Number of remaining flits inside the packet
 
-  NoximPacket() {;}
-  NoximPacket(const int s, const int d, const double ts, const int sz) {
-    make(s, d, ts, sz);
-  }
+     NoximPacket() {;
+    } NoximPacket(const int s, const int d, const double ts, const int sz) {
+	make(s, d, ts, sz);
+    }
 
-  void make(const int s, const int d, const double ts, const int sz) {
-    src_id = s; dst_id = d; timestamp = ts; size = sz; flit_left = sz;
-  }
+    void make(const int s, const int d, const double ts, const int sz) {
+	src_id = s;
+	dst_id = d;
+	timestamp = ts;
+	size = sz;
+	flit_left = sz;
+    }
 };
 
 // NoximRouteData -- data required to perform routing
-struct NoximRouteData
-{
+struct NoximRouteData {
     int current_id;
     int src_id;
     int dst_id;
-    int dir_in; // direction from which the packet comes from
+    int dir_in;			// direction from which the packet comes from
 };
 
-struct NoximChannelStatus
-{
-    int free_slots;  // occupied buffer slots
-    bool available; // 
-    inline bool operator == (const NoximChannelStatus& bs) const
-    {
+struct NoximChannelStatus {
+    int free_slots;		// occupied buffer slots
+    bool available;		// 
+    inline bool operator ==(const NoximChannelStatus & bs) const {
 	return (free_slots == bs.free_slots && available == bs.available);
     };
 };
 
 // NoximNoP_data -- NoP Data definition
-struct NoximNoP_data
-{
+struct NoximNoP_data {
     int sender_id;
-    NoximChannelStatus channel_status_neighbor[DIRECTIONS]; 
+    NoximChannelStatus channel_status_neighbor[DIRECTIONS];
 
-    inline bool operator == (const NoximNoP_data& nop_data) const
-    {
-	return ( sender_id==nop_data.sender_id  &&
-		nop_data.channel_status_neighbor[0]==channel_status_neighbor[0] &&
-		nop_data.channel_status_neighbor[1]==channel_status_neighbor[1] &&
-		nop_data.channel_status_neighbor[2]==channel_status_neighbor[2] &&
-		nop_data.channel_status_neighbor[3]==channel_status_neighbor[3]);
+    inline bool operator ==(const NoximNoP_data & nop_data) const {
+	return (sender_id == nop_data.sender_id &&
+		nop_data.channel_status_neighbor[0] ==
+		channel_status_neighbor[0]
+		&& nop_data.channel_status_neighbor[1] ==
+		channel_status_neighbor[1]
+		&& nop_data.channel_status_neighbor[2] ==
+		channel_status_neighbor[2]
+		&& nop_data.channel_status_neighbor[3] ==
+		channel_status_neighbor[3]);
     };
 };
 
 // NoximFlit -- Flit definition
-struct NoximFlit
-{
-  int                src_id;
-  int                dst_id;
-  NoximFlitType      flit_type;    // The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
-  int                sequence_no;  // The sequence number of the flit inside the packet
-  NoximPayload       payload;      // Optional payload
-  double             timestamp;    // Unix timestamp at packet generation
-  int                hop_no;       // Current number of hops from source to destination
+struct NoximFlit {
+    int src_id;
+    int dst_id;
+    NoximFlitType flit_type;	// The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
+    int sequence_no;		// The sequence number of the flit inside the packet
+    NoximPayload payload;	// Optional payload
+    double timestamp;		// Unix timestamp at packet generation
+    int hop_no;			// Current number of hops from source to destination
 
-  inline bool operator == (const NoximFlit& flit) const
-  {
-    return (flit.src_id==src_id && flit.dst_id==dst_id && flit.flit_type==flit_type && flit.sequence_no==sequence_no && flit.payload==payload && flit.timestamp==timestamp && flit.hop_no==hop_no);
-  }
-};
+    inline bool operator ==(const NoximFlit & flit) const {
+	return (flit.src_id == src_id && flit.dst_id == dst_id
+		&& flit.flit_type == flit_type
+		&& flit.sequence_no == sequence_no
+		&& flit.payload == payload && flit.timestamp == timestamp
+		&& flit.hop_no == hop_no);
+}};
 
 // Output overloading
 
-inline ostream& operator << (ostream& os, const NoximFlit& flit)
+inline ostream & operator <<(ostream & os, const NoximFlit & flit)
 {
 
-  if (NoximGlobalParams::verbose_mode==VERBOSE_HIGH)
-  {
+    if (NoximGlobalParams::verbose_mode == VERBOSE_HIGH) {
 
-      os << "### FLIT ###" << endl;
-      os << "Source Tile[" << flit.src_id << "]" << endl;
-      os << "Destination Tile[" << flit.dst_id << "]" << endl;
-      switch(flit.flit_type)
-      {
-	case FLIT_TYPE_HEAD: os << "Flit Type is HEAD" << endl; break;
-	case FLIT_TYPE_BODY: os << "Flit Type is BODY" << endl; break;
-	case FLIT_TYPE_TAIL: os << "Flit Type is TAIL" << endl; break;
-      }
-      os << "Sequence no. " << flit.sequence_no << endl;
-      os << "Payload printing not implemented (yet)." << endl;
-      os << "Unix timestamp at packet generation " << flit.timestamp << endl;
-      os << "Total number of hops from source to destination is " << flit.hop_no << endl;
-  }
-  else
-    {
-      os << "[type: ";
-      switch(flit.flit_type)
-      {
-	case FLIT_TYPE_HEAD: os << "H"; break;
-	case FLIT_TYPE_BODY: os << "B"; break;
-	case FLIT_TYPE_TAIL: os << "T"; break;
-      }
-      
-      os << ", seq: " << flit.sequence_no << ", " << flit.src_id << "-->" << flit.dst_id << "]"; 
+	os << "### FLIT ###" << endl;
+	os << "Source Tile[" << flit.src_id << "]" << endl;
+	os << "Destination Tile[" << flit.dst_id << "]" << endl;
+	switch (flit.flit_type) {
+	case FLIT_TYPE_HEAD:
+	    os << "Flit Type is HEAD" << endl;
+	    break;
+	case FLIT_TYPE_BODY:
+	    os << "Flit Type is BODY" << endl;
+	    break;
+	case FLIT_TYPE_TAIL:
+	    os << "Flit Type is TAIL" << endl;
+	    break;
+	}
+	os << "Sequence no. " << flit.sequence_no << endl;
+	os << "Payload printing not implemented (yet)." << endl;
+	os << "Unix timestamp at packet generation " << flit.
+	    timestamp << endl;
+	os << "Total number of hops from source to destination is " <<
+	    flit.hop_no << endl;
+    } else {
+	os << "[type: ";
+	switch (flit.flit_type) {
+	case FLIT_TYPE_HEAD:
+	    os << "H";
+	    break;
+	case FLIT_TYPE_BODY:
+	    os << "B";
+	    break;
+	case FLIT_TYPE_TAIL:
+	    os << "T";
+	    break;
+	}
+
+	os << ", seq: " << flit.sequence_no << ", " << flit.
+	    src_id << "-->" << flit.dst_id << "]";
     }
 
-  return os;
+    return os;
 }
 
-inline ostream& operator << (ostream& os, const NoximChannelStatus& status)
+inline ostream & operator <<(ostream & os,
+			     const NoximChannelStatus & status)
 {
-  char msg;
-  if (status.available) msg = 'A'; 
-  else
-      msg = 'N';
-  os << msg << "(" << status.free_slots << ")"; 
-  return os;
+    char msg;
+    if (status.available)
+	msg = 'A';
+    else
+	msg = 'N';
+    os << msg << "(" << status.free_slots << ")";
+    return os;
 }
 
-inline ostream& operator << (ostream& os, const NoximNoP_data& NoP_data)
+inline ostream & operator <<(ostream & os, const NoximNoP_data & NoP_data)
 {
-  os << "      NoP data from [" << NoP_data.sender_id << "] [ ";
+    os << "      NoP data from [" << NoP_data.sender_id << "] [ ";
 
-  for (int j=0; j<DIRECTIONS; j++)
-      os << NoP_data.channel_status_neighbor[j] << " ";
+    for (int j = 0; j < DIRECTIONS; j++)
+	os << NoP_data.channel_status_neighbor[j] << " ";
 
-  cout << "]" << endl;
-  return os;
+    cout << "]" << endl;
+    return os;
 }
 
-inline ostream& operator << (ostream& os, const NoximCoord& coord)
+inline ostream & operator <<(ostream & os, const NoximCoord & coord)
 {
-  os << "(" << coord.x << "," << coord.y << ")";
+    os << "(" << coord.x << "," << coord.y << ")";
 
-  return os;
+    return os;
 }
 
 // Trace overloading
 
-inline void sc_trace(sc_trace_file*& tf, const NoximFlit& flit, string& name)
+inline void sc_trace(sc_trace_file * &tf, const NoximFlit & flit,
+		     string & name)
 {
-  sc_trace(tf, flit.src_id, name+".src_id");
-  sc_trace(tf, flit.dst_id, name+".dst_id");
-  sc_trace(tf, flit.sequence_no, name+".sequence_no");
-  sc_trace(tf, flit.timestamp, name+".timestamp");
-  sc_trace(tf, flit.hop_no, name+".hop_no");
+    sc_trace(tf, flit.src_id, name + ".src_id");
+    sc_trace(tf, flit.dst_id, name + ".dst_id");
+    sc_trace(tf, flit.sequence_no, name + ".sequence_no");
+    sc_trace(tf, flit.timestamp, name + ".timestamp");
+    sc_trace(tf, flit.hop_no, name + ".hop_no");
 }
 
-inline void sc_trace(sc_trace_file*& tf, const NoximNoP_data& NoP_data, string& name)
+inline void sc_trace(sc_trace_file * &tf, const NoximNoP_data & NoP_data,
+		     string & name)
 {
-  sc_trace(tf, NoP_data.sender_id, name+".sender_id");
+    sc_trace(tf, NoP_data.sender_id, name + ".sender_id");
 }
 
-inline void sc_trace(sc_trace_file*& tf, const NoximChannelStatus& bs, string& name)
+inline void sc_trace(sc_trace_file * &tf, const NoximChannelStatus & bs,
+		     string & name)
 {
-  sc_trace(tf, bs.free_slots, name+".free_slots");
-  sc_trace(tf, bs.available, name+".available");
+    sc_trace(tf, bs.free_slots, name + ".free_slots");
+    sc_trace(tf, bs.available, name + ".available");
 }
 
 // Misc common functions
 
-inline NoximCoord id2Coord(int id) 
+inline NoximCoord id2Coord(int id)
 {
-  NoximCoord coord;
+    NoximCoord coord;
 
-  coord.x = id % NoximGlobalParams::mesh_dim_x;
-  coord.y = id / NoximGlobalParams::mesh_dim_x;
+    coord.x = id % NoximGlobalParams::mesh_dim_x;
+    coord.y = id / NoximGlobalParams::mesh_dim_x;
 
-  assert(coord.x < NoximGlobalParams::mesh_dim_x);
-  assert(coord.y < NoximGlobalParams::mesh_dim_y);
+    assert(coord.x < NoximGlobalParams::mesh_dim_x);
+    assert(coord.y < NoximGlobalParams::mesh_dim_y);
 
-  return coord;
+    return coord;
 }
 
-inline int coord2Id(const NoximCoord& coord) 
+inline int coord2Id(const NoximCoord & coord)
 {
-  int id = (coord.y * NoximGlobalParams::mesh_dim_x) + coord.x;
+    int id = (coord.y * NoximGlobalParams::mesh_dim_x) + coord.x;
 
-  assert(id < NoximGlobalParams::mesh_dim_x * NoximGlobalParams::mesh_dim_y);
+    assert(id <
+	   NoximGlobalParams::mesh_dim_x * NoximGlobalParams::mesh_dim_y);
 
-  return id;
+    return id;
 }
 
-#endif  // NOXIMDEFS_H
+#endif				// NOXIMDEFS_H

@@ -12,23 +12,24 @@
 
 NoximReservationTable::NoximReservationTable()
 {
-  clear();
+    clear();
 }
 
 void NoximReservationTable::clear()
 {
-  rtable.resize(DIRECTIONS+1);
-  
-  // note that NOT_VALID entries should remain untouched
-  for (int i=0; i<DIRECTIONS+1; i++)
-    if (rtable[i] != NOT_VALID) rtable[i] = NOT_RESERVED;
+    rtable.resize(DIRECTIONS + 1);
+
+    // note that NOT_VALID entries should remain untouched
+    for (int i = 0; i < DIRECTIONS + 1; i++)
+	if (rtable[i] != NOT_VALID)
+	    rtable[i] = NOT_RESERVED;
 }
 
-bool NoximReservationTable::isAvailable(const int port_out) const
+bool NoximReservationTable::isAvailable(const int port_out) const const
 {
-  assert(port_out >= 0 && port_out < DIRECTIONS+1);
+    assert(port_out >= 0 && port_out < DIRECTIONS + 1);
 
-  return ((rtable[port_out] == NOT_RESERVED));
+    return ((rtable[port_out] == NOT_RESERVED));
 }
 
 void NoximReservationTable::reserve(const int port_in, const int port_out)
@@ -38,33 +39,33 @@ void NoximReservationTable::reserve(const int port_in, const int port_out)
     assert(isAvailable(port_out));
 
     // check for previous reservation to be released
-  int port = getOutputPort(port_in);
+    int port = getOutputPort(port_in);
 
-  if (port!=NOT_RESERVED)
-    release(port);
+    if (port != NOT_RESERVED)
+	release(port);
 
-  rtable[port_out] = port_in;
+    rtable[port_out] = port_in;
 }
 
 void NoximReservationTable::release(const int port_out)
 {
-  assert(port_out >= 0 && port_out < DIRECTIONS+1);
+    assert(port_out >= 0 && port_out < DIRECTIONS + 1);
     // there is a valid reservation on port_out
-  assert(rtable[port_out] >= 0 && rtable[port_out] < DIRECTIONS+1);
+    assert(rtable[port_out] >= 0 && rtable[port_out] < DIRECTIONS + 1);
 
-  rtable[port_out] = NOT_RESERVED;
+    rtable[port_out] = NOT_RESERVED;
 }
 
-int NoximReservationTable::getOutputPort(const int port_in) const
+int NoximReservationTable::getOutputPort(const int port_in) const const
 {
-  assert(port_in >= 0 && port_in < DIRECTIONS+1);
+    assert(port_in >= 0 && port_in < DIRECTIONS + 1);
 
-  for (int i=0; i<DIRECTIONS+1; i++)
-    if (rtable[i] == port_in)
-      return i; // port_in reserved outport i
+    for (int i = 0; i < DIRECTIONS + 1; i++)
+	if (rtable[i] == port_in)
+	    return i;		// port_in reserved outport i
 
-  // semantic: port_in currently doesn't reserve any out port
-  return NOT_RESERVED;
+    // semantic: port_in currently doesn't reserve any out port
+    return NOT_RESERVED;
 }
 
 // makes port_out no longer available for reservation/release
@@ -72,4 +73,3 @@ void NoximReservationTable::invalidate(const int port_out)
 {
     rtable[port_out] = NOT_VALID;
 }
-
