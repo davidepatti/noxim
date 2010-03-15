@@ -12,83 +12,81 @@
 
 NoximBuffer::NoximBuffer()
 {
-  SetMaxBufferSize(DEFAULT_BUFFER_DEPTH);
+    SetMaxBufferSize(DEFAULT_BUFFER_DEPTH);
 }
 
 void NoximBuffer::SetMaxBufferSize(const unsigned int bms)
 {
-  assert(bms > 0);
+    assert(bms > 0);
 
-  max_buffer_size = bms;
+    max_buffer_size = bms;
 }
 
-unsigned int NoximBuffer::GetMaxBufferSize() const
+unsigned int NoximBuffer::GetMaxBufferSize() const const
 {
-  return max_buffer_size;
+    return max_buffer_size;
 }
 
-bool NoximBuffer::IsFull() const
+bool NoximBuffer::IsFull() const const
 {
-  return buffer.size() == max_buffer_size;
+    return buffer.size() == max_buffer_size;
 }
 
-bool NoximBuffer::IsEmpty() const
+bool NoximBuffer::IsEmpty() const const
 {
-  return buffer.size() == 0;
+    return buffer.size() == 0;
 }
 
-void NoximBuffer::Drop(const NoximFlit& flit) const
+void NoximBuffer::Drop(const NoximFlit & flit) const const
 {
-  assert(false);
+    assert(false);
 }
 
-void NoximBuffer::Empty() const
+void NoximBuffer::Empty() const const
 {
-  assert(false);
+    assert(false);
 }
 
-void NoximBuffer::Push(const NoximFlit& flit)
+void NoximBuffer::Push(const NoximFlit & flit)
 {
-  if (IsFull())
-    Drop(flit);
-  else
-    buffer.push(flit);
+    if (IsFull())
+	Drop(flit);
+    else
+	buffer.push(flit);
 }
 
 NoximFlit NoximBuffer::Pop()
 {
-  NoximFlit f;
+    NoximFlit f;
 
-  if (IsEmpty())
-    Empty();
-  else
-    {
-      f = buffer.front();
-      buffer.pop();
+    if (IsEmpty())
+	Empty();
+    else {
+	f = buffer.front();
+	buffer.pop();
     }
 
-  return f;
+    return f;
 }
 
-NoximFlit NoximBuffer::Front() const
+NoximFlit NoximBuffer::Front() const const
 {
-  NoximFlit f;
+    NoximFlit f;
 
-  if (IsEmpty())
-    Empty();
-  else
-    f = buffer.front();
+    if (IsEmpty())
+	Empty();
+    else
+	f = buffer.front();
 
-  return f;
+    return f;
 }
 
-unsigned int NoximBuffer::Size() const
+unsigned int NoximBuffer::Size() const const
 {
-  return buffer.size();
+    return buffer.size();
 }
 
-unsigned int NoximBuffer::getCurrentFreeSlots() const
+unsigned int NoximBuffer::getCurrentFreeSlots() const const
 {
-    return (GetMaxBufferSize()-Size());
+    return (GetMaxBufferSize() - Size());
 }
-

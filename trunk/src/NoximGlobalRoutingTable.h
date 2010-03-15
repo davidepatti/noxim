@@ -24,47 +24,47 @@
 using namespace std;
 
 // Pair of source, destination node
-typedef pair<int,int> NoximLinkId;
+typedef pair < int, int >NoximLinkId;
 
 // Routing table
-typedef set<NoximLinkId> NoximAdmissibleOutputs;
+typedef set < NoximLinkId > NoximAdmissibleOutputs;
 
 // Map a destination to a set of admissible outputs
-typedef map<int,NoximAdmissibleOutputs> NoximRoutingTableLink; 
+typedef map < int, NoximAdmissibleOutputs > NoximRoutingTableLink;
 
 // Map an input link to its routing table
-typedef map<NoximLinkId,NoximRoutingTableLink> NoximRoutingTableNode;
+typedef map < NoximLinkId, NoximRoutingTableLink > NoximRoutingTableNode;
 
 // Map a node of the network to its routing table
-typedef map<int,NoximRoutingTableNode> NoximRoutingTableNoC;
+typedef map < int, NoximRoutingTableNode > NoximRoutingTableNoC;
 
 // Converts an input direction to a link 
 NoximLinkId direction2ILinkId(const int node_id, const int dir);
 
 // Converts an input direction to a link
-int oLinkId2Direction(const NoximLinkId& out_link);
+int oLinkId2Direction(const NoximLinkId & out_link);
 
 // Converts a set of output links to a set of directions
-vector<int> admissibleOutputsSet2Vector(const NoximAdmissibleOutputs& ao);
+vector <
+    int >admissibleOutputsSet2Vector(const NoximAdmissibleOutputs & ao);
 
-class NoximGlobalRoutingTable
-{
+class NoximGlobalRoutingTable {
 
-public:
+  public:
 
-  NoximGlobalRoutingTable(); 
+    NoximGlobalRoutingTable();
 
-  // Load routing table from file. Returns true if ok, false otherwise
-  bool load(const char* fname);
+    // Load routing table from file. Returns true if ok, false otherwise
+    bool load(const char *fname);
 
-  NoximRoutingTableNode getNodeRoutingTable(const int node_id);
+    NoximRoutingTableNode getNodeRoutingTable(const int node_id);
 
-  bool isValid() { return valid; }
+    bool isValid() {
+	return valid;
+  } private:
 
-private:
-
-  NoximRoutingTableNoC rt_noc;  
-  bool             valid;
+     NoximRoutingTableNoC rt_noc;
+    bool valid;
 
 };
 

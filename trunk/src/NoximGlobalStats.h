@@ -18,65 +18,63 @@
 #include "NoximTile.h"
 using namespace std;
 
-class NoximGlobalStats
-{
+class NoximGlobalStats {
 
-public:
+  public:
 
-  NoximGlobalStats(const NoximNoC* _noc);
-  
-  // Returns the aggragated average delay (cycles)
-  double getAverageDelay();
-  
-  // Returns the aggragated average delay (cycles) for communication src_id->dst_id
-  double getAverageDelay(const int src_id, const int dst_id);
+    NoximGlobalStats(const NoximNoC * _noc);
 
-  // Returns the max delay
-  double getMaxDelay();
+    // Returns the aggragated average delay (cycles)
+    double getAverageDelay();
 
-  // Returns the max delay (cycles) experimented by destination
-  // node_id. Returns -1 if node_id is not destination of any
-  // communication
-  double getMaxDelay(const int node_id);
+    // Returns the aggragated average delay (cycles) for communication src_id->dst_id
+    double getAverageDelay(const int src_id, const int dst_id);
 
-  // Returns the max delay (cycles) for communication src_id->dst_id
-  double getMaxDelay(const int src_id, const int dst_id);
-  
-  // Returns tha matrix of max delay for any node of the network
-  vector<vector<double> > getMaxDelayMtx();
+    // Returns the max delay
+    double getMaxDelay();
 
-  // Returns the aggragated average throughput (flits/cycles)
-  double getAverageThroughput();
+    // Returns the max delay (cycles) experimented by destination
+    // node_id. Returns -1 if node_id is not destination of any
+    // communication
+    double getMaxDelay(const int node_id);
 
-  // Returns the aggragated average throughput (flits/cycles) for
-  // communication src_id->dst_id
-  double getAverageThroughput(const int src_id, const int dst_id);
+    // Returns the max delay (cycles) for communication src_id->dst_id
+    double getMaxDelay(const int src_id, const int dst_id);
 
-  // Returns the total number of received packets
-  unsigned int getReceivedPackets();
+    // Returns tha matrix of max delay for any node of the network
+     vector < vector < double >>getMaxDelayMtx();
 
-  // Returns the total number of received flits
-  unsigned int getReceivedFlits();
+    // Returns the aggragated average throughput (flits/cycles)
+    double getAverageThroughput();
 
-  // Returns the maximum value of the accepted traffic
-  double getThroughput();
+    // Returns the aggragated average throughput (flits/cycles) for
+    // communication src_id->dst_id
+    double getAverageThroughput(const int src_id, const int dst_id);
 
-  // Returns the number of routed flits for each router
-  vector<vector<unsigned long> > getRoutedFlitsMtx();
+    // Returns the total number of received packets
+    unsigned int getReceivedPackets();
 
-  // Returns the total power
-  double getPower();
+    // Returns the total number of received flits
+    unsigned int getReceivedFlits();
 
-  // Shows global statistics
-  void showStats(std::ostream& out = std::cout, bool detailed = false);
+    // Returns the maximum value of the accepted traffic
+    double getThroughput();
+
+    // Returns the number of routed flits for each router
+     vector < vector < unsigned long >>getRoutedFlitsMtx();
+
+    // Returns the total power
+    double getPower();
+
+    // Shows global statistics
+    void showStats(std::ostream & out = std::cout, bool detailed = false);
 
 #ifdef TESTING
-  unsigned int drained_total;
+    unsigned int drained_total;
 #endif
 
-private:
-  const NoximNoC* noc;
+  private:
+    const NoximNoC *noc;
 };
 
 #endif
-

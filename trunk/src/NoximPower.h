@@ -46,36 +46,45 @@ hop interconnect is 0.384nJ.
 #define PWR_INCOMING               0.002e-9
 #define PWR_STANDBY                0.0001e-9/2.0
 
-class NoximPower
-{
+class NoximPower {
 
-public:
+  public:
 
-  NoximPower();
+    NoximPower();
 
-  void Routing();
-  void Selection();
-  void Standby();
-  void Forward();
-  void Incoming();
+    void Routing();
+    void Selection();
+    void Standby();
+    void Forward();
+    void Incoming();
 
-  double getPower() { return pwr; }
+    double getPower() {
+	return pwr;
+    } double getPwrRouting() {
+	return pwr_routing;
+    }
+    double getPwrSelection() {
+	return pwr_selection;
+    }
+    double getPwrForward() {
+	return pwr_forward;
+    }
+    double getPwrStandBy() {
+	return pwr_standby;
+    }
+    double getPwrIncoming() {
+	return pwr_incoming;
+    }
 
-  double getPwrRouting() { return pwr_routing; }
-  double getPwrSelection() { return pwr_selection; }
-  double getPwrForward() { return pwr_forward; }
-  double getPwrStandBy() { return pwr_standby; }
-  double getPwrIncoming() { return pwr_incoming; }
+  private:
 
-private:
+    double pwr_routing;
+    double pwr_selection;
+    double pwr_forward;
+    double pwr_standby;
+    double pwr_incoming;
 
-  double pwr_routing;
-  double pwr_selection;
-  double pwr_forward;
-  double pwr_standby;
-  double pwr_incoming;
-
-  double pwr;
+    double pwr;
 };
 
 #endif

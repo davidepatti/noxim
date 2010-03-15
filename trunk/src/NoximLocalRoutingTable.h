@@ -14,30 +14,32 @@
 #include "NoximMain.h"
 #include "NoximGlobalRoutingTable.h"
 
-class NoximLocalRoutingTable
-{
+class NoximLocalRoutingTable {
 
-public:
+  public:
 
-  // Constructor
-  NoximLocalRoutingTable();
+    // Constructor
+    NoximLocalRoutingTable();
 
-  // Extracts the routing table of node _node_id from the global
-  // routing table rtable
-  void configure(NoximGlobalRoutingTable& rtable, const int _node_id);
+    // Extracts the routing table of node _node_id from the global
+    // routing table rtable
+    void configure(NoximGlobalRoutingTable & rtable, const int _node_id);
 
-  // Returns the set of admissible output channels for destination
-  // destination_id and input channel in_link
-  NoximAdmissibleOutputs getAdmissibleOutputs(const NoximLinkId& in_link, const int destination_id);
+    // Returns the set of admissible output channels for destination
+    // destination_id and input channel in_link
+    NoximAdmissibleOutputs getAdmissibleOutputs(const NoximLinkId &
+						in_link,
+						const int destination_id);
 
-  // Returns the set of admissible output channels for a destination
-  // destination_id and a given input direction
-  NoximAdmissibleOutputs getAdmissibleOutputs(const int in_direction, const int destination_id);
+    // Returns the set of admissible output channels for a destination
+    // destination_id and a given input direction
+    NoximAdmissibleOutputs getAdmissibleOutputs(const int in_direction,
+						const int destination_id);
 
-private:
+  private:
 
-  NoximRoutingTableNode rt_node;
-  int node_id;
+     NoximRoutingTableNode rt_node;
+    int node_id;
 };
 
 #endif
