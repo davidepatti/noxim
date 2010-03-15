@@ -140,7 +140,7 @@ bool NoximProcessingElement::canShot(NoximPacket & packet)
 
 	double now = sc_time_stamp().to_double() / 1000;
 	bool use_pir = (transmittedAtPreviousCycle == false);
-	vector < pair < int, double >>dst_prob;
+	vector < pair < int, double > > dst_prob;
 	double threshold =
 	    traffic_table->getCumulativePirPor(local_id, (int) now,
 					       use_pir, dst_prob);

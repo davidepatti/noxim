@@ -114,7 +114,7 @@ struct NoximGlobalParams {
     static int stats_warm_up_time;
     static int rnd_generator_seed;
     static bool detailed;
-    static vector < pair < int, double >>hotspots;
+    static vector < pair < int, double > > hotspots;
     static float dyad_threshold;
     static unsigned int max_volume_to_be_drained;
 };

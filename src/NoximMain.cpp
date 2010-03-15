@@ -44,7 +44,7 @@ bool NoximGlobalParams::detailed = DEFAULT_DETAILED;
 float NoximGlobalParams::dyad_threshold = DEFAULT_DYAD_THRESHOLD;
 unsigned int NoximGlobalParams::max_volume_to_be_drained =
     DEFAULT_MAX_VOLUME_TO_BE_DRAINED;
-vector < pair < int, double >>NoximGlobalParams::hotspots;
+vector < pair < int, double > > NoximGlobalParams::hotspots;
 
 //---------------------------------------------------------------------------
 
