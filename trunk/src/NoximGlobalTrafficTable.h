@@ -43,7 +43,7 @@ class NoximGlobalTrafficTable {
     double getCumulativePirPor(const int src_id,
 			       const int ccycle,
 			       const bool pir_not_por,
-			       vector < pair < int, double >>&dst_prob);
+			       vector < pair < int, double > > &dst_prob);
 
     // Returns the number of occurrences of soruce src_id in the traffic
     // table

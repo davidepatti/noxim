@@ -42,7 +42,7 @@ class NoximGlobalStats {
     double getMaxDelay(const int src_id, const int dst_id);
 
     // Returns tha matrix of max delay for any node of the network
-     vector < vector < double >>getMaxDelayMtx();
+     vector < vector < double > > getMaxDelayMtx();
 
     // Returns the aggragated average throughput (flits/cycles)
     double getAverageThroughput();
@@ -61,7 +61,7 @@ class NoximGlobalStats {
     double getThroughput();
 
     // Returns the number of routed flits for each router
-     vector < vector < unsigned long >>getRoutedFlitsMtx();
+     vector < vector < unsigned long > > getRoutedFlitsMtx();
 
     // Returns the total power
     double getPower();

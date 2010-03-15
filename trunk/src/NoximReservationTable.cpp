@@ -25,7 +25,7 @@ void NoximReservationTable::clear()
 	    rtable[i] = NOT_RESERVED;
 }
 
-bool NoximReservationTable::isAvailable(const int port_out) const const
+bool NoximReservationTable::isAvailable(const int port_out) const
 {
     assert(port_out >= 0 && port_out < DIRECTIONS + 1);
 
@@ -56,7 +56,7 @@ void NoximReservationTable::release(const int port_out)
     rtable[port_out] = NOT_RESERVED;
 }
 
-int NoximReservationTable::getOutputPort(const int port_in) const const
+int NoximReservationTable::getOutputPort(const int port_in) const
 {
     assert(port_in >= 0 && port_in < DIRECTIONS + 1);
 

@@ -176,7 +176,7 @@ void NoximNoC::buildMesh()
     }
 }
 
-NoximTile *NoximNoC::searchNode(const int id) const const
+NoximTile *NoximNoC::searchNode(const int id) const
 {
     for (int i = 0; i < NoximGlobalParams::mesh_dim_x; i++)
 	for (int j = 0; j < NoximGlobalParams::mesh_dim_y; j++)

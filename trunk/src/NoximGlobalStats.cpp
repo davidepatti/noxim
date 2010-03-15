@@ -93,9 +93,9 @@ double NoximGlobalStats::getMaxDelay(const int src_id, const int dst_id)
     return tile->r->stats.getMaxDelay(src_id);
 }
 
-vector < vector < double >>NoximGlobalStats::getMaxDelayMtx()
+vector < vector < double > > NoximGlobalStats::getMaxDelayMtx()
 {
-    vector < vector < double >>mtx;
+    vector < vector < double > > mtx;
 
     mtx.resize(NoximGlobalParams::mesh_dim_y);
     for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
@@ -195,10 +195,10 @@ double NoximGlobalStats::getThroughput()
 
 }
 
-vector < vector < unsigned long >>NoximGlobalStats::getRoutedFlitsMtx()
+vector < vector < unsigned long > > NoximGlobalStats::getRoutedFlitsMtx()
 {
 
-    vector < vector < unsigned long >>mtx;
+    vector < vector < unsigned long > > mtx;
 
     mtx.resize(NoximGlobalParams::mesh_dim_y);
     for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
@@ -245,7 +245,7 @@ void NoximGlobalStats::showStats(std::ostream & out, bool detailed)
 	out << "];" << endl;
 
 	// show MaxDelay matrix
-	vector < vector < double >>md_mtx = getMaxDelayMtx();
+	vector < vector < double > > md_mtx = getMaxDelayMtx();
 
 	out << endl << "max_delay = [" << endl;
 	for (unsigned int y = 0; y < md_mtx.size(); y++) {
@@ -257,7 +257,7 @@ void NoximGlobalStats::showStats(std::ostream & out, bool detailed)
 	out << "];" << endl;
 
 	// show RoutedFlits matrix
-	vector < vector < unsigned long >>rf_mtx = getRoutedFlitsMtx();
+	vector < vector < unsigned long > > rf_mtx = getRoutedFlitsMtx();
 
 	out << endl << "routed_flits = [" << endl;
 	for (unsigned int y = 0; y < rf_mtx.size(); y++) {

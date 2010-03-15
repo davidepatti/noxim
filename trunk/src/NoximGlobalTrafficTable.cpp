@@ -97,7 +97,7 @@ double NoximGlobalTrafficTable::getCumulativePirPor(const int src_id,
 						    const int ccycle,
 						    const bool pir_not_por,
 						    vector < pair < int,
-						    double >>&dst_prob)
+						    double > > &dst_prob)
 {
     double cpirnpor = 0.0;
 

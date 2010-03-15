@@ -151,7 +151,7 @@ void NoximRouter::txProcess()
     stats.power.Standby();
 }
 
-NoximNoP_data NoximRouter::getCurrentNoPData() const const
+NoximNoP_data NoximRouter::getCurrentNoPData() const
 {
     NoximNoP_data NoP_data;
 
@@ -243,7 +243,7 @@ int NoximRouter::route(const NoximRouteData & route_data)
     return selectionFunction(candidate_channels, route_data);
 }
 
-void NoximRouter::NoP_report() const const
+void NoximRouter::NoP_report() const
 {
     NoximNoP_data NoP_tmp;
     cout << sc_time_stamp().to_double() /
@@ -259,7 +259,7 @@ void NoximRouter::NoP_report() const const
 //---------------------------------------------------------------------------
 
 int NoximRouter::NoPScore(const NoximNoP_data & nop_data,
-			  const vector < int >&nop_channels) const const
+			  const vector < int >&nop_channels) const
 {
     int score = 0;
 
@@ -666,7 +666,7 @@ double NoximRouter::getPower()
     return stats.power.getPower();
 }
 
-int NoximRouter::reflexDirection(int direction) const const
+int NoximRouter::reflexDirection(int direction) const
 {
     if (direction == DIRECTION_NORTH)
 	return DIRECTION_SOUTH;
@@ -682,7 +682,7 @@ int NoximRouter::reflexDirection(int direction) const const
     return NOT_VALID;
 }
 
-int NoximRouter::getNeighborId(int _id, int direction) const const
+int NoximRouter::getNeighborId(int _id, int direction) const
 {
     NoximCoord my_coord = id2Coord(_id);
 

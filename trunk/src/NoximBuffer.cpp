@@ -22,27 +22,27 @@ void NoximBuffer::SetMaxBufferSize(const unsigned int bms)
     max_buffer_size = bms;
 }
 
-unsigned int NoximBuffer::GetMaxBufferSize() const const
+unsigned int NoximBuffer::GetMaxBufferSize() const
 {
     return max_buffer_size;
 }
 
-bool NoximBuffer::IsFull() const const
+bool NoximBuffer::IsFull() const
 {
     return buffer.size() == max_buffer_size;
 }
 
-bool NoximBuffer::IsEmpty() const const
+bool NoximBuffer::IsEmpty() const
 {
     return buffer.size() == 0;
 }
 
-void NoximBuffer::Drop(const NoximFlit & flit) const const
+void NoximBuffer::Drop(const NoximFlit & flit) const
 {
     assert(false);
 }
 
-void NoximBuffer::Empty() const const
+void NoximBuffer::Empty() const
 {
     assert(false);
 }
@@ -69,7 +69,7 @@ NoximFlit NoximBuffer::Pop()
     return f;
 }
 
-NoximFlit NoximBuffer::Front() const const
+NoximFlit NoximBuffer::Front() const
 {
     NoximFlit f;
 
@@ -81,12 +81,12 @@ NoximFlit NoximBuffer::Front() const const
     return f;
 }
 
-unsigned int NoximBuffer::Size() const const
+unsigned int NoximBuffer::Size() const
 {
     return buffer.size();
 }
 
-unsigned int NoximBuffer::getCurrentFreeSlots() const const
+unsigned int NoximBuffer::getCurrentFreeSlots() const
 {
     return (GetMaxBufferSize() - Size());
 }
