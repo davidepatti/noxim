@@ -27,24 +27,19 @@ int NoximGlobalParams::buffer_depth = DEFAULT_BUFFER_DEPTH;
 int NoximGlobalParams::min_packet_size = DEFAULT_MIN_PACKET_SIZE;
 int NoximGlobalParams::max_packet_size = DEFAULT_MAX_PACKET_SIZE;
 int NoximGlobalParams::routing_algorithm = DEFAULT_ROUTING_ALGORITHM;
-char NoximGlobalParams::routing_table_filename[128] =
-    DEFAULT_ROUTING_TABLE_FILENAME;
+char NoximGlobalParams::routing_table_filename[128] = DEFAULT_ROUTING_TABLE_FILENAME;
 int NoximGlobalParams::selection_strategy = DEFAULT_SELECTION_STRATEGY;
-float NoximGlobalParams::packet_injection_rate =
-    DEFAULT_PACKET_INJECTION_RATE;
-float NoximGlobalParams::probability_of_retransmission =
-    DEFAULT_PROBABILITY_OF_RETRANSMISSION;
+float NoximGlobalParams::packet_injection_rate = DEFAULT_PACKET_INJECTION_RATE;
+float NoximGlobalParams::probability_of_retransmission = DEFAULT_PROBABILITY_OF_RETRANSMISSION;
 int NoximGlobalParams::traffic_distribution = DEFAULT_TRAFFIC_DISTRIBUTION;
-char NoximGlobalParams::traffic_table_filename[128] =
-    DEFAULT_TRAFFIC_TABLE_FILENAME;
+char NoximGlobalParams::traffic_table_filename[128] = DEFAULT_TRAFFIC_TABLE_FILENAME;
 int NoximGlobalParams::simulation_time = DEFAULT_SIMULATION_TIME;
 int NoximGlobalParams::stats_warm_up_time = DEFAULT_STATS_WARM_UP_TIME;
 int NoximGlobalParams::rnd_generator_seed = time(NULL);
 bool NoximGlobalParams::detailed = DEFAULT_DETAILED;
 float NoximGlobalParams::dyad_threshold = DEFAULT_DYAD_THRESHOLD;
-unsigned int NoximGlobalParams::max_volume_to_be_drained =
-    DEFAULT_MAX_VOLUME_TO_BE_DRAINED;
-vector < pair < int, double > > NoximGlobalParams::hotspots;
+unsigned int NoximGlobalParams::max_volume_to_be_drained = DEFAULT_MAX_VOLUME_TO_BE_DRAINED;
+vector <pair <int, double> > NoximGlobalParams::hotspots;
 
 //---------------------------------------------------------------------------
 
@@ -61,7 +56,7 @@ int sc_main(int arg_num, char *arg_vet[])
 
     // Signals
     sc_clock clock("clock", 1, SC_NS);
-    sc_signal < bool > reset;
+    sc_signal <bool> reset;
 
     // NoC instance
     NoximNoC *n = new NoximNoC("NoC");

@@ -25,47 +25,31 @@ SC_MODULE(NoximNoC)
     sc_in < bool > reset;	// The reset signal for the NoC
 
     // Signals
-    sc_signal < bool > req_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal < bool > req_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal < bool >
-	req_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal < bool >
-	req_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> req_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> req_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> req_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> req_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
 
-    sc_signal < bool > ack_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal < bool > ack_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal < bool >
-	ack_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal < bool >
-	ack_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> ack_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> ack_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> ack_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> ack_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
 
-    sc_signal < NoximFlit >
-	flit_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal < NoximFlit >
-	flit_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal < NoximFlit >
-	flit_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal < NoximFlit >
-	flit_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <NoximFlit> flit_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <NoximFlit> flit_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <NoximFlit> flit_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <NoximFlit> flit_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
 
-    sc_signal <
-	int >free_slots_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <
-	int >free_slots_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <
-	int >free_slots_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <
-	int >free_slots_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <int> free_slots_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <int> free_slots_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <int> free_slots_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <int> free_slots_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
 
     // NoP
-    sc_signal < NoximNoP_data >
-	NoP_data_to_east[MAX_STATIC_DIM][MAX_STATIC_DIM];
-    sc_signal < NoximNoP_data >
-	NoP_data_to_west[MAX_STATIC_DIM][MAX_STATIC_DIM];
-    sc_signal < NoximNoP_data >
-	NoP_data_to_south[MAX_STATIC_DIM][MAX_STATIC_DIM];
-    sc_signal < NoximNoP_data >
-	NoP_data_to_north[MAX_STATIC_DIM][MAX_STATIC_DIM];
+    sc_signal <NoximNoP_data> NoP_data_to_east[MAX_STATIC_DIM][MAX_STATIC_DIM];
+    sc_signal <NoximNoP_data> NoP_data_to_west[MAX_STATIC_DIM][MAX_STATIC_DIM];
+    sc_signal <NoximNoP_data> NoP_data_to_south[MAX_STATIC_DIM][MAX_STATIC_DIM];
+    sc_signal <NoximNoP_data> NoP_data_to_north[MAX_STATIC_DIM][MAX_STATIC_DIM];
 
     // Matrix of tiles
     NoximTile *t[MAX_STATIC_DIM][MAX_STATIC_DIM];
