@@ -20,39 +20,39 @@ SC_MODULE(NoximTile)
 {
 
     // I/O Ports
-    sc_in_clk clock;		// The input clock for the tile
-    sc_in < bool > reset;	// The reset signal for the tile
+    sc_in_clk clock;		                // The input clock for the tile
+    sc_in <bool> reset;	                        // The reset signal for the tile
 
-    sc_in < NoximFlit > flit_rx[DIRECTIONS];	// The input channels
-    sc_in < bool > req_rx[DIRECTIONS];	// The requests associated with the input channels
-    sc_out < bool > ack_rx[DIRECTIONS];	// The outgoing ack signals associated with the input channels
+    sc_in <NoximFlit> flit_rx[DIRECTIONS];	// The input channels
+    sc_in <bool> req_rx[DIRECTIONS];	        // The requests associated with the input channels
+    sc_out <bool> ack_rx[DIRECTIONS];	        // The outgoing ack signals associated with the input channels
 
-    sc_out < NoximFlit > flit_tx[DIRECTIONS];	// The output channels
-    sc_out < bool > req_tx[DIRECTIONS];	// The requests associated with the output channels
-    sc_in < bool > ack_tx[DIRECTIONS];	// The outgoing ack signals associated with the output channels
+    sc_out <NoximFlit> flit_tx[DIRECTIONS];	// The output channels
+    sc_out <bool> req_tx[DIRECTIONS];	        // The requests associated with the output channels
+    sc_in <bool> ack_tx[DIRECTIONS];	        // The outgoing ack signals associated with the output channels
 
-    sc_out < int >free_slots[DIRECTIONS];
-    sc_in < int >free_slots_neighbor[DIRECTIONS];
+    sc_out <int> free_slots[DIRECTIONS];
+    sc_in <int> free_slots_neighbor[DIRECTIONS];
 
     // NoP related I/O
     sc_out < NoximNoP_data > NoP_data_out[DIRECTIONS];
     sc_in < NoximNoP_data > NoP_data_in[DIRECTIONS];
 
     // Signals
-    sc_signal < NoximFlit > flit_rx_local;	// The input channels
-    sc_signal < bool > req_rx_local;	// The requests associated with the input channels
-    sc_signal < bool > ack_rx_local;	// The outgoing ack signals associated with the input channels
+    sc_signal <NoximFlit> flit_rx_local;	// The input channels
+    sc_signal <bool> req_rx_local;              // The requests associated with the input channels
+    sc_signal <bool> ack_rx_local;	        // The outgoing ack signals associated with the input channels
 
-    sc_signal < NoximFlit > flit_tx_local;	// The output channels
-    sc_signal < bool > req_tx_local;	// The requests associated with the output channels
-    sc_signal < bool > ack_tx_local;	// The outgoing ack signals associated with the output channels
+    sc_signal <NoximFlit> flit_tx_local;	// The output channels
+    sc_signal <bool> req_tx_local;	        // The requests associated with the output channels
+    sc_signal <bool> ack_tx_local;	        // The outgoing ack signals associated with the output channels
 
-    sc_signal < int >free_slots_local;
-    sc_signal < int >free_slots_neighbor_local;
+    sc_signal <int> free_slots_local;
+    sc_signal <int> free_slots_neighbor_local;
 
     // Instances
-    NoximRouter *r;		// Router instance
-    NoximProcessingElement *pe;	// Processing Element instance
+    NoximRouter *r;		                // Router instance
+    NoximProcessingElement *pe;	                // Processing Element instance
 
     // Constructor
 

@@ -14,9 +14,6 @@
 #include <cassert>
 #include <systemc.h>
 #include <vector>
-//#include "NoximNoC.h"
-//#include "NoximGlobalStats.h"
-//#include "NoximCmdLineParser.h"
 using namespace std;
 
 // Define the directions as numbers
@@ -42,13 +39,13 @@ using namespace std;
 #define ROUTING_DYAD           5
 #define ROUTING_FULLY_ADAPTIVE 8
 #define ROUTING_TABLE_BASED    9
-#define INVALID_ROUTING        -1
+#define INVALID_ROUTING       -1
 
 // Selection strategies
 #define SEL_RANDOM             0
 #define SEL_BUFFER_LEVEL       1
 #define SEL_NOP                2
-#define INVALID_SELECTION      -1
+#define INVALID_SELECTION     -1
 
 // Traffic distribution
 #define TRAFFIC_RANDOM         0
@@ -59,7 +56,7 @@ using namespace std;
 #define TRAFFIC_BIT_REVERSAL   5
 #define TRAFFIC_SHUFFLE        6
 #define TRAFFIC_BUTTERFLY      7
-#define INVALID_TRAFFIC        -1
+#define INVALID_TRAFFIC       -1
 
 // Verbosity levels
 #define VERBOSE_OFF            0
@@ -90,7 +87,7 @@ using namespace std;
 #define DEFAULT_DYAD_THRESHOLD                     0.6
 #define DEFAULT_MAX_VOLUME_TO_BE_DRAINED             0
 
-// TODO by Fafa - this MUST be removed!!!
+// TODO by Fafa - this MUST be removed!!! Use only STL vectors instead!!!
 #define MAX_STATIC_DIM 20
 
 // NoximGlobalParams -- used to forward configuration to every sub-block
@@ -114,7 +111,7 @@ struct NoximGlobalParams {
     static int stats_warm_up_time;
     static int rnd_generator_seed;
     static bool detailed;
-    static vector < pair < int, double > > hotspots;
+    static vector <pair <int, double> > hotspots;
     static float dyad_threshold;
     static unsigned int max_volume_to_be_drained;
 };
@@ -136,7 +133,7 @@ enum NoximFlitType {
 
 // NoximPayload -- Payload definition
 struct NoximPayload {
-    sc_uint < 32 > data;	// Bus for the data to be exchanged
+    sc_uint<32> data;	// Bus for the data to be exchanged
 
     inline bool operator ==(const NoximPayload & payload) const {
 	return (payload.data == data);
@@ -150,8 +147,9 @@ struct NoximPacket {
     int size;
     int flit_left;		// Number of remaining flits inside the packet
 
-     NoximPacket() {;
-    } NoximPacket(const int s, const int d, const double ts, const int sz) {
+    // Constructors
+    NoximPacket() { }
+    NoximPacket(const int s, const int d, const double ts, const int sz) {
 	make(s, d, ts, sz);
     }
 
@@ -257,8 +255,7 @@ inline ostream & operator <<(ostream & os, const NoximFlit & flit)
 	    break;
 	}
 
-	os << ", seq: " << flit.sequence_no << ", " << flit.
-	    src_id << "-->" << flit.dst_id << "]";
+	os << ", seq: " << flit.sequence_no << ", " << flit.src_id << "-->" << flit.dst_id << "]";
     }
 
     return os;
@@ -296,8 +293,7 @@ inline ostream & operator <<(ostream & os, const NoximCoord & coord)
 
 // Trace overloading
 
-inline void sc_trace(sc_trace_file * &tf, const NoximFlit & flit,
-		     string & name)
+inline void sc_trace(sc_trace_file * &tf, const NoximFlit & flit, string & name)
 {
     sc_trace(tf, flit.src_id, name + ".src_id");
     sc_trace(tf, flit.dst_id, name + ".dst_id");
@@ -306,14 +302,12 @@ inline void sc_trace(sc_trace_file * &tf, const NoximFlit & flit,
     sc_trace(tf, flit.hop_no, name + ".hop_no");
 }
 
-inline void sc_trace(sc_trace_file * &tf, const NoximNoP_data & NoP_data,
-		     string & name)
+inline void sc_trace(sc_trace_file * &tf, const NoximNoP_data & NoP_data, string & name)
 {
     sc_trace(tf, NoP_data.sender_id, name + ".sender_id");
 }
 
-inline void sc_trace(sc_trace_file * &tf, const NoximChannelStatus & bs,
-		     string & name)
+inline void sc_trace(sc_trace_file * &tf, const NoximChannelStatus & bs, string & name)
 {
     sc_trace(tf, bs.free_slots, name + ".free_slots");
     sc_trace(tf, bs.available, name + ".available");
@@ -338,10 +332,9 @@ inline int coord2Id(const NoximCoord & coord)
 {
     int id = (coord.y * NoximGlobalParams::mesh_dim_x) + coord.x;
 
-    assert(id <
-	   NoximGlobalParams::mesh_dim_x * NoximGlobalParams::mesh_dim_y);
+    assert(id < NoximGlobalParams::mesh_dim_x * NoximGlobalParams::mesh_dim_y);
 
     return id;
 }
 
-#endif				// NOXIMDEFS_H
+#endif
