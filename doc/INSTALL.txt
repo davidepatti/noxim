@@ -1,9 +1,10 @@
 Noxim - the NoC Simulator
 =========================
 
-Welcome to Noxim, the Network-on-Chip Simulator developed at the University of Catania (Italy).
+Installation instructions
+-------------------------
 
-This file will show you how to install Noxim on your computer.
+This guide will show you how to install Noxim on your computer.
 
 
 Supported Platforms
