@@ -1,4 +1,0 @@
-Changes from noxim-20081118
-===========================
--dist option has been removed. 
--pir option has been extended. Now it requires the traffic distribution type
