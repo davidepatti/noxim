@@ -17,7 +17,7 @@ but SystemC is known to run under other platforms including Apple Mac OS X and S
 with GCC and Microsoft Windows with Visual C++ (but Cygwin with GCC is also known to work).
 
 This document will then detail the steps required to build Noxim from the sources, including
-the only prerequisite, i.e. SystemC installation.
+the only prerequisite, i.e. the SystemC installation.
 
 
 Prerequisite: SystemC installation
