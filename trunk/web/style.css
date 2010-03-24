@@ -1,0 +1,37 @@
+p,table,th,td,li,address,h1,h2,h3,h4,h5,h6
+{
+  font-family: courier, monospace; 
+  margin-left: 100pt;
+  margin-right: 100pt;
+}
+
+th
+{
+  background-color:#bbccdd
+}
+
+body
+{
+  background-color: #ffffaa;
+}
+
+h1,h2,h3,h4,h5,h6,hr 
+{
+  color: #000060
+}
+
+li
+{
+  list-style: square;
+}
+
+a
+{
+color: darkred; text-decoration: none;
+}
+
+a:hover
+{
+color: red; text-decoration: underline;
+}
+
