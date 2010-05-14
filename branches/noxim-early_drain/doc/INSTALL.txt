@@ -1,0 +1,105 @@
+Noxim - the NoC Simulator
+=========================
+
+Installation instructions
+-------------------------
+
+This guide will show you how to install Noxim on your computer.
+
+
+Supported Platforms
+-------------------
+
+Noxim is written using the C++ language and the SystemC library, so it is easily portable to
+any platform for which SystemC is supported: please refer to their (SystemC) documentation to
+know which they are. Just to let you know, we usually work under GNU/Linux (mainly Ubuntu)
+but SystemC is known to run under other platforms including Apple Mac OS X and Sun Solaris
+with GCC and Microsoft Windows with Visual C++ (but Cygwin with GCC is also known to work).
+
+This document will then detail the steps required to build Noxim from the sources, including
+the only prerequisite, i.e. the SystemC installation.
+
+
+Prerequisite: SystemC installation
+----------------------------------
+
+- To compile SystemC you will obviously need a C++ compiler; if you still don't have it, on
+  Debian/Ubuntu platforms you may install all the required tools with the following command:
+
+    sudo apt-get install build-essential
+
+- Download SystemC (currently at version 2.2.0) from http://www.systemc.org/downloads/standards/
+  (a free registration is required).
+- Unpack it; please note that some versions have a wrong file extension. For instance you may
+  have to use the following commands to untar it:
+
+    mv systemc-2.2.0.tgz systemc-2.2.0.tar
+    tar xvf systemc-2.2.0.tar
+
+- Enter the newly created directory and refer to the file INSTALL which details all the steps
+  required for building. Basically they are:
+
+    mkdir objdir
+    cd objdir
+    export CXX=g++
+    ../configure
+    make
+    make install
+    cd ..
+    rm -rf objdir
+
+- With modern versions of GCC you may find the "make" command above to fail with the
+  following error message:
+
+    ../../../../src/sysc/utils/sc_utils_ids.cpp: In function ‘int sc_core::initialize()’:
+    ../../../../src/sysc/utils/sc_utils_ids.cpp:110: error: ‘getenv’ is not a member of ‘std’
+    ../../../../src/sysc/utils/sc_utils_ids.cpp:111: error: ‘strcmp’ was not declared in this scope
+    make[3]: *** [sc_utils_ids.o] Error 1
+    make[3]: Leaving directory `/opt/systemc-2.2.0/objdir/src/sysc/utils'
+    make[2]: *** [all-recursive] Error 1
+    make[2]: Leaving directory `/opt/systemc-2.2.0/objdir/src/sysc'
+    make[1]: *** [all-recursive] Error 1
+    make[1]: Leaving directory `/opt/systemc-2.2.0/objdir/src'
+    make: *** [all-recursive] Error 1
+
+  If this is your case (for instance it happens while compiling SystemC 2.2.0 with GCC 4.4),
+  then please note that this is not a bug of the compiler but a bug in the SystemC sources,
+  because they have forgot a couple of include clauses.
+  To fix it, add the following includes at the top of file ../src/sysc/utils/sc_utils_ids.cpp :
+
+    #include <cstdlib>
+    #include <cstring>
+
+  You may even modify that file without using any text editor, just use this shell command
+  (yes, Fabrizio still loves UNIX shell!!!):
+
+    sed -i '1 i #include <cstdlib>\n#include <cstring>' ../src/sysc/utils/sc_utils_ids.cpp
+
+  Then restart from the "make" step in the list above.
+
+  Once you have installed SystemC correctly, you may then jump to the next step.
+
+
+Build SystemC
+-------------
+
+If SystemC is installed correctly, then you just have to compile Noxim.
+
+1) Extract the source files and go to the "bin" directory.
+
+2) In that directory edit the file Makefile.defs (NOT Makefile.deps!) to modify
+the "SYSTEMC" environment variable according to your SystemC installation path.
+
+3) Just run "make".
+
+You may ignore warning messages (if any), so if you don't get any error you are
+ready to run Noxim for the first time using the command:
+
+    ./noxim
+
+If everything works fine, it is now safe for you to copy or move this executable
+elsewhere; if you are a maniac of cleaning please note that "make clean" will
+also delete the executable... so move it before cleaning!
+
+That's all, folks!
+

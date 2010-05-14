@@ -1,0 +1,20 @@
+Noxim - the NoC Simulator
+=========================
+
+Authors
+-------
+
+Noxim is developed at the University of Catania (Italy) by the following team of Computer Architecture:
+
+- Maurizio Palesi, PhD
+  Email: mpalesi@diit.unict.it
+  Home: http://www.diit.unict.it/users/mpalesi/
+
+- Davide Patti, PhD
+  Email: dpatti@diit.unict.it
+  Home: http://www.diit.unict.it/users/dpatti/
+
+- Fabrizio Fazzino
+  Email: fabrizio@fazzino.it
+  Home: http://www.fazzino.it/
+
