@@ -24,57 +24,62 @@ The output provided by this command should look like this:
 
 #################################################################
 
-             SystemC 2.2.0 --- Mar 11 2010 11:07:33
-        Copyright (c) 1996-2006 by all Contributors
-                    ALL RIGHTS RESERVED
+             SystemC 2.3.0-ASI --- Oct 16 2013 11:40:12
+        Copyright (c) 1996-2012 by all Contributors,
+        ALL RIGHTS RESERVED
+
 
 		Noxim - the NoC Simulator
-                (C) University of Catania
+		(C) University of Catania
 
 Usage: ./noxim [options]
 where [options] is one or more of the following ones:
-        -help           Show this help and exit
-        -verbose N      Verbosity level (1=low, 2=medium, 3=high, default off)
-        -trace FILENAME Trace signals to a VCD file named 'FILENAME.vcd' (default off)
-        -dimx N	        Set the mesh X dimension to the specified integer value (default 4)
-        -dimy N	        Set the mesh Y dimension to the specified integer value (default 4)
-        -buffer N	Set the buffer depth of each channel of the router to the specified integer value [flits] (default 4)
-        -size Nmin Nmax Set the minimum and maximum packet size to the specified integer values [flits] (default min=2, max=10)
-        -routing TYPE   Set the routing algorithm to TYPE where TYPE is one of the following (default 0):
-      	        xy              XY routing algorithm
-	        westfirst      	West-First routing algorithm
-	        northlast      	North-Last routing algorithm
-	        negativefirst	Negative-First routing algorithm
-	        oddeven 	Odd-Even routing algorithm
- 	        dyad T   	DyAD routing algorithm with threshold T
-	        fullyadaptive	Fully-Adaptive routing algorithm
-	        table FILENAME	Routing Table Based routing algorithm with table in the specified file
-       -sel TYPE	Set the selection strategy to TYPE where TYPE is one of the following (default 0):
-	        random		Random selection strategy
-   	        bufferlevel	Buffer-Level Based selection strategy
-	        nop	  	Neighbors-on-Path selection strategy
-       -pir R TYPE		Set the packet injection rate to the specified real value [0..1] (default 0.01) and the time distribution of traffic to TYPE where TYPE is one of the following:
-	        poisson	        Memory-less Poisson distribution (default)
-	        burst R	  	Burst distribution with given real burstness
-	        pareto on off r	Self-similar Pareto distribution with given real parameters (alfa-on alfa-off r)
-	        custom R     	Custom distribution with given real probability of retransmission
-       -traffic TYPE       	Set the spatial distribution of traffic to TYPE where TYPE is one of the following (default 0'):
-	        random     	Random traffic distribution
-	        transpose1	Transpose matrix 1 traffic distribution
-	        transpose2	Transpose matrix 2 traffic distribution
-	        bitreversal	Bit-reversal traffic distribution
-	        butterfly	Butterfly traffic distribution
-  	        shuffle   	Shuffle traffic distribution
-	        table FILENAME 	Traffic Table Based traffic distribution with table in the specified file
-       -hs ID P         Add node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)
-       -warmup N        Start to collect statistics after N cycles (default 1000)
-       -seed N 	        Set the seed of the random generator (default time())
-       -detailed        Show detailed statistics
-       -volume N        Stop the simulation when either the maximum number of cycles has been reached or N flits have been delivered
-       -sim N  	        Run for the specified simulation time [cycles] (default 10000)
+	-help		Show this help and exit
+	-verbose N	Verbosity level (1=low, 2=medium, 3=high, default off)
+	-trace FILENAME	Trace signals to a VCD file named 'FILENAME.vcd' (default off)
+	-dimx N		Set the mesh X dimension to the specified integer value (default 4)
+	-dimy N		Set the mesh Y dimension to the specified integer value (default 4)
+	-buffer N	Set the buffer depth of each channel of the router to the specified integer value [flits] (default 4)
+	-size Nmin Nmax	Set the minimum and maximum packet size to the specified integer values [flits] (default min=2, max=10)
+	-routing TYPE	Set the routing algorithm to TYPE where TYPE is one of the following (default 0):
+		xy		XY routing algorithm
+		westfirst	West-First routing algorithm
+		northlast	North-Last routing algorithm
+		negativefirst	Negative-First routing algorithm
+		oddeven		Odd-Even routing algorithm
+		dyad T		DyAD routing algorithm with threshold T
+		fullyadaptive	Fully-Adaptive routing algorithm
+		table FILENAME	Routing Table Based routing algorithm with table in the specified file
+	-sel TYPE	Set the selection strategy to TYPE where TYPE is one of the following (default 0):
+		random		Random selection strategy
+		bufferlevel	Buffer-Level Based selection strategy
+		nop		Neighbors-on-Path selection strategy
+	-pir R TYPE		Set the packet injection rate to the specified real value [0..1] (default 0.01) and the time distribution of traffic to TYPE where TYPE is one of the following:
+		poisson		Memory-less Poisson distribution (default)
+		burst R		Burst distribution with given real burstness
+		pareto on off r	Self-similar Pareto distribution with given real parameters (alfa-on alfa-off r)
+		custom R	Custom distribution with given real probability of retransmission
+	-traffic TYPE	Set the spatial distribution of traffic to TYPE where TYPE is one of the following (default 0'):
+		random		Random traffic distribution
+		transpose1	Transpose matrix 1 traffic distribution
+		transpose2	Transpose matrix 2 traffic distribution
+		bitreversal	Bit-reversal traffic distribution
+		butterfly	Butterfly traffic distribution
+		shuffle		Shuffle traffic distribution
+		table FILENAME	Traffic Table Based traffic distribution with table in the specified file
+	-hs ID P	Add node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)
+	-pwr FILENAME	Router and link power data (default default_router.pwr)
+	-lpls		Enable low power link strategy (default 0)
+	-qos PERCENTAGE	Percentage of communication that have to be routed on regular links (default 1)
+	-warmup N	Start to collect statistics after N cycles (default 1000)
+	-seed N		Set the seed of the random generator (default time())
+	-detailed	Show detailed statistics
+	-show_buf_stats	Show buffers statistics (default 0)
+	-volume N	Stop the simulation when either the maximum number of cycles has been reached or N flits have been delivered
+	-sim N		Run for the specified simulation time [cycles] (default 10000)
 
-If you find this program useful please don't forget to mention in your paper Maurizio Palesi <mpalesi@diit.unict.it>
-If you find this program useless please feel free to complain with Davide Patti <dpatti@diit.unict.it>
+If you find this program useful please don't forget to mention in your paper Maurizio Palesi <maurizio.palesi@unikore.it>
+If you find this program useless please feel free to complain with Davide Patti <dpatti@dieei.unict.it>
 And if you want to send money please feel free to PayPal to Fabrizio Fazzino <fabrizio@fazzino.it>
 
 #################################################################
@@ -136,6 +141,14 @@ router. This size is expressed in ﬂits. Please read the above instructions for
 more details.
 
 
+-size Nmin Nmax	
+---------------
+
+The option -size is uded to define the minimum and maximum packet size
+in flits. For each generated packet, the packet size is randomly
+generated between Nmin and Nmax. For fixed packet size just use Nmin=Nmax
+
+
 -routing TYPE
 -------------
 
@@ -158,7 +171,7 @@ with the greater number of free slots in the destination FIFO buffer.
 -----------
 
 With the -pir option you can set the Packet Injection Rate (PIR) to the specified
-real value.
+real value. TYPE defines the type of distribution.
 
 
 -traffic TYPE
@@ -176,6 +189,24 @@ option.
 
 The -hs option is used to specify the Hot-Spot nodes. Along with the node
 identificator you must specify the hot spot percentage.
+
+
+-pwr FILENAME
+-------------
+
+The -pwr option is used to define the power file used for estimating
+energy figures. The folder pwr/ contains a sample power file.
+
+
+-lpls, -qos PERCENTAGE
+----------------------
+
+The -lpls and -qos options allows to simulate the low-voltage link
+strategy proposed in [1]. See [1] for further details.
+
+[1] A. Mineo, M. Palesi, G. Ascia, V. Catania. Runtime Online Links
+Voltage Scaling for Low Energy Networks on Chip. EUROMICRO DSD/SEAA
+2013, Santander, Spain, September 4-6, 2013.
 
 
 -warmup N

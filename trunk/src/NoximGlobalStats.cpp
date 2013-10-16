@@ -234,6 +234,9 @@ void NoximGlobalStats::showStats(std::ostream & out, bool detailed)
     out << "% Max delay (cycles): " << getMaxDelay() << endl;
     out << "% Total energy (J): " << getPower() << endl;
 
+    if (NoximGlobalParams::show_buffer_stats)
+      showBufferStats(out);
+
     if (detailed) {
 	out << endl << "detailed = [" << endl;
 	for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
@@ -268,4 +271,18 @@ void NoximGlobalStats::showStats(std::ostream & out, bool detailed)
 	}
 	out << "];" << endl;
     }
+}
+
+
+void NoximGlobalStats::showBufferStats(std::ostream & out)
+{
+  out << "Router id\tBuffer N\t\tBuffer E\t\tBuffer S\t\tBuffer W\t\tBuffer L" << endl;
+  out << "         \tMean\tMax\tMean\tMax\tMean\tMax\tMean\tMax\tMean\tMax" << endl;
+  for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
+    for (int x = 0; x < NoximGlobalParams::mesh_dim_x; x++)
+      {
+	out << noc->t[x][y]->r->local_id;
+	noc->t[x][y]->r->ShowBuffersStats(out);
+	out << endl;
+      }
 }

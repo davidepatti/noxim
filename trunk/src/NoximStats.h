@@ -30,7 +30,9 @@ class NoximStats {
   public:
 
     NoximStats() {
-    } void configure(const int node_id, const double _warm_up_time);
+    } 
+
+    void configure(const int node_id, const double _warm_up_time);
 
     // Access point for stats update
     void receivedFlit(const double arrival_time, const NoximFlit & flit);

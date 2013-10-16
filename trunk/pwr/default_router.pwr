@@ -1,0 +1,19 @@
+# baseline router
+# energy data obtained from Orion 2.0
+# ./orion_router_power -p -d 2 -l 0.5 my_router
+# PARM_TECH_POINT       45
+# PARM_Vdd              1.0
+# PARM_Freq             1.0e9
+# PARM_v_channel	1
+# PARM_in_buf_set	4
+# PARM_flit_width	32
+
+PWR_BUFFERING   9.38275e-12
+PWR_ROUTING     0.0
+PWR_SELECTION   0.0
+PWR_ARBITRATION 3.71035e-13
+PWR_CROSSBAR    1.0258e-11
+PWR_LINK        11.0e-12
+PWR_LINK_LV     11.0e-12
+PWR_LEAKAGE     1.75635e-12
+PWR_END2END     0.0

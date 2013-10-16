@@ -1,4 +1,6 @@
 TARGET_ARCH = linux
+# TARGET_ARCH = macosx64
+
 CC     = g++
 OPT    = -O3
 DEBUG  = -g
