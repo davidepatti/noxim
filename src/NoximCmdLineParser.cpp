@@ -89,12 +89,22 @@ void showHelp(char selfname[])
 	"\t-hs ID P\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)"
 	<< endl;
     cout <<
+        "\t-pwr FILENAME\tRouter and link power data (default " 
+         << DEFAULT_ROUTER_PWR_FILENAME << ")" << endl;
+    cout <<
+        "\t-lpls\t\tEnable low power link strategy (default "
+         << DEFAULT_LOW_POWER_LINK_STRATEGY << ")" << endl;
+    cout <<
+      "\t-qos PERCENTAGE\tPercentage of communication that have to be routed on regular links (default " << DEFAULT_QOS << ")" << endl;
+
+    cout <<
 	"\t-warmup N\tStart to collect statistics after N cycles (default "
 	<< DEFAULT_STATS_WARM_UP_TIME << ")" << endl;
     cout <<
 	"\t-seed N\t\tSet the seed of the random generator (default time())"
 	<< endl;
     cout << "\t-detailed\tShow detailed statistics" << endl;
+    cout << "\t-show_buf_stats\tShow buffers statistics (default " << DEFAULT_SHOW_BUFFER_STATS << ")" << endl;
     cout <<
 	"\t-volume N\tStop the simulation when either the maximum number of cycles has been reached or N flits have been delivered"
 	<< endl;
@@ -102,10 +112,10 @@ void showHelp(char selfname[])
 	"\t-sim N\t\tRun for the specified simulation time [cycles] (default "
 	<< DEFAULT_SIMULATION_TIME << ")" << endl << endl;
     cout <<
-	"If you find this program useful please don't forget to mention in your paper Maurizio Palesi <mpalesi@diit.unict.it>"
+	"If you find this program useful please don't forget to mention in your paper Maurizio Palesi <maurizio.palesi@unikore.it>"
 	<< endl;
     cout <<
-	"If you find this program useless please feel free to complain with Davide Patti <dpatti@diit.unict.it>"
+	"If you find this program useless please feel free to complain with Davide Patti <dpatti@dieei.unict.it>"
 	<< endl;
     cout <<
 	"And if you want to send money please feel free to PayPal to Fabrizio Fazzino <fabrizio@fazzino.it>"
@@ -226,6 +236,16 @@ void checkInputParameters()
 	NoximGlobalParams::simulation_time) {
 	cerr << "Error: warmup time must be less than simulation time" <<
 	    endl;
+	exit(1);
+    }
+
+    if (NoximGlobalParams::qos < 1.0 && 
+	!NoximGlobalParams::low_power_link_strategy) {
+      cerr << "Warning: it makes no sense using -qos without -lpls option enabled" << endl;
+    }
+
+    if (NoximGlobalParams::qos > 1.0 || NoximGlobalParams::qos < 0.0) {
+	cerr << "Error: qos must be in the range [0,1]" << endl;
 	exit(1);
     }
 }
@@ -358,13 +378,21 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		NoximGlobalParams::stats_warm_up_time = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-seed"))
 		NoximGlobalParams::rnd_generator_seed = atoi(arg_vet[++i]);
-	    else if (!strcmp(arg_vet[i], "-detailed"))
+ 	    else if (!strcmp(arg_vet[i], "-detailed"))
 		NoximGlobalParams::detailed = true;
+	    else if (!strcmp(arg_vet[i], "-show_buf_stats"))
+		NoximGlobalParams::show_buffer_stats = true;
 	    else if (!strcmp(arg_vet[i], "-volume"))
 		NoximGlobalParams::max_volume_to_be_drained =
 		    atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-sim"))
 		NoximGlobalParams::simulation_time = atoi(arg_vet[++i]);
+	    else if (!strcmp(arg_vet[i], "-pwr"))
+	      strcpy(NoximGlobalParams::router_power_filename, arg_vet[++i]);
+	    else if (!strcmp(arg_vet[i], "-lpls"))
+	      NoximGlobalParams::low_power_link_strategy = true;
+	    else if (!strcmp(arg_vet[i], "-qos"))
+		NoximGlobalParams::qos = atof(arg_vet[++i]);
 	    else {
 		cerr << "Error: Invalid option: " << arg_vet[i] << endl;
 		exit(1);

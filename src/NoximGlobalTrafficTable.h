@@ -19,13 +19,14 @@ using namespace std;
 
 // Structure used to store information into the table
 struct NoximCommunication {
-    int src;			// ID of the source node (PE)
-    int dst;			// ID of the destination node (PE)
-    float pir;			// Packet Injection Rate for the link
-    float por;			// Probability Of Retransmission for the link
-    int t_on;			// Time (in cycles) at which activity begins
-    int t_off;			// Time (in cycles) at which activity ends
-    int t_period;		// Period after which activity starts again
+  int src;			// ID of the source node (PE)
+  int dst;			// ID of the destination node (PE)
+  float pir;			// Packet Injection Rate for the link
+  float por;			// Probability Of Retransmission for the link
+  int t_on;			// Time (in cycles) at which activity begins
+  int t_off;			// Time (in cycles) at which activity ends
+  int t_period;		        // Period after which activity starts again
+  bool use_low_voltage_path;
 };
 
 class NoximGlobalTrafficTable {
@@ -43,7 +44,8 @@ class NoximGlobalTrafficTable {
     double getCumulativePirPor(const int src_id,
 			       const int ccycle,
 			       const bool pir_not_por,
-			       vector < pair < int, double > > &dst_prob);
+			       vector < pair < int, double > > &dst_prob,
+			       vector <bool> &use_low_voltage_path);
 
     // Returns the number of occurrences of soruce src_id in the traffic
     // table

@@ -119,11 +119,11 @@ string TrimLeftAndRight(const string& s)
 
 bool ExtractParameter(const string& s, string& parameter)
 {
-  uint i = s.find("[");
+  size_t i = s.find("[");
 
   if (i != string::npos)
     {
-      uint j = s.rfind("]");
+      size_t j = s.rfind("]");
       
       if (j != string::npos)
 	{
@@ -533,8 +533,7 @@ bool ReadResults(const string& fname,
       string line;
       getline(fin, line);
 
-      uint pos;
-      
+      size_t pos;      
       pos = line.find(RPACKETS_LABEL);
       if (pos != string::npos) 
 	{

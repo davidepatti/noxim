@@ -45,12 +45,25 @@ class NoximBuffer {
 
     unsigned int Size() const;
 
+    void ShowStats(std::ostream & out);
+
+    void Disable();
+
   private:
+
+    bool true_buffer;
 
     unsigned int max_buffer_size;
 
     queue < NoximFlit > buffer;
 
+    int    max_occupancy;
+    double hold_time, last_event, hold_time_sum;
+    double mean_occupancy;
+    int    previous_occupancy;
+    
+    void SaveOccupancyAndTime();
+    void UpdateMeanOccupancy();
 };
 
 #endif

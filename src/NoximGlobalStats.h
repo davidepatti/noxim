@@ -69,6 +69,8 @@ class NoximGlobalStats {
     // Shows global statistics
     void showStats(std::ostream & out = std::cout, bool detailed = false);
 
+    void showBufferStats(std::ostream & out);
+
 #ifdef TESTING
     unsigned int drained_total;
 #endif

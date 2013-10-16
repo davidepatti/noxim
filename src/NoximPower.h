@@ -27,7 +27,7 @@ capacitance was set to 0.50fF per micron, so considering an average of
 25% switching activity the amount of energy consumed by a flit for a
 hop interconnect is 0.384nJ.
 
-*/
+
 
 #define PWR_ROUTING_XY             0.151e-9
 #define PWR_ROUTING_WEST_FIRST     0.155e-9
@@ -45,6 +45,7 @@ hop interconnect is 0.384nJ.
 #define PWR_FORWARD_FLIT           0.384e-9
 #define PWR_INCOMING               0.002e-9
 #define PWR_STANDBY                0.0001e-9/2.0
+*/
 
 class NoximPower {
 
@@ -52,37 +53,69 @@ class NoximPower {
 
     NoximPower();
 
+    void Buffering();
     void Routing();
     void Selection();
-    void Standby();
-    void Forward();
-    void Incoming();
+    void Arbitration();
+    void Crossbar();
+    void Link(bool low_voltage);
+    void EndToEnd();
+    void Leakage();
+
+    bool LoadPowerData(const char *fname);
 
     double getPower() {
 	return pwr;
-    } double getPwrRouting() {
+    } 
+
+    double getPwrRouting() {
 	return pwr_routing;
     }
+    
     double getPwrSelection() {
 	return pwr_selection;
     }
-    double getPwrForward() {
-	return pwr_forward;
+    
+    double getPwrBuffering() {
+	return pwr_buffering;
     }
-    double getPwrStandBy() {
-	return pwr_standby;
+    
+    double getArbitration() {
+	return pwr_arbitration;
     }
-    double getPwrIncoming() {
-	return pwr_incoming;
+
+    double getCrossbar() {
+	return pwr_crossbar;
+    }
+
+    double getLeakage() {
+	return pwr_leakage;
+    }
+
+    double getPwrLink(bool low_voltage) {
+      if (low_voltage)
+	return pwr_link_lv;
+      else
+	return pwr_link;
+    }
+
+    double getPwrEndToEnd() {
+      return pwr_end2end;
     }
 
   private:
+    
+    static double pwr_buffering;
+    static double pwr_routing;
+    static double pwr_selection;
+    static double pwr_arbitration;
+    static double pwr_crossbar;
+    static double pwr_link;
+    static double pwr_link_lv;
+    static double pwr_leakage;
+    static double pwr_end2end;
 
-    double pwr_routing;
-    double pwr_selection;
-    double pwr_forward;
-    double pwr_standby;
-    double pwr_incoming;
+    static bool   power_data_loaded;
 
     double pwr;
 };

@@ -139,6 +139,7 @@ SC_MODULE(NoximRouter)
 
     unsigned int local_drained;
 
+    void ShowBuffersStats(std::ostream & out);
 };
 
 #endif

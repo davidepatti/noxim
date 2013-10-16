@@ -49,106 +49,143 @@ void NoximRouter::rxProcess()
 		current_level_rx[i] = 1 - current_level_rx[i];
 
 		// Incoming flit
-		stats.power.Incoming();
+		stats.power.Buffering();
+
+		if (received_flit.src_id == local_id)
+		  stats.power.EndToEnd();
 	    }
 	    ack_rx[i].write(current_level_rx[i]);
 	}
     }
-    stats.power.Standby();
+    stats.power.Leakage();
 }
 
 void NoximRouter::txProcess()
 {
-    if (reset.read()) {
-	// Clear outputs and indexes of transmitting protocol
-	for (int i = 0; i < DIRECTIONS + 1; i++) {
-	    req_tx[i].write(0);
-	    current_level_tx[i] = 0;
+  if (reset.read()) 
+    {
+      // Clear outputs and indexes of transmitting protocol
+      for (int i = 0; i < DIRECTIONS + 1; i++) 
+	{
+	  req_tx[i].write(0);
+	  current_level_tx[i] = 0;
 	}
-    } else {
-	// 1st phase: Reservation
-	for (int j = 0; j < DIRECTIONS + 1; j++) {
-	    int i = (start_from_port + j) % (DIRECTIONS + 1);
+    } 
+  else 
+    {
+      // 1st phase: Reservation
+      for (int j = 0; j < DIRECTIONS + 1; j++) 
+	{
+	  int i = (start_from_port + j) % (DIRECTIONS + 1);
 
-	    if (!buffer[i].IsEmpty()) {
-		NoximFlit flit = buffer[i].Front();
+	  if (!buffer[i].IsEmpty()) 
+	    {
+	      NoximFlit flit = buffer[i].Front();
 
-		if (flit.flit_type == FLIT_TYPE_HEAD) {
-		    // prepare data for routing
-		    NoximRouteData route_data;
-		    route_data.current_id = local_id;
-		    route_data.src_id = flit.src_id;
-		    route_data.dst_id = flit.dst_id;
-		    route_data.dir_in = i;
+	      if (flit.flit_type == FLIT_TYPE_HEAD) 
+		{
+		  // prepare data for routing
+		  NoximRouteData route_data;
+		  route_data.current_id = local_id;
+		  route_data.src_id = flit.src_id;
+		  route_data.dst_id = flit.dst_id;
+		  route_data.dir_in = i;
 
-		    int o = route(route_data);
+		  int o = route(route_data);
 
-		    if (reservation_table.isAvailable(o)) {
-			reservation_table.reserve(i, o);
-			if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) {
-			    cout << sc_time_stamp().to_double() / 1000
-				<< ": Router[" << local_id
-				<< "], Input[" << i << "] (" << buffer[i].
-				Size() << " flits)" << ", reserved Output["
-				<< o << "], flit: " << flit << endl;
+		  stats.power.Arbitration();
+
+		  if (reservation_table.isAvailable(o)) 
+		    {
+		      stats.power.Crossbar();
+		      reservation_table.reserve(i, o);
+		      if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) 
+			{
+			  cout << sc_time_stamp().to_double() / 1000
+			       << ": Router[" << local_id
+			       << "], Input[" << i << "] (" << buffer[i].
+			    Size() << " flits)" << ", reserved Output["
+			       << o << "], flit: " << flit << endl;
 			}
 		    }
 		}
 	    }
 	}
-	start_from_port++;
+      start_from_port++;
 
-	// 2nd phase: Forwarding
-	for (int i = 0; i < DIRECTIONS + 1; i++) {
-	    if (!buffer[i].IsEmpty()) {
-		NoximFlit flit = buffer[i].Front();
+      // 2nd phase: Forwarding
+      for (int i = 0; i < DIRECTIONS + 1; i++) 
+	{
+	  if (!buffer[i].IsEmpty()) 
+	    {
+	      NoximFlit flit = buffer[i].Front();
 
-		int o = reservation_table.getOutputPort(i);
-		if (o != NOT_RESERVED) {
-		    if (current_level_tx[o] == ack_tx[o].read()) {
-			if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) {
-			    cout << sc_time_stamp().to_double() / 1000
-				<< ": Router[" << local_id
-				<< "], Input[" << i <<
-				"] forward to Output[" << o << "], flit: "
-				<< flit << endl;
+	      int o = reservation_table.getOutputPort(i);
+	      if (o != NOT_RESERVED) 
+		{
+		  if (current_level_tx[o] == ack_tx[o].read()) 
+		    {
+		      if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) 
+			{
+			  cout << sc_time_stamp().to_double() / 1000
+			       << ": Router[" << local_id
+			       << "], Input[" << i <<
+			    "] forward to Output[" << o << "], flit: "
+			       << flit << endl;
 			}
 
-			flit_tx[o].write(flit);
-			current_level_tx[o] = 1 - current_level_tx[o];
-			req_tx[o].write(current_level_tx[o]);
-			buffer[i].Pop();
+		      flit_tx[o].write(flit);
+		      current_level_tx[o] = 1 - current_level_tx[o];
+		      req_tx[o].write(current_level_tx[o]);
+		      buffer[i].Pop();
 
-			stats.power.Forward();
+		      if (NoximGlobalParams::low_power_link_strategy)
+			{
+			  if (flit.flit_type == FLIT_TYPE_HEAD || 
+			      flit.use_low_voltage_path == false)
+			    stats.power.Link(false);
+			  else
+			    stats.power.Link(true);
+			}
+		      else
+			stats.power.Link(false);
 
-			if (flit.flit_type == FLIT_TYPE_TAIL)
-			    reservation_table.release(o);
+		      if (flit.dst_id == local_id)
+			stats.power.EndToEnd();
 
-			// Update stats
-			if (o == DIRECTION_LOCAL) {
-			    stats.receivedFlit(sc_time_stamp().
-					       to_double() / 1000, flit);
-			    if (NoximGlobalParams::
-				max_volume_to_be_drained) {
-				if (drained_volume >=
-				    NoximGlobalParams::
-				    max_volume_to_be_drained)
-				    sc_stop();
-				else {
-				    drained_volume++;
-				    local_drained++;
+		      if (flit.flit_type == FLIT_TYPE_TAIL)
+			reservation_table.release(o);
+
+		      // Update stats
+		      if (o == DIRECTION_LOCAL) 
+			{
+			  stats.receivedFlit(sc_time_stamp().
+					     to_double() / 1000, flit);
+			  if (NoximGlobalParams::
+			      max_volume_to_be_drained) 
+			    {
+			      if (drained_volume >=
+				  NoximGlobalParams::
+				  max_volume_to_be_drained)
+				sc_stop();
+			      else 
+				{
+				  drained_volume++;
+				  local_drained++;
 				}
 			    }
-			} else if (i != DIRECTION_LOCAL) {
-			    // Increment routed flits counter
-			    routed_flits++;
+			} 
+		      else if (i != DIRECTION_LOCAL) 
+			{
+			  // Increment routed flits counter
+			  routed_flits++;
 			}
 		    }
 		}
 	    }
 	}
     }				// else
-    stats.power.Standby();
+  stats.power.Leakage();
 }
 
 NoximNoP_data NoximRouter::getCurrentNoPData() const
@@ -409,6 +446,7 @@ int NoximRouter::selectionFunction(const vector < int >&directions,
 	return directions[0];
 
     stats.power.Selection();
+
     switch (NoximGlobalParams::selection_strategy) {
     case SEL_RANDOM:
 	return selectionRandom(directions);
@@ -644,6 +682,17 @@ void NoximRouter::configure(const int _id,
 
     for (int i = 0; i < DIRECTIONS + 1; i++)
 	buffer[i].SetMaxBufferSize(_max_buffer_size);
+
+    int row = _id / NoximGlobalParams::mesh_dim_x;
+    int col = _id % NoximGlobalParams::mesh_dim_x;
+    if (row == 0)
+      buffer[DIRECTION_NORTH].Disable();
+    if (row == NoximGlobalParams::mesh_dim_y-1)
+      buffer[DIRECTION_SOUTH].Disable();
+    if (col == 0)
+      buffer[DIRECTION_WEST].Disable();
+    if (col == NoximGlobalParams::mesh_dim_x-1)
+      buffer[DIRECTION_EAST].Disable();
 }
 
 unsigned long NoximRouter::getRoutedFlits()
@@ -729,4 +778,10 @@ bool NoximRouter::inCongestion()
     }
 
     return false;
+}
+
+void NoximRouter::ShowBuffersStats(std::ostream & out)
+{
+  for (int i=0; i<DIRECTIONS+1; i++)
+    buffer[i].ShowStats(out);
 }

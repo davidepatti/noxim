@@ -28,13 +28,13 @@ Prerequisite: SystemC installation
 
     sudo apt-get install build-essential
 
-- Download SystemC (currently at version 2.2.0) from http://www.systemc.org/downloads/standards/
-  (a free registration is required).
+- Download SystemC (currently at version 2.3.0) from 
+  http://www.accellera.org/downloads/standards/systemc (a free registration is required).
 - Unpack it; please note that some versions have a wrong file extension. For instance you may
   have to use the following commands to untar it:
 
-    mv systemc-2.2.0.tgz systemc-2.2.0.tar
-    tar xvf systemc-2.2.0.tar
+    mv systemc-2.3.0.tgz systemc-2.3.0.tar
+    tar xvf systemc-2.3.0.tar
 
 - Enter the newly created directory and refer to the file INSTALL which details all the steps
   required for building. Basically they are:

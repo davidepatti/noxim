@@ -65,30 +65,36 @@ using namespace std;
 #define VERBOSE_HIGH           3
 
 // Default configuration can be overridden with command-line arguments
-#define DEFAULT_VERBOSE_MODE               VERBOSE_OFF
-#define DEFAULT_TRACE_MODE                       false
-#define DEFAULT_TRACE_FILENAME                      ""
-#define DEFAULT_MESH_DIM_X                           4
-#define DEFAULT_MESH_DIM_Y                           4
-#define DEFAULT_BUFFER_DEPTH                         4
-#define DEFAULT_MAX_PACKET_SIZE                     10
-#define DEFAULT_MIN_PACKET_SIZE                      2
-#define DEFAULT_ROUTING_ALGORITHM           ROUTING_XY
-#define DEFAULT_ROUTING_TABLE_FILENAME              ""
-#define DEFAULT_SELECTION_STRATEGY          SEL_RANDOM
-#define DEFAULT_PACKET_INJECTION_RATE             0.01
-#define DEFAULT_PROBABILITY_OF_RETRANSMISSION     0.01
-#define DEFAULT_TRAFFIC_DISTRIBUTION   TRAFFIC_RANDOM
-#define DEFAULT_TRAFFIC_TABLE_FILENAME              ""
-#define DEFAULT_RESET_TIME                        1000
-#define DEFAULT_SIMULATION_TIME                  10000
-#define DEFAULT_STATS_WARM_UP_TIME  DEFAULT_RESET_TIME
-#define DEFAULT_DETAILED                         false
-#define DEFAULT_DYAD_THRESHOLD                     0.6
-#define DEFAULT_MAX_VOLUME_TO_BE_DRAINED             0
+#define DEFAULT_VERBOSE_MODE                     VERBOSE_OFF
+#define DEFAULT_TRACE_MODE                             false
+#define DEFAULT_TRACE_FILENAME                            ""
+#define DEFAULT_MESH_DIM_X                                 4
+#define DEFAULT_MESH_DIM_Y                                 4
+#define DEFAULT_BUFFER_DEPTH                               4
+#define DEFAULT_MAX_PACKET_SIZE                           10
+#define DEFAULT_MIN_PACKET_SIZE                            2
+#define DEFAULT_ROUTING_ALGORITHM                 ROUTING_XY
+#define DEFAULT_ROUTING_TABLE_FILENAME                    ""
+#define DEFAULT_SELECTION_STRATEGY                SEL_RANDOM
+#define DEFAULT_PACKET_INJECTION_RATE                   0.01
+#define DEFAULT_PROBABILITY_OF_RETRANSMISSION           0.01
+#define DEFAULT_TRAFFIC_DISTRIBUTION          TRAFFIC_RANDOM
+#define DEFAULT_TRAFFIC_TABLE_FILENAME                    ""
+#define DEFAULT_RESET_TIME                              1000
+#define DEFAULT_SIMULATION_TIME                        10000
+#define DEFAULT_STATS_WARM_UP_TIME        DEFAULT_RESET_TIME
+#define DEFAULT_DETAILED                               false
+#define DEFAULT_DYAD_THRESHOLD                           0.6
+#define DEFAULT_MAX_VOLUME_TO_BE_DRAINED                   0
+#define DEFAULT_ROUTER_PWR_FILENAME     "default_router.pwr"
+#define DEFAULT_LOW_POWER_LINK_STRATEGY                false
+#define DEFAULT_QOS                                      1.0
+#define DEFAULT_SHOW_BUFFER_STATS                      false
 
 // TODO by Fafa - this MUST be removed!!! Use only STL vectors instead!!!
-#define MAX_STATIC_DIM 20
+#define MAX_STATIC_DIM 32
+
+typedef unsigned int uint;
 
 // NoximGlobalParams -- used to forward configuration to every sub-block
 struct NoximGlobalParams {
@@ -114,6 +120,10 @@ struct NoximGlobalParams {
     static vector <pair <int, double> > hotspots;
     static float dyad_threshold;
     static unsigned int max_volume_to_be_drained;
+    static char router_power_filename[128];
+    static bool low_power_link_strategy;
+    static double qos;
+    static bool show_buffer_stats;
 };
 
 // NoximCoord -- XY coordinates type of the Tile inside the Mesh
@@ -146,9 +156,11 @@ struct NoximPacket {
     double timestamp;		// SC timestamp at packet generation
     int size;
     int flit_left;		// Number of remaining flits inside the packet
+    bool use_low_voltage_path;
 
     // Constructors
     NoximPacket() { }
+
     NoximPacket(const int s, const int d, const double ts, const int sz) {
 	make(s, d, ts, sz);
     }
@@ -159,6 +171,7 @@ struct NoximPacket {
 	timestamp = ts;
 	size = sz;
 	flit_left = sz;
+	use_low_voltage_path = false;
     }
 };
 
@@ -205,13 +218,15 @@ struct NoximFlit {
     NoximPayload payload;	// Optional payload
     double timestamp;		// Unix timestamp at packet generation
     int hop_no;			// Current number of hops from source to destination
+    bool use_low_voltage_path;
 
     inline bool operator ==(const NoximFlit & flit) const {
 	return (flit.src_id == src_id && flit.dst_id == dst_id
 		&& flit.flit_type == flit_type
 		&& flit.sequence_no == sequence_no
 		&& flit.payload == payload && flit.timestamp == timestamp
-		&& flit.hop_no == hop_no);
+		&& flit.hop_no == hop_no
+		&& flit.use_low_voltage_path == use_low_voltage_path);
 }};
 
 // Output overloading

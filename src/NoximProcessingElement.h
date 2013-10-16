@@ -53,6 +53,7 @@ SC_MODULE(NoximProcessingElement)
     NoximPacket trafficShuffle();	// Shuffle destination distribution
     NoximPacket trafficButterfly();	// Butterfly destination distribution
 
+    void setUseLowVoltagePath(NoximPacket& packet);
 
     NoximGlobalTrafficTable *traffic_table;	// Reference to the Global traffic Table
     bool never_transmit;	// true if the PE does not transmit any packet 
