@@ -1,0 +1,35 @@
+#############################
+# Noxim - the NoC Simulator #
+#############################
+
+# NOTE FOR NOXIM USERS: before running "make" you just have to modify
+# the following variable to point to your SystemC installation path
+#
+SYSTEMC = /Library/SystemC/systemc-2.3.0
+#
+# That's all for you!!!
+
+INCDIR = -I. -I.. -I../src -I$(SYSTEMC)/include
+LIBDIR = -L. -L.. -L../src -L$(SYSTEMC)/lib-$(TARGET_ARCH)
+
+#EXTRA_LIBS = -lpthread
+LIBS = -lsystemc -lm $(EXTRA_LIBS)
+
+EXE    = $(MODULE)
+
+.SUFFIXES: .cpp .o 
+
+$(EXE): $(OBJS) $(SYSTEMC)/lib-$(TARGET_ARCH)/libsystemc.a 
+	$(CC) $(CFLAGS) $(INCDIR) $(LIBDIR) -o $@ $(OBJS) $(LIBS) 2>&1 | c++filt
+
+.cpp.o:
+	$(CC) $(CFLAGS) $(INCDIR) -c $<
+
+clean:
+	rm -f $(OBJS) *~ $(EXE) core
+
+depend: 
+	makedepend $(SRCS) -Y -f Makefile.deps
+
+include ./Makefile.deps
+
