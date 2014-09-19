@@ -17,12 +17,23 @@ NoximReservationTable::NoximReservationTable()
 
 void NoximReservationTable::clear()
 {
+  rtable.clear();
+  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_NORTH
+  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_EAST
+  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_SOUTH
+  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_WEST
+  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_LOCAL
+
+  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_WIFI
+
+  /* old code - TODO: remove
     rtable.resize(DIRECTIONS + 1);
 
     // note that NOT_VALID entries should remain untouched
     for (int i = 0; i < DIRECTIONS + 1; i++)
 	if (rtable[i] != NOT_VALID)
 	    rtable[i] = NOT_RESERVED;
+	    */
 }
 
 bool NoximReservationTable::isAvailable(const int port_out) const

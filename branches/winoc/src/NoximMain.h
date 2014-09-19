@@ -23,6 +23,7 @@ using namespace std;
 #define DIRECTION_SOUTH        2
 #define DIRECTION_WEST         3
 #define DIRECTION_LOCAL        4
+#define DIRECTION_WIRELESS     5
 
 // Generic not reserved resource
 #define NOT_RESERVED          -2
@@ -90,9 +91,13 @@ using namespace std;
 #define DEFAULT_LOW_POWER_LINK_STRATEGY                false
 #define DEFAULT_QOS                                      1.0
 #define DEFAULT_SHOW_BUFFER_STATS                      false
+#define DEFAULT_USE_WINOC                              false
+#define DEFAULT_WINOC_CFG_FILENAME                        ""
 
 // TODO by Fafa - this MUST be removed!!! Use only STL vectors instead!!!
 #define MAX_STATIC_DIM 32
+#define MAX_HUB_PORTS 2
+#define MAX_HUBS 4
 
 typedef unsigned int uint;
 
@@ -124,6 +129,8 @@ struct NoximGlobalParams {
     static bool low_power_link_strategy;
     static double qos;
     static bool show_buffer_stats;
+    static bool use_winoc;
+    static char winoc_cfg_fname[128];
 };
 
 // NoximCoord -- XY coordinates type of the Tile inside the Mesh
