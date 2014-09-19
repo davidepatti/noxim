@@ -93,21 +93,30 @@ void NoximRouter::txProcess()
 
 		  int o = route(route_data);
 
-		  stats.power.Arbitration();
+		  if ( o==DIRECTION_WIRELESS)
+		  {
+		      cout << name() << " ready to go wireless ..." << endl;
 
-		  if (reservation_table.isAvailable(o)) 
-		    {
-		      stats.power.Crossbar();
-		      reservation_table.reserve(i, o);
-		      if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) 
+		      //if (reservation_table.isAvailable(o)) reservation_table.reserve(i, o);
+		  }
+		  else
+		  {
+		      stats.power.Arbitration();
+
+		      if (reservation_table.isAvailable(o)) 
 			{
-			  cout << sc_time_stamp().to_double() / 1000
-			       << ": Router[" << local_id
-			       << "], Input[" << i << "] (" << buffer[i].
-			    Size() << " flits)" << ", reserved Output["
-			       << o << "], flit: " << flit << endl;
+			  stats.power.Crossbar();
+			  reservation_table.reserve(i, o);
+			  if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) 
+			    {
+			      cout << sc_time_stamp().to_double() / 1000
+				   << ": Router[" << local_id
+				   << "], Input[" << i << "] (" << buffer[i].
+				Size() << " flits)" << ", reserved Output["
+				   << o << "], flit: " << flit << endl;
+			    }
 			}
-		    }
+		  }
 		}
 	    }
 	}
@@ -122,9 +131,35 @@ void NoximRouter::txProcess()
 
 	      int o = reservation_table.getOutputPort(i);
 	      if (o != NOT_RESERVED) 
-		{
+	      {
 		  if (current_level_tx[o] == ack_tx[o].read()) 
+		  {
+		    if (o == DIRECTION_WIRELESS)
 		    {
+			assert(false);
+			  cout << name() << " forwarding wireless " << endl;
+		  /* TODO: adapt code to new model
+			// Forward flit to WiNoC
+			if (winoc->CanTransmit(local_id))
+			{
+			    if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) 
+			    {
+				cout << sc_time_stamp().to_double() / 1000
+				    << ": Router[" << local_id
+				    << "], Input[" << i <<
+				    "] forward to Output[" << o << "], flit: "
+				    << flit << endl;
+			    }
+			    // cout << "Inject to RH: Router ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
+
+			    winoc->InjectToRadioHub(local_id, flit);
+			    buffer[i].Pop();
+
+			    if (flit.flit_type == FLIT_TYPE_TAIL)
+				reservation_table.release(o);
+			}
+		    */
+		    }
 		      if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) 
 			{
 			  cout << sc_time_stamp().to_double() / 1000
@@ -184,7 +219,17 @@ void NoximRouter::txProcess()
 		}
 	    }
 	}
-    }				// else
+      /* TODO: move this code as a normal direction
+	// 3rd phase: Consume incoming flits from WiNoC
+	if (NoximGlobalParams::use_winoc &&
+	    winoc->FlitAvailable(local_id))
+	{
+	  NoximFlit flit = winoc->GetFlit(local_id);
+	  stats.receivedFlit(sc_time_stamp().
+			     to_double() / 1000, flit);
+	}
+	*/
+    }				// else reset read
   stats.power.Leakage();
 }
 
@@ -230,6 +275,22 @@ void NoximRouter::bufferMonitor()
 vector <
     int >NoximRouter::routingFunction(const NoximRouteData & route_data)
 {
+
+    // TODO: check 
+  // If WiNoC available, check for intercluster communication
+  if (NoximGlobalParams::use_winoc)
+  {
+      assert(false);
+    // Check for intercluster communication
+      /*
+    if (!winoc->SameRadioHub(local_id, route_data.dst_id))
+    {
+      vector<int> dirv;
+      dirv.push_back(DIRECTION_WIFI);
+      return dirv;
+    }
+    */
+  }
     NoximCoord position = id2Coord(route_data.current_id);
     NoximCoord src_coord = id2Coord(route_data.src_id);
     NoximCoord dst_coord = id2Coord(route_data.dst_id);

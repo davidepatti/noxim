@@ -15,6 +15,8 @@
 #include "NoximTile.h"
 #include "NoximGlobalRoutingTable.h"
 #include "NoximGlobalTrafficTable.h"
+#include "NoximHub.h"
+
 using namespace std;
 
 SC_MODULE(NoximNoC)
@@ -35,6 +37,7 @@ SC_MODULE(NoximNoC)
     sc_signal <bool> ack_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
     sc_signal <bool> ack_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
 
+
     sc_signal <NoximFlit> flit_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
     sc_signal <NoximFlit> flit_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
     sc_signal <NoximFlit> flit_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
@@ -45,6 +48,15 @@ SC_MODULE(NoximNoC)
     sc_signal <int> free_slots_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
     sc_signal <int> free_slots_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
 
+    // Wireless Hub
+    sc_signal <bool> req_to_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> ack_to_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <NoximFlit> flit_to_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+
+    sc_signal <bool> req_from_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> ack_from_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <NoximFlit> flit_from_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+
     // NoP
     sc_signal <NoximNoP_data> NoP_data_to_east[MAX_STATIC_DIM][MAX_STATIC_DIM];
     sc_signal <NoximNoP_data> NoP_data_to_west[MAX_STATIC_DIM][MAX_STATIC_DIM];
@@ -53,6 +65,8 @@ SC_MODULE(NoximNoC)
 
     // Matrix of tiles
     NoximTile *t[MAX_STATIC_DIM][MAX_STATIC_DIM];
+    
+    NoximHub *h[MAX_HUBS];
 
     // Global tables
     NoximGlobalRoutingTable grtable;

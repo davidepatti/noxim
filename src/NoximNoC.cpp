@@ -60,6 +60,49 @@ void NoximNoC::buildMesh()
 	    t[i][j]->flit_rx[DIRECTION_WEST] (flit_to_east[i][j]);
 	    t[i][j]->ack_rx[DIRECTION_WEST] (ack_to_west[i][j]);
 
+	    // TODO: wireless hub test - replace with dynamic code
+	    // using configuration file
+	    // node 0,0 connected to Hub 0
+	    // node 3,3 connected to Hub 1
+	    if (i==0 && j==0)
+	    {
+		t[i][j]->req_rx[DIRECTION_WIRELESS] (req_to_hub[i][j]);
+		t[i][j]->flit_rx[DIRECTION_WIRELESS] (flit_to_hub[i][j]);
+		t[i][j]->ack_rx[DIRECTION_WIRELESS] (ack_to_hub[i][j]);
+
+		t[i][j]->req_tx[DIRECTION_WIRELESS] (req_from_hub[i][j]);
+		t[i][j]->flit_tx[DIRECTION_WIRELESS] (flit_from_hub[i][j]);
+		t[i][j]->ack_tx[DIRECTION_WIRELESS] (ack_from_hub[i][j]);
+
+		h[0]->req_rx[0](req_to_hub[i][j]);
+		h[0]->flit_rx[0](flit_to_hub[i][j]);
+		h[0]->ack_rx[0](ack_to_hub[i][j]);
+
+		h[0]->req_tx[0](req_from_hub[i][j]);
+		h[0]->flit_tx[0](flit_from_hub[i][j]);
+		h[0]->ack_tx[0](ack_from_hub[i][j]);
+	    }
+
+	    if (i==3 && j==3)
+	    {
+		t[i][j]->req_rx[DIRECTION_WIRELESS] (req_to_hub[i][j]);
+		t[i][j]->flit_rx[DIRECTION_WIRELESS] (flit_to_hub[i][j]);
+		t[i][j]->ack_rx[DIRECTION_WIRELESS] (ack_to_hub[i][j]);
+
+		t[i][j]->req_tx[DIRECTION_WIRELESS] (req_from_hub[i][j]);
+		t[i][j]->flit_tx[DIRECTION_WIRELESS] (flit_from_hub[i][j]);
+		t[i][j]->ack_tx[DIRECTION_WIRELESS] (ack_from_hub[i][j]);
+		
+		h[3]->req_rx[3](req_to_hub[i][j]);
+		h[3]->flit_rx[3](flit_to_hub[i][j]);
+		h[3]->ack_rx[3](ack_to_hub[i][j]);
+
+		h[3]->req_tx[3](req_from_hub[i][j]);
+		h[3]->flit_tx[3](flit_from_hub[i][j]);
+		h[3]->ack_tx[3](ack_from_hub[i][j]);
+	    }
+
+
 	    // Map Tx signals
 	    t[i][j]->req_tx[DIRECTION_NORTH] (req_to_north[i][j]);
 	    t[i][j]->flit_tx[DIRECTION_NORTH] (flit_to_north[i][j]);
