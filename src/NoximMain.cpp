@@ -59,12 +59,15 @@ int sc_main(int arg_num, char *arg_vet[])
 
     parseCmdLine(arg_num, arg_vet);
 
+    //cout << "\n ROUTING = " <<  NoximGlobalParams::routing_algorithm << endl;
+
     // Signals
     sc_clock clock("clock", 1, SC_NS);
     sc_signal <bool> reset;
 
     // NoC instance
     NoximNoC *n = new NoximNoC("NoC");
+
     n->clock(clock);
     n->reset(reset);
 

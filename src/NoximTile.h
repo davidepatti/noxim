@@ -31,10 +31,19 @@ SC_MODULE(NoximTile)
     sc_out <bool> req_tx[DIRECTIONS];	        // The requests associated with the output channels
     sc_in <bool> ack_tx[DIRECTIONS];	        // The outgoing ack signals associated with the output channels
 
-    sc_out <int> free_slots[DIRECTIONS];
-    sc_in <int> free_slots_neighbor[DIRECTIONS];
+    // hub specific ports
+    sc_in <NoximFlit> hub_flit_rx;	// The input channels
+    sc_in <bool> hub_req_rx;	        // The requests associated with the input channels
+    sc_out <bool> hub_ack_rx;	        // The outgoing ack signals associated with the input channels
+
+    sc_out <NoximFlit> hub_flit_tx;	// The output channels
+    sc_out <bool> hub_req_tx;	        // The requests associated with the output channels
+    sc_in <bool> hub_ack_tx;	        // The outgoing ack signals associated with the output channels
+
 
     // NoP related I/O
+    sc_out <int> free_slots[DIRECTIONS];
+    sc_in <int> free_slots_neighbor[DIRECTIONS];
     sc_out < NoximNoP_data > NoP_data_out[DIRECTIONS];
     sc_in < NoximNoP_data > NoP_data_in[DIRECTIONS];
 
@@ -78,7 +87,8 @@ SC_MODULE(NoximTile)
 	    r->NoP_data_out[i] (NoP_data_out[i]);
 	    r->NoP_data_in[i] (NoP_data_in[i]);
 	}
-
+	
+	// local
 	r->flit_rx[DIRECTION_LOCAL] (flit_tx_local);
 	r->req_rx[DIRECTION_LOCAL] (req_tx_local);
 	r->ack_rx[DIRECTION_LOCAL] (ack_tx_local);
@@ -90,6 +100,16 @@ SC_MODULE(NoximTile)
 	r->free_slots[DIRECTION_LOCAL] (free_slots_local);
 	r->free_slots_neighbor[DIRECTION_LOCAL]
 	    (free_slots_neighbor_local);
+
+	// hub related
+	r->flit_rx[DIRECTION_WIRELESS] (hub_flit_rx);
+	r->req_rx[DIRECTION_WIRELESS] (hub_req_rx);
+	r->ack_rx[DIRECTION_WIRELESS] (hub_ack_rx);
+
+	r->flit_tx[DIRECTION_WIRELESS] (hub_flit_tx);
+	r->req_tx[DIRECTION_WIRELESS] (hub_req_tx);
+	r->ack_tx[DIRECTION_WIRELESS] (hub_ack_tx);
+
 
 	// Processing Element pin assignments
 	pe = new NoximProcessingElement("ProcessingElement");

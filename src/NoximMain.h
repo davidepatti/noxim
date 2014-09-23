@@ -96,8 +96,8 @@ using namespace std;
 
 // TODO by Fafa - this MUST be removed!!! Use only STL vectors instead!!!
 #define MAX_STATIC_DIM 32
-#define MAX_HUB_PORTS 2
-#define MAX_HUBS 4
+#define MAX_HUB_PORTS 1
+#define MAX_HUBS 2
 
 typedef unsigned int uint;
 
