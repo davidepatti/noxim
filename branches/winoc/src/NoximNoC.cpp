@@ -12,6 +12,17 @@
 
 void NoximNoC::buildMesh()
 {
+    char hub_name[10];
+    // TODO: replace with dynamic code based on configuration file
+    for (int i=0;i<MAX_HUBS;i++)
+    {
+	sprintf(hub_name, "HUB_%d", i);
+	cout << "\n creating " << i << endl;
+	h[i] = new NoximHub(hub_name);
+	h[i]->clock(clock);
+	h[i]->reset(reset);
+    }
+
     // Check for routing table availability
     if (NoximGlobalParams::routing_algorithm == ROUTING_TABLE_BASED)
 	assert(grtable.load(NoximGlobalParams::routing_table_filename));
@@ -60,19 +71,22 @@ void NoximNoC::buildMesh()
 	    t[i][j]->flit_rx[DIRECTION_WEST] (flit_to_east[i][j]);
 	    t[i][j]->ack_rx[DIRECTION_WEST] (ack_to_west[i][j]);
 
+	    // TODO: check if hub signal is always required
+	    t[i][j]->hub_req_rx(req_to_hub[i][j]);
+	    t[i][j]->hub_flit_rx(flit_to_hub[i][j]);
+	    t[i][j]->hub_ack_rx(ack_to_hub[i][j]);
+
+	    t[i][j]->hub_req_tx(req_from_hub[i][j]); // 7, sc_out
+	    t[i][j]->hub_flit_tx(flit_from_hub[i][j]);
+	    t[i][j]->hub_ack_tx(ack_from_hub[i][j]);
+
 	    // TODO: wireless hub test - replace with dynamic code
 	    // using configuration file
 	    // node 0,0 connected to Hub 0
 	    // node 3,3 connected to Hub 1
+
 	    if (i==0 && j==0)
 	    {
-		t[i][j]->req_rx[DIRECTION_WIRELESS] (req_to_hub[i][j]);
-		t[i][j]->flit_rx[DIRECTION_WIRELESS] (flit_to_hub[i][j]);
-		t[i][j]->ack_rx[DIRECTION_WIRELESS] (ack_to_hub[i][j]);
-
-		t[i][j]->req_tx[DIRECTION_WIRELESS] (req_from_hub[i][j]);
-		t[i][j]->flit_tx[DIRECTION_WIRELESS] (flit_from_hub[i][j]);
-		t[i][j]->ack_tx[DIRECTION_WIRELESS] (ack_from_hub[i][j]);
 
 		h[0]->req_rx[0](req_to_hub[i][j]);
 		h[0]->flit_rx[0](flit_to_hub[i][j]);
@@ -82,24 +96,20 @@ void NoximNoC::buildMesh()
 		h[0]->flit_tx[0](flit_from_hub[i][j]);
 		h[0]->ack_tx[0](ack_from_hub[i][j]);
 	    }
-
+	    else
 	    if (i==3 && j==3)
 	    {
-		t[i][j]->req_rx[DIRECTION_WIRELESS] (req_to_hub[i][j]);
-		t[i][j]->flit_rx[DIRECTION_WIRELESS] (flit_to_hub[i][j]);
-		t[i][j]->ack_rx[DIRECTION_WIRELESS] (ack_to_hub[i][j]);
+		h[1]->req_rx[0](req_to_hub[i][j]);
+		h[1]->flit_rx[0](flit_to_hub[i][j]);
+		h[1]->ack_rx[0](ack_to_hub[i][j]);
 
-		t[i][j]->req_tx[DIRECTION_WIRELESS] (req_from_hub[i][j]);
-		t[i][j]->flit_tx[DIRECTION_WIRELESS] (flit_from_hub[i][j]);
-		t[i][j]->ack_tx[DIRECTION_WIRELESS] (ack_from_hub[i][j]);
-		
-		h[3]->req_rx[3](req_to_hub[i][j]);
-		h[3]->flit_rx[3](flit_to_hub[i][j]);
-		h[3]->ack_rx[3](ack_to_hub[i][j]);
+		h[1]->flit_tx[0](flit_from_hub[i][j]);
+		h[1]->req_tx[0](req_from_hub[i][j]);
+		h[1]->ack_tx[0](ack_from_hub[i][j]);
 
-		h[3]->req_tx[3](req_from_hub[i][j]);
-		h[3]->flit_tx[3](flit_from_hub[i][j]);
-		h[3]->ack_tx[3](ack_from_hub[i][j]);
+	    }
+	    else
+	    {
 	    }
 
 
