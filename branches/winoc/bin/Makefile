@@ -1,43 +1,47 @@
-SYSTEMC = systemc-2.3.1
-TARGET_ARCH=macosx64
-#TARGET_ARCH=macosx64
+##### SYSTEMC CONFIGURATION #####
 
-CC     = g++
-OPT    = -O3
-DEBUG  = -g
-OTHER  = # -Wall -Wno-deprecated
-CFLAGS = $(OPT) $(OTHER) # $(DEBUG)
+SYSTEMC     = systemc-2.3.1
+TARGET_ARCH = macosx64
 
-INCDIR = -I. -I.. -I../src -I$(SYSTEMC)/include
-LIBDIR = -L. -L.. -L../src -L$(SYSTEMC)/lib-$(TARGET_ARCH)
 
-#EXTRA_LIBS = -lpthread
-LIBS = -lsystemc -lm $(EXTRA_LIBS)
+##### DIRECTORIES #####
 
-VPATH = ../src:.
+SRCDIR = ../src
+OBJDIR = .
+
+SRCS = $(wildcard $(SRCDIR)/*.cpp)
+OBJS = $(subst $(SRCDIR),$(OBJDIR),$(SRCS:.cpp=.o))
 
 MODULE = noxim
 
-SRCS = NoximNoC.cpp NoximRouter.cpp NoximProcessingElement.cpp NoximBuffer.cpp \
-	NoximStats.cpp NoximGlobalStats.cpp NoximGlobalRoutingTable.cpp \
-	NoximLocalRoutingTable.cpp NoximGlobalTrafficTable.cpp NoximReservationTable.cpp \
-	NoximPower.cpp NoximCmdLineParser.cpp NoximMain.cpp NoximHub.cpp
 
-OBJS = $(SRCS:.cpp=.o)
+##### COMPILER OPTIONS #####
 
-EXE    = $(MODULE)
+CXX      = g++
+OPT      = -O3
+DEBUG    = -g
+OTHER    = -Wall -Wno-deprecated
+CXXFLAGS = $(OPT) $(OTHER) # $(DEBUG)
 
-.SUFFIXES: .cpp .o 
+INCDIR = -I. -I.. -I$(SRCDIR) -I$(SYSTEMC)/include
+LIBDIR = -L. -L.. -L$(SRCDIR) -L$(SYSTEMC)/lib-$(TARGET_ARCH)
 
-$(EXE): $(OBJS) $(SYSTEMC)/lib-$(TARGET_ARCH)/libsystemc.a 
-	$(CC) $(CFLAGS) $(INCDIR) $(LIBDIR) -o $@ $(OBJS) $(LIBS) 2>&1 | c++filt
+LIBS = -lsystemc -lm
 
-.cpp.o:
-	$(CC) $(CFLAGS) $(INCDIR) -c $<
+
+##### RULES #####
+
+$(MODULE): $(OBJS) $(SYSTEMC)/lib-$(TARGET_ARCH)/libsystemc.a
+	$(CXX) $(LIBDIR) $^ $(LIBS) -o $@ 2>&1 | c++filt
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) $(CFLAGS) $(INCDIR) -c $<
 
 clean:
-	rm -f $(OBJS) *~ $(EXE) core
+	echo $(OBJS)
+	rm -f $(OBJS) *~ $(MODULE)
 
 depend: 
-	makedepend $(SRCS) -Y -f Makefile.deps
+	makedepend $(SRCS) -Y -f- 2>/dev/null | sed 's_$(SRCDIR)_$(OBJDIR)_' > Makefile.deps
 
+-include Makefile.deps
