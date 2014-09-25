@@ -106,6 +106,7 @@ void NoximNoC::buildMesh()
 
 	    if (i==0 && j==0)
 	    {
+		h[0]->initiator->socket.bind(h[1]->memory->socket );
 
 		// hub receives
 		h[0]->req_rx[0](req_to_hub[i][j]);
@@ -120,6 +121,7 @@ void NoximNoC::buildMesh()
 	    else
 	    if (i==3 && j==3)
 	    {
+		h[1]->initiator->socket.bind(h[0]->memory->socket );
 		h[1]->req_rx[0](req_to_hub[i][j]);
 		h[1]->flit_rx[0](flit_to_hub[i][j]);
 		h[1]->ack_rx[0](ack_from_hub[i][j]);
