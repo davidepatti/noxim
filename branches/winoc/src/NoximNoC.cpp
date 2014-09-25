@@ -216,5 +216,5 @@ NoximTile *NoximNoC::searchNode(const int id) const
 	    if (t[i][j]->r->local_id == id)
 		return t[i][j];
 
-    return false;
+    return NULL;
 }
