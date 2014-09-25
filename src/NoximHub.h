@@ -22,12 +22,12 @@ SC_MODULE(NoximHub)
     sc_in_clk clock;		                // The input clock for the tile
     sc_in <bool> reset;	                        // The reset signal for the tile
 
-    sc_out <NoximFlit> flit_rx[MAX_HUB_PORTS];	// The input channels
-    sc_out <bool> req_rx[MAX_HUB_PORTS];	        // The requests associated with the input channels
-    sc_in <bool> ack_rx[MAX_HUB_PORTS];	        // The outgoing ack signals associated with the input channels
+    sc_in <NoximFlit> flit_rx[MAX_HUB_PORTS];	// The input channels
+    sc_in <bool> req_rx[MAX_HUB_PORTS];	        // The requests associated with the input channels
+    sc_out <bool> ack_rx[MAX_HUB_PORTS];	        // The outgoing ack signals associated with the input channels
 
-    sc_in <NoximFlit> flit_tx[MAX_HUB_PORTS];	// The output channels
-    sc_in <bool> req_tx[MAX_HUB_PORTS];	        // The requests associated with the output channels
+    sc_out <NoximFlit> flit_tx[MAX_HUB_PORTS];	// The output channels
+    sc_out <bool> req_tx[MAX_HUB_PORTS];	        // The requests associated with the output channels
     sc_in <bool> ack_tx[MAX_HUB_PORTS];	        // The outgoing ack signals associated with the output channels
 
 

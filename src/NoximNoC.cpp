@@ -71,48 +71,6 @@ void NoximNoC::buildMesh()
 	    t[i][j]->flit_rx[DIRECTION_WEST] (flit_to_east[i][j]);
 	    t[i][j]->ack_rx[DIRECTION_WEST] (ack_to_west[i][j]);
 
-	    // TODO: check if hub signal is always required
-	    t[i][j]->hub_req_rx(req_to_hub[i][j]);
-	    t[i][j]->hub_flit_rx(flit_to_hub[i][j]);
-	    t[i][j]->hub_ack_rx(ack_to_hub[i][j]);
-
-	    t[i][j]->hub_req_tx(req_from_hub[i][j]); // 7, sc_out
-	    t[i][j]->hub_flit_tx(flit_from_hub[i][j]);
-	    t[i][j]->hub_ack_tx(ack_from_hub[i][j]);
-
-	    // TODO: wireless hub test - replace with dynamic code
-	    // using configuration file
-	    // node 0,0 connected to Hub 0
-	    // node 3,3 connected to Hub 1
-
-	    if (i==0 && j==0)
-	    {
-
-		h[0]->req_rx[0](req_to_hub[i][j]);
-		h[0]->flit_rx[0](flit_to_hub[i][j]);
-		h[0]->ack_rx[0](ack_to_hub[i][j]);
-
-		h[0]->req_tx[0](req_from_hub[i][j]);
-		h[0]->flit_tx[0](flit_from_hub[i][j]);
-		h[0]->ack_tx[0](ack_from_hub[i][j]);
-	    }
-	    else
-	    if (i==3 && j==3)
-	    {
-		h[1]->req_rx[0](req_to_hub[i][j]);
-		h[1]->flit_rx[0](flit_to_hub[i][j]);
-		h[1]->ack_rx[0](ack_to_hub[i][j]);
-
-		h[1]->flit_tx[0](flit_from_hub[i][j]);
-		h[1]->req_tx[0](req_from_hub[i][j]);
-		h[1]->ack_tx[0](ack_from_hub[i][j]);
-
-	    }
-	    else
-	    {
-	    }
-
-
 	    // Map Tx signals
 	    t[i][j]->req_tx[DIRECTION_NORTH] (req_to_north[i][j]);
 	    t[i][j]->flit_tx[DIRECTION_NORTH] (flit_to_north[i][j]);
@@ -129,6 +87,53 @@ void NoximNoC::buildMesh()
 	    t[i][j]->req_tx[DIRECTION_WEST] (req_to_west[i][j]);
 	    t[i][j]->flit_tx[DIRECTION_WEST] (flit_to_west[i][j]);
 	    t[i][j]->ack_tx[DIRECTION_WEST] (ack_to_east[i][j]);
+
+	    // TODO: check if hub signal is always required
+	    // signals/port when tile receives(rx) from hub
+	    t[i][j]->hub_req_rx(req_from_hub[i][j]);
+	    t[i][j]->hub_flit_rx(flit_from_hub[i][j]);
+	    t[i][j]->hub_ack_rx(ack_to_hub[i][j]);
+
+	    // signals/port when tile transmits(tx) to hub
+	    t[i][j]->hub_req_tx(req_to_hub[i][j]); // 7, sc_out
+	    t[i][j]->hub_flit_tx(flit_to_hub[i][j]);
+	    t[i][j]->hub_ack_tx(ack_from_hub[i][j]);
+
+	    // TODO: wireless hub test - replace with dynamic code
+	    // using configuration file
+	    // node 0,0 connected to Hub 0
+	    // node 3,3 connected to Hub 1
+
+	    if (i==0 && j==0)
+	    {
+
+		// hub receives
+		h[0]->req_rx[0](req_to_hub[i][j]);
+		h[0]->flit_rx[0](flit_to_hub[i][j]);
+		h[0]->ack_rx[0](ack_from_hub[i][j]);
+
+		// hub transmits
+		h[0]->req_tx[0](req_from_hub[i][j]);
+		h[0]->flit_tx[0](flit_from_hub[i][j]);
+		h[0]->ack_tx[0](ack_to_hub[i][j]);
+	    }
+	    else
+	    if (i==3 && j==3)
+	    {
+		h[1]->req_rx[0](req_to_hub[i][j]);
+		h[1]->flit_rx[0](flit_to_hub[i][j]);
+		h[1]->ack_rx[0](ack_from_hub[i][j]);
+
+		h[1]->flit_tx[0](flit_from_hub[i][j]);
+		h[1]->req_tx[0](req_from_hub[i][j]);
+		h[1]->ack_tx[0](ack_to_hub[i][j]);
+
+	    }
+	    else
+	    {
+	    }
+
+
 
 	    // Map buffer level signals (analogy with req_tx/rx port mapping)
 	    t[i][j]->free_slots[DIRECTION_NORTH] (free_slots_to_north[i][j]);
