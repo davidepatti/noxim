@@ -14,7 +14,7 @@ void NoximRouter::rxProcess()
 {
     if (reset.read()) {
 	// Clear outputs and indexes of receiving protocol
-	for (int i = 0; i < DIRECTIONS + 1; i++) {
+	for (int i = 0; i < DIRECTIONS + 2; i++) {
 	    ack_rx[i].write(0);
 	    current_level_rx[i] = 0;
 	}
@@ -27,7 +27,7 @@ void NoximRouter::rxProcess()
 	// This process simply sees a flow of incoming flits. All arbitration
 	// and wormhole related issues are addressed in the txProcess()
 
-	for (int i = 0; i < DIRECTIONS + 1; i++) {
+	for (int i = 0; i < DIRECTIONS + 2; i++) {
 	    // To accept a new flit, the following conditions must match:
 	    //
 	    // 1) there is an incoming request
@@ -65,7 +65,7 @@ void NoximRouter::txProcess()
   if (reset.read()) 
     {
       // Clear outputs and indexes of transmitting protocol
-      for (int i = 0; i < DIRECTIONS + 1; i++) 
+      for (int i = 0; i < DIRECTIONS + 2; i++) 
 	{
 	  req_tx[i].write(0);
 	  current_level_tx[i] = 0;
@@ -74,9 +74,9 @@ void NoximRouter::txProcess()
   else 
     {
       // 1st phase: Reservation
-      for (int j = 0; j < DIRECTIONS + 1; j++) 
+      for (int j = 0; j < DIRECTIONS + 2; j++) 
 	{
-	  int i = (start_from_port + j) % (DIRECTIONS + 1);
+	  int i = (start_from_port + j) % (DIRECTIONS + 2);
 
 	  if (!buffer[i].IsEmpty()) 
 	    {
@@ -123,7 +123,7 @@ void NoximRouter::txProcess()
       start_from_port++;
 
       // 2nd phase: Forwarding
-      for (int i = 0; i < DIRECTIONS + 1; i++) 
+      for (int i = 0; i < DIRECTIONS + 2; i++) 
 	{
 	  if (!buffer[i].IsEmpty()) 
 	    {
@@ -741,7 +741,7 @@ void NoximRouter::configure(const int _id,
     if (grt.isValid())
 	routing_table.configure(grt, _id);
 
-    for (int i = 0; i < DIRECTIONS + 1; i++)
+    for (int i = 0; i < DIRECTIONS + 2; i++)
 	buffer[i].SetMaxBufferSize(_max_buffer_size);
 
     int row = _id / NoximGlobalParams::mesh_dim_x;
@@ -765,7 +765,7 @@ unsigned int NoximRouter::getFlitsCount()
 {
     unsigned count = 0;
 
-    for (int i = 0; i < DIRECTIONS + 1; i++)
+    for (int i = 0; i < DIRECTIONS + 2; i++)
 	count += buffer[i].Size();
 
     return count;
@@ -843,6 +843,6 @@ bool NoximRouter::inCongestion()
 
 void NoximRouter::ShowBuffersStats(std::ostream & out)
 {
-  for (int i=0; i<DIRECTIONS+1; i++)
+  for (int i=0; i<DIRECTIONS+2; i++)
     buffer[i].ShowStats(out);
 }
