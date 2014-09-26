@@ -1,44 +1,43 @@
 ##### SYSTEMC CONFIGURATION #####
 
-SYSTEMC     = systemc-2.3.1
-TARGET_ARCH = macosx64
+SYSTEMC     := systemc-2.3.1
+TARGET_ARCH := macosx64
 
 
 ##### DIRECTORIES #####
 
-SRCDIR = ../src
-OBJDIR = .
+SRCDIR := ../src
+OBJDIR := .
 
-SRCS = $(wildcard $(SRCDIR)/*.cpp)
-OBJS = $(subst $(SRCDIR),$(OBJDIR),$(SRCS:.cpp=.o))
+SRCS := $(wildcard $(SRCDIR)/*.cpp)
+OBJS := $(subst $(SRCDIR),$(OBJDIR),$(SRCS:.cpp=.o))
 
 MODULE = noxim
 
 
 ##### COMPILER OPTIONS #####
 
-CXX      = g++
-OPT      = -O3
-DEBUG    = -g
-OTHER    = -Wall -Wno-deprecated
-CXXFLAGS = $(OPT) $(OTHER) # $(DEBUG)
+CXX      := g++
+OPT      := -O3
+DEBUG    := -g
+OTHER    := -Wall# -Wno-deprecated
+CXXFLAGS := $(OPT) $(OTHER)# $(DEBUG)
 
-INCDIR = -I. -I.. -I$(SRCDIR) -I$(SYSTEMC)/include
-LIBDIR = -L. -L.. -L$(SRCDIR) -L$(SYSTEMC)/lib-$(TARGET_ARCH)
+INCDIR := -I$(SRCDIR) -I$(SYSTEMC)/include
+LIBDIR := -L$(SRCDIR) -L$(SYSTEMC)/lib-$(TARGET_ARCH)
 
-LIBS = -lsystemc -lm
+LIBS := -lsystemc -lm
 
 
 ##### RULES #####
 
-$(MODULE): $(OBJS) $(SYSTEMC)/lib-$(TARGET_ARCH)/libsystemc.a
+$(MODULE): $(OBJS)
 	$(CXX) $(LIBDIR) $^ $(LIBS) -o $@ 2>&1 | c++filt
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CXX) $(CFLAGS) $(INCDIR) -c $<
+	$(CXX) $(CXXFLAGS) $(INCDIR) -c $<
 
 clean:
-	echo $(OBJS)
 	rm -f $(OBJS) *~ $(MODULE)
 
 depend: 
