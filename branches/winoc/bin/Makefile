@@ -12,7 +12,7 @@ OBJDIR := .
 SRCS := $(wildcard $(SRCDIR)/*.cpp)
 OBJS := $(subst $(SRCDIR),$(OBJDIR),$(SRCS:.cpp=.o))
 
-MODULE = noxim
+MODULE := noxim
 
 
 ##### COMPILER OPTIONS #####
