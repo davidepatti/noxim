@@ -17,44 +17,47 @@ void NoximHub::rxProcess()
 	reservation_table.clear();
 
 	/* TODO: re-enable
-	routed_flits = 0;
-	local_drained = 0;
-	*/
+	   routed_flits = 0;
+	   local_drained = 0;
+	 */
     } 
     else 
     {
-	// For each port decide if a new flit can be accepted
+	    ////////////////////////////////////////////////////////////////
+	    // For each port decide if a new flit can be accepted
 
-	for (int i = 0; i < MAX_HUB_PORTS; i++) 
-	{
-	    if ((req_rx[i].read() == 1 - current_level_rx[i]) && !buffer[i].IsFull()) 
+	    for (int i = 0; i < MAX_HUB_PORTS; i++) 
 	    {
-		NoximFlit received_flit = flit_rx[i].read();
+		if ((req_rx[i].read() == 1 - current_level_rx[i]) && !buffer[i].IsFull()) 
+		{
+		    NoximFlit received_flit = flit_rx[i].read();
 
-		if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) {
-		    cout << sc_time_stamp().to_double() /
-			1000 << ": Hub[" << local_id << "], Port[" << i
-			<< "], Received flit: " << received_flit << endl;
+		    if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) {
+			cout << sc_time_stamp().to_double() /
+			    1000 << ": Hub[" << local_id << "], Port[" << i
+			    << "], Received flit: " << received_flit << endl;
+		    }
+
+		    buffer[i].Push(received_flit);
+
+		    current_level_rx[i] = 1 - current_level_rx[i];
+
+		    /* TODO: re-enable
+		    // Incoming flit
+		    //stats.power.Buffering();
+
+		    if (received_flit.src_id == local_id)
+		    stats.power.EndToEnd();
+		     */
 		}
-
-		buffer[i].Push(received_flit);
-
-		current_level_rx[i] = 1 - current_level_rx[i];
-
-		/* TODO: re-enable
-		// Incoming flit
-		//stats.power.Buffering();
-
-		if (received_flit.src_id == local_id)
-		  stats.power.EndToEnd();
-		  */
+		ack_rx[i].write(current_level_rx[i]);
 	    }
-	    ack_rx[i].write(current_level_rx[i]);
-	}
+	// TODO: re-enable
+	//stats.power.Leakage();
     }
-    // TODO: re-enable
-    //stats.power.Leakage();
 }
+
+
 
 void NoximHub::txProcess()
 {

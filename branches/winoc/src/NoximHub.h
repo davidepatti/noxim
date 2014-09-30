@@ -14,16 +14,17 @@
 // Needed for the simple_target_socket
 #define SC_INCLUDE_DYNAMIC_PROCESSES
 
-#include "tlm.h"
 #include "tlm_utils/simple_initiator_socket.h"
 #include "tlm_utils/simple_target_socket.h"
+#include "tlm_utils/peq_with_cb_and_phase.h"
 
 #include <systemc.h>
 #include "NoximMain.h"
 #include "NoximBuffer.h"
 #include "NoximReservationTable.h"
-#include "NoximTLMInitiator.h"
-#include "NoximTLMTarget.h"
+
+#include "Initiator.h"
+#include "Target.h"
 
 
 SC_MODULE(NoximHub)
@@ -47,6 +48,9 @@ SC_MODULE(NoximHub)
     bool current_level_rx[MAX_HUB_PORTS];	// Current level for ABP
     bool current_level_tx[MAX_HUB_PORTS];	// Current level for ABP
 
+    Initiator* init[MAX_HUB_PORTS];
+    Target* target[MAX_HUB_PORTS];
+
     int start_from_port;	                // Port from which to start the reservation cycle
 
     // TODO: use different table or extend in order to support also
@@ -56,14 +60,13 @@ SC_MODULE(NoximHub)
     void rxProcess();		// The receiving process
     void txProcess();		// The transmitting process
 
-    Initiator *initiator;
-    Memory    *memory;
-
     void setup();
 
     // Constructor
 
-    SC_CTOR(NoximHub) {
+    SC_CTOR(NoximHub) 
+    {
+
 	SC_METHOD(rxProcess);
 	sensitive << reset;
 	sensitive << clock.pos();
@@ -72,8 +75,23 @@ SC_MODULE(NoximHub)
 	sensitive << reset;
 	sensitive << clock.pos();
 
-	initiator = new Initiator("initiator");
-	memory    = new Memory   ("memory");
+	for (int i = 0; i < MAX_HUB_PORTS; i++)
+	{
+	    char txt[20];
+	    sprintf(txt, "init_%d", i);
+	    init[i] = new Initiator(txt);
+	    // actual bus binding in buildMesh()
+	    //init[i]->socket.bind( bus->targ_socket );
+	}
+
+	for (int i = 0; i < MAX_HUB_PORTS; i++)
+	{
+	    char txt[20];
+	    sprintf(txt, "target_%d", i);
+	    target[i] = new Target(txt);
+	    // actual bus binding in buildMesh()
+	    // bus->init_socket.bind( target[i]->socket );
+	}
 
     }
 
