@@ -16,6 +16,7 @@
 #include "NoximGlobalRoutingTable.h"
 #include "NoximGlobalTrafficTable.h"
 #include "NoximHub.h"
+#include "Bus.h"
 
 using namespace std;
 
@@ -67,6 +68,8 @@ SC_MODULE(NoximNoC)
     NoximTile *t[MAX_STATIC_DIM][MAX_STATIC_DIM];
     
     NoximHub *h[MAX_HUBS];
+
+    Bus* bus;
 
     // Global tables
     NoximGlobalRoutingTable grtable;

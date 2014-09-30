@@ -12,13 +12,18 @@
 
 void NoximNoC::buildMesh()
 {
-    char hub_name[10];
+
+
+    bus   = new Bus("bus");
+
+     char hub_name[10];   
     // TODO: replace with dynamic code based on configuration file
     for (int i=0;i<MAX_HUBS;i++)
     {
 	sprintf(hub_name, "HUB_%d", i);
 	cout << "\n creating " << i << endl;
 	h[i] = new NoximHub(hub_name);
+	h[i]->local_id = i;
 	h[i]->clock(clock);
 	h[i]->reset(reset);
     }
@@ -104,9 +109,11 @@ void NoximNoC::buildMesh()
 	    // node 0,0 connected to Hub 0
 	    // node 3,3 connected to Hub 1
 
+	    // TODO: where pointers should be allocated ?
 	    if (i==0 && j==0)
 	    {
-		h[0]->initiator->socket.bind(h[1]->memory->socket );
+		h[0]->init[0]->socket.bind(bus->targ_socket );
+		bus->init_socket.bind(h[0]->target[0]->socket);
 
 		// hub receives
 		h[0]->req_rx[0](req_to_hub[i][j]);
@@ -121,7 +128,9 @@ void NoximNoC::buildMesh()
 	    else
 	    if (i==3 && j==3)
 	    {
-		h[1]->initiator->socket.bind(h[0]->memory->socket );
+		h[1]->init[0]->socket.bind(bus->targ_socket );
+		bus->init_socket.bind(h[1]->target[0]->socket);
+
 		h[1]->req_rx[0](req_to_hub[i][j]);
 		h[1]->flit_rx[0](flit_to_hub[i][j]);
 		h[1]->ack_rx[0](ack_from_hub[i][j]);
