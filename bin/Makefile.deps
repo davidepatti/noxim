@@ -43,3 +43,4 @@
 ./Stats.o: ../src/Stats.h ../src/Main.h ../src/Power.h
 ./Target.o: ../src/Target.h ../src/Utils.h
 ./Utils.o: ../src/Utils.h
+./WiNoC.o: ../src/WiNoC.h ../src/Main.h ../src/Power.h
