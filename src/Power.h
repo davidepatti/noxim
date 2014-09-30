@@ -12,6 +12,7 @@
 #define __NOXIMPOWER_H__
 
 #include <cassert>
+#include <map>
 #include "Main.h"
 using namespace std;
 
@@ -62,11 +63,18 @@ class Power {
     void EndToEnd();
     void Leakage();
 
+    void RHTransmitWiFi(int rh_src_id, int rh_dst_id);
+    void RHTransmitElec();
+
     bool LoadPowerData(const char *fname);
 
     double getPower() {
 	return pwr;
     } 
+
+    double getPowerRH() const {
+	return pwr_rh;
+    }
 
     double getPwrRouting() {
 	return pwr_routing;
@@ -103,6 +111,14 @@ class Power {
       return pwr_end2end;
     }
 
+    double getPwrRHTxWiFi() const {
+	return pwr_rhtxwifi;
+    }
+
+    double getPwrRHTxElec() const {
+	return pwr_rhtxelec;
+    }
+
   private:
     
     static double pwr_buffering;
@@ -115,9 +131,16 @@ class Power {
     static double pwr_leakage;
     static double pwr_end2end;
 
+    static double pwr_rhtxwifi;
+    static double pwr_rhtxelec;
+
     static bool   power_data_loaded;
 
+    static map<pair<int,int>, double> rh_power_map;
+    void ScanPowerMapEntry(char *line);
+
     double pwr;
+    double pwr_rh;
 };
 
 #endif
