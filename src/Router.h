@@ -12,17 +12,17 @@
 #define __NOXIMROUTER_H__
 
 #include <systemc.h>
-#include "NoximMain.h"
-#include "NoximBuffer.h"
-#include "NoximStats.h"
-#include "NoximGlobalRoutingTable.h"
-#include "NoximLocalRoutingTable.h"
-#include "NoximReservationTable.h"
+#include "Main.h"
+#include "Buffer.h"
+#include "Stats.h"
+#include "GlobalRoutingTable.h"
+#include "LocalRoutingTable.h"
+#include "ReservationTable.h"
 using namespace std;
 
 extern unsigned int drained_volume;
 
-SC_MODULE(NoximRouter)
+SC_MODULE(Router)
 {
 
     // I/O Ports
@@ -30,11 +30,11 @@ SC_MODULE(NoximRouter)
     sc_in <bool> reset;                           // The reset signal for the router
 
     // number of ports: 4 mesh directions + local + wireless 
-    sc_in <NoximFlit> flit_rx[DIRECTIONS + 2];	  // The input channels 
+    sc_in <Flit> flit_rx[DIRECTIONS + 2];	  // The input channels 
     sc_in <bool> req_rx[DIRECTIONS + 2];	  // The requests associated with the input channels
     sc_out <bool> ack_rx[DIRECTIONS + 2];	  // The outgoing ack signals associated with the input channels
 
-    sc_out <NoximFlit> flit_tx[DIRECTIONS + 2];   // The output channels
+    sc_out <Flit> flit_tx[DIRECTIONS + 2];   // The output channels
     sc_out <bool> req_tx[DIRECTIONS + 2];	  // The requests associated with the output channels
     sc_in <bool> ack_tx[DIRECTIONS + 2];	  // The outgoing ack signals associated with the output channels
 
@@ -42,23 +42,23 @@ SC_MODULE(NoximRouter)
     sc_in <int> free_slots_neighbor[DIRECTIONS + 1];
 
     // Neighbor-on-Path related I/O
-    sc_out < NoximNoP_data > NoP_data_out[DIRECTIONS];
-    sc_in < NoximNoP_data > NoP_data_in[DIRECTIONS];
+    sc_out < NoP_data > NoP_data_out[DIRECTIONS];
+    sc_in < NoP_data > NoP_data_in[DIRECTIONS];
 
     // Registers
 
     /*
-       NoximCoord position;                     // Router position inside the mesh
+       Coord position;                     // Router position inside the mesh
      */
     int local_id;		                // Unique ID
     int routing_type;		                // Type of routing algorithm
     int selection_type;
-    NoximBuffer buffer[DIRECTIONS + 2];	        // Buffer for each input channel 
+    Buffer buffer[DIRECTIONS + 2];	        // Buffer for each input channel 
     bool current_level_rx[DIRECTIONS + 2];	// Current level for Alternating Bit Protocol (ABP)
     bool current_level_tx[DIRECTIONS + 2];	// Current level for Alternating Bit Protocol (ABP)
-    NoximStats stats;		                // Statistics
-    NoximLocalRoutingTable routing_table;	// Routing table
-    NoximReservationTable reservation_table;	// Switch reservation table
+    Stats stats;		                // Statistics
+    LocalRoutingTable routing_table;	// Routing table
+    ReservationTable reservation_table;	// Switch reservation table
     int start_from_port;	                // Port from which to start the reservation cycle
     unsigned long routed_flits;
 
@@ -69,7 +69,7 @@ SC_MODULE(NoximRouter)
     void bufferMonitor();
     void configure(const int _id, const double _warm_up_time,
 		   const unsigned int _max_buffer_size,
-		   NoximGlobalRoutingTable & grt);
+		   GlobalRoutingTable & grt);
 
     unsigned long getRoutedFlits();	// Returns the number of routed flits 
     unsigned int getFlitsCount();	// Returns the number of flits into the router
@@ -77,7 +77,7 @@ SC_MODULE(NoximRouter)
 
     // Constructor
 
-    SC_CTOR(NoximRouter) {
+    SC_CTOR(Router) {
 	SC_METHOD(rxProcess);
 	sensitive << reset;
 	sensitive << clock.pos();
@@ -94,44 +94,44 @@ SC_MODULE(NoximRouter)
   private:
 
     // performs actual routing + selection
-    int route(const NoximRouteData & route_data);
+    int route(const RouteData & route_data);
 
     // wrappers
     int selectionFunction(const vector <int> &directions,
-			  const NoximRouteData & route_data);
-    vector < int >routingFunction(const NoximRouteData & route_data);
+			  const RouteData & route_data);
+    vector < int >routingFunction(const RouteData & route_data);
 
     // selection strategies
     int selectionRandom(const vector <int> & directions);
     int selectionBufferLevel(const vector <int> & directions);
     int selectionNoP(const vector <int> & directions,
-		     const NoximRouteData & route_data);
+		     const RouteData & route_data);
 
     // routing functions
-    vector < int >routingXY(const NoximCoord & current,
-			    const NoximCoord & destination);
-    vector < int >routingWestFirst(const NoximCoord & current,
-				   const NoximCoord & destination);
-    vector < int >routingNorthLast(const NoximCoord & current,
-				   const NoximCoord & destination);
-    vector < int >routingNegativeFirst(const NoximCoord & current,
-				       const NoximCoord & destination);
-    vector < int >routingOddEven(const NoximCoord & current,
-				 const NoximCoord & source,
-				 const NoximCoord & destination);
-    vector < int >routingDyAD(const NoximCoord & current,
-			      const NoximCoord & source,
-			      const NoximCoord & destination);
-    vector < int >routingLookAhead(const NoximCoord & current,
-				   const NoximCoord & destination);
-    vector < int >routingFullyAdaptive(const NoximCoord & current,
-				       const NoximCoord & destination);
+    vector < int >routingXY(const Coord & current,
+			    const Coord & destination);
+    vector < int >routingWestFirst(const Coord & current,
+				   const Coord & destination);
+    vector < int >routingNorthLast(const Coord & current,
+				   const Coord & destination);
+    vector < int >routingNegativeFirst(const Coord & current,
+				       const Coord & destination);
+    vector < int >routingOddEven(const Coord & current,
+				 const Coord & source,
+				 const Coord & destination);
+    vector < int >routingDyAD(const Coord & current,
+			      const Coord & source,
+			      const Coord & destination);
+    vector < int >routingLookAhead(const Coord & current,
+				   const Coord & destination);
+    vector < int >routingFullyAdaptive(const Coord & current,
+				       const Coord & destination);
     vector < int >routingTableBased(const int dir_in,
-				    const NoximCoord & current,
-				    const NoximCoord & destination);
-    NoximNoP_data getCurrentNoPData() const;
+				    const Coord & current,
+				    const Coord & destination);
+    NoP_data getCurrentNoPData() const;
     void NoP_report() const;
-    int NoPScore(const NoximNoP_data & nop_data, const vector <int> & nop_channels) const;
+    int NoPScore(const NoP_data & nop_data, const vector <int> & nop_channels) const;
     int reflexDirection(int direction) const;
     int getNeighborId(int _id, int direction) const;
     bool inCongestion();

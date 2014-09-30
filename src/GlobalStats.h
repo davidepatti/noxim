@@ -14,15 +14,15 @@
 #include <iostream>
 #include <vector>
 #include <iomanip>
-#include "NoximNoC.h"
-#include "NoximTile.h"
+#include "NoC.h"
+#include "Tile.h"
 using namespace std;
 
-class NoximGlobalStats {
+class GlobalStats {
 
   public:
 
-    NoximGlobalStats(const NoximNoC * _noc);
+    GlobalStats(const NoC * _noc);
 
     // Returns the aggragated average delay (cycles)
     double getAverageDelay();
@@ -76,7 +76,7 @@ class NoximGlobalStats {
 #endif
 
   private:
-    const NoximNoC *noc;
+    const NoC *noc;
 };
 
 #endif

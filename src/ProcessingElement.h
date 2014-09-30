@@ -13,22 +13,22 @@
 
 #include <queue>
 #include <systemc.h>
-#include "NoximMain.h"
-#include "NoximGlobalTrafficTable.h"
+#include "Main.h"
+#include "GlobalTrafficTable.h"
 using namespace std;
 
-SC_MODULE(NoximProcessingElement)
+SC_MODULE(ProcessingElement)
 {
 
     // I/O Ports
     sc_in_clk clock;		// The input clock for the PE
     sc_in < bool > reset;	// The reset signal for the PE
 
-    sc_in < NoximFlit > flit_rx;	// The input channel
+    sc_in < Flit > flit_rx;	// The input channel
     sc_in < bool > req_rx;	// The request associated with the input channel
     sc_out < bool > ack_rx;	// The outgoing ack signal associated with the input channel
 
-    sc_out < NoximFlit > flit_tx;	// The output channel
+    sc_out < Flit > flit_tx;	// The output channel
     sc_out < bool > req_tx;	// The request associated with the output channel
     sc_in < bool > ack_tx;	// The outgoing ack signal associated with the output channel
 
@@ -38,28 +38,28 @@ SC_MODULE(NoximProcessingElement)
     int local_id;		// Unique identification number
     bool current_level_rx;	// Current level for Alternating Bit Protocol (ABP)
     bool current_level_tx;	// Current level for Alternating Bit Protocol (ABP)
-    queue < NoximPacket > packet_queue;	// Local queue of packets
+    queue < Packet > packet_queue;	// Local queue of packets
     bool transmittedAtPreviousCycle;	// Used for distributions with memory
 
     // Functions
     void rxProcess();		// The receiving process
     void txProcess();		// The transmitting process
-    bool canShot(NoximPacket & packet);	// True when the packet must be shot
-    NoximFlit nextFlit();	// Take the next flit of the current packet
-    NoximPacket trafficRandom();	// Random destination distribution
-    NoximPacket trafficTranspose1();	// Transpose 1 destination distribution
-    NoximPacket trafficTranspose2();	// Transpose 2 destination distribution
-    NoximPacket trafficBitReversal();	// Bit-reversal destination distribution
-    NoximPacket trafficShuffle();	// Shuffle destination distribution
-    NoximPacket trafficButterfly();	// Butterfly destination distribution
+    bool canShot(Packet & packet);	// True when the packet must be shot
+    Flit nextFlit();	// Take the next flit of the current packet
+    Packet trafficRandom();	// Random destination distribution
+    Packet trafficTranspose1();	// Transpose 1 destination distribution
+    Packet trafficTranspose2();	// Transpose 2 destination distribution
+    Packet trafficBitReversal();	// Bit-reversal destination distribution
+    Packet trafficShuffle();	// Shuffle destination distribution
+    Packet trafficButterfly();	// Butterfly destination distribution
 
-    void setUseLowVoltagePath(NoximPacket& packet);
+    void setUseLowVoltagePath(Packet& packet);
 
-    NoximGlobalTrafficTable *traffic_table;	// Reference to the Global traffic Table
+    GlobalTrafficTable *traffic_table;	// Reference to the Global traffic Table
     bool never_transmit;	// true if the PE does not transmit any packet 
     //  (valid only for the table based traffic)
 
-    void fixRanges(const NoximCoord, NoximCoord &);	// Fix the ranges of the destination
+    void fixRanges(const Coord, Coord &);	// Fix the ranges of the destination
     int randInt(int min, int max);	// Extracts a random integer number between min and max
     int getRandomSize();	// Returns a random size in flits for the packet
     void setBit(int &x, int w, int v);
@@ -67,7 +67,7 @@ SC_MODULE(NoximProcessingElement)
     double log2ceil(double x);
 
     // Constructor
-    SC_CTOR(NoximProcessingElement) {
+    SC_CTOR(ProcessingElement) {
 	SC_METHOD(rxProcess);
 	sensitive << reset;
 	sensitive << clock.pos();

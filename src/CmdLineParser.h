@@ -11,7 +11,7 @@
 #ifndef __NOXIMCMDLINEPARSER_H__
 #define __NOXIMCMDLINEPARSER_H__
 
-#include "NoximMain.h"
+#include "Main.h"
 using namespace std;
 
 void parseCmdLine(int arg_num, char *arg_vet[]);

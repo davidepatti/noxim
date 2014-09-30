@@ -12,7 +12,7 @@
 #define __NOXIMPOWER_H__
 
 #include <cassert>
-#include "NoximMain.h"
+#include "Main.h"
 using namespace std;
 
 /*
@@ -47,11 +47,11 @@ hop interconnect is 0.384nJ.
 #define PWR_STANDBY                0.0001e-9/2.0
 */
 
-class NoximPower {
+class Power {
 
   public:
 
-    NoximPower();
+    Power();
 
     void Buffering();
     void Routing();

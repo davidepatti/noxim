@@ -9,74 +9,74 @@
  */
 
 #include <iostream>
-#include "NoximMain.h"
-#include "NoximPower.h"
+#include "Main.h"
+#include "Power.h"
 using namespace std;
 
-double NoximPower::pwr_buffering   = 0.0;
-double NoximPower::pwr_routing     = 0.0;
-double NoximPower::pwr_selection   = 0.0;
-double NoximPower::pwr_arbitration = 0.0;
-double NoximPower::pwr_crossbar    = 0.0;
-double NoximPower::pwr_link        = 0.0;
-double NoximPower::pwr_link_lv     = 0.0;
-double NoximPower::pwr_leakage     = 0.0;
-double NoximPower::pwr_end2end     = 0.0;
+double Power::pwr_buffering   = 0.0;
+double Power::pwr_routing     = 0.0;
+double Power::pwr_selection   = 0.0;
+double Power::pwr_arbitration = 0.0;
+double Power::pwr_crossbar    = 0.0;
+double Power::pwr_link        = 0.0;
+double Power::pwr_link_lv     = 0.0;
+double Power::pwr_leakage     = 0.0;
+double Power::pwr_end2end     = 0.0;
 
-bool   NoximPower::power_data_loaded = false;
+bool   Power::power_data_loaded = false;
 
-NoximPower::NoximPower()
+Power::Power()
 {
   pwr = 0.0;
 
   if (!power_data_loaded)
     {
-      assert(LoadPowerData(NoximGlobalParams::router_power_filename));
+      assert(LoadPowerData(GlobalParams::router_power_filename));
       power_data_loaded = true;
     }
 }
 
-void NoximPower::Routing()
+void Power::Routing()
 {
   pwr += pwr_routing;
 }
 
-void NoximPower::Selection()
+void Power::Selection()
 {
   pwr += pwr_selection;
 }
 
-void NoximPower::Buffering()
+void Power::Buffering()
 {
   pwr += pwr_buffering;
 }
 
-void NoximPower::Link(bool low_voltage)
+void Power::Link(bool low_voltage)
 {
   pwr += low_voltage ? pwr_link_lv : pwr_link;
 }
 
-void NoximPower::Arbitration()
+void Power::Arbitration()
 {
   pwr += pwr_arbitration;
 }
 
-void NoximPower::Crossbar()
+void Power::Crossbar()
 {
   pwr += pwr_crossbar;
 }
 
-void NoximPower::Leakage()
+void Power::Leakage()
 {
   pwr += pwr_leakage;
 }
 
-void NoximPower::EndToEnd()
+void Power::EndToEnd()
 {
   pwr += pwr_end2end;
 }
 
-bool NoximPower::LoadPowerData(const char *fname)
+bool Power::LoadPowerData(const char *fname)
 {
   ifstream fin(fname, ios::in);
 

@@ -19,32 +19,32 @@
 #include "tlm_utils/peq_with_cb_and_phase.h"
 
 #include <systemc.h>
-#include "NoximMain.h"
-#include "NoximBuffer.h"
-#include "NoximReservationTable.h"
+#include "Main.h"
+#include "Buffer.h"
+#include "ReservationTable.h"
 
 #include "Initiator.h"
 #include "Target.h"
 
 
-SC_MODULE(NoximHub)
+SC_MODULE(Hub)
 {
 
     // I/O Ports
     sc_in_clk clock;		                // The input clock for the tile
     sc_in <bool> reset;	                        // The reset signal for the tile
 
-    sc_in <NoximFlit> flit_rx[MAX_HUB_PORTS];	// The input channels
+    sc_in <Flit> flit_rx[MAX_HUB_PORTS];	// The input channels
     sc_in <bool> req_rx[MAX_HUB_PORTS];	        // The requests associated with the input channels
     sc_out <bool> ack_rx[MAX_HUB_PORTS];	        // The outgoing ack signals associated with the input channels
 
-    sc_out <NoximFlit> flit_tx[MAX_HUB_PORTS];	// The output channels
+    sc_out <Flit> flit_tx[MAX_HUB_PORTS];	// The output channels
     sc_out <bool> req_tx[MAX_HUB_PORTS];	        // The requests associated with the output channels
     sc_in <bool> ack_tx[MAX_HUB_PORTS];	        // The outgoing ack signals associated with the output channels
 
 
     int local_id;		                // Unique ID
-    NoximBuffer buffer[MAX_HUB_PORTS];	        // Buffer for each port
+    Buffer buffer[MAX_HUB_PORTS];	        // Buffer for each port
     bool current_level_rx[MAX_HUB_PORTS];	// Current level for ABP
     bool current_level_tx[MAX_HUB_PORTS];	// Current level for ABP
 
@@ -55,7 +55,7 @@ SC_MODULE(NoximHub)
 
     // TODO: use different table or extend in order to support also
     // Hubs
-    NoximReservationTable reservation_table;	// Switch reservation table
+    ReservationTable reservation_table;	// Switch reservation table
 
     void rxProcess();		// The receiving process
     void txProcess();		// The transmitting process
@@ -64,7 +64,7 @@ SC_MODULE(NoximHub)
 
     // Constructor
 
-    SC_CTOR(NoximHub) 
+    SC_CTOR(Hub) 
     {
 
 	SC_METHOD(rxProcess);

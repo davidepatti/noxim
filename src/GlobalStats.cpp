@@ -8,10 +8,10 @@
  * This file contains the implementaton of the global statistics
  */
 
-#include "NoximGlobalStats.h"
+#include "GlobalStats.h"
 using namespace std;
 
-NoximGlobalStats::NoximGlobalStats(const NoximNoC * _noc)
+GlobalStats::GlobalStats(const NoC * _noc)
 {
     noc = _noc;
 
@@ -20,13 +20,13 @@ NoximGlobalStats::NoximGlobalStats(const NoximNoC * _noc)
 #endif
 }
 
-double NoximGlobalStats::getAverageDelay()
+double GlobalStats::getAverageDelay()
 {
     unsigned int total_packets = 0;
     double avg_delay = 0.0;
 
-    for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < NoximGlobalParams::mesh_dim_x; x++) {
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
 	    unsigned int received_packets =
 		noc->t[x][y]->r->stats.getReceivedPackets();
 
@@ -43,23 +43,23 @@ double NoximGlobalStats::getAverageDelay()
     return avg_delay;
 }
 
-double NoximGlobalStats::getAverageDelay(const int src_id,
+double GlobalStats::getAverageDelay(const int src_id,
 					 const int dst_id)
 {
-    NoximTile *tile = noc->searchNode(dst_id);
+    Tile *tile = noc->searchNode(dst_id);
 
     assert(tile != NULL);
 
     return tile->r->stats.getAverageDelay(src_id);
 }
 
-double NoximGlobalStats::getMaxDelay()
+double GlobalStats::getMaxDelay()
 {
     double maxd = -1.0;
 
-    for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < NoximGlobalParams::mesh_dim_x; x++) {
-	    NoximCoord coord;
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
+	    Coord coord;
 	    coord.x = x;
 	    coord.y = y;
 	    int node_id = coord2Id(coord);
@@ -71,9 +71,9 @@ double NoximGlobalStats::getMaxDelay()
     return maxd;
 }
 
-double NoximGlobalStats::getMaxDelay(const int node_id)
+double GlobalStats::getMaxDelay(const int node_id)
 {
-    NoximCoord coord = id2Coord(node_id);
+    Coord coord = id2Coord(node_id);
 
     unsigned int received_packets =
 	noc->t[coord.x][coord.y]->r->stats.getReceivedPackets();
@@ -84,26 +84,26 @@ double NoximGlobalStats::getMaxDelay(const int node_id)
 	return -1.0;
 }
 
-double NoximGlobalStats::getMaxDelay(const int src_id, const int dst_id)
+double GlobalStats::getMaxDelay(const int src_id, const int dst_id)
 {
-    NoximTile *tile = noc->searchNode(dst_id);
+    Tile *tile = noc->searchNode(dst_id);
 
     assert(tile != NULL);
 
     return tile->r->stats.getMaxDelay(src_id);
 }
 
-vector < vector < double > > NoximGlobalStats::getMaxDelayMtx()
+vector < vector < double > > GlobalStats::getMaxDelayMtx()
 {
     vector < vector < double > > mtx;
 
-    mtx.resize(NoximGlobalParams::mesh_dim_y);
-    for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
-	mtx[y].resize(NoximGlobalParams::mesh_dim_x);
+    mtx.resize(GlobalParams::mesh_dim_y);
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	mtx[y].resize(GlobalParams::mesh_dim_x);
 
-    for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < NoximGlobalParams::mesh_dim_x; x++) {
-	    NoximCoord coord;
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
+	    Coord coord;
 	    coord.x = x;
 	    coord.y = y;
 	    int id = coord2Id(coord);
@@ -113,23 +113,23 @@ vector < vector < double > > NoximGlobalStats::getMaxDelayMtx()
     return mtx;
 }
 
-double NoximGlobalStats::getAverageThroughput(const int src_id,
+double GlobalStats::getAverageThroughput(const int src_id,
 					      const int dst_id)
 {
-    NoximTile *tile = noc->searchNode(dst_id);
+    Tile *tile = noc->searchNode(dst_id);
 
     assert(tile != NULL);
 
     return tile->r->stats.getAverageThroughput(src_id);
 }
 
-double NoximGlobalStats::getAverageThroughput()
+double GlobalStats::getAverageThroughput()
 {
     unsigned int total_comms = 0;
     double avg_throughput = 0.0;
 
-    for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < NoximGlobalParams::mesh_dim_x; x++) {
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
 	    unsigned int ncomms =
 		noc->t[x][y]->r->stats.getTotalCommunications();
 
@@ -145,23 +145,23 @@ double NoximGlobalStats::getAverageThroughput()
     return avg_throughput;
 }
 
-unsigned int NoximGlobalStats::getReceivedPackets()
+unsigned int GlobalStats::getReceivedPackets()
 {
     unsigned int n = 0;
 
-    for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < NoximGlobalParams::mesh_dim_x; x++)
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
 	    n += noc->t[x][y]->r->stats.getReceivedPackets();
 
     return n;
 }
 
-unsigned int NoximGlobalStats::getReceivedFlits()
+unsigned int GlobalStats::getReceivedFlits()
 {
     unsigned int n = 0;
 
-    for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < NoximGlobalParams::mesh_dim_x; x++) {
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
 	    n += noc->t[x][y]->r->stats.getReceivedFlits();
 #ifdef TESTING
 	    drained_total += noc->t[x][y]->r->local_drained;
@@ -171,19 +171,19 @@ unsigned int NoximGlobalStats::getReceivedFlits()
     return n;
 }
 
-double NoximGlobalStats::getThroughput()
+double GlobalStats::getThroughput()
 {
     int total_cycles =
-	NoximGlobalParams::simulation_time -
-	NoximGlobalParams::stats_warm_up_time;
+	GlobalParams::simulation_time -
+	GlobalParams::stats_warm_up_time;
 
-    //  int number_of_ip = NoximGlobalParams::mesh_dim_x * NoximGlobalParams::mesh_dim_y;
+    //  int number_of_ip = GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y;
     //  return (double)getReceivedFlits()/(double)(total_cycles * number_of_ip);
 
     unsigned int n = 0;
     unsigned int trf = 0;
-    for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < NoximGlobalParams::mesh_dim_x; x++) {
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
 	    unsigned int rf = noc->t[x][y]->r->stats.getReceivedFlits();
 
 	    if (rf != 0)
@@ -195,34 +195,34 @@ double NoximGlobalStats::getThroughput()
 
 }
 
-vector < vector < unsigned long > > NoximGlobalStats::getRoutedFlitsMtx()
+vector < vector < unsigned long > > GlobalStats::getRoutedFlitsMtx()
 {
 
     vector < vector < unsigned long > > mtx;
 
-    mtx.resize(NoximGlobalParams::mesh_dim_y);
-    for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
-	mtx[y].resize(NoximGlobalParams::mesh_dim_x);
+    mtx.resize(GlobalParams::mesh_dim_y);
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	mtx[y].resize(GlobalParams::mesh_dim_x);
 
-    for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < NoximGlobalParams::mesh_dim_x; x++)
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
 	    mtx[y][x] = noc->t[x][y]->r->getRoutedFlits();
 
     return mtx;
 }
 
-double NoximGlobalStats::getPower()
+double GlobalStats::getPower()
 {
     double power = 0.0;
 
-    for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < NoximGlobalParams::mesh_dim_x; x++)
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
 	    power += noc->t[x][y]->r->getPower();
 
     return power;
 }
 
-void NoximGlobalStats::showStats(std::ostream & out, bool detailed)
+void GlobalStats::showStats(std::ostream & out, bool detailed)
 {
     out << "% Total received packets: " << getReceivedPackets() << endl;
     out << "% Total received flits: " << getReceivedFlits() << endl;
@@ -234,15 +234,15 @@ void NoximGlobalStats::showStats(std::ostream & out, bool detailed)
     out << "% Max delay (cycles): " << getMaxDelay() << endl;
     out << "% Total energy (J): " << getPower() << endl;
 
-    if (NoximGlobalParams::show_buffer_stats)
+    if (GlobalParams::show_buffer_stats)
       showBufferStats(out);
 
     if (detailed) {
 	out << endl << "detailed = [" << endl;
-	for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
-	    for (int x = 0; x < NoximGlobalParams::mesh_dim_x; x++)
+	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
 		noc->t[x][y]->r->stats.showStats(y *
-						 NoximGlobalParams::
+						 GlobalParams::
 						 mesh_dim_x + x, out,
 						 true);
 	out << "];" << endl;
@@ -274,12 +274,12 @@ void NoximGlobalStats::showStats(std::ostream & out, bool detailed)
 }
 
 
-void NoximGlobalStats::showBufferStats(std::ostream & out)
+void GlobalStats::showBufferStats(std::ostream & out)
 {
   out << "Router id\tBuffer N\t\tBuffer E\t\tBuffer S\t\tBuffer W\t\tBuffer L" << endl;
   out << "         \tMean\tMax\tMean\tMax\tMean\tMax\tMean\tMax\tMean\tMax" << endl;
-  for (int y = 0; y < NoximGlobalParams::mesh_dim_y; y++)
-    for (int x = 0; x < NoximGlobalParams::mesh_dim_x; x++)
+  for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+    for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
       {
 	out << noc->t[x][y]->r->local_id;
 	noc->t[x][y]->r->ShowBuffersStats(out);

@@ -8,20 +8,20 @@
  * This file contains the implementation of the global routing table
  */
 
-#include "NoximGlobalRoutingTable.h"
+#include "GlobalRoutingTable.h"
 using namespace std;
 
-NoximLinkId direction2ILinkId(const int node_id, const int dir)
+LinkId direction2ILinkId(const int node_id, const int dir)
 {
     int node_src;
 
     switch (dir) {
     case DIRECTION_NORTH:
-	node_src = node_id - NoximGlobalParams::mesh_dim_x;
+	node_src = node_id - GlobalParams::mesh_dim_x;
 	break;
 
     case DIRECTION_SOUTH:
-	node_src = node_id + NoximGlobalParams::mesh_dim_x;
+	node_src = node_id + GlobalParams::mesh_dim_x;
 	break;
 
     case DIRECTION_EAST:
@@ -41,10 +41,10 @@ NoximLinkId direction2ILinkId(const int node_id, const int dir)
     }
 
 
-    return NoximLinkId(node_src, node_id);
+    return LinkId(node_src, node_id);
 }
 
-int oLinkId2Direction(const NoximLinkId & out_link)
+int oLinkId2Direction(const LinkId & out_link)
 {
     int src = out_link.first;
     int dst = out_link.second;
@@ -55,9 +55,9 @@ int oLinkId2Direction(const NoximLinkId & out_link)
 	return DIRECTION_EAST;
     else if (dst == src - 1)
 	return DIRECTION_WEST;
-    else if (dst == src - NoximGlobalParams::mesh_dim_x)
+    else if (dst == src - GlobalParams::mesh_dim_x)
 	return DIRECTION_NORTH;
-    else if (dst == src + NoximGlobalParams::mesh_dim_x)
+    else if (dst == src + GlobalParams::mesh_dim_x)
 	return DIRECTION_SOUTH;
     else
 	assert(false);
@@ -65,23 +65,23 @@ int oLinkId2Direction(const NoximLinkId & out_link)
 }
 
 vector <
-    int >admissibleOutputsSet2Vector(const NoximAdmissibleOutputs & ao)
+    int >admissibleOutputsSet2Vector(const AdmissibleOutputs & ao)
 {
     vector < int >dirs;
 
-    for (NoximAdmissibleOutputs::iterator i = ao.begin(); i != ao.end();
+    for (AdmissibleOutputs::iterator i = ao.begin(); i != ao.end();
 	 i++)
 	dirs.push_back(oLinkId2Direction(*i));
 
     return dirs;
 }
 
-NoximGlobalRoutingTable::NoximGlobalRoutingTable()
+GlobalRoutingTable::GlobalRoutingTable()
 {
     valid = false;
 }
 
-bool NoximGlobalRoutingTable::load(const char *fname)
+bool GlobalRoutingTable::load(const char *fname)
 {
     ifstream fin(fname, ios::in);
 
@@ -104,11 +104,11 @@ bool NoximGlobalRoutingTable::load(const char *fname)
 		if (sscanf
 		    (line + 1, "%d %d->%d %d", &node_id, &in_src, &in_dst,
 		     &dst_id) == 4) {
-		    NoximLinkId lin(in_src, in_dst);
+		    LinkId lin(in_src, in_dst);
 
 		    char *pstr = line + COLUMN_AOC;
 		    while (sscanf(pstr, "%d->%d", &out_src, &out_dst) == 2) {
-			NoximLinkId lout(out_src, out_dst);
+			LinkId lout(out_src, out_dst);
 
 			rt_noc[node_id][lin][dst_id].insert(lout);
 
@@ -125,7 +125,7 @@ bool NoximGlobalRoutingTable::load(const char *fname)
     return true;
 }
 
-NoximRoutingTableNode NoximGlobalRoutingTable::
+RoutingTableNode GlobalRoutingTable::
 getNodeRoutingTable(const int node_id)
 {
     return rt_noc[node_id];

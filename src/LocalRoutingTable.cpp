@@ -8,29 +8,29 @@
  * This file contains the implementation of the local routing table
  */
 
-#include "NoximLocalRoutingTable.h"
+#include "LocalRoutingTable.h"
 
-NoximLocalRoutingTable::NoximLocalRoutingTable()
+LocalRoutingTable::LocalRoutingTable()
 {
 }
 
-void NoximLocalRoutingTable::configure(NoximGlobalRoutingTable & rtable,
+void LocalRoutingTable::configure(GlobalRoutingTable & rtable,
 				       const int _node_id)
 {
     rt_node = rtable.getNodeRoutingTable(_node_id);
     node_id = _node_id;
 }
 
-NoximAdmissibleOutputs NoximLocalRoutingTable::
-getAdmissibleOutputs(const NoximLinkId & in_link, const int destination_id)
+AdmissibleOutputs LocalRoutingTable::
+getAdmissibleOutputs(const LinkId & in_link, const int destination_id)
 {
     return rt_node[in_link][destination_id];
 }
 
-NoximAdmissibleOutputs NoximLocalRoutingTable::
+AdmissibleOutputs LocalRoutingTable::
 getAdmissibleOutputs(const int in_direction, const int destination_id)
 {
-    NoximLinkId lid = direction2ILinkId(node_id, in_direction);
+    LinkId lid = direction2ILinkId(node_id, in_direction);
 
     return getAdmissibleOutputs(lid, destination_id);
 }
