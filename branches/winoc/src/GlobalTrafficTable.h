@@ -14,11 +14,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-#include "NoximMain.h"
+#include "Main.h"
 using namespace std;
 
 // Structure used to store information into the table
-struct NoximCommunication {
+struct Communication {
   int src;			// ID of the source node (PE)
   int dst;			// ID of the destination node (PE)
   float pir;			// Packet Injection Rate for the link
@@ -29,11 +29,11 @@ struct NoximCommunication {
   bool use_low_voltage_path;
 };
 
-class NoximGlobalTrafficTable {
+class GlobalTrafficTable {
 
   public:
 
-    NoximGlobalTrafficTable();
+    GlobalTrafficTable();
 
     // Load traffic table from file. Returns true if ok, false otherwise
     bool load(const char *fname);
@@ -53,7 +53,7 @@ class NoximGlobalTrafficTable {
 
   private:
 
-     vector < NoximCommunication > traffic_table;
+     vector < Communication > traffic_table;
 };
 
 #endif

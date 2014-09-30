@@ -12,13 +12,13 @@
 #define __NOXIMRESERVATIONTABLE_H__
 
 #include <cassert>
-#include "NoximMain.h"
+#include "Main.h"
 using namespace std;
 
-class NoximReservationTable {
+class ReservationTable {
   public:
 
-    NoximReservationTable();
+    ReservationTable();
 
     // Clear reservation table
     void clear();

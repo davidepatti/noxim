@@ -1,11 +1,11 @@
-#include "NoximHub.h"
+#include "Hub.h"
 
-void NoximHub::setup()
+void Hub::setup()
 {
 
 }
 
-void NoximHub::rxProcess()
+void Hub::rxProcess()
 {
     if (reset.read()) 
     {
@@ -30,9 +30,9 @@ void NoximHub::rxProcess()
 	    {
 		if ((req_rx[i].read() == 1 - current_level_rx[i]) && !buffer[i].IsFull()) 
 		{
-		    NoximFlit received_flit = flit_rx[i].read();
+		    Flit received_flit = flit_rx[i].read();
 
-		    if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) {
+		    if (GlobalParams::verbose_mode > VERBOSE_OFF) {
 			cout << sc_time_stamp().to_double() /
 			    1000 << ": Hub[" << local_id << "], Port[" << i
 			    << "], Received flit: " << received_flit << endl;
@@ -59,7 +59,7 @@ void NoximHub::rxProcess()
 
 
 
-void NoximHub::txProcess()
+void Hub::txProcess()
 {
     if (reset.read()) 
     {
@@ -80,7 +80,7 @@ void NoximHub::txProcess()
 	    {
 		// TODO: put code to handle TLM transmission
 		//
-		NoximFlit flit = buffer[i].Front();
+		Flit flit = buffer[i].Front();
 
 		// TODO: replace
 		int o = 0;
@@ -90,7 +90,7 @@ void NoximHub::txProcess()
 		    if (reservation_table.isAvailable(o)) 
 		    {
 			reservation_table.reserve(i, o);
-			if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) 
+			if (GlobalParams::verbose_mode > VERBOSE_OFF) 
 			{
 			    cout << sc_time_stamp().to_double() / 1000 << ": Hub[" << local_id
 				<< "], Port[" << i << "] (" << buffer[i].  Size() << " flits)" << ", reserved Output["
@@ -107,7 +107,7 @@ void NoximHub::txProcess()
 	{
 	    if (!buffer[i].IsEmpty()) 
 	    {
-		NoximFlit flit = buffer[i].Front();
+		Flit flit = buffer[i].Front();
 
 		int o = reservation_table.getOutputPort(i);
 		if (o != NOT_RESERVED) 

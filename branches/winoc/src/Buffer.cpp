@@ -8,9 +8,9 @@
  * This file contains the implementation of the buffer
  */
 
-#include "NoximBuffer.h"
+#include "Buffer.h"
 
-NoximBuffer::NoximBuffer()
+Buffer::Buffer()
 {
   SetMaxBufferSize(DEFAULT_BUFFER_DEPTH);
   max_occupancy = 0;
@@ -22,44 +22,44 @@ NoximBuffer::NoximBuffer()
   true_buffer = true;
 }
 
-void NoximBuffer::Disable()
+void Buffer::Disable()
 {
   true_buffer = false;
 }
 
-void NoximBuffer::SetMaxBufferSize(const unsigned int bms)
+void Buffer::SetMaxBufferSize(const unsigned int bms)
 {
   assert(bms > 0);
 
   max_buffer_size = bms;
 }
 
-unsigned int NoximBuffer::GetMaxBufferSize() const
+unsigned int Buffer::GetMaxBufferSize() const
 {
   return max_buffer_size;
 }
 
-bool NoximBuffer::IsFull() const
+bool Buffer::IsFull() const
 {
   return buffer.size() == max_buffer_size;
 }
 
-bool NoximBuffer::IsEmpty() const
+bool Buffer::IsEmpty() const
 {
   return buffer.size() == 0;
 }
 
-void NoximBuffer::Drop(const NoximFlit & flit) const
+void Buffer::Drop(const Flit & flit) const
 {
   assert(false);
 }
 
-void NoximBuffer::Empty() const
+void Buffer::Empty() const
 {
   assert(false);
 }
 
-void NoximBuffer::Push(const NoximFlit & flit)
+void Buffer::Push(const Flit & flit)
 {
   SaveOccupancyAndTime();
 
@@ -74,9 +74,9 @@ void NoximBuffer::Push(const NoximFlit & flit)
     max_occupancy = buffer.size();
 }
 
-NoximFlit NoximBuffer::Pop()
+Flit Buffer::Pop()
 {
-  NoximFlit f;
+  Flit f;
 
   SaveOccupancyAndTime();
 
@@ -92,9 +92,9 @@ NoximFlit NoximBuffer::Pop()
   return f;
 }
 
-NoximFlit NoximBuffer::Front() const
+Flit Buffer::Front() const
 {
-  NoximFlit f;
+  Flit f;
 
   if (IsEmpty())
     Empty();
@@ -104,27 +104,27 @@ NoximFlit NoximBuffer::Front() const
   return f;
 }
 
-unsigned int NoximBuffer::Size() const
+unsigned int Buffer::Size() const
 {
   return buffer.size();
 }
 
-unsigned int NoximBuffer::getCurrentFreeSlots() const
+unsigned int Buffer::getCurrentFreeSlots() const
 {
   return (GetMaxBufferSize() - Size());
 }
 
-void NoximBuffer::SaveOccupancyAndTime()
+void Buffer::SaveOccupancyAndTime()
 {
   previous_occupancy = buffer.size();
   hold_time = (sc_time_stamp().to_double() / 1000) - last_event;
   last_event = sc_time_stamp().to_double() / 1000;
 }
 
-void NoximBuffer::UpdateMeanOccupancy()
+void Buffer::UpdateMeanOccupancy()
 {
   double current_time = sc_time_stamp().to_double() / 1000;
-  if (current_time - DEFAULT_RESET_TIME < NoximGlobalParams::stats_warm_up_time)
+  if (current_time - DEFAULT_RESET_TIME < GlobalParams::stats_warm_up_time)
     return;
 
   mean_occupancy = mean_occupancy * (hold_time_sum/(hold_time_sum+hold_time)) +
@@ -133,7 +133,7 @@ void NoximBuffer::UpdateMeanOccupancy()
   hold_time_sum += hold_time;
 }
 
-void NoximBuffer::ShowStats(std::ostream & out)
+void Buffer::ShowStats(std::ostream & out)
 {
   if (true_buffer)
     out << "\t" << mean_occupancy << "\t" << max_occupancy;

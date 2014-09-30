@@ -101,8 +101,8 @@ using namespace std;
 
 typedef unsigned int uint;
 
-// NoximGlobalParams -- used to forward configuration to every sub-block
-struct NoximGlobalParams {
+// GlobalParams -- used to forward configuration to every sub-block
+struct GlobalParams {
     static int verbose_mode;
     static int trace_mode;
     static char trace_filename[128];
@@ -133,31 +133,31 @@ struct NoximGlobalParams {
     static char winoc_cfg_fname[128];
 };
 
-// NoximCoord -- XY coordinates type of the Tile inside the Mesh
-class NoximCoord {
+// Coord -- XY coordinates type of the Tile inside the Mesh
+class Coord {
   public:
     int x;			// X coordinate
     int y;			// Y coordinate
 
-    inline bool operator ==(const NoximCoord & coord) const {
+    inline bool operator ==(const Coord & coord) const {
 	return (coord.x == x && coord.y == y);
 }};
 
-// NoximFlitType -- Flit type enumeration
-enum NoximFlitType {
+// FlitType -- Flit type enumeration
+enum FlitType {
     FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL
 };
 
-// NoximPayload -- Payload definition
-struct NoximPayload {
+// Payload -- Payload definition
+struct Payload {
     sc_uint<32> data;	// Bus for the data to be exchanged
 
-    inline bool operator ==(const NoximPayload & payload) const {
+    inline bool operator ==(const Payload & payload) const {
 	return (payload.data == data);
 }};
 
-// NoximPacket -- Packet definition
-struct NoximPacket {
+// Packet -- Packet definition
+struct Packet {
     int src_id;
     int dst_id;
     double timestamp;		// SC timestamp at packet generation
@@ -166,9 +166,9 @@ struct NoximPacket {
     bool use_low_voltage_path;
 
     // Constructors
-    NoximPacket() { }
+    Packet() { }
 
-    NoximPacket(const int s, const int d, const double ts, const int sz) {
+    Packet(const int s, const int d, const double ts, const int sz) {
 	make(s, d, ts, sz);
     }
 
@@ -182,28 +182,28 @@ struct NoximPacket {
     }
 };
 
-// NoximRouteData -- data required to perform routing
-struct NoximRouteData {
+// RouteData -- data required to perform routing
+struct RouteData {
     int current_id;
     int src_id;
     int dst_id;
     int dir_in;			// direction from which the packet comes from
 };
 
-struct NoximChannelStatus {
+struct ChannelStatus {
     int free_slots;		// occupied buffer slots
     bool available;		// 
-    inline bool operator ==(const NoximChannelStatus & bs) const {
+    inline bool operator ==(const ChannelStatus & bs) const {
 	return (free_slots == bs.free_slots && available == bs.available);
     };
 };
 
-// NoximNoP_data -- NoP Data definition
-struct NoximNoP_data {
+// NoP_data -- NoP Data definition
+struct NoP_data {
     int sender_id;
-    NoximChannelStatus channel_status_neighbor[DIRECTIONS];
+    ChannelStatus channel_status_neighbor[DIRECTIONS];
 
-    inline bool operator ==(const NoximNoP_data & nop_data) const {
+    inline bool operator ==(const NoP_data & nop_data) const {
 	return (sender_id == nop_data.sender_id &&
 		nop_data.channel_status_neighbor[0] ==
 		channel_status_neighbor[0]
@@ -216,18 +216,18 @@ struct NoximNoP_data {
     };
 };
 
-// NoximFlit -- Flit definition
-struct NoximFlit {
+// Flit -- Flit definition
+struct Flit {
     int src_id;
     int dst_id;
-    NoximFlitType flit_type;	// The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
+    FlitType flit_type;	// The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
     int sequence_no;		// The sequence number of the flit inside the packet
-    NoximPayload payload;	// Optional payload
+    Payload payload;	// Optional payload
     double timestamp;		// Unix timestamp at packet generation
     int hop_no;			// Current number of hops from source to destination
     bool use_low_voltage_path;
 
-    inline bool operator ==(const NoximFlit & flit) const {
+    inline bool operator ==(const Flit & flit) const {
 	return (flit.src_id == src_id && flit.dst_id == dst_id
 		&& flit.flit_type == flit_type
 		&& flit.sequence_no == sequence_no
@@ -238,10 +238,10 @@ struct NoximFlit {
 
 // Output overloading
 
-inline ostream & operator <<(ostream & os, const NoximFlit & flit)
+inline ostream & operator <<(ostream & os, const Flit & flit)
 {
 
-    if (NoximGlobalParams::verbose_mode == VERBOSE_HIGH) {
+    if (GlobalParams::verbose_mode == VERBOSE_HIGH) {
 
 	os << "### FLIT ###" << endl;
 	os << "Source Tile[" << flit.src_id << "]" << endl;
@@ -284,7 +284,7 @@ inline ostream & operator <<(ostream & os, const NoximFlit & flit)
 }
 
 inline ostream & operator <<(ostream & os,
-			     const NoximChannelStatus & status)
+			     const ChannelStatus & status)
 {
     char msg;
     if (status.available)
@@ -295,7 +295,7 @@ inline ostream & operator <<(ostream & os,
     return os;
 }
 
-inline ostream & operator <<(ostream & os, const NoximNoP_data & NoP_data)
+inline ostream & operator <<(ostream & os, const NoP_data & NoP_data)
 {
     os << "      NoP data from [" << NoP_data.sender_id << "] [ ";
 
@@ -306,7 +306,7 @@ inline ostream & operator <<(ostream & os, const NoximNoP_data & NoP_data)
     return os;
 }
 
-inline ostream & operator <<(ostream & os, const NoximCoord & coord)
+inline ostream & operator <<(ostream & os, const Coord & coord)
 {
     os << "(" << coord.x << "," << coord.y << ")";
 
@@ -315,7 +315,7 @@ inline ostream & operator <<(ostream & os, const NoximCoord & coord)
 
 // Trace overloading
 
-inline void sc_trace(sc_trace_file * &tf, const NoximFlit & flit, string & name)
+inline void sc_trace(sc_trace_file * &tf, const Flit & flit, string & name)
 {
     sc_trace(tf, flit.src_id, name + ".src_id");
     sc_trace(tf, flit.dst_id, name + ".dst_id");
@@ -324,12 +324,12 @@ inline void sc_trace(sc_trace_file * &tf, const NoximFlit & flit, string & name)
     sc_trace(tf, flit.hop_no, name + ".hop_no");
 }
 
-inline void sc_trace(sc_trace_file * &tf, const NoximNoP_data & NoP_data, string & name)
+inline void sc_trace(sc_trace_file * &tf, const NoP_data & NoP_data, string & name)
 {
     sc_trace(tf, NoP_data.sender_id, name + ".sender_id");
 }
 
-inline void sc_trace(sc_trace_file * &tf, const NoximChannelStatus & bs, string & name)
+inline void sc_trace(sc_trace_file * &tf, const ChannelStatus & bs, string & name)
 {
     sc_trace(tf, bs.free_slots, name + ".free_slots");
     sc_trace(tf, bs.available, name + ".available");
@@ -337,24 +337,24 @@ inline void sc_trace(sc_trace_file * &tf, const NoximChannelStatus & bs, string 
 
 // Misc common functions
 
-inline NoximCoord id2Coord(int id)
+inline Coord id2Coord(int id)
 {
-    NoximCoord coord;
+    Coord coord;
 
-    coord.x = id % NoximGlobalParams::mesh_dim_x;
-    coord.y = id / NoximGlobalParams::mesh_dim_x;
+    coord.x = id % GlobalParams::mesh_dim_x;
+    coord.y = id / GlobalParams::mesh_dim_x;
 
-    assert(coord.x < NoximGlobalParams::mesh_dim_x);
-    assert(coord.y < NoximGlobalParams::mesh_dim_y);
+    assert(coord.x < GlobalParams::mesh_dim_x);
+    assert(coord.y < GlobalParams::mesh_dim_y);
 
     return coord;
 }
 
-inline int coord2Id(const NoximCoord & coord)
+inline int coord2Id(const Coord & coord)
 {
-    int id = (coord.y * NoximGlobalParams::mesh_dim_x) + coord.x;
+    int id = (coord.y * GlobalParams::mesh_dim_x) + coord.x;
 
-    assert(id < NoximGlobalParams::mesh_dim_x * NoximGlobalParams::mesh_dim_y);
+    assert(id < GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y);
 
     return id;
 }

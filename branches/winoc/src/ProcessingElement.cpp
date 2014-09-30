@@ -8,23 +8,23 @@
  * This file contains the implementation of the processing element
  */
 
-#include "NoximProcessingElement.h"
+#include "ProcessingElement.h"
 
-int NoximProcessingElement::randInt(int min, int max)
+int ProcessingElement::randInt(int min, int max)
 {
     return min +
 	(int) ((double) (max - min + 1) * rand() / (RAND_MAX + 1.0));
 }
 
-void NoximProcessingElement::rxProcess()
+void ProcessingElement::rxProcess()
 {
     if (reset.read()) {
 	ack_rx.write(0);
 	current_level_rx = 0;
     } else {
 	if (req_rx.read() == 1 - current_level_rx) {
-	    NoximFlit flit_tmp = flit_rx.read();
-	    if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) {
+	    Flit flit_tmp = flit_rx.read();
+	    if (GlobalParams::verbose_mode > VERBOSE_OFF) {
 		cout << sc_simulation_time() << ": ProcessingElement[" <<
 		    local_id << "] RECEIVING " << flit_tmp << endl;
 	    }
@@ -34,14 +34,14 @@ void NoximProcessingElement::rxProcess()
     }
 }
 
-void NoximProcessingElement::txProcess()
+void ProcessingElement::txProcess()
 {
     if (reset.read()) {
 	req_tx.write(0);
 	current_level_tx = 0;
 	transmittedAtPreviousCycle = false;
     } else {
-	NoximPacket packet;
+	Packet packet;
 
 	if (canShot(packet)) {
 	    packet_queue.push(packet);
@@ -52,8 +52,8 @@ void NoximProcessingElement::txProcess()
 
 	if (ack_tx.read() == current_level_tx) {
 	    if (!packet_queue.empty()) {
-		NoximFlit flit = nextFlit();	// Generate a new flit
-		if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) {
+		Flit flit = nextFlit();	// Generate a new flit
+		if (GlobalParams::verbose_mode > VERBOSE_OFF) {
 		    cout << sc_time_stamp().to_double() /
 			1000 << ": ProcessingElement[" << local_id <<
 			"] SENDING " << flit << endl;
@@ -66,10 +66,10 @@ void NoximProcessingElement::txProcess()
     }
 }
 
-NoximFlit NoximProcessingElement::nextFlit()
+Flit ProcessingElement::nextFlit()
 {
-    NoximFlit flit;
-    NoximPacket packet = packet_queue.front();
+    Flit flit;
+    Packet packet = packet_queue.front();
 
     flit.src_id = packet.src_id;
     flit.dst_id = packet.dst_id;
@@ -93,20 +93,20 @@ NoximFlit NoximProcessingElement::nextFlit()
     return flit;
 }
 
-bool NoximProcessingElement::canShot(NoximPacket & packet)
+bool ProcessingElement::canShot(Packet & packet)
 {
     bool shot;
     double threshold;
 
-    if (NoximGlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED) {
+    if (GlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED) {
 	if (!transmittedAtPreviousCycle)
-	    threshold = NoximGlobalParams::packet_injection_rate;
+	    threshold = GlobalParams::packet_injection_rate;
 	else
-	    threshold = NoximGlobalParams::probability_of_retransmission;
+	    threshold = GlobalParams::probability_of_retransmission;
 
 	shot = (((double) rand()) / RAND_MAX < threshold);
 	if (shot) {
-	    switch (NoximGlobalParams::traffic_distribution) {
+	    switch (GlobalParams::traffic_distribution) {
 	    case TRAFFIC_RANDOM:
 		packet = trafficRandom();
 		break;
@@ -165,15 +165,15 @@ bool NoximProcessingElement::canShot(NoximPacket & packet)
     return shot;
 }
 
-void NoximProcessingElement::setUseLowVoltagePath(NoximPacket& packet)
+void ProcessingElement::setUseLowVoltagePath(Packet& packet)
 {
-  if (NoximGlobalParams::qos < 1.0)
+  if (GlobalParams::qos < 1.0)
     {
       double rnd = (double)rand() / (double)RAND_MAX;
 
-      packet.use_low_voltage_path = (rnd >= NoximGlobalParams::qos);
+      packet.use_low_voltage_path = (rnd >= GlobalParams::qos);
       /*
-      if (rnd >= NoximGlobalParams::qos)
+      if (rnd >= GlobalParams::qos)
 	packet.use_low_voltage_path = true;
       else
 	packet.use_low_voltage_path = false;
@@ -183,9 +183,9 @@ void NoximProcessingElement::setUseLowVoltagePath(NoximPacket& packet)
     packet.use_low_voltage_path = false;
 }
 
-NoximPacket NoximProcessingElement::trafficRandom()
+Packet ProcessingElement::trafficRandom()
 {
-    NoximPacket p;
+    Packet p;
     p.src_id = local_id;
     double rnd = rand() / (double) RAND_MAX;
     double range_start = 0.0;
@@ -193,7 +193,7 @@ NoximPacket NoximProcessingElement::trafficRandom()
     //cout << "\n " << sc_time_stamp().to_double()/1000 << " PE " << local_id << " rnd = " << rnd << endl;
 
     int max_id =
-	(NoximGlobalParams::mesh_dim_x * NoximGlobalParams::mesh_dim_y) -
+	(GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) -
 	1;
 
     // Random destination distribution
@@ -201,19 +201,19 @@ NoximPacket NoximProcessingElement::trafficRandom()
 	p.dst_id = randInt(0, max_id);
 
 	// check for hotspot destination
-	for (uint i = 0; i < NoximGlobalParams::hotspots.size(); i++) {
-	    //cout << sc_time_stamp().to_double()/1000 << " PE " << local_id << " Checking node " << NoximGlobalParams::hotspots[i].first << " with P = " << NoximGlobalParams::hotspots[i].second << endl;
+	for (uint i = 0; i < GlobalParams::hotspots.size(); i++) {
+	    //cout << sc_time_stamp().to_double()/1000 << " PE " << local_id << " Checking node " << GlobalParams::hotspots[i].first << " with P = " << GlobalParams::hotspots[i].second << endl;
 
 	    if (rnd >= range_start
 		&& rnd <
-		range_start + NoximGlobalParams::hotspots[i].second) {
-		if (local_id != NoximGlobalParams::hotspots[i].first) {
+		range_start + GlobalParams::hotspots[i].second) {
+		if (local_id != GlobalParams::hotspots[i].first) {
 		    //cout << sc_time_stamp().to_double()/1000 << " PE " << local_id <<" That is ! " << endl;
-		    p.dst_id = NoximGlobalParams::hotspots[i].first;
+		    p.dst_id = GlobalParams::hotspots[i].first;
 		}
 		break;
 	    } else
-		range_start += NoximGlobalParams::hotspots[i].second;	// try next
+		range_start += GlobalParams::hotspots[i].second;	// try next
 	}
     } while (p.dst_id == p.src_id);
 
@@ -223,17 +223,17 @@ NoximPacket NoximProcessingElement::trafficRandom()
     return p;
 }
 
-NoximPacket NoximProcessingElement::trafficTranspose1()
+Packet ProcessingElement::trafficTranspose1()
 {
-    NoximPacket p;
+    Packet p;
     p.src_id = local_id;
-    NoximCoord src, dst;
+    Coord src, dst;
 
     // Transpose 1 destination distribution
     src.x = id2Coord(p.src_id).x;
     src.y = id2Coord(p.src_id).y;
-    dst.x = NoximGlobalParams::mesh_dim_x - 1 - src.y;
-    dst.y = NoximGlobalParams::mesh_dim_y - 1 - src.x;
+    dst.x = GlobalParams::mesh_dim_x - 1 - src.y;
+    dst.y = GlobalParams::mesh_dim_y - 1 - src.x;
     fixRanges(src, dst);
     p.dst_id = coord2Id(dst);
 
@@ -243,11 +243,11 @@ NoximPacket NoximProcessingElement::trafficTranspose1()
     return p;
 }
 
-NoximPacket NoximProcessingElement::trafficTranspose2()
+Packet ProcessingElement::trafficTranspose2()
 {
-    NoximPacket p;
+    Packet p;
     p.src_id = local_id;
-    NoximCoord src, dst;
+    Coord src, dst;
 
     // Transpose 2 destination distribution
     src.x = id2Coord(p.src_id).x;
@@ -263,7 +263,7 @@ NoximPacket NoximProcessingElement::trafficTranspose2()
     return p;
 }
 
-void NoximProcessingElement::setBit(int &x, int w, int v)
+void ProcessingElement::setBit(int &x, int w, int v)
 {
     int mask = 1 << w;
 
@@ -275,29 +275,29 @@ void NoximProcessingElement::setBit(int &x, int w, int v)
 	assert(false);
 }
 
-int NoximProcessingElement::getBit(int x, int w)
+int ProcessingElement::getBit(int x, int w)
 {
     return (x >> w) & 1;
 }
 
-inline double NoximProcessingElement::log2ceil(double x)
+inline double ProcessingElement::log2ceil(double x)
 {
     return ceil(log(x) / log(2.0));
 }
 
-NoximPacket NoximProcessingElement::trafficBitReversal()
+Packet ProcessingElement::trafficBitReversal()
 {
 
     int nbits =
 	(int)
 	log2ceil((double)
-		 (NoximGlobalParams::mesh_dim_x *
-		  NoximGlobalParams::mesh_dim_y));
+		 (GlobalParams::mesh_dim_x *
+		  GlobalParams::mesh_dim_y));
     int dnode = 0;
     for (int i = 0; i < nbits; i++)
 	setBit(dnode, i, getBit(local_id, nbits - i - 1));
 
-    NoximPacket p;
+    Packet p;
     p.src_id = local_id;
     p.dst_id = dnode;
 
@@ -307,20 +307,20 @@ NoximPacket NoximProcessingElement::trafficBitReversal()
     return p;
 }
 
-NoximPacket NoximProcessingElement::trafficShuffle()
+Packet ProcessingElement::trafficShuffle()
 {
 
     int nbits =
 	(int)
 	log2ceil((double)
-		 (NoximGlobalParams::mesh_dim_x *
-		  NoximGlobalParams::mesh_dim_y));
+		 (GlobalParams::mesh_dim_x *
+		  GlobalParams::mesh_dim_y));
     int dnode = 0;
     for (int i = 0; i < nbits - 1; i++)
 	setBit(dnode, i + 1, getBit(local_id, i));
     setBit(dnode, 0, getBit(local_id, nbits - 1));
 
-    NoximPacket p;
+    Packet p;
     p.src_id = local_id;
     p.dst_id = dnode;
 
@@ -330,21 +330,21 @@ NoximPacket NoximProcessingElement::trafficShuffle()
     return p;
 }
 
-NoximPacket NoximProcessingElement::trafficButterfly()
+Packet ProcessingElement::trafficButterfly()
 {
 
     int nbits =
 	(int)
 	log2ceil((double)
-		 (NoximGlobalParams::mesh_dim_x *
-		  NoximGlobalParams::mesh_dim_y));
+		 (GlobalParams::mesh_dim_x *
+		  GlobalParams::mesh_dim_y));
     int dnode = 0;
     for (int i = 1; i < nbits - 1; i++)
 	setBit(dnode, i, getBit(local_id, i));
     setBit(dnode, 0, getBit(local_id, nbits - 1));
     setBit(dnode, nbits - 1, getBit(local_id, 0));
 
-    NoximPacket p;
+    Packet p;
     p.src_id = local_id;
     p.dst_id = dnode;
 
@@ -354,22 +354,22 @@ NoximPacket NoximProcessingElement::trafficButterfly()
     return p;
 }
 
-void NoximProcessingElement::fixRanges(const NoximCoord src,
-				       NoximCoord & dst)
+void ProcessingElement::fixRanges(const Coord src,
+				       Coord & dst)
 {
     // Fix ranges
     if (dst.x < 0)
 	dst.x = 0;
     if (dst.y < 0)
 	dst.y = 0;
-    if (dst.x >= NoximGlobalParams::mesh_dim_x)
-	dst.x = NoximGlobalParams::mesh_dim_x - 1;
-    if (dst.y >= NoximGlobalParams::mesh_dim_y)
-	dst.y = NoximGlobalParams::mesh_dim_y - 1;
+    if (dst.x >= GlobalParams::mesh_dim_x)
+	dst.x = GlobalParams::mesh_dim_x - 1;
+    if (dst.y >= GlobalParams::mesh_dim_y)
+	dst.y = GlobalParams::mesh_dim_y - 1;
 }
 
-int NoximProcessingElement::getRandomSize()
+int ProcessingElement::getRandomSize()
 {
-    return randInt(NoximGlobalParams::min_packet_size,
-		   NoximGlobalParams::max_packet_size);
+    return randInt(GlobalParams::min_packet_size,
+		   GlobalParams::max_packet_size);
 }

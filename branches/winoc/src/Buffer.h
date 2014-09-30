@@ -13,16 +13,16 @@
 
 #include <cassert>
 #include <queue>
-#include "NoximMain.h"
+#include "Main.h"
 using namespace std;
 
-class NoximBuffer {
+class Buffer {
 
   public:
 
-    NoximBuffer();
+    Buffer();
 
-    virtual ~ NoximBuffer() {
+    virtual ~ Buffer() {
     } void SetMaxBufferSize(const unsigned int bms);	// Set buffer max size (in flits)
 
     unsigned int GetMaxBufferSize() const;	// Get max buffer size
@@ -33,15 +33,15 @@ class NoximBuffer {
 
     bool IsEmpty() const;	// Returns true if buffer is empty
 
-    virtual void Drop(const NoximFlit & flit) const;	// Called by Push() when buffer is full
+    virtual void Drop(const Flit & flit) const;	// Called by Push() when buffer is full
 
     virtual void Empty() const;	// Called by Pop() when buffer is empty
 
-    void Push(const NoximFlit & flit);	// Push a flit. Calls Drop method if buffer is full
+    void Push(const Flit & flit);	// Push a flit. Calls Drop method if buffer is full
 
-    NoximFlit Pop();		// Pop a flit
+    Flit Pop();		// Pop a flit
 
-    NoximFlit Front() const;	// Return a copy of the first flit in the buffer
+    Flit Front() const;	// Return a copy of the first flit in the buffer
 
     unsigned int Size() const;
 
@@ -55,7 +55,7 @@ class NoximBuffer {
 
     unsigned int max_buffer_size;
 
-    queue < NoximFlit > buffer;
+    queue < Flit > buffer;
 
     int    max_occupancy;
     double hold_time, last_event, hold_time_sum;

@@ -12,15 +12,15 @@
 #define __NOXIMNOC_H__
 
 #include <systemc.h>
-#include "NoximTile.h"
-#include "NoximGlobalRoutingTable.h"
-#include "NoximGlobalTrafficTable.h"
-#include "NoximHub.h"
+#include "Tile.h"
+#include "GlobalRoutingTable.h"
+#include "GlobalTrafficTable.h"
+#include "Hub.h"
 #include "Bus.h"
 
 using namespace std;
 
-SC_MODULE(NoximNoC)
+SC_MODULE(NoC)
 {
 
     // I/O Ports
@@ -39,10 +39,10 @@ SC_MODULE(NoximNoC)
     sc_signal <bool> ack_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
 
 
-    sc_signal <NoximFlit> flit_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <NoximFlit> flit_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <NoximFlit> flit_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <NoximFlit> flit_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <Flit> flit_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <Flit> flit_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <Flit> flit_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <Flit> flit_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
 
     sc_signal <int> free_slots_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
     sc_signal <int> free_slots_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
@@ -52,28 +52,28 @@ SC_MODULE(NoximNoC)
     // Wireless Hub
     sc_signal <bool> req_to_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
     sc_signal <bool> ack_to_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <NoximFlit> flit_to_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <Flit> flit_to_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
 
     sc_signal <bool> req_from_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
     sc_signal <bool> ack_from_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <NoximFlit> flit_from_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <Flit> flit_from_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
 
     // NoP
-    sc_signal <NoximNoP_data> NoP_data_to_east[MAX_STATIC_DIM][MAX_STATIC_DIM];
-    sc_signal <NoximNoP_data> NoP_data_to_west[MAX_STATIC_DIM][MAX_STATIC_DIM];
-    sc_signal <NoximNoP_data> NoP_data_to_south[MAX_STATIC_DIM][MAX_STATIC_DIM];
-    sc_signal <NoximNoP_data> NoP_data_to_north[MAX_STATIC_DIM][MAX_STATIC_DIM];
+    sc_signal <NoP_data> NoP_data_to_east[MAX_STATIC_DIM][MAX_STATIC_DIM];
+    sc_signal <NoP_data> NoP_data_to_west[MAX_STATIC_DIM][MAX_STATIC_DIM];
+    sc_signal <NoP_data> NoP_data_to_south[MAX_STATIC_DIM][MAX_STATIC_DIM];
+    sc_signal <NoP_data> NoP_data_to_north[MAX_STATIC_DIM][MAX_STATIC_DIM];
 
     // Matrix of tiles
-    NoximTile *t[MAX_STATIC_DIM][MAX_STATIC_DIM];
+    Tile *t[MAX_STATIC_DIM][MAX_STATIC_DIM];
     
-    NoximHub *h[MAX_HUBS];
+    Hub *h[MAX_HUBS];
 
     Bus* bus;
 
     // Global tables
-    NoximGlobalRoutingTable grtable;
-    NoximGlobalTrafficTable gttable;
+    GlobalRoutingTable grtable;
+    GlobalTrafficTable gttable;
 
     //---------- Mau experiment <start>
     void flitsMonitor() {
@@ -83,8 +83,8 @@ SC_MODULE(NoximNoC)
 	    //        return;
 
 	    unsigned int count = 0;
-	    for (int i = 0; i < NoximGlobalParams::mesh_dim_x; i++)
-		for (int j = 0; j < NoximGlobalParams::mesh_dim_y; j++)
+	    for (int i = 0; i < GlobalParams::mesh_dim_x; i++)
+		for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
 		    count += t[i][j]->r->getFlitsCount();
 	    cout << count << endl;
 	}
@@ -93,7 +93,7 @@ SC_MODULE(NoximNoC)
 
     // Constructor
 
-    SC_CTOR(NoximNoC) {
+    SC_CTOR(NoC) {
 
 	//---------- Mau experiment <start>
 	/*
@@ -108,7 +108,7 @@ SC_MODULE(NoximNoC)
     }
 
     // Support methods
-    NoximTile *searchNode(const int id) const;
+    Tile *searchNode(const int id) const;
 
   private:
 

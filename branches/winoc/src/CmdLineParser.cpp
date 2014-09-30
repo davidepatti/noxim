@@ -8,7 +8,7 @@
  * This file contains the implementation of the command line parser
  */
 
-#include "NoximCmdLineParser.h"
+#include "CmdLineParser.h"
 
 void showHelp(char selfname[])
 {
@@ -125,96 +125,96 @@ void showHelp(char selfname[])
 void showConfig()
 {
     cout << "Using the following configuration: " << endl;
-    cout << "- verbose_mode = " << NoximGlobalParams::verbose_mode << endl;
-    cout << "- trace_mode = " << NoximGlobalParams::trace_mode << endl;
-    //  cout << "- trace_filename = " << NoximGlobalParams::trace_filename << endl;
-    cout << "- mesh_dim_x = " << NoximGlobalParams::mesh_dim_x << endl;
-    cout << "- mesh_dim_y = " << NoximGlobalParams::mesh_dim_y << endl;
-    cout << "- buffer_depth = " << NoximGlobalParams::buffer_depth << endl;
-    cout << "- max_packet_size = " << NoximGlobalParams::
+    cout << "- verbose_mode = " << GlobalParams::verbose_mode << endl;
+    cout << "- trace_mode = " << GlobalParams::trace_mode << endl;
+    //  cout << "- trace_filename = " << GlobalParams::trace_filename << endl;
+    cout << "- mesh_dim_x = " << GlobalParams::mesh_dim_x << endl;
+    cout << "- mesh_dim_y = " << GlobalParams::mesh_dim_y << endl;
+    cout << "- buffer_depth = " << GlobalParams::buffer_depth << endl;
+    cout << "- max_packet_size = " << GlobalParams::
 	max_packet_size << endl;
-    cout << "- routing_algorithm = " << NoximGlobalParams::
+    cout << "- routing_algorithm = " << GlobalParams::
 	routing_algorithm << endl;
-    //  cout << "- routing_table_filename = " << NoximGlobalParams::routing_table_filename << endl;
-    cout << "- selection_strategy = " << NoximGlobalParams::
+    //  cout << "- routing_table_filename = " << GlobalParams::routing_table_filename << endl;
+    cout << "- selection_strategy = " << GlobalParams::
 	selection_strategy << endl;
-    cout << "- packet_injection_rate = " << NoximGlobalParams::
+    cout << "- packet_injection_rate = " << GlobalParams::
 	packet_injection_rate << endl;
-    cout << "- probability_of_retransmission = " << NoximGlobalParams::
+    cout << "- probability_of_retransmission = " << GlobalParams::
 	probability_of_retransmission << endl;
-    cout << "- traffic_distribution = " << NoximGlobalParams::
+    cout << "- traffic_distribution = " << GlobalParams::
 	traffic_distribution << endl;
-    cout << "- simulation_time = " << NoximGlobalParams::
+    cout << "- simulation_time = " << GlobalParams::
 	simulation_time << endl;
-    cout << "- stats_warm_up_time = " << NoximGlobalParams::
+    cout << "- stats_warm_up_time = " << GlobalParams::
 	stats_warm_up_time << endl;
-    cout << "- rnd_generator_seed = " << NoximGlobalParams::
+    cout << "- rnd_generator_seed = " << GlobalParams::
 	rnd_generator_seed << endl;
 }
 
 void checkInputParameters()
 {
-    if (NoximGlobalParams::mesh_dim_x <= 1) {
+    if (GlobalParams::mesh_dim_x <= 1) {
 	cerr << "Error: dimx must be greater than 1" << endl;
 	exit(1);
     }
 
-    if (NoximGlobalParams::mesh_dim_y <= 1) {
+    if (GlobalParams::mesh_dim_y <= 1) {
 	cerr << "Error: dimy must be greater than 1" << endl;
 	exit(1);
     }
 
-    if (NoximGlobalParams::buffer_depth < 1) {
+    if (GlobalParams::buffer_depth < 1) {
 	cerr << "Error: buffer must be >= 1" << endl;
 	exit(1);
     }
 
-    if (NoximGlobalParams::min_packet_size < 2 ||
-	NoximGlobalParams::max_packet_size < 2) {
+    if (GlobalParams::min_packet_size < 2 ||
+	GlobalParams::max_packet_size < 2) {
 	cerr << "Error: packet size must be >= 2" << endl;
 	exit(1);
     }
 
-    if (NoximGlobalParams::min_packet_size >
-	NoximGlobalParams::max_packet_size) {
+    if (GlobalParams::min_packet_size >
+	GlobalParams::max_packet_size) {
 	cerr << "Error: min packet size must be less than max packet size"
 	    << endl;
 	exit(1);
     }
 
-    if (NoximGlobalParams::routing_algorithm == INVALID_ROUTING) {
+    if (GlobalParams::routing_algorithm == INVALID_ROUTING) {
 	cerr << "Error: invalid routing algorithm" << endl;
 	exit(1);
     }
 
-    if (NoximGlobalParams::selection_strategy == INVALID_SELECTION) {
+    if (GlobalParams::selection_strategy == INVALID_SELECTION) {
 	cerr << "Error: invalid selection policy" << endl;
 	exit(1);
     }
 
-    if (NoximGlobalParams::packet_injection_rate <= 0.0 ||
-	NoximGlobalParams::packet_injection_rate > 1.0) {
+    if (GlobalParams::packet_injection_rate <= 0.0 ||
+	GlobalParams::packet_injection_rate > 1.0) {
 	cerr <<
 	    "Error: packet injection rate mmust be in the interval ]0,1]"
 	    << endl;
 	exit(1);
     }
 
-    if (NoximGlobalParams::traffic_distribution == INVALID_TRAFFIC) {
+    if (GlobalParams::traffic_distribution == INVALID_TRAFFIC) {
 	cerr << "Error: invalid traffic" << endl;
 	exit(1);
     }
 
-    for (unsigned int i = 0; i < NoximGlobalParams::hotspots.size(); i++) {
-	if (NoximGlobalParams::hotspots[i].first >=
-	    NoximGlobalParams::mesh_dim_x *
-	    NoximGlobalParams::mesh_dim_y) {
-	    cerr << "Error: hotspot node " << NoximGlobalParams::
+    for (unsigned int i = 0; i < GlobalParams::hotspots.size(); i++) {
+	if (GlobalParams::hotspots[i].first >=
+	    GlobalParams::mesh_dim_x *
+	    GlobalParams::mesh_dim_y) {
+	    cerr << "Error: hotspot node " << GlobalParams::
 		hotspots[i].first << " is invalid (out of range)" << endl;
 	    exit(1);
 	}
-	if (NoximGlobalParams::hotspots[i].second < 0.0
-	    && NoximGlobalParams::hotspots[i].second > 1.0) {
+	if (GlobalParams::hotspots[i].second < 0.0
+	    && GlobalParams::hotspots[i].second > 1.0) {
 	    cerr <<
 		"Error: hotspot percentage must be in the interval [0,1]"
 		<< endl;
@@ -222,29 +222,29 @@ void checkInputParameters()
 	}
     }
 
-    if (NoximGlobalParams::stats_warm_up_time < 0) {
+    if (GlobalParams::stats_warm_up_time < 0) {
 	cerr << "Error: warm-up time must be positive" << endl;
 	exit(1);
     }
 
-    if (NoximGlobalParams::simulation_time < 0) {
+    if (GlobalParams::simulation_time < 0) {
 	cerr << "Error: simulation time must be positive" << endl;
 	exit(1);
     }
 
-    if (NoximGlobalParams::stats_warm_up_time >
-	NoximGlobalParams::simulation_time) {
+    if (GlobalParams::stats_warm_up_time >
+	GlobalParams::simulation_time) {
 	cerr << "Error: warmup time must be less than simulation time" <<
 	    endl;
 	exit(1);
     }
 
-    if (NoximGlobalParams::qos < 1.0 && 
-	!NoximGlobalParams::low_power_link_strategy) {
+    if (GlobalParams::qos < 1.0 && 
+	!GlobalParams::low_power_link_strategy) {
       cerr << "Warning: it makes no sense using -qos without -lpls option enabled" << endl;
     }
 
-    if (NoximGlobalParams::qos > 1.0 || NoximGlobalParams::qos < 0.0) {
+    if (GlobalParams::qos > 1.0 || GlobalParams::qos < 0.0) {
 	cerr << "Error: qos must be in the range [0,1]" << endl;
 	exit(1);
     }
@@ -264,135 +264,135 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		showHelp(arg_vet[0]);
 		exit(0);
 	    } else if (!strcmp(arg_vet[i], "-verbose"))
-		NoximGlobalParams::verbose_mode = atoi(arg_vet[++i]);
+		GlobalParams::verbose_mode = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-trace")) {
-		NoximGlobalParams::trace_mode = true;
-		strcpy(NoximGlobalParams::trace_filename, arg_vet[++i]);
+		GlobalParams::trace_mode = true;
+		strcpy(GlobalParams::trace_filename, arg_vet[++i]);
 	    } else if (!strcmp(arg_vet[i], "-dimx"))
-		NoximGlobalParams::mesh_dim_x = atoi(arg_vet[++i]);
+		GlobalParams::mesh_dim_x = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-dimy"))
-		NoximGlobalParams::mesh_dim_y = atoi(arg_vet[++i]);
+		GlobalParams::mesh_dim_y = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-buffer"))
-		NoximGlobalParams::buffer_depth = atoi(arg_vet[++i]);
+		GlobalParams::buffer_depth = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-size")) {
-		NoximGlobalParams::min_packet_size = atoi(arg_vet[++i]);
-		NoximGlobalParams::max_packet_size = atoi(arg_vet[++i]);
+		GlobalParams::min_packet_size = atoi(arg_vet[++i]);
+		GlobalParams::max_packet_size = atoi(arg_vet[++i]);
 	    } else if (!strcmp(arg_vet[i], "-routing")) {
 		char *routing = arg_vet[++i];
 		if (!strcmp(routing, "xy"))
-		    NoximGlobalParams::routing_algorithm = ROUTING_XY;
+		    GlobalParams::routing_algorithm = ROUTING_XY;
 		else if (!strcmp(routing, "westfirst"))
-		    NoximGlobalParams::routing_algorithm =
+		    GlobalParams::routing_algorithm =
 			ROUTING_WEST_FIRST;
 		else if (!strcmp(routing, "northlast"))
-		    NoximGlobalParams::routing_algorithm =
+		    GlobalParams::routing_algorithm =
 			ROUTING_NORTH_LAST;
 		else if (!strcmp(routing, "negativefirst"))
-		    NoximGlobalParams::routing_algorithm =
+		    GlobalParams::routing_algorithm =
 			ROUTING_NEGATIVE_FIRST;
 		else if (!strcmp(routing, "oddeven"))
-		    NoximGlobalParams::routing_algorithm =
+		    GlobalParams::routing_algorithm =
 			ROUTING_ODD_EVEN;
 		else if (!strcmp(routing, "dyad")) {
-		    NoximGlobalParams::routing_algorithm = ROUTING_DYAD;
-		    NoximGlobalParams::dyad_threshold = atof(arg_vet[++i]);
+		    GlobalParams::routing_algorithm = ROUTING_DYAD;
+		    GlobalParams::dyad_threshold = atof(arg_vet[++i]);
 		} else if (!strcmp(routing, "fullyadaptive"))
-		    NoximGlobalParams::routing_algorithm =
+		    GlobalParams::routing_algorithm =
 			ROUTING_FULLY_ADAPTIVE;
 		else if (!strcmp(routing, "table")) {
-		    NoximGlobalParams::routing_algorithm =
+		    GlobalParams::routing_algorithm =
 			ROUTING_TABLE_BASED;
-		    strcpy(NoximGlobalParams::routing_table_filename,
+		    strcpy(GlobalParams::routing_table_filename,
 			   arg_vet[++i]);
-		    NoximGlobalParams::packet_injection_rate = 0;	// ??? why ???
+		    GlobalParams::packet_injection_rate = 0;	// ??? why ???
 		} else
-		    NoximGlobalParams::routing_algorithm = INVALID_ROUTING;
+		    GlobalParams::routing_algorithm = INVALID_ROUTING;
 	    } else if (!strcmp(arg_vet[i], "-sel")) {
 		char *selection = arg_vet[++i];
 		if (!strcmp(selection, "random"))
-		    NoximGlobalParams::selection_strategy = SEL_RANDOM;
+		    GlobalParams::selection_strategy = SEL_RANDOM;
 		else if (!strcmp(selection, "bufferlevel"))
-		    NoximGlobalParams::selection_strategy =
+		    GlobalParams::selection_strategy =
 			SEL_BUFFER_LEVEL;
 		else if (!strcmp(selection, "nop"))
-		    NoximGlobalParams::selection_strategy = SEL_NOP;
+		    GlobalParams::selection_strategy = SEL_NOP;
 		else
-		    NoximGlobalParams::selection_strategy =
+		    GlobalParams::selection_strategy =
 			INVALID_SELECTION;
 	    } else if (!strcmp(arg_vet[i], "-pir")) {
-		NoximGlobalParams::packet_injection_rate =
+		GlobalParams::packet_injection_rate =
 		    atof(arg_vet[++i]);
 		char *distribution = arg_vet[++i];
 		if (!strcmp(distribution, "poisson"))
-		    NoximGlobalParams::probability_of_retransmission =
-			NoximGlobalParams::packet_injection_rate;
+		    GlobalParams::probability_of_retransmission =
+			GlobalParams::packet_injection_rate;
 		else if (!strcmp(distribution, "burst")) {
 		    float burstness = atof(arg_vet[++i]);
-		    NoximGlobalParams::probability_of_retransmission =
-			NoximGlobalParams::packet_injection_rate / (1 -
+		    GlobalParams::probability_of_retransmission =
+			GlobalParams::packet_injection_rate / (1 -
 								    burstness);
 		} else if (!strcmp(distribution, "pareto")) {
 		    float Aon = atof(arg_vet[++i]);
 		    float Aoff = atof(arg_vet[++i]);
 		    float r = atof(arg_vet[++i]);
-		    NoximGlobalParams::probability_of_retransmission =
-			NoximGlobalParams::packet_injection_rate *
+		    GlobalParams::probability_of_retransmission =
+			GlobalParams::packet_injection_rate *
 			pow((1 - r), (1 / Aoff - 1 / Aon));
 		} else if (!strcmp(distribution, "custom"))
-		    NoximGlobalParams::probability_of_retransmission =
+		    GlobalParams::probability_of_retransmission =
 			atof(arg_vet[++i]);
 	    } else if (!strcmp(arg_vet[i], "-traffic")) {
 		char *traffic = arg_vet[++i];
 		if (!strcmp(traffic, "random"))
-		    NoximGlobalParams::traffic_distribution =
+		    GlobalParams::traffic_distribution =
 			TRAFFIC_RANDOM;
 		else if (!strcmp(traffic, "transpose1"))
-		    NoximGlobalParams::traffic_distribution =
+		    GlobalParams::traffic_distribution =
 			TRAFFIC_TRANSPOSE1;
 		else if (!strcmp(traffic, "transpose2"))
-		    NoximGlobalParams::traffic_distribution =
+		    GlobalParams::traffic_distribution =
 			TRAFFIC_TRANSPOSE2;
 		else if (!strcmp(traffic, "bitreversal"))
-		    NoximGlobalParams::traffic_distribution =
+		    GlobalParams::traffic_distribution =
 			TRAFFIC_BIT_REVERSAL;
 		else if (!strcmp(traffic, "butterfly"))
-		    NoximGlobalParams::traffic_distribution =
+		    GlobalParams::traffic_distribution =
 			TRAFFIC_BUTTERFLY;
 		else if (!strcmp(traffic, "shuffle"))
-		    NoximGlobalParams::traffic_distribution =
+		    GlobalParams::traffic_distribution =
 			TRAFFIC_SHUFFLE;
 		else if (!strcmp(traffic, "table")) {
-		    NoximGlobalParams::traffic_distribution =
+		    GlobalParams::traffic_distribution =
 			TRAFFIC_TABLE_BASED;
-		    strcpy(NoximGlobalParams::traffic_table_filename,
+		    strcpy(GlobalParams::traffic_table_filename,
 			   arg_vet[++i]);
 		} else
-		    NoximGlobalParams::traffic_distribution =
+		    GlobalParams::traffic_distribution =
 			INVALID_TRAFFIC;
 	    } else if (!strcmp(arg_vet[i], "-hs")) {
 		int node = atoi(arg_vet[++i]);
 		double percentage = atof(arg_vet[++i]);
 		pair < int, double >t(node, percentage);
-		NoximGlobalParams::hotspots.push_back(t);
+		GlobalParams::hotspots.push_back(t);
 	    } else if (!strcmp(arg_vet[i], "-warmup"))
-		NoximGlobalParams::stats_warm_up_time = atoi(arg_vet[++i]);
+		GlobalParams::stats_warm_up_time = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-seed"))
-		NoximGlobalParams::rnd_generator_seed = atoi(arg_vet[++i]);
+		GlobalParams::rnd_generator_seed = atoi(arg_vet[++i]);
  	    else if (!strcmp(arg_vet[i], "-detailed"))
-		NoximGlobalParams::detailed = true;
+		GlobalParams::detailed = true;
 	    else if (!strcmp(arg_vet[i], "-show_buf_stats"))
-		NoximGlobalParams::show_buffer_stats = true;
+		GlobalParams::show_buffer_stats = true;
 	    else if (!strcmp(arg_vet[i], "-volume"))
-		NoximGlobalParams::max_volume_to_be_drained =
+		GlobalParams::max_volume_to_be_drained =
 		    atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-sim"))
-		NoximGlobalParams::simulation_time = atoi(arg_vet[++i]);
+		GlobalParams::simulation_time = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-pwr"))
-	      strcpy(NoximGlobalParams::router_power_filename, arg_vet[++i]);
+	      strcpy(GlobalParams::router_power_filename, arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-lpls"))
-	      NoximGlobalParams::low_power_link_strategy = true;
+	      GlobalParams::low_power_link_strategy = true;
 	    else if (!strcmp(arg_vet[i], "-qos"))
-		NoximGlobalParams::qos = atof(arg_vet[++i]);
+		GlobalParams::qos = atof(arg_vet[++i]);
 	    else {
 		cerr << "Error: Invalid option: " << arg_vet[i] << endl;
 		exit(1);
@@ -403,6 +403,6 @@ void parseCmdLine(int arg_num, char *arg_vet[])
     checkInputParameters();
 
     // Show configuration
-    if (NoximGlobalParams::verbose_mode > VERBOSE_OFF)
+    if (GlobalParams::verbose_mode > VERBOSE_OFF)
 	showConfig();
 }

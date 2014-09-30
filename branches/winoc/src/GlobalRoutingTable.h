@@ -20,50 +20,50 @@
 #include <cstring>
 #include <cassert>
 #include <fstream>
-#include "NoximMain.h"
+#include "Main.h"
 using namespace std;
 
 // Pair of source, destination node
-typedef pair < int, int >NoximLinkId;
+typedef pair < int, int >LinkId;
 
 // Routing table
-typedef set < NoximLinkId > NoximAdmissibleOutputs;
+typedef set < LinkId > AdmissibleOutputs;
 
 // Map a destination to a set of admissible outputs
-typedef map < int, NoximAdmissibleOutputs > NoximRoutingTableLink;
+typedef map < int, AdmissibleOutputs > RoutingTableLink;
 
 // Map an input link to its routing table
-typedef map < NoximLinkId, NoximRoutingTableLink > NoximRoutingTableNode;
+typedef map < LinkId, RoutingTableLink > RoutingTableNode;
 
 // Map a node of the network to its routing table
-typedef map < int, NoximRoutingTableNode > NoximRoutingTableNoC;
+typedef map < int, RoutingTableNode > RoutingTableNoC;
 
 // Converts an input direction to a link 
-NoximLinkId direction2ILinkId(const int node_id, const int dir);
+LinkId direction2ILinkId(const int node_id, const int dir);
 
 // Converts an input direction to a link
-int oLinkId2Direction(const NoximLinkId & out_link);
+int oLinkId2Direction(const LinkId & out_link);
 
 // Converts a set of output links to a set of directions
 vector <
-    int >admissibleOutputsSet2Vector(const NoximAdmissibleOutputs & ao);
+    int >admissibleOutputsSet2Vector(const AdmissibleOutputs & ao);
 
-class NoximGlobalRoutingTable {
+class GlobalRoutingTable {
 
   public:
 
-    NoximGlobalRoutingTable();
+    GlobalRoutingTable();
 
     // Load routing table from file. Returns true if ok, false otherwise
     bool load(const char *fname);
 
-    NoximRoutingTableNode getNodeRoutingTable(const int node_id);
+    RoutingTableNode getNodeRoutingTable(const int node_id);
 
     bool isValid() {
 	return valid;
   } private:
 
-     NoximRoutingTableNoC rt_noc;
+     RoutingTableNoC rt_noc;
     bool valid;
 
 };

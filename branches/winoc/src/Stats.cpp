@@ -8,18 +8,18 @@
  * This file contains the implementation of the statistics
  */
 
-#include "NoximStats.h"
+#include "Stats.h"
 
 // TODO: nan in averageDelay
 
-void NoximStats::configure(const int node_id, const double _warm_up_time)
+void Stats::configure(const int node_id, const double _warm_up_time)
 {
     id = node_id;
     warm_up_time = _warm_up_time;
 }
 
-void NoximStats::receivedFlit(const double arrival_time,
-			      const NoximFlit & flit)
+void Stats::receivedFlit(const double arrival_time,
+			      const Flit & flit)
 {
     if (arrival_time - DEFAULT_RESET_TIME < warm_up_time)
 	return;
@@ -45,7 +45,7 @@ void NoximStats::receivedFlit(const double arrival_time,
     chist[i].last_received_flit_time = arrival_time - warm_up_time;
 }
 
-double NoximStats::getAverageDelay(const int src_id)
+double Stats::getAverageDelay(const int src_id)
 {
     double sum = 0.0;
 
@@ -59,7 +59,7 @@ double NoximStats::getAverageDelay(const int src_id)
     return sum / (double) chist[i].delays.size();
 }
 
-double NoximStats::getAverageDelay()
+double Stats::getAverageDelay()
 {
     double avg = 0.0;
 
@@ -72,7 +72,7 @@ double NoximStats::getAverageDelay()
     return avg / (double) getReceivedPackets();
 }
 
-double NoximStats::getMaxDelay(const int src_id)
+double Stats::getMaxDelay(const int src_id)
 {
     double maxd = -1.0;
 
@@ -88,7 +88,7 @@ double NoximStats::getMaxDelay(const int src_id)
     return maxd;
 }
 
-double NoximStats::getMaxDelay()
+double Stats::getMaxDelay()
 {
     double maxd = -1.0;
 
@@ -104,7 +104,7 @@ double NoximStats::getMaxDelay()
     return maxd;
 }
 
-double NoximStats::getAverageThroughput(const int src_id)
+double Stats::getAverageThroughput(const int src_id)
 {
     int i = searchCommHistory(src_id);
 
@@ -117,7 +117,7 @@ double NoximStats::getAverageThroughput(const int src_id)
 	    (double) chist[i].last_received_flit_time;
 }
 
-double NoximStats::getAverageThroughput()
+double Stats::getAverageThroughput()
 {
     double sum = 0.0;
 
@@ -130,7 +130,7 @@ double NoximStats::getAverageThroughput()
     return sum;
 }
 
-unsigned int NoximStats::getReceivedPackets()
+unsigned int Stats::getReceivedPackets()
 {
     int n = 0;
 
@@ -140,7 +140,7 @@ unsigned int NoximStats::getReceivedPackets()
     return n;
 }
 
-unsigned int NoximStats::getReceivedFlits()
+unsigned int Stats::getReceivedFlits()
 {
     int n = 0;
 
@@ -150,18 +150,18 @@ unsigned int NoximStats::getReceivedFlits()
     return n;
 }
 
-unsigned int NoximStats::getTotalCommunications()
+unsigned int Stats::getTotalCommunications()
 {
     return chist.size();
 }
 
-double NoximStats::getCommunicationEnergy(int src_id, int dst_id)
+double Stats::getCommunicationEnergy(int src_id, int dst_id)
 {
   // NOT YET IMPLEMENTED
     // Assumptions: minimal path routing, constant packet size
   /*
-    NoximCoord src_coord = id2Coord(src_id);
-    NoximCoord dst_coord = id2Coord(dst_id);
+    Coord src_coord = id2Coord(src_id);
+    Coord dst_coord = id2Coord(dst_id);
 
     int hops =
 	abs(src_coord.x - dst_coord.x) + abs(src_coord.y - dst_coord.y);
@@ -169,8 +169,8 @@ double NoximStats::getCommunicationEnergy(int src_id, int dst_id)
     double energy =
 	hops * (power.getPwrArbitration() + power.getPwrCrossbar() +
 		 power.getPwrBuffering() *
-		(NoximGlobalParams::min_packet_size +
-		 NoximGlobalParams::max_packet_size) / 2 +
+		(GlobalParams::min_packet_size +
+		 GlobalParams::max_packet_size) / 2 +
 		power.getPwrRouting() + power.getPwrSelection()
 	);
 
@@ -180,7 +180,7 @@ double NoximStats::getCommunicationEnergy(int src_id, int dst_id)
   return -1.0;
 }
 
-int NoximStats::searchCommHistory(int src_id)
+int Stats::searchCommHistory(int src_id)
 {
     for (unsigned int i = 0; i < chist.size(); i++)
 	if (chist[i].src_id == src_id)
@@ -189,7 +189,7 @@ int NoximStats::searchCommHistory(int src_id)
     return -1;
 }
 
-void NoximStats::showStats(int curr_node, std::ostream & out, bool header)
+void Stats::showStats(int curr_node, std::ostream & out, bool header)
 {
     if (header) {
 	out << "%"

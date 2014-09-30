@@ -8,9 +8,9 @@
  * This file contains the implementation of the router
  */
 
-#include "NoximRouter.h"
+#include "Router.h"
 
-void NoximRouter::rxProcess()
+void Router::rxProcess()
 {
     if (reset.read()) {
 	// Clear outputs and indexes of receiving protocol
@@ -35,9 +35,9 @@ void NoximRouter::rxProcess()
 
 	    if ((req_rx[i].read() == 1 - current_level_rx[i])
 		&& !buffer[i].IsFull()) {
-		NoximFlit received_flit = flit_rx[i].read();
+		Flit received_flit = flit_rx[i].read();
 
-		if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) {
+		if (GlobalParams::verbose_mode > VERBOSE_OFF) {
 		    cout << sc_time_stamp().to_double() /
 			1000 << ": Router[" << local_id << "], Input[" << i
 			<< "], Received flit: " << received_flit << endl;
@@ -60,7 +60,7 @@ void NoximRouter::rxProcess()
     stats.power.Leakage();
 }
 
-void NoximRouter::txProcess()
+void Router::txProcess()
 {
   if (reset.read()) 
     {
@@ -80,12 +80,12 @@ void NoximRouter::txProcess()
 
 	  if (!buffer[i].IsEmpty()) 
 	    {
-	      NoximFlit flit = buffer[i].Front();
+	      Flit flit = buffer[i].Front();
 
 	      if (flit.flit_type == FLIT_TYPE_HEAD) 
 		{
 		  // prepare data for routing
-		  NoximRouteData route_data;
+		  RouteData route_data;
 		  route_data.current_id = local_id;
 		  route_data.src_id = flit.src_id;
 		  route_data.dst_id = flit.dst_id;
@@ -107,7 +107,7 @@ void NoximRouter::txProcess()
 			{
 			  stats.power.Crossbar();
 			  reservation_table.reserve(i, o);
-			  if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) 
+			  if (GlobalParams::verbose_mode > VERBOSE_OFF) 
 			    {
 			      cout << sc_time_stamp().to_double() / 1000
 				   << ": Router[" << local_id
@@ -127,7 +127,7 @@ void NoximRouter::txProcess()
 	{
 	  if (!buffer[i].IsEmpty()) 
 	    {
-	      NoximFlit flit = buffer[i].Front();
+	      Flit flit = buffer[i].Front();
 
 	      int o = reservation_table.getOutputPort(i);
 	      if (o != NOT_RESERVED) 
@@ -142,7 +142,7 @@ void NoximRouter::txProcess()
 			// Forward flit to WiNoC
 			if (winoc->CanTransmit(local_id))
 			{
-			    if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) 
+			    if (GlobalParams::verbose_mode > VERBOSE_OFF) 
 			    {
 				cout << sc_time_stamp().to_double() / 1000
 				    << ": Router[" << local_id
@@ -160,7 +160,7 @@ void NoximRouter::txProcess()
 			}
 		    */
 		    }
-		      if (NoximGlobalParams::verbose_mode > VERBOSE_OFF) 
+		      if (GlobalParams::verbose_mode > VERBOSE_OFF) 
 			{
 			  cout << sc_time_stamp().to_double() / 1000
 			       << ": Router[" << local_id
@@ -174,7 +174,7 @@ void NoximRouter::txProcess()
 		      req_tx[o].write(current_level_tx[o]);
 		      buffer[i].Pop();
 
-		      if (NoximGlobalParams::low_power_link_strategy)
+		      if (GlobalParams::low_power_link_strategy)
 			{
 			  if (flit.flit_type == FLIT_TYPE_HEAD || 
 			      flit.use_low_voltage_path == false)
@@ -196,11 +196,11 @@ void NoximRouter::txProcess()
 			{
 			  stats.receivedFlit(sc_time_stamp().
 					     to_double() / 1000, flit);
-			  if (NoximGlobalParams::
+			  if (GlobalParams::
 			      max_volume_to_be_drained) 
 			    {
 			      if (drained_volume >=
-				  NoximGlobalParams::
+				  GlobalParams::
 				  max_volume_to_be_drained)
 				sc_stop();
 			      else 
@@ -221,10 +221,10 @@ void NoximRouter::txProcess()
 	}
       /* TODO: move this code as a normal direction
 	// 3rd phase: Consume incoming flits from WiNoC
-	if (NoximGlobalParams::use_winoc &&
+	if (GlobalParams::use_winoc &&
 	    winoc->FlitAvailable(local_id))
 	{
-	  NoximFlit flit = winoc->GetFlit(local_id);
+	  Flit flit = winoc->GetFlit(local_id);
 	  stats.receivedFlit(sc_time_stamp().
 			     to_double() / 1000, flit);
 	}
@@ -233,9 +233,9 @@ void NoximRouter::txProcess()
   stats.power.Leakage();
 }
 
-NoximNoP_data NoximRouter::getCurrentNoPData() const
+NoP_data Router::getCurrentNoPData() const
 {
-    NoximNoP_data NoP_data;
+    NoP_data NoP_data;
 
     for (int j = 0; j < DIRECTIONS; j++) {
 	NoP_data.channel_status_neighbor[j].free_slots =
@@ -249,22 +249,22 @@ NoximNoP_data NoximRouter::getCurrentNoPData() const
     return NoP_data;
 }
 
-void NoximRouter::bufferMonitor()
+void Router::bufferMonitor()
 {
     if (reset.read()) {
 	for (int i = 0; i < DIRECTIONS + 1; i++)
 	    free_slots[i].write(buffer[i].GetMaxBufferSize());
     } else {
 
-	if (NoximGlobalParams::selection_strategy == SEL_BUFFER_LEVEL ||
-	    NoximGlobalParams::selection_strategy == SEL_NOP) {
+	if (GlobalParams::selection_strategy == SEL_BUFFER_LEVEL ||
+	    GlobalParams::selection_strategy == SEL_NOP) {
 
 	    // update current input buffers level to neighbors
 	    for (int i = 0; i < DIRECTIONS + 1; i++)
 		free_slots[i].write(buffer[i].getCurrentFreeSlots());
 
 	    // NoP selection: send neighbor info to each direction 'i'
-	    NoximNoP_data current_NoP_data = getCurrentNoPData();
+	    NoP_data current_NoP_data = getCurrentNoPData();
 
 	    for (int i = 0; i < DIRECTIONS; i++)
 		NoP_data_out[i].write(current_NoP_data);
@@ -273,12 +273,12 @@ void NoximRouter::bufferMonitor()
 }
 
 vector <
-    int >NoximRouter::routingFunction(const NoximRouteData & route_data)
+    int >Router::routingFunction(const RouteData & route_data)
 {
 
     // TODO: check 
   // If WiNoC available, check for intercluster communication
-  if (NoximGlobalParams::use_winoc)
+  if (GlobalParams::use_winoc)
   {
       assert(false);
     // Check for intercluster communication
@@ -291,12 +291,12 @@ vector <
     }
     */
   }
-    NoximCoord position = id2Coord(route_data.current_id);
-    NoximCoord src_coord = id2Coord(route_data.src_id);
-    NoximCoord dst_coord = id2Coord(route_data.dst_id);
+    Coord position = id2Coord(route_data.current_id);
+    Coord src_coord = id2Coord(route_data.src_id);
+    Coord dst_coord = id2Coord(route_data.dst_id);
     int dir_in = route_data.dir_in;
 
-    switch (NoximGlobalParams::routing_algorithm) {
+    switch (GlobalParams::routing_algorithm) {
     case ROUTING_XY:
 	return routingXY(position, dst_coord);
 
@@ -329,7 +329,7 @@ vector <
     return (vector < int >) (0);
 }
 
-int NoximRouter::route(const NoximRouteData & route_data)
+int Router::route(const RouteData & route_data)
 {
     stats.power.Routing();
 
@@ -341,9 +341,9 @@ int NoximRouter::route(const NoximRouteData & route_data)
     return selectionFunction(candidate_channels, route_data);
 }
 
-void NoximRouter::NoP_report() const
+void Router::NoP_report() const
 {
-    NoximNoP_data NoP_tmp;
+    NoP_data NoP_tmp;
     cout << sc_time_stamp().to_double() /
 	1000 << ": Router[" << local_id << "] NoP report: " << endl;
 
@@ -356,7 +356,7 @@ void NoximRouter::NoP_report() const
 
 //---------------------------------------------------------------------------
 
-int NoximRouter::NoPScore(const NoximNoP_data & nop_data,
+int Router::NoPScore(const NoP_data & nop_data,
 			  const vector < int >&nop_channels) const
 {
     int score = 0;
@@ -378,8 +378,8 @@ int NoximRouter::NoPScore(const NoximNoP_data & nop_data,
     return score;
 }
 
-int NoximRouter::selectionNoP(const vector < int >&directions,
-			      const NoximRouteData & route_data)
+int Router::selectionNoP(const vector < int >&directions,
+			      const RouteData & route_data)
 {
     vector < int >neighbors_on_path;
     vector < int >score;
@@ -392,7 +392,7 @@ int NoximRouter::selectionNoP(const vector < int >&directions,
 	int candidate_id = getNeighborId(current_id, directions[i]);
 
 	// apply routing function to the adjacent candidate node
-	NoximRouteData tmp_route_data;
+	RouteData tmp_route_data;
 	tmp_route_data.current_id = candidate_id;
 	tmp_route_data.src_id = route_data.src_id;
 	tmp_route_data.dst_id = route_data.dst_id;
@@ -403,7 +403,7 @@ int NoximRouter::selectionNoP(const vector < int >&directions,
 	    routingFunction(tmp_route_data);
 
 	// select useful data from Neighbor-on-Path input 
-	NoximNoP_data nop_tmp = NoP_data_in[directions[i]].read();
+	NoP_data nop_tmp = NoP_data_in[directions[i]].read();
 
 	// store the score of node in the direction[i]
 	score.push_back(NoPScore(nop_tmp, next_candidate_channels));
@@ -433,7 +433,7 @@ int NoximRouter::selectionNoP(const vector < int >&directions,
     return direction_selected;
 }
 
-int NoximRouter::selectionBufferLevel(const vector < int >&directions)
+int Router::selectionBufferLevel(const vector < int >&directions)
 {
     vector < int >best_dirs;
     int max_free_slots = 0;
@@ -476,9 +476,9 @@ int NoximRouter::selectionBufferLevel(const vector < int >&directions)
 //   if (direction_choosen==NOT_VALID)
 //     direction_choosen = directions[rand() % directions.size()]; 
 
-//   if(NoximGlobalParams::verbose_mode>VERBOSE_OFF)
+//   if(GlobalParams::verbose_mode>VERBOSE_OFF)
 //     {
-//       NoximChannelStatus tmp;
+//       ChannelStatus tmp;
 
 //       cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id << "] SELECTION between: " << endl;
 //       for (unsigned int i=0;i<directions.size();i++)
@@ -494,13 +494,13 @@ int NoximRouter::selectionBufferLevel(const vector < int >&directions)
 //   return direction_choosen;
 }
 
-int NoximRouter::selectionRandom(const vector < int >&directions)
+int Router::selectionRandom(const vector < int >&directions)
 {
     return directions[rand() % directions.size()];
 }
 
-int NoximRouter::selectionFunction(const vector < int >&directions,
-				   const NoximRouteData & route_data)
+int Router::selectionFunction(const vector < int >&directions,
+				   const RouteData & route_data)
 {
     // not so elegant but fast escape ;)
     if (directions.size() == 1)
@@ -508,7 +508,7 @@ int NoximRouter::selectionFunction(const vector < int >&directions,
 
     stats.power.Selection();
 
-    switch (NoximGlobalParams::selection_strategy) {
+    switch (GlobalParams::selection_strategy) {
     case SEL_RANDOM:
 	return selectionRandom(directions);
     case SEL_BUFFER_LEVEL:
@@ -522,8 +522,8 @@ int NoximRouter::selectionFunction(const vector < int >&directions,
     return 0;
 }
 
-vector < int >NoximRouter::routingXY(const NoximCoord & current,
-				     const NoximCoord & destination)
+vector < int >Router::routingXY(const Coord & current,
+				     const Coord & destination)
 {
     vector < int >directions;
 
@@ -539,8 +539,8 @@ vector < int >NoximRouter::routingXY(const NoximCoord & current,
     return directions;
 }
 
-vector < int >NoximRouter::routingWestFirst(const NoximCoord & current,
-					    const NoximCoord & destination)
+vector < int >Router::routingWestFirst(const Coord & current,
+					    const Coord & destination)
 {
     vector < int >directions;
 
@@ -558,8 +558,8 @@ vector < int >NoximRouter::routingWestFirst(const NoximCoord & current,
     return directions;
 }
 
-vector < int >NoximRouter::routingNorthLast(const NoximCoord & current,
-					    const NoximCoord & destination)
+vector < int >Router::routingNorthLast(const Coord & current,
+					    const Coord & destination)
 {
     vector < int >directions;
 
@@ -577,8 +577,8 @@ vector < int >NoximRouter::routingNorthLast(const NoximCoord & current,
     return directions;
 }
 
-vector < int >NoximRouter::routingNegativeFirst(const NoximCoord & current,
-						const NoximCoord &
+vector < int >Router::routingNegativeFirst(const Coord & current,
+						const Coord &
 						destination)
 {
     vector < int >directions;
@@ -598,9 +598,9 @@ vector < int >NoximRouter::routingNegativeFirst(const NoximCoord & current,
     return directions;
 }
 
-vector < int >NoximRouter::routingOddEven(const NoximCoord & current,
-					  const NoximCoord & source,
-					  const NoximCoord & destination)
+vector < int >Router::routingOddEven(const Coord & current,
+					  const Coord & source,
+					  const Coord & destination)
 {
     vector < int >directions;
 
@@ -657,9 +657,9 @@ vector < int >NoximRouter::routingOddEven(const NoximCoord & current,
     return directions;
 }
 
-vector < int >NoximRouter::routingDyAD(const NoximCoord & current,
-				       const NoximCoord & source,
-				       const NoximCoord & destination)
+vector < int >Router::routingDyAD(const Coord & current,
+				       const Coord & source,
+				       const Coord & destination)
 {
     vector < int >directions;
 
@@ -671,8 +671,8 @@ vector < int >NoximRouter::routingDyAD(const NoximCoord & current,
     return directions;
 }
 
-vector < int >NoximRouter::routingFullyAdaptive(const NoximCoord & current,
-						const NoximCoord &
+vector < int >Router::routingFullyAdaptive(const Coord & current,
+						const Coord &
 						destination)
 {
     vector < int >directions;
@@ -697,12 +697,12 @@ vector < int >NoximRouter::routingFullyAdaptive(const NoximCoord & current,
     return directions;
 }
 
-vector < int >NoximRouter::routingTableBased(const int dir_in,
-					     const NoximCoord & current,
-					     const NoximCoord &
+vector < int >Router::routingTableBased(const int dir_in,
+					     const Coord & current,
+					     const Coord &
 					     destination)
 {
-    NoximAdmissibleOutputs ao =
+    AdmissibleOutputs ao =
 	routing_table.getAdmissibleOutputs(dir_in, coord2Id(destination));
 
     if (ao.size() == 0) {
@@ -728,10 +728,10 @@ vector < int >NoximRouter::routingTableBased(const int dir_in,
     return admissibleOutputsSet2Vector(ao);
 }
 
-void NoximRouter::configure(const int _id,
+void Router::configure(const int _id,
 			    const double _warm_up_time,
 			    const unsigned int _max_buffer_size,
-			    NoximGlobalRoutingTable & grt)
+			    GlobalRoutingTable & grt)
 {
     local_id = _id;
     stats.configure(_id, _warm_up_time);
@@ -744,24 +744,24 @@ void NoximRouter::configure(const int _id,
     for (int i = 0; i < DIRECTIONS + 2; i++)
 	buffer[i].SetMaxBufferSize(_max_buffer_size);
 
-    int row = _id / NoximGlobalParams::mesh_dim_x;
-    int col = _id % NoximGlobalParams::mesh_dim_x;
+    int row = _id / GlobalParams::mesh_dim_x;
+    int col = _id % GlobalParams::mesh_dim_x;
     if (row == 0)
       buffer[DIRECTION_NORTH].Disable();
-    if (row == NoximGlobalParams::mesh_dim_y-1)
+    if (row == GlobalParams::mesh_dim_y-1)
       buffer[DIRECTION_SOUTH].Disable();
     if (col == 0)
       buffer[DIRECTION_WEST].Disable();
-    if (col == NoximGlobalParams::mesh_dim_x-1)
+    if (col == GlobalParams::mesh_dim_x-1)
       buffer[DIRECTION_EAST].Disable();
 }
 
-unsigned long NoximRouter::getRoutedFlits()
+unsigned long Router::getRoutedFlits()
 {
     return routed_flits;
 }
 
-unsigned int NoximRouter::getFlitsCount()
+unsigned int Router::getFlitsCount()
 {
     unsigned count = 0;
 
@@ -771,12 +771,12 @@ unsigned int NoximRouter::getFlitsCount()
     return count;
 }
 
-double NoximRouter::getPower()
+double Router::getPower()
 {
     return stats.power.getPower();
 }
 
-int NoximRouter::reflexDirection(int direction) const
+int Router::reflexDirection(int direction) const
 {
     if (direction == DIRECTION_NORTH)
 	return DIRECTION_SOUTH;
@@ -792,9 +792,9 @@ int NoximRouter::reflexDirection(int direction) const
     return NOT_VALID;
 }
 
-int NoximRouter::getNeighborId(int _id, int direction) const
+int Router::getNeighborId(int _id, int direction) const
 {
-    NoximCoord my_coord = id2Coord(_id);
+    Coord my_coord = id2Coord(_id);
 
     switch (direction) {
     case DIRECTION_NORTH:
@@ -803,12 +803,12 @@ int NoximRouter::getNeighborId(int _id, int direction) const
 	my_coord.y--;
 	break;
     case DIRECTION_SOUTH:
-	if (my_coord.y == NoximGlobalParams::mesh_dim_y - 1)
+	if (my_coord.y == GlobalParams::mesh_dim_y - 1)
 	    return NOT_VALID;
 	my_coord.y++;
 	break;
     case DIRECTION_EAST:
-	if (my_coord.x == NoximGlobalParams::mesh_dim_x - 1)
+	if (my_coord.x == GlobalParams::mesh_dim_x - 1)
 	    return NOT_VALID;
 	my_coord.x++;
 	break;
@@ -827,21 +827,21 @@ int NoximRouter::getNeighborId(int _id, int direction) const
     return neighbor_id;
 }
 
-bool NoximRouter::inCongestion()
+bool Router::inCongestion()
 {
     for (int i = 0; i < DIRECTIONS; i++) {
 	int flits =
-	    NoximGlobalParams::buffer_depth - free_slots_neighbor[i];
+	    GlobalParams::buffer_depth - free_slots_neighbor[i];
 	if (flits >
-	    (int) (NoximGlobalParams::buffer_depth *
-		   NoximGlobalParams::dyad_threshold))
+	    (int) (GlobalParams::buffer_depth *
+		   GlobalParams::dyad_threshold))
 	    return true;
     }
 
     return false;
 }
 
-void NoximRouter::ShowBuffersStats(std::ostream & out)
+void Router::ShowBuffersStats(std::ostream & out)
 {
   for (int i=0; i<DIRECTIONS+2; i++)
     buffer[i].ShowStats(out);

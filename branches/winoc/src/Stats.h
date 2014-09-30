@@ -14,8 +14,8 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
-#include "NoximMain.h"
-#include "NoximPower.h"
+#include "Main.h"
+#include "Power.h"
 using namespace std;
 
 struct CommHistory {
@@ -25,17 +25,17 @@ struct CommHistory {
     double last_received_flit_time;
 };
 
-class NoximStats {
+class Stats {
 
   public:
 
-    NoximStats() {
+    Stats() {
     } 
 
     void configure(const int node_id, const double _warm_up_time);
 
     // Access point for stats update
-    void receivedFlit(const double arrival_time, const NoximFlit & flit);
+    void receivedFlit(const double arrival_time, const Flit & flit);
 
     // Returns the average delay (cycles) for the current node as
     // regards to the communication whose source is src_id
@@ -80,7 +80,7 @@ class NoximStats {
 
   public:
 
-    NoximPower power;
+    Power power;
 
   private:
 

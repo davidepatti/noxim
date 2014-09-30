@@ -8,13 +8,13 @@
  * This file contains the implementation of the global traffic table
  */
 
-#include "NoximGlobalTrafficTable.h"
+#include "GlobalTrafficTable.h"
 
-NoximGlobalTrafficTable::NoximGlobalTrafficTable()
+GlobalTrafficTable::GlobalTrafficTable()
 {
 }
 
-bool NoximGlobalTrafficTable::load(const char *fname)
+bool GlobalTrafficTable::load(const char *fname)
 {
   // Open file
   ifstream fin(fname, ios::in);
@@ -41,7 +41,7 @@ bool NoximGlobalTrafficTable::load(const char *fname)
 		 &por, &t_on, &t_off, &t_period);
 	if (params >= 2) {
 	  // Create a communication from the parameters read on the line
-	  NoximCommunication communication;
+	  Communication communication;
 
 	  // Mandatory fields
 	  communication.src = src;
@@ -58,13 +58,13 @@ bool NoximGlobalTrafficTable::load(const char *fname)
 	    communication.pir = pir;
 	  else
 	    communication.pir =
-	      NoximGlobalParams::packet_injection_rate;
+	      GlobalParams::packet_injection_rate;
 
 	  // Custom POR
 	  if (params >= 5 && por >= 0 && por <= 1)
 	    communication.por = por;
 	  else
-	    communication.por = communication.pir;	// NoximGlobalParams::probability_of_retransmission;
+	    communication.por = communication.pir;	// GlobalParams::probability_of_retransmission;
 
 	  // Custom Ton
 	  if (params >= 6 && t_on >= 0)
@@ -79,7 +79,7 @@ bool NoximGlobalTrafficTable::load(const char *fname)
 	  } else
 	    communication.t_off =
 	      DEFAULT_RESET_TIME +
-	      NoximGlobalParams::simulation_time;
+	      GlobalParams::simulation_time;
 
 	  // Custom Tperiod
 	  if (params >= 8 && t_period > 0) {
@@ -88,7 +88,7 @@ bool NoximGlobalTrafficTable::load(const char *fname)
 	  } else
 	    communication.t_period =
 	      DEFAULT_RESET_TIME +
-	      NoximGlobalParams::simulation_time;
+	      GlobalParams::simulation_time;
 
 	  // Add this communication to the vector of communications
 	  traffic_table.push_back(communication);
@@ -100,7 +100,7 @@ bool NoximGlobalTrafficTable::load(const char *fname)
   return true;
 }
 
-double NoximGlobalTrafficTable::getCumulativePirPor(const int src_id,
+double GlobalTrafficTable::getCumulativePirPor(const int src_id,
 						    const int ccycle,
 						    const bool pir_not_por,
 						    vector < pair < int, double > > &dst_prob,
@@ -112,7 +112,7 @@ double NoximGlobalTrafficTable::getCumulativePirPor(const int src_id,
   use_low_voltage_path.clear();
 
   for (unsigned int i = 0; i < traffic_table.size(); i++) {
-    NoximCommunication comm = traffic_table[i];
+    Communication comm = traffic_table[i];
     if (comm.src == src_id) {
       int r_ccycle = ccycle % comm.t_period;
       if (r_ccycle > comm.t_on && r_ccycle < comm.t_off) {
@@ -127,7 +127,7 @@ double NoximGlobalTrafficTable::getCumulativePirPor(const int src_id,
   return cpirnpor;
 }
 
-int NoximGlobalTrafficTable::occurrencesAsSource(const int src_id)
+int GlobalTrafficTable::occurrencesAsSource(const int src_id)
 {
   int count = 0;
 
