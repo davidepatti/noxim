@@ -71,7 +71,7 @@ struct Bus: sc_module
   // In this example, for clarity, the address is passed through unmodified to the target
   inline unsigned int decode_address( sc_dt::uint64 address, sc_dt::uint64& masked_address )
   {
-    unsigned int target_nr = static_cast<unsigned int>( address & 0x3 );
+    unsigned int target_nr = static_cast<unsigned int>( address & 0x1 );
     masked_address = address;
     return target_nr;
   }

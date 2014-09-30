@@ -22,8 +22,12 @@ double Power::pwr_link        = 0.0;
 double Power::pwr_link_lv     = 0.0;
 double Power::pwr_leakage     = 0.0;
 double Power::pwr_end2end     = 0.0;
+double Power::pwr_rhtxwifi    = 0.0;
+double Power::pwr_rhtxelec    = 0.0;
 
 bool   Power::power_data_loaded = false;
+
+map<pair<int,int>, double> Power::rh_power_map;
 
 Power::Power()
 {
@@ -76,6 +80,22 @@ void Power::EndToEnd()
   pwr += pwr_end2end;
 }
 
+void Power::RHTransmitWiFi(int rh_src_id, int rh_dst_id)
+{
+  pair<int,int> key(rh_src_id, rh_dst_id);
+  map<pair<int,int>, double>::iterator i = rh_power_map.find(key);
+
+  if (i == rh_power_map.end())
+    pwr_rh += pwr_rhtxwifi;
+  else
+    pwr_rh += i->second;
+}
+
+void Power::RHTransmitElec()
+{
+  pwr_rh += pwr_rhtxelec;
+}
+
 bool Power::LoadPowerData(const char *fname)
 {
   ifstream fin(fname, ios::in);
@@ -117,6 +137,12 @@ bool Power::LoadPowerData(const char *fname)
 		    pwr_leakage = value;
 		  else if (strcmp(label, "PWR_END2END") == 0)
 		    pwr_end2end = value;
+		  else if (strcmp(label, "PWR_RH_TX_WIFI") == 0)
+		    pwr_rhtxwifi = value;
+		  else if (strcmp(label, "PWR_RH_TX_ELEC") == 0)
+		    pwr_rhtxelec = value;
+		  else if (strcmp(label, "PWR_RH_TX_WIFI_PM") == 0)
+		    ScanPowerMapEntry(line);
 		  else
 		    cerr << "WARNING: Invalid power label: " << label << endl;
 		}
@@ -127,4 +153,17 @@ bool Power::LoadPowerData(const char *fname)
   fin.close();
 
   return true;
+}
+void Power::ScanPowerMapEntry(char *line)
+{
+  int src, dst;
+  double energy;
+
+  if (sscanf(line, "%*s %d %d %lf", &src, &dst, &energy) != 3)
+    cerr << "WARNING: Invalid power data format: " << line << endl;
+  else
+  {
+    pair<int,int> key(src,dst);
+    rh_power_map[key] = energy;
+  }
 }
