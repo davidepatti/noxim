@@ -1,56 +1,45 @@
 # DO NOT DELETE
 
-./NoximBuffer.o: ../src/NoximBuffer.h ../src/NoximMain.h
-./NoximCmdLineParser.o: ../src/NoximCmdLineParser.h ../src/NoximMain.h
-./NoximGlobalRoutingTable.o: ../src/NoximGlobalRoutingTable.h
-./NoximGlobalRoutingTable.o: ../src/NoximMain.h
-./NoximGlobalStats.o: ../src/NoximGlobalStats.h ../src/NoximNoC.h
-./NoximGlobalStats.o: ../src/NoximTile.h ../src/NoximRouter.h
-./NoximGlobalStats.o: ../src/NoximMain.h ../src/NoximBuffer.h
-./NoximGlobalStats.o: ../src/NoximStats.h ../src/NoximPower.h
-./NoximGlobalStats.o: ../src/NoximGlobalRoutingTable.h
-./NoximGlobalStats.o: ../src/NoximLocalRoutingTable.h
-./NoximGlobalStats.o: ../src/NoximReservationTable.h
-./NoximGlobalStats.o: ../src/NoximProcessingElement.h
-./NoximGlobalStats.o: ../src/NoximGlobalTrafficTable.h ../src/NoximHub.h
-./NoximGlobalStats.o: ../src/NoximTLMInitiator.h ../src/NoximTLMTarget.h
-./NoximGlobalTrafficTable.o: ../src/NoximGlobalTrafficTable.h
-./NoximGlobalTrafficTable.o: ../src/NoximMain.h
-./NoximHub.o: ../src/NoximHub.h ../src/NoximMain.h ../src/NoximBuffer.h
-./NoximHub.o: ../src/NoximReservationTable.h ../src/NoximTLMInitiator.h
-./NoximHub.o: ../src/NoximTLMTarget.h
-./NoximLocalRoutingTable.o: ../src/NoximLocalRoutingTable.h
-./NoximLocalRoutingTable.o: ../src/NoximMain.h
-./NoximLocalRoutingTable.o: ../src/NoximGlobalRoutingTable.h
-./NoximMain.o: ../src/NoximMain.h ../src/NoximNoC.h ../src/NoximTile.h
-./NoximMain.o: ../src/NoximRouter.h ../src/NoximBuffer.h
-./NoximMain.o: ../src/NoximStats.h ../src/NoximPower.h
-./NoximMain.o: ../src/NoximGlobalRoutingTable.h
-./NoximMain.o: ../src/NoximLocalRoutingTable.h
-./NoximMain.o: ../src/NoximReservationTable.h
-./NoximMain.o: ../src/NoximProcessingElement.h
-./NoximMain.o: ../src/NoximGlobalTrafficTable.h ../src/NoximHub.h
-./NoximMain.o: ../src/NoximTLMInitiator.h ../src/NoximTLMTarget.h
-./NoximMain.o: ../src/NoximGlobalStats.h ../src/NoximCmdLineParser.h
-./NoximNoC.o: ../src/NoximNoC.h ../src/NoximTile.h ../src/NoximRouter.h
-./NoximNoC.o: ../src/NoximMain.h ../src/NoximBuffer.h
-./NoximNoC.o: ../src/NoximStats.h ../src/NoximPower.h
-./NoximNoC.o: ../src/NoximGlobalRoutingTable.h
-./NoximNoC.o: ../src/NoximLocalRoutingTable.h
-./NoximNoC.o: ../src/NoximReservationTable.h
-./NoximNoC.o: ../src/NoximProcessingElement.h
-./NoximNoC.o: ../src/NoximGlobalTrafficTable.h ../src/NoximHub.h
-./NoximNoC.o: ../src/NoximTLMInitiator.h ../src/NoximTLMTarget.h
-./NoximPower.o: ../src/NoximMain.h ../src/NoximPower.h
-./NoximProcessingElement.o: ../src/NoximProcessingElement.h
-./NoximProcessingElement.o: ../src/NoximMain.h
-./NoximProcessingElement.o: ../src/NoximGlobalTrafficTable.h
-./NoximReservationTable.o: ../src/NoximReservationTable.h
-./NoximReservationTable.o: ../src/NoximMain.h
-./NoximRouter.o: ../src/NoximRouter.h ../src/NoximMain.h
-./NoximRouter.o: ../src/NoximBuffer.h ../src/NoximStats.h
-./NoximRouter.o: ../src/NoximPower.h ../src/NoximGlobalRoutingTable.h
-./NoximRouter.o: ../src/NoximLocalRoutingTable.h
-./NoximRouter.o: ../src/NoximReservationTable.h
-./NoximStats.o: ../src/NoximStats.h ../src/NoximMain.h
-./NoximStats.o: ../src/NoximPower.h
+./Buffer.o: ../src/Buffer.h ../src/Main.h
+./Bus.o: ../src/Bus.h
+./CmdLineParser.o: ../src/CmdLineParser.h ../src/Main.h
+./GlobalRoutingTable.o: ../src/GlobalRoutingTable.h ../src/Main.h
+./GlobalStats.o: ../src/GlobalStats.h ../src/NoC.h ../src/Tile.h
+./GlobalStats.o: ../src/Router.h ../src/Main.h ../src/Buffer.h
+./GlobalStats.o: ../src/Stats.h ../src/Power.h
+./GlobalStats.o: ../src/GlobalRoutingTable.h ../src/LocalRoutingTable.h
+./GlobalStats.o: ../src/ReservationTable.h ../src/ProcessingElement.h
+./GlobalStats.o: ../src/GlobalTrafficTable.h ../src/Hub.h
+./GlobalStats.o: ../src/Initiator.h ../src/MM.h ../src/Utils.h
+./GlobalStats.o: ../src/Target.h ../src/Bus.h
+./GlobalTrafficTable.o: ../src/GlobalTrafficTable.h ../src/Main.h
+./Hub.o: ../src/Hub.h ../src/Main.h ../src/Buffer.h
+./Hub.o: ../src/ReservationTable.h ../src/Initiator.h ../src/MM.h
+./Hub.o: ../src/Utils.h ../src/Target.h
+./Initiator.o: ../src/Initiator.h ../src/MM.h ../src/Utils.h
+./LocalRoutingTable.o: ../src/LocalRoutingTable.h ../src/Main.h
+./LocalRoutingTable.o: ../src/GlobalRoutingTable.h
+./MM.o: ../src/MM.h
+./Main.o: ../src/Main.h ../src/NoC.h ../src/Tile.h ../src/Router.h
+./Main.o: ../src/Buffer.h ../src/Stats.h ../src/Power.h
+./Main.o: ../src/GlobalRoutingTable.h ../src/LocalRoutingTable.h
+./Main.o: ../src/ReservationTable.h ../src/ProcessingElement.h
+./Main.o: ../src/GlobalTrafficTable.h ../src/Hub.h ../src/Initiator.h
+./Main.o: ../src/MM.h ../src/Utils.h ../src/Target.h ../src/Bus.h
+./Main.o: ../src/GlobalStats.h ../src/CmdLineParser.h
+./NoC.o: ../src/NoC.h ../src/Tile.h ../src/Router.h ../src/Main.h
+./NoC.o: ../src/Buffer.h ../src/Stats.h ../src/Power.h
+./NoC.o: ../src/GlobalRoutingTable.h ../src/LocalRoutingTable.h
+./NoC.o: ../src/ReservationTable.h ../src/ProcessingElement.h
+./NoC.o: ../src/GlobalTrafficTable.h ../src/Hub.h ../src/Initiator.h
+./NoC.o: ../src/MM.h ../src/Utils.h ../src/Target.h ../src/Bus.h
+./Power.o: ../src/Main.h ../src/Power.h
+./ProcessingElement.o: ../src/ProcessingElement.h ../src/Main.h
+./ProcessingElement.o: ../src/GlobalTrafficTable.h
+./ReservationTable.o: ../src/ReservationTable.h ../src/Main.h
+./Router.o: ../src/Router.h ../src/Main.h ../src/Buffer.h ../src/Stats.h
+./Router.o: ../src/Power.h ../src/GlobalRoutingTable.h
+./Router.o: ../src/LocalRoutingTable.h ../src/ReservationTable.h
+./Stats.o: ../src/Stats.h ../src/Main.h ../src/Power.h
+./Target.o: ../src/Target.h ../src/Utils.h
+./Utils.o: ../src/Utils.h
