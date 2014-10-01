@@ -2,6 +2,7 @@
 
 SYSTEMC     := systemc-2.3.1
 TARGET_ARCH := macosx64
+YAML		:= /opt/local
 
 
 ##### DIRECTORIES #####
@@ -23,10 +24,10 @@ DEBUG    := -g
 OTHER    := -Wall# -Wno-deprecated
 CXXFLAGS := $(OPT) $(OTHER)# $(DEBUG)
 
-INCDIR := -I$(SRCDIR) -I$(SYSTEMC)/include
-LIBDIR := -L$(SRCDIR) -L$(SYSTEMC)/lib-$(TARGET_ARCH)
+INCDIR := -I$(SRCDIR) -I$(SYSTEMC)/include -I$(YAML)/include
+LIBDIR := -L$(SRCDIR) -L$(SYSTEMC)/lib-$(TARGET_ARCH) -L$(YAML)/lib
 
-LIBS := -lsystemc -lm
+LIBS := -lsystemc -lm -lyaml-cpp 
 
 
 ##### RULES #####
