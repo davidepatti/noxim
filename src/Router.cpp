@@ -95,27 +95,24 @@ void Router::txProcess()
 
 		  if ( o==DIRECTION_WIRELESS)
 		  {
-		      cout << name() << " ready to go wireless ..." << endl;
+		      cout << name() << "\n **** DEBUG **** ready to go wireless ..." << endl;
 
-		      //if (reservation_table.isAvailable(o)) reservation_table.reserve(i, o);
 		  }
-		  else
-		  {
-		      stats.power.Arbitration();
 
-		      if (reservation_table.isAvailable(o)) 
-			{
-			  stats.power.Crossbar();
-			  reservation_table.reserve(i, o);
-			  if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-			    {
-			      cout << sc_time_stamp().to_double() / 1000
-				   << ": Router[" << local_id
-				   << "], Input[" << i << "] (" << buffer[i].
-				Size() << " flits)" << ", reserved Output["
-				   << o << "], flit: " << flit << endl;
-			    }
-			}
+		  stats.power.Arbitration();
+
+		  if (reservation_table.isAvailable(o)) 
+		  {
+		      stats.power.Crossbar();
+		      reservation_table.reserve(i, o);
+		      if (GlobalParams::verbose_mode > VERBOSE_OFF) 
+		      {
+			  cout << sc_time_stamp().to_double() / 1000
+			      << ": Router[" << local_id
+			      << "], Input[" << i << "] (" << buffer[i].
+			      Size() << " flits)" << ", reserved Output["
+			      << o << "], flit: " << flit << endl;
+		      }
 		  }
 		}
 	    }
@@ -136,8 +133,7 @@ void Router::txProcess()
 		  {
 		    if (o == DIRECTION_WIRELESS)
 		    {
-			assert(false);
-			  cout << name() << " forwarding wireless " << endl;
+			  cout << name() << " ***** DEBUG *** forwarding wireless " << endl;
 		  /* TODO: adapt code to new model
 			// Forward flit to WiNoC
 			if (winoc->CanTransmit(local_id))
@@ -160,75 +156,75 @@ void Router::txProcess()
 			}
 		    */
 		    }
-		      if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-			{
-			  cout << sc_time_stamp().to_double() / 1000
-			       << ": Router[" << local_id
-			       << "], Input[" << i <<
+		    if (GlobalParams::verbose_mode > VERBOSE_OFF) 
+		    {
+			cout << sc_time_stamp().to_double() / 1000
+			    << ": Router[" << local_id
+			    << "], Input[" << i <<
 			    "] forward to Output[" << o << "], flit: "
-			       << flit << endl;
-			}
+			    << flit << endl;
+		    }
 
-		      flit_tx[o].write(flit);
-		      current_level_tx[o] = 1 - current_level_tx[o];
-		      req_tx[o].write(current_level_tx[o]);
-		      buffer[i].Pop();
+		    flit_tx[o].write(flit);
+		    current_level_tx[o] = 1 - current_level_tx[o];
+		    req_tx[o].write(current_level_tx[o]);
+		    buffer[i].Pop();
 
-		      if (GlobalParams::low_power_link_strategy)
-			{
-			  if (flit.flit_type == FLIT_TYPE_HEAD || 
-			      flit.use_low_voltage_path == false)
+		    if (GlobalParams::low_power_link_strategy)
+		    {
+			if (flit.flit_type == FLIT_TYPE_HEAD || 
+				flit.use_low_voltage_path == false)
 			    stats.power.Link(false);
-			  else
+			else
 			    stats.power.Link(true);
-			}
-		      else
+		    }
+		    else
 			stats.power.Link(false);
 
-		      if (flit.dst_id == local_id)
+		    if (flit.dst_id == local_id)
 			stats.power.EndToEnd();
 
-		      if (flit.flit_type == FLIT_TYPE_TAIL)
+		    if (flit.flit_type == FLIT_TYPE_TAIL)
 			reservation_table.release(o);
 
-		      // Update stats
-		      if (o == DIRECTION_LOCAL) 
+		    // Update stats
+		    if (o == DIRECTION_LOCAL) 
+		    {
+			stats.receivedFlit(sc_time_stamp().
+				to_double() / 1000, flit);
+			if (GlobalParams::
+				max_volume_to_be_drained) 
 			{
-			  stats.receivedFlit(sc_time_stamp().
-					     to_double() / 1000, flit);
-			  if (GlobalParams::
-			      max_volume_to_be_drained) 
-			    {
-			      if (drained_volume >=
-				  GlobalParams::
-				  max_volume_to_be_drained)
+			    if (drained_volume >=
+				    GlobalParams::
+				    max_volume_to_be_drained)
 				sc_stop();
-			      else 
-				{
-				  drained_volume++;
-				  local_drained++;
-				}
+			    else 
+			    {
+				drained_volume++;
+				local_drained++;
 			    }
-			} 
-		      else if (i != DIRECTION_LOCAL) 
-			{
-			  // Increment routed flits counter
-			  routed_flits++;
 			}
+		    } 
+		    else if (i != DIRECTION_LOCAL) 
+		    {
+			// Increment routed flits counter
+			routed_flits++;
 		    }
-		}
+		  }
+	      }
 	    }
 	}
       /* TODO: move this code as a normal direction
-	// 3rd phase: Consume incoming flits from WiNoC
-	if (GlobalParams::use_winoc &&
-	    winoc->FlitAvailable(local_id))
-	{
-	  Flit flit = winoc->GetFlit(local_id);
-	  stats.receivedFlit(sc_time_stamp().
-			     to_double() / 1000, flit);
-	}
-	*/
+      // 3rd phase: Consume incoming flits from WiNoC
+      if (GlobalParams::use_winoc &&
+      winoc->FlitAvailable(local_id))
+      {
+      Flit flit = winoc->GetFlit(local_id);
+      stats.receivedFlit(sc_time_stamp().
+      to_double() / 1000, flit);
+      }
+       */
     }				// else reset read
   stats.power.Leakage();
 }
@@ -286,7 +282,7 @@ vector <
     if (!winoc->SameRadioHub(local_id, route_data.dst_id))
     {
       vector<int> dirv;
-      dirv.push_back(DIRECTION_WIFI);
+      dirv.push_back(DIRECTION_WIRELESS);
       return dirv;
     }
     */
@@ -332,6 +328,13 @@ vector <
 int Router::route(const RouteData & route_data)
 {
     stats.power.Routing();
+
+    // TODO: test code
+    if (local_id==0 && ((int)(sc_time_stamp().to_double())%50000 == 0) )
+    {
+	cout << "\n ***** TEST: routing to wireless at time " << sc_time_stamp() << endl;
+	return DIRECTION_WIRELESS;
+    }
 
     if (route_data.dst_id == local_id)
 	return DIRECTION_LOCAL;
