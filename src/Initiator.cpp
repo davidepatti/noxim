@@ -4,20 +4,21 @@
   void Initiator::thread_process()
   {
 
-      tlm::tlm_generic_payload* trans;
+      tlm::tlm_generic_payload* trans = new tlm::tlm_generic_payload;
       tlm::tlm_phase phase;
       sc_time delay;
 
 
-      if (!GlobalParams::use_winoc) goto skip;
+      //if (!GlobalParams::use_winoc) goto skip;
 
 
       // TODO: check
       wait(start_request_event);
 
 
-      cout << "\n ****** WIRELESS TEST - starting 2 non-blocking transmissions" << endl;
+//      cout << "\n ****** WIRELESS TEST - starting 2 non-blocking transmissions" << endl;
 
+      /* TODO: remove nb
     // Generate a sequence of random transactions
     for (int i = 0; i < 2; i++)
     {
@@ -71,15 +72,23 @@
       }
       wait( sc_time(rand_ps(), SC_PS) );
     }
+    */
 
-    wait(100, SC_NS);
+    //wait(100, SC_NS);
 
     // Allocate a transaction for one final, nominal call to b_transport
-    trans = m_mm.allocate();
-    trans->acquire();
-    trans->set_command( tlm::TLM_WRITE_COMMAND );
-    trans->set_address( 0 );
-    trans->set_data_ptr( reinterpret_cast<unsigned char*>(&data[0]) );
+    //trans = m_mm.allocate();
+    //trans->acquire();
+    
+      // TODO: fixed address!
+    int i = 0;
+
+    tlm::tlm_command cmd = static_cast<tlm::tlm_command>(rand() % 2);
+    if (cmd == tlm::TLM_WRITE_COMMAND) data = 0xFF000000 | i;
+
+    trans->set_command(cmd);
+    trans->set_address( i );
+    trans->set_data_ptr( reinterpret_cast<unsigned char*>(&data) );
     trans->set_data_length( 4 );
     trans->set_streaming_width( 4 ); // = data_length to indicate no streaming
     trans->set_byte_enable_ptr( 0 ); // 0 indicates unused
@@ -92,7 +101,18 @@
 
     // Call b_transport to demonstrate the b/nb conversion by the simple_target_socket
     socket->b_transport( *trans, delay );
-    check_transaction( *trans );
+
+    // Initiator obliged to check response status and delay
+    if ( trans->is_response_error() )
+	SC_REPORT_ERROR("TLM-2", "Response error from b_transport");
+
+    cout << "trans = { " << (cmd ? 'W' : 'R') << ", " << hex << i
+	<< " } , data = " << hex << data << " at time " << sc_time_stamp()
+	<< " delay = " << delay << endl;
+
+    // Realize the delay annotated onto the transport call
+      wait(delay);
+    //check_transaction( *trans );
 
 skip:
     ;
@@ -102,6 +122,7 @@ skip:
 
   // TLM-2 backward non-blocking transport method
 
+/* TODO: remove nb
   tlm::tlm_sync_enum Initiator::nb_transport_bw( tlm::tlm_generic_payload& trans,
                                               tlm::tlm_phase& phase, sc_time& delay )
   {
@@ -142,8 +163,11 @@ skip:
       // Ignore return value
     }
   }
+  */
 
   // Called on receiving BEGIN_RESP or TLM_COMPLETED
+
+/*
   void Initiator::check_transaction(tlm::tlm_generic_payload& trans)
   {
     if ( trans.is_response_error() )
@@ -164,6 +188,7 @@ skip:
     // Allow the memory manager to free the transaction object
     trans.release();
   }
+  */
 
 
 void Initiator::set_payload(Flit& payload)

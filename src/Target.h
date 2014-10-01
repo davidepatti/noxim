@@ -3,7 +3,7 @@
 
 #include "tlm_utils/simple_target_socket.h"
 #include "tlm_utils/multi_passthrough_target_socket.h"
-#include "tlm_utils/peq_with_cb_and_phase.h"
+//#include "tlm_utils/peq_with_cb_and_phase.h"
 
 #include "Utils.h"
 #include <queue>
@@ -11,11 +11,13 @@
 using namespace sc_core;
 using namespace std;
 
+#define MEM_SIZE 256
+
 // **************************************************************************************
 // Target module able to handle two pipelined transactions
 // **************************************************************************************
 
-DECLARE_EXTENDED_PHASE(internal_ph);
+//DECLARE_EXTENDED_PHASE(internal_ph);
 
 struct Target: sc_module
 {
@@ -24,28 +26,39 @@ struct Target: sc_module
 
   SC_CTOR(Target)
   : socket("socket")
+    /*
   , n_trans(0)
   , response_in_progress(false)
   , next_response_pending(0)
   , end_req_pending()
   , m_peq(this, &Target::peq_cb)
+  */
   {
     // Register callbacks for incoming interface method calls
-    socket.register_nb_transport_fw(this, &Target::nb_transport_fw);
+    //socket.register_nb_transport_fw(this, &Target::nb_transport_fw);
+    //
+
+    // Register callback for incoming b_transport interface method call
+      socket.register_b_transport(this, &Target::b_transport);
   }
 
+  virtual void b_transport( tlm::tlm_generic_payload& trans, sc_time& delay );
   // TLM-2 non-blocking transport method
 
+  /*
   virtual tlm::tlm_sync_enum nb_transport_fw( tlm::tlm_generic_payload& trans, tlm::tlm_phase& phase, sc_time& delay );
   void peq_cb(tlm::tlm_generic_payload& trans, const tlm::tlm_phase& phase);
   tlm::tlm_sync_enum send_end_req(tlm::tlm_generic_payload& trans);
   void send_response(tlm::tlm_generic_payload& trans);
+  */
+
+  int mem[MEM_SIZE];
 
   int   n_trans;
   bool  response_in_progress;
-  tlm::tlm_generic_payload*  next_response_pending;
-  std::queue<tlm::tlm_generic_payload*>  end_req_pending;
-  tlm_utils::peq_with_cb_and_phase<Target> m_peq;
+  //tlm::tlm_generic_payload*  next_response_pending;
+ // std::queue<tlm::tlm_generic_payload*>  end_req_pending;
+  //tlm_utils::peq_with_cb_and_phase<Target> m_peq;
 };
 
 
