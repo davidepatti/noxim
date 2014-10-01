@@ -14,23 +14,6 @@
 
 // ---------------------------------------------------------------------------
 
-#define RADIOHUB_SECTION_START       "[radiohub]"
-#define RADIOHUB_SECTION_STOP        "[/radiohub]"
-
-#define RADIO_CHANNELS_SECTION_START "[channels]"
-#define RADIO_CHANNELS_SECTION_STOP  "[/channels]"
-
-#define BINDING_SECTION_START        "[binding]"
-#define BINDING_SECTION_STOP         "[/binding]"
-
-#define BUFFERS_SECTION_START        "[buffers]"
-#define BUFFERS_SECTION_STOP         "[/buffers]"
-
-#define TOKEN_RING_SECTION_START     "[tokenring]"
-#define TOKEN_RING_SECTION_STOP      "[/tokenring]"
-
-// ---------------------------------------------------------------------------
-
 bool WiNoC::SameRadioHub(int router_id1, int router_id2)
 {
   map<int,int>::iterator it1 = routers_to_radio_hubs.find(router_id1);
@@ -59,241 +42,65 @@ void WiNoC::SetFromRouterBufferSize(int router_id, int buffer_size)
 
 void WiNoC::Configure(char* cfg_fname)
 {
-  FILE *f = fopen(cfg_fname, "r");
+  YAML::Node config = YAML::LoadFile(cfg_fname);
 
-  if (f == NULL)
+  for(YAML::const_iterator radio_hubs_it= config["RadioHubs"].begin();
+      radio_hubs_it!= config["RadioHubs"].end(); 
+      ++radio_hubs_it )
   {
-    cerr << "Cannot open winoc configuration file '" << cfg_fname << "'" << endl;
-    assert(false);
-  }
+    int radio_hub_id = radio_hubs_it->first.as<int>();
+    YAML::Node radio_hub = radio_hubs_it->second;
 
-  // DO NOT CHANGE THE FOLLOWING ORDER!!!
+    RadioHub rh(radio_hub_id);
+    radio_hubs[radio_hub_id] = rh;
 
-  // Determine how many radio_hubs form the WiNoC
-  CfgGetRadioHubsInfo(f);
-
-  // Set RX/TX channels
-  CfgGetRadioChannelsInfo(f);
-
-  // Set internal buffers size of the radio_hubs
-  CfgGetBuffersInfo(f);
-
-  // Connect routers to radio_hub
-  CfgGetBindingInfo(f);
-
-  // Configure token rings
-  CfgGetTokenRingInfo(f);
-
-  fclose(f);
-}
-
-// ---------------------------------------------------------------------------
-
-bool WiNoC::IsComment(char* line)
-{
-  return (line[0] == '%');
-}
-
-bool WiNoC::IsEmptyLine(char *line)
-{
-  if (strlen(line) == 0)
-    return true;
-
-  int i=0;
-  while (line[i] != '\0')
-  {
-    if (line[i] != ' ' && line[i] != '\n')
-      return false;
-    i++;
-  }
-
-  return true;
-}
-
-bool WiNoC::SeekToSection(FILE* f, char* section_name)
-{
-  fseek(f, 0, SEEK_SET);
-
-  bool section_found = false;
-
-  while (!feof(f) && !section_found)
-  {
-    char line[256];
-
-    if (fgets(line, sizeof(line), f))
+    for (map<int, RadioHub>::iterator i = radio_hubs.begin();
+        i != radio_hubs.end(); i++)
     {
-      if (strncmp(line, section_name, strlen(section_name)) == 0)
-	section_found = true;
-    }
-  }
-
-  return section_found;
-}
-
-// ---------------------------------------------------------------------------
-
-void WiNoC::CfgGetRadioHubsInfo(FILE* f)
-{
-  assert(SeekToSection(f, (char*)RADIOHUB_SECTION_START));
-
-  bool end_of_section = false;
-  while (!end_of_section && !feof(f))
-  {
-    char line[256];
-
-    if (fgets(line, sizeof(line), f))
-    {
-      if (!IsComment(line) && !IsEmptyLine(line))
+      if (radio_hub_id != i->first)
       {
-	if (strncmp(line, RADIOHUB_SECTION_STOP, strlen(RADIOHUB_SECTION_STOP)) == 0)
-	  end_of_section = true;
-	else
-	{
-	  int radio_hub_id, buffers_size;
-
-	  if (sscanf(line, "%d", &radio_hub_id) != 1)
-	  {
-	    cerr << "Error reading WiNoC configuration file (section radiohub)" << endl;
-	    assert(false);
-	  }
-	  AddRadioHub(radio_hub_id);
-	}
+        // Add internal buffer for radio_hubs != radio_hub_id
+        i->second.AddInternalBuffers(radio_hub_id);
+        // Add internal buffers to radio_hub_id
+        radio_hubs[radio_hub_id].AddInternalBuffers(i->first);
       }
     }
-  }
-}
 
-// ---------------------------------------------------------------------------
-
-void WiNoC::CfgGetBindingInfo(FILE* f)
-{
-  assert(SeekToSection(f, (char *)BINDING_SECTION_START));
-
-  bool end_of_section = false;
-  while (!end_of_section && !feof(f))
-  {
-    char line[256];
-
-    if (fgets(line, sizeof(line), f))
+    for (size_t i = 0; i < radio_hub["rxChannels"].size(); i++)
     {
-      if (!IsComment(line) && !IsEmptyLine(line))
-      {
-	if (strncmp(line, BINDING_SECTION_STOP, strlen(BINDING_SECTION_STOP)) == 0)
-	  end_of_section = true;
-	else
-	{
-	  int router_id, radio_hub_id;
+      radio_hubs[radio_hub_id].AssignRXChannel(radio_hub["rxChannels"][i].as<int>());
+    }
 
-	  if (sscanf(line, "%d %d", &router_id, &radio_hub_id) != 2)
-	  {
-	    cerr << "Error reading WiNoC configuration file (section binding)" << endl;
-	    assert(false);
-	  }
-	  AttachRouterToRadioHub(router_id, radio_hub_id);
-	}
-      }
+    for (size_t i = 0; i < radio_hub["txChannels"].size(); i++)
+    {
+      radio_hubs[radio_hub_id].AssignTXChannel(radio_hub["txChannels"][i].as<int>());
+    }
+
+    for (size_t i = 0; i < radio_hub["attachedNodes"].size(); i++)
+    {
+      int router_id = radio_hub["attachedNodes"][i].as<int>();
+      routers_to_radio_hubs[router_id] = radio_hub_id;
+      radio_hubs[radio_hub_id].AttachRouter(router_id);
+    }
+
+    int token_cycles =  radio_hub["tokenHoldingTime"].as<int>();
+    set<int> tx_channels = radio_hubs[radio_hub_id].GetTXChannels();
+    for (set<int>::iterator i = tx_channels.begin(); i != tx_channels.end(); i++)
+    {
+      token_rings[*i].AddElement(radio_hub_id, token_cycles);
     }
   }
-}
 
-// ---------------------------------------------------------------------------
-
-void WiNoC::CfgGetRadioChannelsInfo(FILE* f)
-{
-  assert(SeekToSection(f, (char *)RADIO_CHANNELS_SECTION_START));
-
-  bool end_of_section = false;
-  while (!end_of_section && !feof(f))
+  for(YAML::const_iterator radio_hubs_it= config["RadioHubs"].begin();
+      radio_hubs_it!= config["RadioHubs"].end(); 
+      ++radio_hubs_it)
   {
-    char line[256];
-
-    if (fgets(line, sizeof(line), f))
-    {
-      if (!IsComment(line) && !IsEmptyLine(line))
-      {
-	if (strncmp(line, RADIO_CHANNELS_SECTION_STOP, strlen(RADIO_CHANNELS_SECTION_STOP)) == 0)
-	  end_of_section = true;
-	else
-	{
-	  int  radio_hub_id, channel;
-	  char mode[16];
-
-	  if (sscanf(line, "%d %d %s", &radio_hub_id, &channel, mode) != 3)
-	  {
-	    cerr << "Error reading WiNoC configuration file (section radio_channels)" << endl;
-	    assert(false);
-	  }
-	  AssignChannelToRadioHub(radio_hub_id, channel, mode);
-	}
-      }
-    }
+    int radio_hub_id = radio_hubs_it->first.as<int>();
+    YAML::Node radio_hub = radio_hubs_it->second;
+    radio_hubs[radio_hub_id].SetBuffersSize(radio_hub["bufferSize"].as<int>());
   }
-}
 
-// ---------------------------------------------------------------------------
-
-void WiNoC::CfgGetBuffersInfo(FILE* f)
-{
-  assert(SeekToSection(f, (char *)BUFFERS_SECTION_START));
-
-  bool end_of_section = false;
-  while (!end_of_section && !feof(f))
-  {
-    char line[256];
-
-    if (fgets(line, sizeof(line), f))
-    {
-      if (!IsComment(line) && !IsEmptyLine(line))
-      {
-	if (strncmp(line, BUFFERS_SECTION_STOP, strlen(BUFFERS_SECTION_STOP)) == 0)
-	  end_of_section = true;
-	else
-	{
-	  int radio_hub_id, buffers_size;
-
-	  if (sscanf(line, "%d %d", &radio_hub_id, &buffers_size) != 2)
-	  {
-	    cerr << "Error reading WiNoC configuration file (section buffers)" << endl;
-	    assert(false);
-	  }
-	  SetRadioHubBuffersSize(radio_hub_id, buffers_size);
-	}
-      }
-    }
-  }
-}
-
-// ---------------------------------------------------------------------------
-
-void WiNoC::CfgGetTokenRingInfo(FILE* f)
-{
-  assert(SeekToSection(f, (char *)TOKEN_RING_SECTION_START));
-
-  bool end_of_section = false;
-  while (!end_of_section && !feof(f))
-  {
-    char line[256];
-
-    if (fgets(line, sizeof(line), f))
-    {
-      if (!IsComment(line) && !IsEmptyLine(line))
-      {
-	if (strncmp(line, TOKEN_RING_SECTION_STOP, strlen(TOKEN_RING_SECTION_STOP)) == 0)
-	  end_of_section = true;
-	else
-	{
-	  int radio_hub_id, token_cycles;
-
-	  if (sscanf(line, "%d %d", &radio_hub_id, &token_cycles) != 2)
-	  {
-	    cerr << "Error reading WiNoC configuration file (section tokenring)" << endl;
-	    assert(false);
-	  }
-	  SetTokenRing(radio_hub_id, token_cycles);
-	}
-      }
-    }
-  }
+  //ShowConfiguration("");
 }
 
 // ---------------------------------------------------------------------------
@@ -449,118 +256,6 @@ void WiNoC::UpdateTokens()
     else
       i->second.Update();
   }
-}
-
-// ---------------------------------------------------------------------------
-
-void WiNoC::AddRadioHub(int radio_hub_id)
-{
-  map<int, RadioHub>::iterator i = radio_hubs.find(radio_hub_id);
-
-  if (i != radio_hubs.end())
-  {
-    cerr << "Warning: radio_hub " << radio_hub_id << " already present" << endl;
-    return;
-  }
-
-  RadioHub rh(radio_hub_id);
-  radio_hubs[radio_hub_id] = rh;
-
-  UpdateRadioHubsInternalBuffers(radio_hub_id);
-}
-
-// ---------------------------------------------------------------------------
-
-void WiNoC::UpdateRadioHubsInternalBuffers(int radio_hub_id)
-{
-  // Add internal buffer for radio_hubs != radio_hub_id
-  for (map<int, RadioHub>::iterator i = radio_hubs.begin();
-       i != radio_hubs.end(); i++)
-  {
-    if (radio_hub_id != i->first)
-    {
-      i->second.AddInternalBuffers(radio_hub_id);
-    }
-  }
-
-  // Add internal buffers to radio_hub_id
-  for (map<int, RadioHub>::iterator i = radio_hubs.begin();
-       i != radio_hubs.end(); i++)
-  {
-    if (radio_hub_id != i->first)
-    {
-      radio_hubs[radio_hub_id].AddInternalBuffers(i->first);
-    }
-  }
-}
-
-// ---------------------------------------------------------------------------
-
-void WiNoC::AttachRouterToRadioHub(int router_id, int radio_hub_id)
-{
-  map<int, RadioHub>::iterator radio_hubs_i = radio_hubs.find(radio_hub_id);
-  if (radio_hubs_i == radio_hubs.end())
-  {
-    cerr << "Undefined radio_hub_id " << radio_hub_id << endl;
-    assert(false);
-  }
-  
-  routers_to_radio_hubs[router_id] = radio_hub_id;
-
-  radio_hubs_i->second.AttachRouter(router_id);
-}
-
-// ---------------------------------------------------------------------------
-
-void WiNoC::AssignChannelToRadioHub(int radio_hub_id, int channel, 
-					 char* mode)
-{
-  if (radio_hubs.find(radio_hub_id) == radio_hubs.end())
-  {
-    cerr << "Undefined radio_hub_id " << radio_hub_id << endl;
-    assert(false);
-  }
-
-  if (strcmp(mode, "rx") == 0)
-    radio_hubs[radio_hub_id].AssignRXChannel(channel);
-  else if (strcmp(mode, "tx") == 0)
-    radio_hubs[radio_hub_id].AssignTXChannel(channel);
-  else if (strcmp(mode, "rxtx") == 0)
-    radio_hubs[radio_hub_id].AssignRXTXChannel(channel);
-  else
-  {
-    cerr << "Invalid channel type '" << mode << "'" << endl;
-    assert(false);
-  }
-}
-
-// ---------------------------------------------------------------------------
-
-void WiNoC::SetRadioHubBuffersSize(int radio_hub_id, int buffers_size)
-{
-  if (radio_hubs.find(radio_hub_id) == radio_hubs.end())
-  {
-    cerr << "Undefined radio_hub_id " << radio_hub_id << endl;
-    assert(false);
-  }
-
-  radio_hubs[radio_hub_id].SetBuffersSize(buffers_size);
-}
-
-// ---------------------------------------------------------------------------
-
-void WiNoC::SetTokenRing(int radio_hub_id, int token_cycles)
-{
-  if (radio_hubs.find(radio_hub_id) == radio_hubs.end())
-  {
-    cerr << "Undefined radio_hub_id " << radio_hub_id << endl;
-    assert(false);
-  }
-
-  set<int> tx_channels = radio_hubs[radio_hub_id].GetTXChannels();
-  for (set<int>::iterator i = tx_channels.begin();
-       i != tx_channels.end(); i++)
-    token_rings[*i].AddElement(radio_hub_id, token_cycles);
 }
 
 // ---------------------------------------------------------------------------

@@ -17,6 +17,8 @@
 #include "TokenRing.h"
 #include "Power.h"
 
+#include "yaml-cpp/yaml.h"
+
 using namespace std;
 
 class WiNoC
@@ -89,27 +91,6 @@ private:
 
   void TransmitFlit(RadioHub *p_radio_hub_src, 
 		    RadioHub *p_radio_hub_dst);
-
-  bool IsComment(char* line);
-  bool IsEmptyLine(char *line);
-
-  bool SeekToSection(FILE* f, char* section_name);
-
-  void AddRadioHub(int radio_hub_id);
-  void UpdateRadioHubsInternalBuffers(int radio_hub_id);
-
-  void AttachRouterToRadioHub(int router_id, int radio_hub_id);
-
-  void AssignChannelToRadioHub(int radio_hub_id, int channel, char* mode);
-
-  void SetRadioHubBuffersSize(int radio_hub_id, int buffers_size);
-  void SetTokenRing(int radio_hub_id, int token_cycles);
-
-  void CfgGetRadioHubsInfo(FILE* f);
-  void CfgGetRadioChannelsInfo(FILE* f);
-  void CfgGetBuffersInfo(FILE* f);
-  void CfgGetBindingInfo(FILE* f);
-  void CfgGetTokenRingInfo(FILE* f);
 
   set<int> RouterID2RadioHubID(set<int>& router_dst);
 };

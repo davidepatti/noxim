@@ -10,13 +10,13 @@
 ./GlobalStats.o: ../src/GlobalRoutingTable.h ../src/LocalRoutingTable.h
 ./GlobalStats.o: ../src/ReservationTable.h ../src/ProcessingElement.h
 ./GlobalStats.o: ../src/GlobalTrafficTable.h ../src/Hub.h
-./GlobalStats.o: ../src/Initiator.h ../src/MM.h ../src/Utils.h
-./GlobalStats.o: ../src/Target.h ../src/Bus.h
+./GlobalStats.o: ../src/Initiator.h ../src/Utils.h ../src/Target.h
+./GlobalStats.o: ../src/Bus.h
 ./GlobalTrafficTable.o: ../src/GlobalTrafficTable.h ../src/Main.h
 ./Hub.o: ../src/Hub.h ../src/Main.h ../src/Buffer.h
-./Hub.o: ../src/ReservationTable.h ../src/Initiator.h ../src/MM.h
-./Hub.o: ../src/Utils.h ../src/Target.h
-./Initiator.o: ../src/Initiator.h ../src/MM.h ../src/Utils.h
+./Hub.o: ../src/ReservationTable.h ../src/Initiator.h ../src/Utils.h
+./Hub.o: ../src/Target.h
+./Initiator.o: ../src/Initiator.h ../src/Utils.h ../src/Main.h
 ./LocalRoutingTable.o: ../src/LocalRoutingTable.h ../src/Main.h
 ./LocalRoutingTable.o: ../src/GlobalRoutingTable.h
 ./MM.o: ../src/MM.h
@@ -25,22 +25,25 @@
 ./Main.o: ../src/GlobalRoutingTable.h ../src/LocalRoutingTable.h
 ./Main.o: ../src/ReservationTable.h ../src/ProcessingElement.h
 ./Main.o: ../src/GlobalTrafficTable.h ../src/Hub.h ../src/Initiator.h
-./Main.o: ../src/MM.h ../src/Utils.h ../src/Target.h ../src/Bus.h
+./Main.o: ../src/Utils.h ../src/Target.h ../src/Bus.h
 ./Main.o: ../src/GlobalStats.h ../src/CmdLineParser.h
 ./NoC.o: ../src/NoC.h ../src/Tile.h ../src/Router.h ../src/Main.h
 ./NoC.o: ../src/Buffer.h ../src/Stats.h ../src/Power.h
 ./NoC.o: ../src/GlobalRoutingTable.h ../src/LocalRoutingTable.h
 ./NoC.o: ../src/ReservationTable.h ../src/ProcessingElement.h
 ./NoC.o: ../src/GlobalTrafficTable.h ../src/Hub.h ../src/Initiator.h
-./NoC.o: ../src/MM.h ../src/Utils.h ../src/Target.h ../src/Bus.h
+./NoC.o: ../src/Utils.h ../src/Target.h ../src/Bus.h
 ./Power.o: ../src/Main.h ../src/Power.h
 ./ProcessingElement.o: ../src/ProcessingElement.h ../src/Main.h
 ./ProcessingElement.o: ../src/GlobalTrafficTable.h
+./RadioHub.o: ../src/RadioHub.h ../src/Buffer.h ../src/Main.h
 ./ReservationTable.o: ../src/ReservationTable.h ../src/Main.h
 ./Router.o: ../src/Router.h ../src/Main.h ../src/Buffer.h ../src/Stats.h
 ./Router.o: ../src/Power.h ../src/GlobalRoutingTable.h
 ./Router.o: ../src/LocalRoutingTable.h ../src/ReservationTable.h
 ./Stats.o: ../src/Stats.h ../src/Main.h ../src/Power.h
 ./Target.o: ../src/Target.h ../src/Utils.h
+./TokenRing.o: ../src/TokenRing.h
 ./Utils.o: ../src/Utils.h
-./WiNoC.o: ../src/WiNoC.h ../src/Main.h ../src/Power.h
+./WiNoC.o: ../src/WiNoC.h ../src/Main.h ../src/RadioHub.h
+./WiNoC.o: ../src/Buffer.h ../src/TokenRing.h ../src/Power.h
