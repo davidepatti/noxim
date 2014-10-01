@@ -12,6 +12,10 @@
       if (!GlobalParams::use_winoc) goto skip;
 
 
+      // TODO: check
+      wait(start_request_event);
+
+
       cout << "\n ****** WIRELESS TEST - starting 2 non-blocking transmissions" << endl;
 
     // Generate a sequence of random transactions
@@ -160,4 +164,10 @@ skip:
     // Allow the memory manager to free the transaction object
     trans.release();
   }
+
+
+void Initiator::set_payload(Flit& payload)
+{
+    this->flit_payload = payload;
+}
 

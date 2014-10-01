@@ -83,6 +83,7 @@ void Hub::txProcess()
 		Flit flit = buffer[i].Front();
 
 		// TODO: replace
+		// fixed to first channel 
 		int o = 0;
 
 		if (flit.flit_type == FLIT_TYPE_HEAD) 
@@ -93,7 +94,7 @@ void Hub::txProcess()
 			if (GlobalParams::verbose_mode > VERBOSE_OFF) 
 			{
 			    cout << sc_time_stamp().to_double() / 1000 << ": Hub[" << local_id
-				<< "], Port[" << i << "] (" << buffer[i].  Size() << " flits)" << ", reserved Output["
+				<< "], Port[" << i << "] (" << buffer[i].  Size() << " flits)" << ", WIFI Channel["
 				<< o << "], flit: " << flit << endl;
 			}
 		    }
@@ -106,38 +107,45 @@ void Hub::txProcess()
 	for (int i = 0; i < MAX_HUB_PORTS; i++) 
 	{
 	    if (!buffer[i].IsEmpty()) 
-	    {
+	    {     
 		Flit flit = buffer[i].Front();
 
 		int o = reservation_table.getOutputPort(i);
 		if (o != NOT_RESERVED) 
 		{
-		    if (current_level_tx[o] == ack_tx[o].read()) 
-		    {
-			cout << "(FAKE!!) Inject to RH: Router ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
-			cout << sc_time_stamp().to_double() / 1000 << ": Hub[" << local_id
-			<< "], Port[" << i << "] forward to Output[" << o << "], flit: "
+		    cout << "(FAKE!!) Inject to RH: Router ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
+		    cout << sc_time_stamp().to_double() / 1000 << ": Hub[" << local_id
+			<< "], Port[" << i << "] forward to WIFI Channel[" << o << "], flit: "
 			<< flit << endl;
 
-			/* TODO: put here the code that actually
-			 * inject to TLM
-			 * .........
-			Inject(local_id, flit);
-			*/
+		    init[0]->set_payload(flit);
+		    init[0]->start_request_event.notify();
 
 
-			flit_tx[o].write(flit);
-			current_level_tx[o] = 1 - current_level_tx[o];
-			req_tx[o].write(current_level_tx[o]);
-			buffer[i].Pop();
+			//TODO: put here the code that actually
+		    /*
+		       if (current_level_tx[o] == ack_tx[o].read()) 
+		       {
 
-			if (flit.flit_type == FLIT_TYPE_TAIL) reservation_table.release(o);
+		     * inject to TLM
+		     * .........
+		     Inject(local_id, flit);
 
-		    }
+
+
+		     flit_tx[o].write(flit);
+		     current_level_tx[o] = 1 - current_level_tx[o];
+		     req_tx[o].write(current_level_tx[o]);
+		     */
+		    buffer[i].Pop();
+
+		    if (flit.flit_type == FLIT_TYPE_TAIL) reservation_table.release(o);
+
 		}
+
 	    }
-	}
-    }				// else reset read
+	} //if
+    }				// for
 }
 
 

@@ -7,6 +7,7 @@
 
 #include "MM.h"
 #include "Utils.h"
+#include "Main.h"
 
 using namespace sc_core;
 using namespace std;
@@ -41,6 +42,12 @@ struct Initiator: sc_module
   tlm::tlm_generic_payload* request_in_progress;
   sc_event end_request_event;
   tlm_utils::peq_with_cb_and_phase<Initiator> m_peq;
+
+  // custom
+  sc_event start_request_event;
+
+  void set_payload(Flit&);
+  Flit flit_payload;
 };
 
 #endif
