@@ -24,7 +24,7 @@ void ReservationTable::clear()
   rtable.push_back(NOT_RESERVED); // this is for DIRECTION_WEST
   rtable.push_back(NOT_RESERVED); // this is for DIRECTION_LOCAL
 
-  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_WIFI
+  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_WIRELESS
 
   /* old code - TODO: remove
     rtable.resize(DIRECTIONS + 1);
@@ -38,7 +38,7 @@ void ReservationTable::clear()
 
 bool ReservationTable::isAvailable(const int port_out) const
 {
-    assert(port_out >= 0 && port_out < DIRECTIONS + 1);
+    assert(port_out >= 0 && port_out < DIRECTIONS + 2);
 
     return ((rtable[port_out] == NOT_RESERVED));
 }
@@ -60,18 +60,18 @@ void ReservationTable::reserve(const int port_in, const int port_out)
 
 void ReservationTable::release(const int port_out)
 {
-    assert(port_out >= 0 && port_out < DIRECTIONS + 1);
+    assert(port_out >= 0 && port_out < DIRECTIONS + 2);
     // there is a valid reservation on port_out
-    assert(rtable[port_out] >= 0 && rtable[port_out] < DIRECTIONS + 1);
+    assert(rtable[port_out] >= 0 && rtable[port_out] < DIRECTIONS + 2);
 
     rtable[port_out] = NOT_RESERVED;
 }
 
 int ReservationTable::getOutputPort(const int port_in) const
 {
-    assert(port_in >= 0 && port_in < DIRECTIONS + 1);
+    assert(port_in >= 0 && port_in < DIRECTIONS + 2);
 
-    for (int i = 0; i < DIRECTIONS + 1; i++)
+    for (int i = 0; i < DIRECTIONS + 2; i++)
 	if (rtable[i] == port_in)
 	    return i;		// port_in reserved outport i
 

@@ -114,7 +114,6 @@ void Hub::txProcess()
 		{
 		    if (current_level_tx[o] == ack_tx[o].read()) 
 		    {
-			assert(false);
 			cout << "(FAKE!!) Inject to RH: Router ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
 			cout << sc_time_stamp().to_double() / 1000 << ": Hub[" << local_id
 			<< "], Port[" << i << "] forward to Output[" << o << "], flit: "
