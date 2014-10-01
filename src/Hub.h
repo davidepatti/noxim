@@ -48,8 +48,8 @@ SC_MODULE(Hub)
     bool current_level_rx[MAX_HUB_PORTS];	// Current level for ABP
     bool current_level_tx[MAX_HUB_PORTS];	// Current level for ABP
 
-    Initiator* init[MAX_HUB_PORTS];
-    Target* target[MAX_HUB_PORTS];
+    Initiator* init[MAX_HUB_CHANNELS];
+    Target* target[MAX_HUB_CHANNELS];
 
     int start_from_port;	                // Port from which to start the reservation cycle
 
@@ -75,7 +75,7 @@ SC_MODULE(Hub)
 	sensitive << reset;
 	sensitive << clock.pos();
 
-	for (int i = 0; i < MAX_HUB_PORTS; i++)
+	for (int i = 0; i < MAX_HUB_CHANNELS; i++)
 	{
 	    char txt[20];
 	    sprintf(txt, "init_%d", i);
@@ -84,7 +84,7 @@ SC_MODULE(Hub)
 	    //init[i]->socket.bind( bus->targ_socket );
 	}
 
-	for (int i = 0; i < MAX_HUB_PORTS; i++)
+	for (int i = 0; i < MAX_HUB_CHANNELS; i++)
 	{
 	    char txt[20];
 	    sprintf(txt, "target_%d", i);

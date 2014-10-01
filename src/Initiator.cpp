@@ -1,13 +1,21 @@
 #include "Initiator.h"
+#include "Main.h"
 
   void Initiator::thread_process()
   {
-    tlm::tlm_generic_payload* trans;
-    tlm::tlm_phase phase;
-    sc_time delay;
+
+      tlm::tlm_generic_payload* trans;
+      tlm::tlm_phase phase;
+      sc_time delay;
+
+
+      if (!GlobalParams::use_winoc) goto skip;
+
+
+      cout << "\n ****** WIRELESS TEST - starting 2 non-blocking transmissions" << endl;
 
     // Generate a sequence of random transactions
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 2; i++)
     {
       int adr = rand();
       tlm::tlm_command cmd = static_cast<tlm::tlm_command>(rand() % 2);
@@ -81,6 +89,11 @@
     // Call b_transport to demonstrate the b/nb conversion by the simple_target_socket
     socket->b_transport( *trans, delay );
     check_transaction( *trans );
+
+skip:
+    ;
+    // ciao
+
   }
 
   // TLM-2 backward non-blocking transport method

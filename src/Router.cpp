@@ -280,7 +280,7 @@ vector <
   // If WiNoC available, check for intercluster communication
   if (GlobalParams::use_winoc)
   {
-      assert(false);
+      //assert(false);
     // Check for intercluster communication
       /*
     if (!winoc->SameRadioHub(local_id, route_data.dst_id))

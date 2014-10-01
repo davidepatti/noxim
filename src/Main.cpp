@@ -45,6 +45,7 @@ bool GlobalParams::low_power_link_strategy = DEFAULT_LOW_POWER_LINK_STRATEGY;
 double GlobalParams::qos = DEFAULT_QOS;
 bool GlobalParams::show_buffer_stats = DEFAULT_SHOW_BUFFER_STATS;
 bool GlobalParams::use_winoc = DEFAULT_USE_WINOC;
+char GlobalParams::winoc_cfg_fname[128] = DEFAULT_WINOC_CFG_FILENAME;
                                   
 //---------------------------------------------------------------------------
 
