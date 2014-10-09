@@ -87,7 +87,7 @@ using namespace std;
 #define DEFAULT_DETAILED                               false
 #define DEFAULT_DYAD_THRESHOLD                           0.6
 #define DEFAULT_MAX_VOLUME_TO_BE_DRAINED                   0
-#define DEFAULT_ROUTER_PWR_FILENAME     "default_router.pwr"
+#define DEFAULT_ROUTER_PWR_FILENAME    "default_router.yaml"
 #define DEFAULT_LOW_POWER_LINK_STRATEGY                false
 #define DEFAULT_QOS                                      1.0
 #define DEFAULT_SHOW_BUFFER_STATS                      false
