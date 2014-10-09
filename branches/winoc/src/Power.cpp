@@ -98,72 +98,27 @@ void Power::RHTransmitElec()
 
 bool Power::LoadPowerData(const char *fname)
 {
-  ifstream fin(fname, ios::in);
+  YAML::Node config = YAML::LoadFile(fname);
+  YAML::Node router = config["Router"];
+  YAML::Node radio_hub = config["RadioHub"];
 
-  if (!fin)
-    return false;
-  
-  while (!fin.eof())
-    {
-      char line[1024];
-      fin.getline(line, sizeof(line)-1);
+  pwr_routing = router["Routing"].as<double>();
+  pwr_buffering = router["Buffering"].as<double>();
+  pwr_selection = router["Selection"].as<double>();
+  pwr_arbitration = router["Arbitration"].as<double>();
+  pwr_crossbar = router["Crossbar"].as<double>();
+  pwr_link = router["Link"].as<double>();
+  pwr_link_lv = router["Link_LV"].as<double>();
+  pwr_leakage = router["Leakage"].as<double>();
+  pwr_end2end = router["End2end"].as<double>();
+  pwr_rhtxwifi = radio_hub["DefaultPower"].as<double>();
+  pwr_rhtxelec = radio_hub["WiresPowerContribution"].as<double>();
 
-      if (line[0] != '\0')
-	{
-	  if (line[0] != '#')
-	    {
-	      char   label[1024];
-	      double value;
-	      int params = sscanf(line, "%s %lf", label, &value);
-	      if (params != 2)
-		cerr << "WARNING: Invalid power data format: " << line << endl;
-	      else
-		{
-		  if (strcmp(label, "PWR_ROUTING") == 0)
-		    pwr_routing = value;
-		  else if (strcmp(label, "PWR_BUFFERING") == 0)
-		    pwr_buffering = value;
-		  else if (strcmp(label, "PWR_SELECTION") == 0)
-		    pwr_selection = value;
-		  else if (strcmp(label, "PWR_ARBITRATION") == 0)
-		    pwr_arbitration = value;
-		  else if (strcmp(label, "PWR_CROSSBAR") == 0)
-		    pwr_crossbar = value;
-		  else if (strcmp(label, "PWR_LINK") == 0)
-		    pwr_link = value;
-		  else if (strcmp(label, "PWR_LINK_LV") == 0)
-		    pwr_link_lv = value;
-		  else if (strcmp(label, "PWR_LEAKAGE") == 0)
-		    pwr_leakage = value;
-		  else if (strcmp(label, "PWR_END2END") == 0)
-		    pwr_end2end = value;
-		  else if (strcmp(label, "PWR_RH_TX_WIFI") == 0)
-		    pwr_rhtxwifi = value;
-		  else if (strcmp(label, "PWR_RH_TX_ELEC") == 0)
-		    pwr_rhtxelec = value;
-		  else if (strcmp(label, "PWR_RH_TX_WIFI_PM") == 0)
-		    ScanPowerMapEntry(line);
-		  else
-		    cerr << "WARNING: Invalid power label: " << label << endl;
-		}
-	    }
-	}
-    }
-
-  fin.close();
+  for (size_t i = 0; i < radio_hub["PowerMap"].size(); i++)
+  {
+      pair<int,int> key(radio_hub["PowerMap"][i]["TXHubID"].as<int>(), radio_hub["PowerMap"][i]["RXHubID"].as<int>());
+      rh_power_map[key] =radio_hub["PowerMap"][i]["Energy"].as<double>();
+  }
 
   return true;
-}
-void Power::ScanPowerMapEntry(char *line)
-{
-  int src, dst;
-  double energy;
-
-  if (sscanf(line, "%*s %d %d %lf", &src, &dst, &energy) != 3)
-    cerr << "WARNING: Invalid power data format: " << line << endl;
-  else
-  {
-    pair<int,int> key(src,dst);
-    rh_power_map[key] = energy;
-  }
 }

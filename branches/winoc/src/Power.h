@@ -14,6 +14,9 @@
 #include <cassert>
 #include <map>
 #include "Main.h"
+
+#include "yaml-cpp/yaml.h"
+
 using namespace std;
 
 /*
@@ -137,7 +140,6 @@ class Power {
     static bool   power_data_loaded;
 
     static map<pair<int,int>, double> rh_power_map;
-    void ScanPowerMapEntry(char *line);
 
     double pwr;
     double pwr_rh;

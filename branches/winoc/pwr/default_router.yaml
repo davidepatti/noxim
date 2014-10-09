@@ -1,0 +1,21 @@
+Router:
+    Buffering: 9.38275e-12
+    Routing: 0.0
+    Selection: 0.0
+    Arbitration: 3.71035e-13
+    Crossbar: 1.0258e-11
+    Link: 11.0e-12
+    Link_LV: 11.0e-12
+    Leakage: 1.75635e-12
+    End2end: 0.0
+
+RadioHub:
+    WiresPowerContribution: 0.0
+    DefaultPower: 0.0
+#    PowerMap:
+#        - TXHubID: 1
+#          RXHubID: 2
+#          Energy: 0.0
+#        - TXHubID: 2
+#          RXHubID: 1
+#          Energy: 0.0
