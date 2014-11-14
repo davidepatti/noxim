@@ -14,7 +14,8 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
     // Can ignore DMI hint and extensions
     // Using the SystemC report handler is an acceptable way of signalling an error
 
-    if (adr >= sc_dt::uint64(MEM_SIZE) || byt != 0 || len > 4 || wid < len)
+    //if (adr >= sc_dt::uint64(MEM_SIZE) || byt != 0 || len > 4 || wid < len)
+    if (adr >= sc_dt::uint64(MEM_SIZE) || byt != 0 )
 	SC_REPORT_ERROR("TLM-2", "Target does not support given generic payload transaction");
 
     // Obliged to implement read and write commands
