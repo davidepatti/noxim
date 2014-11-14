@@ -14,14 +14,15 @@ void NoC::buildMesh()
 {
 
 
-    bus   = new Bus("bus");
+    // TODO: replace with dynamic code based on configuration file
+    channel   = new Channel("channel");
 
      char hub_name[10];   
     // TODO: replace with dynamic code based on configuration file
     for (int i=0;i<MAX_HUBS;i++)
     {
 	sprintf(hub_name, "HUB_%d", i);
-	cout << "\n creating " << i << endl;
+	cout << "\n creating HUB " << i << endl;
 	h[i] = new Hub(hub_name);
 	h[i]->local_id = i;
 	h[i]->clock(clock);
@@ -112,8 +113,8 @@ void NoC::buildMesh()
 	    // TODO: where pointers should be allocated ?
 	    if (i==0 && j==0)
 	    {
-		h[0]->init[0]->socket.bind(bus->targ_socket );
-		bus->init_socket.bind(h[0]->target[0]->socket);
+		h[0]->init[0]->socket.bind(channel->targ_socket );
+		channel->init_socket.bind(h[0]->target[0]->socket);
 
 		// hub receives
 		h[0]->req_rx[0](req_to_hub[i][j]);
@@ -128,8 +129,8 @@ void NoC::buildMesh()
 	    else
 	    if (i==3 && j==3)
 	    {
-		h[1]->init[0]->socket.bind(bus->targ_socket );
-		bus->init_socket.bind(h[1]->target[0]->socket);
+		h[1]->init[0]->socket.bind(channel->targ_socket );
+		channel->init_socket.bind(h[1]->target[0]->socket);
 
 		h[1]->req_rx[0](req_to_hub[i][j]);
 		h[1]->flit_rx[0](flit_to_hub[i][j]);

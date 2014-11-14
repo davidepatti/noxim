@@ -16,7 +16,7 @@
 #include "GlobalRoutingTable.h"
 #include "GlobalTrafficTable.h"
 #include "Hub.h"
-#include "Bus.h"
+#include "Channel.h"
 
 using namespace std;
 
@@ -69,7 +69,7 @@ SC_MODULE(NoC)
     
     Hub *h[MAX_HUBS];
 
-    Bus* bus;
+    Channel* channel;
 
     // Global tables
     GlobalRoutingTable grtable;

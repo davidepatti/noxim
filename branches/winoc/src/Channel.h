@@ -14,32 +14,32 @@ using namespace std;
 #define DEBUG
 
 // ************************************************************************************
-// Bus model supports multiple initiators and multiple targets
+// Channel model supports multiple initiators and multiple targets
 // Supports b_ and nb_ transport interfaces, DMI and debug
 // It does no arbitration, but routes all transactions from initiators without blocking
 // It uses a simple built-in routing algorithm
 // ************************************************************************************
 
-struct Bus: sc_module
+struct Channel: sc_module
 {
   // ***********************************************************
   // Each multi-socket can be bound to multiple sockets
   // No need for an array-of-sockets
   // ***********************************************************
 
-  tlm_utils::multi_passthrough_target_socket<Bus>    targ_socket;
-  tlm_utils::multi_passthrough_initiator_socket<Bus> init_socket;
+  tlm_utils::multi_passthrough_target_socket<Channel>    targ_socket;
+  tlm_utils::multi_passthrough_initiator_socket<Channel> init_socket;
 
-  SC_CTOR(Bus)
+  SC_CTOR(Channel)
   : targ_socket("targ_socket"), init_socket("init_socket")
   {
-    targ_socket.register_nb_transport_fw(   this, &Bus::nb_transport_fw);
-    targ_socket.register_b_transport(       this, &Bus::b_transport);
-    targ_socket.register_get_direct_mem_ptr(this, &Bus::get_direct_mem_ptr);
-    targ_socket.register_transport_dbg(     this, &Bus::transport_dbg);
+    targ_socket.register_nb_transport_fw(   this, &Channel::nb_transport_fw);
+    targ_socket.register_b_transport(       this, &Channel::b_transport);
+    targ_socket.register_get_direct_mem_ptr(this, &Channel::get_direct_mem_ptr);
+    targ_socket.register_transport_dbg(     this, &Channel::transport_dbg);
 
-    init_socket.register_nb_transport_bw(          this, &Bus::nb_transport_bw);
-    init_socket.register_invalidate_direct_mem_ptr(this, &Bus::invalidate_direct_mem_ptr);
+    init_socket.register_nb_transport_bw(          this, &Channel::nb_transport_bw);
+    init_socket.register_invalidate_direct_mem_ptr(this, &Channel::invalidate_direct_mem_ptr);
   }
 
 

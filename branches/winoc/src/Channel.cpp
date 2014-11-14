@@ -1,6 +1,6 @@
-#include "Bus.h"
+#include "Channel.h"
 
-  tlm::tlm_sync_enum Bus::nb_transport_fw(int id,
+  tlm::tlm_sync_enum Channel::nb_transport_fw(int id,
       tlm::tlm_generic_payload& trans, tlm::tlm_phase& phase, sc_time& delay)
   {
     assert (id < targ_socket.size());
@@ -29,7 +29,7 @@
       return tlm::TLM_COMPLETED;
   }
 
-  tlm::tlm_sync_enum Bus::nb_transport_bw(int id,
+  tlm::tlm_sync_enum Channel::nb_transport_bw(int id,
       tlm::tlm_generic_payload& trans, tlm::tlm_phase& phase, sc_time& delay)
   {
     assert (id < init_socket.size());
@@ -43,7 +43,7 @@
     return targ_socket[ m_id_map[ &trans ] ]->nb_transport_bw(trans, phase, delay);
   }
 
-  void Bus::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& delay )
+  void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& delay )
   {
     assert (id < targ_socket.size());
 
@@ -65,7 +65,7 @@
     }
   }
 
-  bool Bus::get_direct_mem_ptr(int id,
+  bool Channel::get_direct_mem_ptr(int id,
                                   tlm::tlm_generic_payload& trans,
                                   tlm::tlm_dmi&  dmi_data)
   {
@@ -85,7 +85,7 @@
     return status;
   }
 
-  unsigned int Bus::transport_dbg(int id, tlm::tlm_generic_payload& trans)
+  unsigned int Channel::transport_dbg(int id, tlm::tlm_generic_payload& trans)
   {
     sc_dt::uint64 masked_address;
     unsigned int target_nr = decode_address( trans.get_address(), masked_address );
@@ -97,7 +97,7 @@
     return init_socket[target_nr]->transport_dbg( trans );
   }
 
-  void Bus::invalidate_direct_mem_ptr(int id,
+  void Channel::invalidate_direct_mem_ptr(int id,
                                          sc_dt::uint64 start_range,
                                          sc_dt::uint64 end_range)
   {
