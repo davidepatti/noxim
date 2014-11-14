@@ -113,9 +113,8 @@ void Hub::txProcess()
 		int o = reservation_table.getOutputPort(i);
 		if (o != NOT_RESERVED) 
 		{
-		    cout << " Inject to RH: Hub ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
-		    cout << sc_time_stamp().to_double() / 1000 << ": Hub[" << local_id
-			<< "], Port[" << i << "] forward to WIFI Channel[" << o << "], flit: "
+		    cout << name() << " inject to RH: Hub ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
+		    cout << name() << " port[" << i << "] forward to WIFI Channel[" << o << "], flit: "
 			<< flit << endl;
 
 		    init[0]->set_payload(flit);

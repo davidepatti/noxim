@@ -95,7 +95,7 @@ void Router::txProcess()
 
 		  if ( o==DIRECTION_WIRELESS)
 		  {
-		      cout << name() << "\n **** DEBUG **** ready to go wireless ..." << endl;
+		      cout << name() << " ready to reserve wireless direction ..." << endl;
 
 		  }
 
@@ -133,7 +133,7 @@ void Router::txProcess()
 		  {
 		    if (o == DIRECTION_WIRELESS)
 		    {
-			  cout << name() << " ***** DEBUG *** forwarding wireless " << endl;
+			  cout << name() << " forwarding to wireless " << endl;
 		  /* TODO: adapt code to new model
 			// Forward flit to WiNoC
 			if (winoc->CanTransmit(local_id))
@@ -332,7 +332,7 @@ int Router::route(const RouteData & route_data)
     // TODO: test code
     if (local_id==0 && ((int)(sc_time_stamp().to_double())%50000 == 0) )
     {
-	cout << "\n ***** TEST: routing to wireless at time " << sc_time_stamp() << endl;
+	cout << name() << " route() function setting wireless direction at time " << sc_time_stamp() << endl;
 	return DIRECTION_WIRELESS;
     }
 

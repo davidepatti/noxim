@@ -41,23 +41,24 @@ SC_MODULE(Tile)
     sc_in <bool> hub_ack_tx;	        // The outgoing ack signals associated with the output channels
 
 
-    // NoP related I/O
+    // NoP related I/O and signals
     sc_out <int> free_slots[DIRECTIONS];
     sc_in <int> free_slots_neighbor[DIRECTIONS];
     sc_out < NoP_data > NoP_data_out[DIRECTIONS];
     sc_in < NoP_data > NoP_data_in[DIRECTIONS];
 
-    // Signals
-    sc_signal <Flit> flit_rx_local;	// The input channels
-    sc_signal <bool> req_rx_local;              // The requests associated with the input channels
-    sc_signal <bool> ack_rx_local;	        // The outgoing ack signals associated with the input channels
-
-    sc_signal <Flit> flit_tx_local;	// The output channels
-    sc_signal <bool> req_tx_local;	        // The requests associated with the output channels
-    sc_signal <bool> ack_tx_local;	        // The outgoing ack signals associated with the output channels
-
     sc_signal <int> free_slots_local;
     sc_signal <int> free_slots_neighbor_local;
+
+    // Signals required for Router-PE connection
+    sc_signal <Flit> flit_rx_local;	
+    sc_signal <bool> req_rx_local;     
+    sc_signal <bool> ack_rx_local;
+
+    sc_signal <Flit> flit_tx_local;
+    sc_signal <bool> req_tx_local;
+    sc_signal <bool> ack_tx_local;
+
 
     // Instances
     Router *r;		                // Router instance
@@ -97,9 +98,6 @@ SC_MODULE(Tile)
 	r->req_tx[DIRECTION_LOCAL] (req_rx_local);
 	r->ack_tx[DIRECTION_LOCAL] (ack_rx_local);
 
-	r->free_slots[DIRECTION_LOCAL] (free_slots_local);
-	r->free_slots_neighbor[DIRECTION_LOCAL]
-	    (free_slots_neighbor_local);
 
 	// hub related
 	r->flit_rx[DIRECTION_WIRELESS] (hub_flit_rx);
@@ -124,6 +122,10 @@ SC_MODULE(Tile)
 	pe->req_tx(req_tx_local);
 	pe->ack_tx(ack_tx_local);
 
+	// NoP
+	//
+	r->free_slots[DIRECTION_LOCAL] (free_slots_local);
+	r->free_slots_neighbor[DIRECTION_LOCAL] (free_slots_neighbor_local);
 	pe->free_slots_neighbor(free_slots_neighbor_local);
 
     }
