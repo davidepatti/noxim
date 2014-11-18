@@ -10,23 +10,29 @@
 
 #include "NoC.h"
 
-void NoC::buildMesh()
+void NoC::buildMesh(char const * cfg_fname)
 {
-
-
+    YAML::Node config = YAML::LoadFile(cfg_fname);
+  
+    char channel_name[15];
     // TODO: replace with dynamic code based on configuration file
-    channel   = new Channel("channel");
+    channel = (Channel **) malloc (config["Channels"].size() * sizeof(Channel*));
+    for (size_t i = 0; i < config["Channels"].size() ; i++) {
+        sprintf(channel_name, "Channel_%lu", i);
+        channel[i] = new Channel(channel_name);
+    }
 
-     char hub_name[10];   
+    char hub_name[15];
     // TODO: replace with dynamic code based on configuration file
-    for (int i=0;i<MAX_HUBS;i++)
-    {
-	sprintf(hub_name, "HUB_%d", i);
-	cout << "\n creating HUB " << i << endl;
-	h[i] = new Hub(hub_name);
-	h[i]->local_id = i;
-	h[i]->clock(clock);
-	h[i]->reset(reset);
+    h = (Hub **) malloc (config["Hubs"].size() * sizeof(Hub*));
+    //for (int i=0;i<MAX_HUBS;i++)
+    for (size_t i = 0; i < config["Hubs"].size() ; i++) {
+        sprintf(hub_name, "HUB_%lu", i);
+        cout << "Creating HUB " << i << endl;
+        h[i] = new Hub(hub_name);
+        h[i]->local_id = i;
+        h[i]->clock(clock);
+        h[i]->reset(reset);
     }
 
     // Check for routing table availability
@@ -36,6 +42,40 @@ void NoC::buildMesh()
     // Check for traffic table availability
     if (GlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
 	assert(gttable.load(GlobalParams::traffic_table_filename));
+
+    // Determine, from configuration file, which Hub is connected to which Tile
+    int **hub_for_tile;
+
+    hub_for_tile = (int **) malloc(GlobalParams::mesh_dim_y * sizeof(int **));
+    assert(hub_for_tile != NULL);
+
+    for(int i = 0; i < GlobalParams::mesh_dim_y; i++) {
+        hub_for_tile[i] = (int *) malloc(GlobalParams::mesh_dim_x * sizeof(int *));
+        assert(hub_for_tile[i] != NULL);
+    }
+
+    for(YAML::const_iterator hubs_it = config["Hubs"].begin(); 
+            hubs_it != config["Hubs"].end();
+            ++hubs_it) {
+
+        int hub_id = hubs_it->first.as<int>();
+        YAML::Node hub = hubs_it->second;
+
+        for (size_t i = 0; i < hub["attachedNodes"].size(); i++){
+            int tile_id = hub["attachedNodes"][i].as<int>();
+            hub_for_tile[tile_id % GlobalParams::mesh_dim_x][tile_id / GlobalParams::mesh_dim_x] = hub_id;
+        }
+    } 
+   
+    // DEBUG Print Tile / Hub connections 
+    for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
+	    for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
+            cout << "t[" << i << "][" << j << "] => " << hub_for_tile[i][j] << endl;
+        }
+    }
+
+    // Var to track Hub connected ports
+    int * hub_connected_ports = (int *) calloc(config["Hubs"].size(), sizeof(int));
 
     // Create the mesh as a matrix of tiles
     for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
@@ -104,7 +144,7 @@ void NoC::buildMesh()
 	    t[i][j]->hub_req_tx(req_to_hub[i][j]); // 7, sc_out
 	    t[i][j]->hub_flit_tx(flit_to_hub[i][j]);
 	    t[i][j]->hub_ack_tx(ack_from_hub[i][j]);
-
+/*
 	    // TODO: wireless hub test - replace with dynamic code
 	    // using configuration file
 	    // node 0,0 connected to Hub 0
@@ -144,8 +184,24 @@ void NoC::buildMesh()
 	    else
 	    {
 	    }
+*/
+        // TODO: Review port index. Connect each Hub to all its Channels 
+        int hub_id = hub_for_tile[i][j];
+        int port = hub_connected_ports[hub_id]++;
 
+        if (port == 0) {
+            cout << "HUB ID " << hub_id << "Connected port " << port << endl;
+            h[hub_id]->init[0]->socket.bind(channel[0]->targ_socket);
+            channel[0]->init_socket.bind(h[hub_id]->target[0]->socket);
 
+            h[hub_id]->req_rx[port](req_to_hub[i][j]);
+            h[hub_id]->flit_rx[port](flit_to_hub[i][j]);
+            h[hub_id]->ack_rx[port](ack_from_hub[i][j]);
+
+            h[hub_id]->flit_tx[port](flit_from_hub[i][j]);
+            h[hub_id]->req_tx[port](req_from_hub[i][j]);
+            h[hub_id]->ack_tx[port](ack_to_hub[i][j]);
+        }
 
 	    // Map buffer level signals (analogy with req_tx/rx port mapping)
 	    t[i][j]->free_slots[DIRECTION_NORTH] (free_slots_to_north[i][j]);

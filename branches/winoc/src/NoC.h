@@ -18,6 +18,8 @@
 #include "Hub.h"
 #include "Channel.h"
 
+#include "yaml-cpp/yaml.h"
+
 using namespace std;
 
 SC_MODULE(NoC)
@@ -67,9 +69,10 @@ SC_MODULE(NoC)
     // Matrix of tiles
     Tile *t[MAX_STATIC_DIM][MAX_STATIC_DIM];
     
-    Hub *h[MAX_HUBS];
+    //Hub *h[MAX_HUBS];
+    Hub **h;
 
-    Channel* channel;
+    Channel **channel;
 
     // Global tables
     GlobalRoutingTable grtable;
@@ -104,7 +107,7 @@ SC_MODULE(NoC)
 	//---------- Mau experiment <stop>
 
 	// Build the Mesh
-	buildMesh();
+	buildMesh("config.yaml");
     }
 
     // Support methods
@@ -112,7 +115,7 @@ SC_MODULE(NoC)
 
   private:
 
-    void buildMesh();
+    void buildMesh(char const * cfg_fname);
 
 };
 
