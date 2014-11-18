@@ -77,6 +77,7 @@ void NoC::buildMesh(char const * cfg_fname)
     // Var to track Hub connected ports
     int * hub_connected_ports = (int *) calloc(config["Hubs"].size(), sizeof(int));
 
+
     // Create the mesh as a matrix of tiles
     for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
 	for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
@@ -84,6 +85,8 @@ void NoC::buildMesh(char const * cfg_fname)
 	    char tile_name[20];
 	    sprintf(tile_name, "Tile[%02d][%02d]", i, j);
 	    t[i][j] = new Tile(tile_name);
+
+	    cout << "> Setting " << tile_name << endl;
 
 	    // Tell to the router its coordinates
 	    t[i][j]->r->configure(j * GlobalParams::mesh_dim_x + i,
@@ -187,9 +190,12 @@ void NoC::buildMesh(char const * cfg_fname)
 */
         // TODO: Review port index. Connect each Hub to all its Channels 
         int hub_id = hub_for_tile[i][j];
+	// The next time that the same HUB is considered, the next
+	// port will be connected
         int port = hub_connected_ports[hub_id]++;
 
-        if (port == 0) {
+
+        //if (port == 0) {
             cout << "HUB ID " << hub_id << "Connected port " << port << endl;
             h[hub_id]->init[0]->socket.bind(channel[0]->targ_socket);
             channel[0]->init_socket.bind(h[hub_id]->target[0]->socket);
@@ -201,7 +207,7 @@ void NoC::buildMesh(char const * cfg_fname)
             h[hub_id]->flit_tx[port](flit_from_hub[i][j]);
             h[hub_id]->req_tx[port](req_from_hub[i][j]);
             h[hub_id]->ack_tx[port](ack_to_hub[i][j]);
-        }
+        //}
 
 	    // Map buffer level signals (analogy with req_tx/rx port mapping)
 	    t[i][j]->free_slots[DIRECTION_NORTH] (free_slots_to_north[i][j]);
