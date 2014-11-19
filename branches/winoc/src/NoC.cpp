@@ -107,6 +107,7 @@ void NoC::buildMesh(char const * cfg_fname)
 				  GlobalParams::buffer_depth,
 				  grtable);
 
+
 	    // Tell to the PE its coordinates
 	    t[i][j]->pe->local_id = j * GlobalParams::mesh_dim_x + i;
 	    t[i][j]->pe->traffic_table = &gttable;	// Needed to choose destination
@@ -235,8 +236,27 @@ void NoC::buildMesh(char const * cfg_fname)
 	    t[i][j]->NoP_data_in[DIRECTION_EAST] (NoP_data_to_west[i + 1][j]);
 	    t[i][j]->NoP_data_in[DIRECTION_SOUTH] (NoP_data_to_north[i][j + 1]);
 	    t[i][j]->NoP_data_in[DIRECTION_WEST] (NoP_data_to_east[i][j]);
+
+
 	}
     }
+
+/*
+    for (size_t hub_id = 0; hub_id < config["Hubs"].size() ; hub_id++) {
+        cout << "setting unused  HUB " << hub_id << " ports " << endl;
+
+	for (int port= hub_connected_ports[i]; port < MAX_HUB_PORTS; port++) {
+            h[hub_id]->req_rx[port] = 0;
+            h[hub_id]->flit_rx[port](0);
+            h[hub_id]->ack_rx[port](0);
+
+            h[hub_id]->flit_tx[port](0);
+            h[hub_id]->req_tx[port](0);
+            h[hub_id]->ack_tx[port](0);
+	}
+    }
+    */
+
 
     // dummy NoP_data structure
     NoP_data tmp_NoP;
