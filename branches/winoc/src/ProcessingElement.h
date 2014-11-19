@@ -46,6 +46,7 @@ SC_MODULE(ProcessingElement)
     void txProcess();		// The transmitting process
     bool canShot(Packet & packet);	// True when the packet must be shot
     Flit nextFlit();	// Take the next flit of the current packet
+    Packet trafficTest();	// used for testing traffic
     Packet trafficRandom();	// Random destination distribution
     Packet trafficTranspose1();	// Transpose 1 destination distribution
     Packet trafficTranspose2();	// Transpose 2 destination distribution

@@ -32,7 +32,7 @@ void showHelp(char selfname[])
 	"\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value [flits] (default "
 	<< DEFAULT_BUFFER_DEPTH << ")" << endl;
   cout <<
-    "\t-winoc FILENAME\tUse a second level WiNoC network as specified by the FILENAME configuration file" 
+    "\t-winoc enable radio hub wireless transmission" 
        << endl;
     cout <<
 	"\t-size Nmin Nmax\tSet the minimum and maximum packet size to the specified integer values [flits] (default min="
@@ -279,7 +279,6 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::buffer_depth = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-winoc")) {
 		GlobalParams::use_winoc = true;
-		strcpy(GlobalParams::winoc_cfg_fname, arg_vet[++i]);
 	    }
 	    else if (!strcmp(arg_vet[i], "-size")) {
 		GlobalParams::min_packet_size = atoi(arg_vet[++i]);

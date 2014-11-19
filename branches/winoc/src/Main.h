@@ -360,4 +360,15 @@ inline int coord2Id(const Coord & coord)
     return id;
 }
 
+inline bool SameRadioHub(int id1, int id2)
+{
+    // TODO WIRELSS: replace with actual choice based on topology
+
+    if (id1==0 && id2==3)
+	return false;
+
+    return true;
+}
+
+
 #endif

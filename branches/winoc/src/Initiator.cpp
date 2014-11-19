@@ -11,14 +11,12 @@
       while (1)
       {
 
-	  //if (!GlobalParams::use_winoc) goto skip;
-
-	  cout << "\n" << name() << " ****** WIRELESS TEST - waiting transmissions" << endl;
+	  cout << "\n" << name() << " ****** Initiator - waiting transmissions" << endl;
 
 	  // TODO: check
 	  wait(start_request_event);
 
-	  cout << "\n" << name() << " ****** WIRELESS TEST - starting blocking transmissions" << endl;
+	  cout << "\n" << name() << " ****** Initiator - starting blocking transmissions" << endl;
 
 	  // TODO: fixed address!
 	  int i = 0;
