@@ -43,7 +43,6 @@ void NoC::buildMesh(char const * cfg_fname)
     if (GlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
 	assert(gttable.load(GlobalParams::traffic_table_filename));
 
-    // Determine, from configuration file, which Hub is connected to which Tile
     int **hub_for_tile;
 
     hub_for_tile = (int **) malloc(GlobalParams::mesh_dim_y * sizeof(int **));
@@ -61,12 +60,26 @@ void NoC::buildMesh(char const * cfg_fname)
         int hub_id = hubs_it->first.as<int>();
         YAML::Node hub = hubs_it->second;
 
+        // Determine, from configuration file, which Hub is connected to which Tile
         for (size_t i = 0; i < hub["attachedNodes"].size(); i++){
             int tile_id = hub["attachedNodes"][i].as<int>();
             hub_for_tile[tile_id % GlobalParams::mesh_dim_x][tile_id / GlobalParams::mesh_dim_x] = hub_id;
         }
+        // Determine, from configuration file, which Hub is connected to which Channel
+        for (size_t i = 0; i < hub["txChannels"].size(); i++){
+            int channel_id = hub["txChannels"][i].as<int>();
+            cout << "HUB: " << hub_id << "Channel: " << channel_id << endl;
+            h[hub_id]->init[channel_id]->socket.bind(channel[channel_id]->targ_socket);
+            cout << "OK" << endl;
+        }
+        for (size_t i = 0; i < hub["rxChannels"].size(); i++){
+            int channel_id = hub["rxChannels"][i].as<int>();
+            cout << "HUB: " << hub_id << "Channel: " << channel_id << endl;
+            channel[channel_id]->init_socket.bind(h[hub_id]->target[channel_id]->socket);
+            cout << "OK" << endl;
+        }
     } 
-   
+
     // DEBUG Print Tile / Hub connections 
     for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
 	    for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
@@ -194,12 +207,6 @@ void NoC::buildMesh(char const * cfg_fname)
 	// port will be connected
         int port = hub_connected_ports[hub_id]++;
 
-
-        //if (port == 0) {
-            cout << "HUB ID " << hub_id << "Connected port " << port << endl;
-            h[hub_id]->init[0]->socket.bind(channel[0]->targ_socket);
-            channel[0]->init_socket.bind(h[hub_id]->target[0]->socket);
-
             h[hub_id]->req_rx[port](req_to_hub[i][j]);
             h[hub_id]->flit_rx[port](flit_to_hub[i][j]);
             h[hub_id]->ack_rx[port](ack_from_hub[i][j]);
@@ -207,8 +214,6 @@ void NoC::buildMesh(char const * cfg_fname)
             h[hub_id]->flit_tx[port](flit_from_hub[i][j]);
             h[hub_id]->req_tx[port](req_from_hub[i][j]);
             h[hub_id]->ack_tx[port](ack_to_hub[i][j]);
-        //}
-
 	    // Map buffer level signals (analogy with req_tx/rx port mapping)
 	    t[i][j]->free_slots[DIRECTION_NORTH] (free_slots_to_north[i][j]);
 	    t[i][j]->free_slots[DIRECTION_EAST] (free_slots_to_east[i + 1][j]);
