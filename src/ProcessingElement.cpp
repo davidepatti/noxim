@@ -54,8 +54,7 @@ void ProcessingElement::txProcess()
 	    if (!packet_queue.empty()) {
 		Flit flit = nextFlit();	// Generate a new flit
 		if (GlobalParams::verbose_mode > VERBOSE_OFF) {
-		    cout << sc_time_stamp().to_double() /
-			1000 << ": ProcessingElement[" << local_id <<
+		    cout << sc_time_stamp().to_double() / 1000 << ": ProcessingElement[" << local_id <<
 			"] SENDING " << flit << endl;
 		}
 		flit_tx->write(flit);	// Send the generated flit
@@ -97,6 +96,24 @@ bool ProcessingElement::canShot(Packet & packet)
 {
     bool shot;
     double threshold;
+    static bool once = false;
+
+    double now = sc_time_stamp().to_double() / 1000;
+
+    // TODO WIRELESS: enabling only some transmissions from 0 toward
+    // node 3, thus requiring wireless
+    if (GlobalParams::use_winoc) 
+    {
+	if (once) return false;
+	once = true;
+	if (local_id==0 && (int)now%1000 ==0)
+	{
+	    packet = trafficTest();
+	    return true;
+	}
+	else
+	    return false;
+    }
 
     if (GlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED) {
 	if (!transmittedAtPreviousCycle)
@@ -140,7 +157,6 @@ bool ProcessingElement::canShot(Packet & packet)
 	if (never_transmit)
 	    return false;
 
-	double now = sc_time_stamp().to_double() / 1000;
 	bool use_pir = (transmittedAtPreviousCycle == false);
 	vector < pair < int, double > > dst_prob;
 	vector <bool> use_low_voltage_path;
@@ -216,6 +232,18 @@ Packet ProcessingElement::trafficRandom()
 		range_start += GlobalParams::hotspots[i].second;	// try next
 	}
     } while (p.dst_id == p.src_id);
+
+    p.timestamp = sc_time_stamp().to_double() / 1000;
+    p.size = p.flit_left = getRandomSize();
+
+    return p;
+}
+// TODO WIRELESS: for testing only
+Packet ProcessingElement::trafficTest()
+{
+    Packet p;
+    p.src_id = local_id;
+    p.dst_id = 3;
 
     p.timestamp = sc_time_stamp().to_double() / 1000;
     p.size = p.flit_left = getRandomSize();

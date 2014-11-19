@@ -276,16 +276,15 @@ vector <
   // If WiNoC available, check for intercluster communication
   if (GlobalParams::use_winoc)
   {
-      //assert(false);
-    // Check for intercluster communication
-      /*
-    if (!winoc->SameRadioHub(local_id, route_data.dst_id))
+    // TODO WIRELESS: replace using configuration file
+    if (!SameRadioHub(local_id, route_data.dst_id))
     {
-      vector<int> dirv;
-      dirv.push_back(DIRECTION_WIRELESS);
-      return dirv;
+	cout << name() << " setting wireless direction to reach node " << route_data.dst_id << " of different Hub..." << endl;
+
+	vector<int> dirv;
+	dirv.push_back(DIRECTION_WIRELESS);
+	return dirv;
     }
-    */
   }
     Coord position = id2Coord(route_data.current_id);
     Coord src_coord = id2Coord(route_data.src_id);
@@ -328,13 +327,6 @@ vector <
 int Router::route(const RouteData & route_data)
 {
     stats.power.Routing();
-
-    // TODO: test code
-    if (local_id==0 && ((int)(sc_time_stamp().to_double())%50000 == 0) )
-    {
-	cout << name() << " route() function setting wireless direction at time " << sc_time_stamp() << endl;
-	return DIRECTION_WIRELESS;
-    }
 
     if (route_data.dst_id == local_id)
 	return DIRECTION_LOCAL;

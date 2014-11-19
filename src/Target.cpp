@@ -1,4 +1,5 @@
 #include "Target.h"
+#include "Main.h"
 
 void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 {
@@ -28,5 +29,12 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 
     // Obliged to set response status to indicate successful completion
     trans.set_response_status( tlm::TLM_OK_RESPONSE );
+}
+
+Flit Target::get_payload()
+{
+    Flit f;
+    cout << name() << " returning dummy payload flit " << endl;
+    return f;
 }
 

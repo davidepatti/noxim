@@ -5,6 +5,7 @@
 #include "tlm_utils/multi_passthrough_target_socket.h"
 
 #include "Utils.h"
+#include "Main.h"
 #include <queue>
 
 using namespace sc_core;
@@ -36,6 +37,8 @@ struct Target: sc_module
 
   int   n_trans;
   bool  response_in_progress;
+
+  Flit get_payload();
 };
 
 
