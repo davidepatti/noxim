@@ -34,13 +34,14 @@ SC_MODULE(Hub)
     sc_in_clk clock;		                // The input clock for the tile
     sc_in <bool> reset;	                        // The reset signal for the tile
 
-    sc_in <Flit> flit_rx[MAX_HUB_PORTS];	// The input channels
-    sc_in <bool> req_rx[MAX_HUB_PORTS];	        // The requests associated with the input channels
-    sc_out <bool> ack_rx[MAX_HUB_PORTS];	        // The outgoing ack signals associated with the input channels
+   // sc_in <Flit,MAX_HUB_PORTS,SC_ZERO_OR_MORE_BOUND> flit_rx[MAX_HUB_PORTS];	// The input channels
+    sc_port<sc_signal_in_if<Flit>, 1 ,SC_ZERO_OR_MORE_BOUND> flit_rx[MAX_HUB_PORTS+1];
+    sc_port<sc_signal_in_if<bool>, 1 ,SC_ZERO_OR_MORE_BOUND> req_rx[MAX_HUB_PORTS+1];	   
+    sc_port<sc_signal_inout_if<bool>, 1 ,SC_ZERO_OR_MORE_BOUND> ack_rx[MAX_HUB_PORTS+1];	  
 
-    sc_out <Flit> flit_tx[MAX_HUB_PORTS];	// The output channels
-    sc_out <bool> req_tx[MAX_HUB_PORTS];	        // The requests associated with the output channels
-    sc_in <bool> ack_tx[MAX_HUB_PORTS];	        // The outgoing ack signals associated with the output channels
+    sc_port<sc_signal_inout_if<Flit>, 1 ,SC_ZERO_OR_MORE_BOUND> flit_tx[MAX_HUB_PORTS+1];
+    sc_port<sc_signal_inout_if<bool>, 1 ,SC_ZERO_OR_MORE_BOUND> req_tx[MAX_HUB_PORTS+1];	   
+    sc_port<sc_signal_in_if<bool>, 1 ,SC_ZERO_OR_MORE_BOUND> ack_tx[MAX_HUB_PORTS+1];	  
 
 
     int local_id;		                // Unique ID

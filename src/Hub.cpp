@@ -11,7 +11,8 @@ void Hub::rxProcess()
     {
 	for (int i = 0; i < MAX_HUB_PORTS; i++) 
 	{
-	    ack_rx[i].write(0);
+	    //cout << "TESTTTT " << ack_rx[i].size() << " i " << endl;
+	    ack_rx[i]->write(0);
 	    current_level_rx[i] = 0;
 	}
 	reservation_table.clear();
@@ -28,9 +29,9 @@ void Hub::rxProcess()
 
 	    for (int i = 0; i < MAX_HUB_PORTS; i++) 
 	    {
-		if ((req_rx[i].read() == 1 - current_level_rx[i]) && !buffer[i].IsFull()) 
+		if ((req_rx[i]->read() == 1 - current_level_rx[i]) && !buffer[i].IsFull()) 
 		{
-		    Flit received_flit = flit_rx[i].read();
+		    Flit received_flit = flit_rx[i]->read();
 
 		    if (GlobalParams::verbose_mode > VERBOSE_OFF) {
 			cout << sc_time_stamp().to_double() /
@@ -50,7 +51,7 @@ void Hub::rxProcess()
 		    stats.power.EndToEnd();
 		     */
 		}
-		ack_rx[i].write(current_level_rx[i]);
+		ack_rx[i]->write(current_level_rx[i]);
 	    }
 	// TODO: re-enable
 	//stats.power.Leakage();
@@ -65,7 +66,7 @@ void Hub::txProcess()
     {
 	for (int i = 0; i < MAX_HUB_PORTS; i++) 
 	{
-	    req_tx[i].write(0);
+	    req_tx[i]->write(0);
 	    current_level_tx[i] = 0;
 	}
     } 
