@@ -78,7 +78,7 @@ bool GlobalTrafficTable::load(const char *fname)
 	    communication.t_off = t_off;
 	  } else
 	    communication.t_off =
-	      DEFAULT_RESET_TIME +
+	      GlobalParams::reset_time +
 	      GlobalParams::simulation_time;
 
 	  // Custom Tperiod
@@ -87,7 +87,7 @@ bool GlobalTrafficTable::load(const char *fname)
 	    communication.t_period = t_period;
 	  } else
 	    communication.t_period =
-	      DEFAULT_RESET_TIME +
+	      GlobalParams::reset_time +
 	      GlobalParams::simulation_time;
 
 	  // Add this communication to the vector of communications

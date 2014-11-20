@@ -12,22 +12,20 @@
 
 void NoC::buildMesh(char const * cfg_fname)
 {
-    YAML::Node config = YAML::LoadFile(cfg_fname);
-  
     char channel_name[15];
     // TODO: replace with dynamic code based on configuration file
-    channel = (Channel **) malloc (config["Channels"].size() * sizeof(Channel*));
-    for (size_t i = 0; i < config["Channels"].size() ; i++) {
-        sprintf(channel_name, "Channel_%lu", i);
+    channel = (Channel **) malloc (GlobalParams::channels_num * sizeof(Channel*));
+    for (int i = 0; i < GlobalParams::channels_num; i++) {
+        sprintf(channel_name, "Channel_%d", i);
         channel[i] = new Channel(channel_name);
     }
 
     char hub_name[15];
     // TODO: replace with dynamic code based on configuration file
-    h = (Hub **) malloc (config["Hubs"].size() * sizeof(Hub*));
+    h = (Hub **) malloc (GlobalParams::hubs_num * sizeof(Hub*));
     //for (int i=0;i<MAX_HUBS;i++)
-    for (size_t i = 0; i < config["Hubs"].size() ; i++) {
-        sprintf(hub_name, "HUB_%lu", i);
+    for (int i = 0; i < GlobalParams::hubs_num; i++) {
+        sprintf(hub_name, "HUB_%d", i);
         cout << "Creating HUB " << i << endl;
         h[i] = new Hub(hub_name);
         h[i]->local_id = i;
@@ -53,28 +51,24 @@ void NoC::buildMesh(char const * cfg_fname)
         assert(hub_for_tile[i] != NULL);
     }
 
-    for(YAML::const_iterator hubs_it = config["Hubs"].begin(); 
-            hubs_it != config["Hubs"].end();
-            ++hubs_it) {
-
-        int hub_id = hubs_it->first.as<int>();
-        YAML::Node hub = hubs_it->second;
-
+    for(int hub_id = 0; hub_id < GlobalParams::hubs_num; hub_id++) {
         // Determine, from configuration file, which Hub is connected to which Tile
-        for (size_t i = 0; i < hub["attachedNodes"].size(); i++){
-            int tile_id = hub["attachedNodes"][i].as<int>();
+        for (int i = 0; i < GlobalParams::hub_conf[hub_id].attachedNodes_num; i++){
+            int tile_id = GlobalParams::hub_conf[hub_id].attachedNodes[i];
             hub_for_tile[tile_id % GlobalParams::mesh_dim_x][tile_id / GlobalParams::mesh_dim_x] = hub_id;
         }
         // Determine, from configuration file, which Hub is connected to which Channel
-        for (size_t i = 0; i < hub["txChannels"].size(); i++){
-            int channel_id = hub["txChannels"][i].as<int>();
-            cout << "HUB: " << hub_id << "Channel: " << channel_id << endl;
+        //for (int i = 0; i < GlobalParams::hub_conf[hub_id].txChannels; i++){
+        for (int i = 0; i < GlobalParams::hub_conf[hub_id].txChannels_num; i++){
+            int channel_id = GlobalParams::hub_conf[hub_id].txChannels[i];
+            cout << "HUB: " << hub_id << "TX Channel: " << channel_id << endl;
             h[hub_id]->init[channel_id]->socket.bind(channel[channel_id]->targ_socket);
             cout << "OK" << endl;
         }
-        for (size_t i = 0; i < hub["rxChannels"].size(); i++){
-            int channel_id = hub["rxChannels"][i].as<int>();
-            cout << "HUB: " << hub_id << "Channel: " << channel_id << endl;
+        //for (int i = 0; i < GlobalParams::hub_conf[hub_id].rxChannels; i++){
+        for (int i = 0; i < GlobalParams::hub_conf[hub_id].rxChannels_num; i++){
+            int channel_id = GlobalParams::hub_conf[hub_id].rxChannels[i];
+            cout << "HUB: " << hub_id << "RX Channel: " << channel_id << endl;
             channel[channel_id]->init_socket.bind(h[hub_id]->target[channel_id]->socket);
             cout << "OK" << endl;
         }
@@ -88,7 +82,7 @@ void NoC::buildMesh(char const * cfg_fname)
     }
 
     // Var to track Hub connected ports
-    int * hub_connected_ports = (int *) calloc(config["Hubs"].size(), sizeof(int));
+    int * hub_connected_ports = (int *) calloc(GlobalParams::hubs_num, sizeof(int));
 
 
     // Create the mesh as a matrix of tiles

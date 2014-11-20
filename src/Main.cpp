@@ -11,43 +11,11 @@
 #include "Main.h"
 #include "NoC.h"
 #include "GlobalStats.h"
-#include "CmdLineParser.h"
+
 using namespace std;
 
 // need to be globally visible to allow "-volume" simulation stop
 unsigned int drained_volume;
-
-// Initialize global configuration parameters (can be overridden with command-line arguments)
-int GlobalParams::verbose_mode = DEFAULT_VERBOSE_MODE;
-int GlobalParams::trace_mode = DEFAULT_TRACE_MODE;
-char GlobalParams::trace_filename[128] = DEFAULT_TRACE_FILENAME;
-int GlobalParams::mesh_dim_x = DEFAULT_MESH_DIM_X;
-int GlobalParams::mesh_dim_y = DEFAULT_MESH_DIM_Y;
-int GlobalParams::buffer_depth = DEFAULT_BUFFER_DEPTH;
-int GlobalParams::min_packet_size = DEFAULT_MIN_PACKET_SIZE;
-int GlobalParams::max_packet_size = DEFAULT_MAX_PACKET_SIZE;
-int GlobalParams::routing_algorithm = DEFAULT_ROUTING_ALGORITHM;
-char GlobalParams::routing_table_filename[128] = DEFAULT_ROUTING_TABLE_FILENAME;
-int GlobalParams::selection_strategy = DEFAULT_SELECTION_STRATEGY;
-float GlobalParams::packet_injection_rate = DEFAULT_PACKET_INJECTION_RATE;
-float GlobalParams::probability_of_retransmission = DEFAULT_PROBABILITY_OF_RETRANSMISSION;
-int GlobalParams::traffic_distribution = DEFAULT_TRAFFIC_DISTRIBUTION;
-char GlobalParams::traffic_table_filename[128] = DEFAULT_TRAFFIC_TABLE_FILENAME;
-int GlobalParams::simulation_time = DEFAULT_SIMULATION_TIME;
-int GlobalParams::stats_warm_up_time = DEFAULT_STATS_WARM_UP_TIME;
-int GlobalParams::rnd_generator_seed = time(NULL);
-bool GlobalParams::detailed = DEFAULT_DETAILED;
-float GlobalParams::dyad_threshold = DEFAULT_DYAD_THRESHOLD;
-unsigned int GlobalParams::max_volume_to_be_drained = DEFAULT_MAX_VOLUME_TO_BE_DRAINED;
-vector <pair <int, double> > GlobalParams::hotspots;
-char GlobalParams::router_power_filename[128] = DEFAULT_ROUTER_PWR_FILENAME;
-bool GlobalParams::low_power_link_strategy = DEFAULT_LOW_POWER_LINK_STRATEGY;
-double GlobalParams::qos = DEFAULT_QOS;
-bool GlobalParams::show_buffer_stats = DEFAULT_SHOW_BUFFER_STATS;
-bool GlobalParams::use_winoc = DEFAULT_USE_WINOC;
-char GlobalParams::winoc_cfg_fname[128] = DEFAULT_WINOC_CFG_FILENAME;
-                                  
-//---------------------------------------------------------------------------
 
 int sc_main(int arg_num, char *arg_vet[])
 {
@@ -58,7 +26,7 @@ int sc_main(int arg_num, char *arg_vet[])
     cout << endl << "\t\tNoxim - the NoC Simulator" << endl;
     cout << "\t\t(C) University of Catania" << endl << endl;
 
-    parseCmdLine(arg_num, arg_vet);
+    configure(arg_num, arg_vet);
 
     //cout << "\n ROUTING = " <<  GlobalParams::routing_algorithm << endl;
 
@@ -107,7 +75,7 @@ int sc_main(int arg_num, char *arg_vet[])
     reset.write(1);
     cout << "Reset...";
     srand(GlobalParams::rnd_generator_seed);	// time(NULL));
-    sc_start(DEFAULT_RESET_TIME, SC_NS);
+    sc_start(GlobalParams::reset_time, SC_NS);
     reset.write(0);
     cout << " done! Now running for " << GlobalParams::
 	simulation_time << " cycles..." << endl;

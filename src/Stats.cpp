@@ -21,7 +21,7 @@ void Stats::configure(const int node_id, const double _warm_up_time)
 void Stats::receivedFlit(const double arrival_time,
 			      const Flit & flit)
 {
-    if (arrival_time - DEFAULT_RESET_TIME < warm_up_time)
+    if (arrival_time - GlobalParams::reset_time < warm_up_time)
 	return;
 
     int i = searchCommHistory(flit.src_id);

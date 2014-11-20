@@ -18,8 +18,6 @@
 #include "Hub.h"
 #include "Channel.h"
 
-#include "yaml-cpp/yaml.h"
-
 using namespace std;
 
 SC_MODULE(NoC)
