@@ -12,7 +12,7 @@
 
 Buffer::Buffer()
 {
-  SetMaxBufferSize(DEFAULT_BUFFER_DEPTH);
+  SetMaxBufferSize(GlobalParams::buffer_depth);
   max_occupancy = 0;
   hold_time = 0.0;
   last_event = 0.0;
@@ -124,7 +124,7 @@ void Buffer::SaveOccupancyAndTime()
 void Buffer::UpdateMeanOccupancy()
 {
   double current_time = sc_time_stamp().to_double() / 1000;
-  if (current_time - DEFAULT_RESET_TIME < GlobalParams::stats_warm_up_time)
+  if (current_time - GlobalParams::reset_time < GlobalParams::stats_warm_up_time)
     return;
 
   mean_occupancy = mean_occupancy * (hold_time_sum/(hold_time_sum+hold_time)) +
