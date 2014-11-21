@@ -57,7 +57,7 @@ class Buffer {
 
     queue < Flit > buffer;
 
-    int    max_occupancy;
+    unsigned int max_occupancy;
     double hold_time, last_event, hold_time_sum;
     double mean_occupancy;
     int    previous_occupancy;

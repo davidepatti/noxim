@@ -13,22 +13,20 @@
 void NoC::buildMesh(char const * cfg_fname)
 {
     char channel_name[15];
-    // TODO: replace with dynamic code based on configuration file
-    channel = (Channel **) malloc (GlobalParams::channels_num * sizeof(Channel*));
+    channel = new Channel*[GlobalParams::channels_num];
     for (int i = 0; i < GlobalParams::channels_num; i++) {
         sprintf(channel_name, "Channel_%d", i);
+        cout << "Creating " << channel_name << endl;
         channel[i] = new Channel(channel_name);
     }
 
     char hub_name[15];
-    // TODO: replace with dynamic code based on configuration file
-    h = (Hub **) malloc (GlobalParams::hubs_num * sizeof(Hub*));
-    //for (int i=0;i<MAX_HUBS;i++)
+    h = new Hub*[GlobalParams::hubs_num];
+
     for (int i = 0; i < GlobalParams::hubs_num; i++) {
         sprintf(hub_name, "HUB_%d", i);
-        cout << "Creating HUB " << i << endl;
-        h[i] = new Hub(hub_name);
-        h[i]->local_id = i;
+        cout << "Creating " << hub_name << endl;
+        h[i] = new Hub(hub_name, i);
         h[i]->clock(clock);
         h[i]->reset(reset);
     }
@@ -43,11 +41,11 @@ void NoC::buildMesh(char const * cfg_fname)
 
     int **hub_for_tile;
 
-    hub_for_tile = (int **) malloc(GlobalParams::mesh_dim_y * sizeof(int **));
+    hub_for_tile = new int*[GlobalParams::mesh_dim_y];
     assert(hub_for_tile != NULL);
 
     for(int i = 0; i < GlobalParams::mesh_dim_y; i++) {
-        hub_for_tile[i] = (int *) malloc(GlobalParams::mesh_dim_x * sizeof(int *));
+        hub_for_tile[i] = new int[GlobalParams::mesh_dim_x];
         assert(hub_for_tile[i] != NULL);
     }
 
@@ -61,23 +59,21 @@ void NoC::buildMesh(char const * cfg_fname)
         //for (int i = 0; i < GlobalParams::hub_conf[hub_id].txChannels; i++){
         for (int i = 0; i < GlobalParams::hub_conf[hub_id].txChannels_num; i++){
             int channel_id = GlobalParams::hub_conf[hub_id].txChannels[i];
-            cout << "HUB: " << hub_id << "TX Channel: " << channel_id << endl;
+            cout << "Binding HUB_" << hub_id << " to txChannel " << channel_id << endl;
             h[hub_id]->init[channel_id]->socket.bind(channel[channel_id]->targ_socket);
-            cout << "OK" << endl;
         }
         //for (int i = 0; i < GlobalParams::hub_conf[hub_id].rxChannels; i++){
         for (int i = 0; i < GlobalParams::hub_conf[hub_id].rxChannels_num; i++){
             int channel_id = GlobalParams::hub_conf[hub_id].rxChannels[i];
-            cout << "HUB: " << hub_id << "RX Channel: " << channel_id << endl;
+            cout << "Binding HUB_" << hub_id << " to rxChannel " << channel_id << endl;
             channel[channel_id]->init_socket.bind(h[hub_id]->target[channel_id]->socket);
-            cout << "OK" << endl;
         }
     } 
 
     // DEBUG Print Tile / Hub connections 
     for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
 	    for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
-            cout << "t[" << i << "][" << j << "] => " << hub_for_tile[i][j] << endl;
+            cout << "Tile [" << i << "][" << j << "] is connected to HUB_" << hub_for_tile[i][j] << endl;
         }
     }
 
@@ -155,61 +151,23 @@ void NoC::buildMesh(char const * cfg_fname)
 	    t[i][j]->hub_req_tx(req_to_hub[i][j]); // 7, sc_out
 	    t[i][j]->hub_flit_tx(flit_to_hub[i][j]);
 	    t[i][j]->hub_ack_tx(ack_from_hub[i][j]);
-/*
-	    // TODO: wireless hub test - replace with dynamic code
-	    // using configuration file
-	    // node 0,0 connected to Hub 0
-	    // node 3,3 connected to Hub 1
 
-	    // TODO: where pointers should be allocated ?
-	    if (i==0 && j==0)
-	    {
-		h[0]->init[0]->socket.bind(channel->targ_socket );
-		channel->init_socket.bind(h[0]->target[0]->socket);
-
-		// hub receives
-		h[0]->req_rx[0](req_to_hub[i][j]);
-		h[0]->flit_rx[0](flit_to_hub[i][j]);
-		h[0]->ack_rx[0](ack_from_hub[i][j]);
-
-		// hub transmits
-		h[0]->req_tx[0](req_from_hub[i][j]);
-		h[0]->flit_tx[0](flit_from_hub[i][j]);
-		h[0]->ack_tx[0](ack_to_hub[i][j]);
-	    }
-	    else
-	    if (i==3 && j==3)
-	    {
-		h[1]->init[0]->socket.bind(channel->targ_socket );
-		channel->init_socket.bind(h[1]->target[0]->socket);
-
-		h[1]->req_rx[0](req_to_hub[i][j]);
-		h[1]->flit_rx[0](flit_to_hub[i][j]);
-		h[1]->ack_rx[0](ack_from_hub[i][j]);
-
-		h[1]->flit_tx[0](flit_from_hub[i][j]);
-		h[1]->req_tx[0](req_from_hub[i][j]);
-		h[1]->ack_tx[0](ack_to_hub[i][j]);
-
-	    }
-	    else
-	    {
-	    }
-*/
         // TODO: Review port index. Connect each Hub to all its Channels 
         int hub_id = hub_for_tile[i][j];
-	// The next time that the same HUB is considered, the next
-	// port will be connected
+	
+        // The next time that the same HUB is considered, the next
+        // port will be connected
         int port = hub_connected_ports[hub_id]++;
 
-            h[hub_id]->req_rx[port](req_to_hub[i][j]);
-            h[hub_id]->flit_rx[port](flit_to_hub[i][j]);
-            h[hub_id]->ack_rx[port](ack_from_hub[i][j]);
+        h[hub_id]->req_rx[port](req_to_hub[i][j]);
+        h[hub_id]->flit_rx[port](flit_to_hub[i][j]);
+        h[hub_id]->ack_rx[port](ack_from_hub[i][j]);
 
-            h[hub_id]->flit_tx[port](flit_from_hub[i][j]);
-            h[hub_id]->req_tx[port](req_from_hub[i][j]);
-            h[hub_id]->ack_tx[port](ack_to_hub[i][j]);
-	    // Map buffer level signals (analogy with req_tx/rx port mapping)
+        h[hub_id]->flit_tx[port](flit_from_hub[i][j]);
+        h[hub_id]->req_tx[port](req_from_hub[i][j]);
+        h[hub_id]->ack_tx[port](ack_to_hub[i][j]);
+
+        // Map buffer level signals (analogy with req_tx/rx port mapping)
 	    t[i][j]->free_slots[DIRECTION_NORTH] (free_slots_to_north[i][j]);
 	    t[i][j]->free_slots[DIRECTION_EAST] (free_slots_to_east[i + 1][j]);
 	    t[i][j]->free_slots[DIRECTION_SOUTH] (free_slots_to_south[i][j + 1]);
@@ -231,26 +189,8 @@ void NoC::buildMesh(char const * cfg_fname)
 	    t[i][j]->NoP_data_in[DIRECTION_SOUTH] (NoP_data_to_north[i][j + 1]);
 	    t[i][j]->NoP_data_in[DIRECTION_WEST] (NoP_data_to_east[i][j]);
 
-
 	}
     }
-
-/*
-    for (size_t hub_id = 0; hub_id < config["Hubs"].size() ; hub_id++) {
-        cout << "setting unused  HUB " << hub_id << " ports " << endl;
-
-	for (int port= hub_connected_ports[i]; port < MAX_HUB_PORTS; port++) {
-            h[hub_id]->req_rx[port] = 0;
-            h[hub_id]->flit_rx[port](0);
-            h[hub_id]->ack_rx[port](0);
-
-            h[hub_id]->flit_tx[port](0);
-            h[hub_id]->req_tx[port](0);
-            h[hub_id]->ack_tx[port](0);
-	}
-    }
-    */
-
 
     // dummy NoP_data structure
     NoP_data tmp_NoP;

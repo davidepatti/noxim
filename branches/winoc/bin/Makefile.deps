@@ -59,6 +59,7 @@
 ./Router.o: ../src/LocalRoutingTable.h ../src/ReservationTable.h
 ./Stats.o: ../src/Stats.h ../src/Main.h ../src/ConfigurationManager.h
 ./Stats.o: ../src/GlobalParams.h ../src/Power.h
-./Target.o: ../src/Target.h ../src/Utils.h
+./Target.o: ../src/Target.h ../src/Utils.h ../src/Main.h
+./Target.o: ../src/ConfigurationManager.h ../src/GlobalParams.h
 ./TokenRing.o: ../src/TokenRing.h
 ./Utils.o: ../src/Utils.h

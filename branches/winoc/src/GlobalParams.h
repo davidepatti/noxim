@@ -67,10 +67,8 @@ using namespace std;
 
 // TODO by Fafa - this MUST be removed!!! Use only STL vectors instead!!!
 #define MAX_STATIC_DIM 32
-#define MAX_HUB_PORTS 4
-#define MAX_HUB_CHANNELS 1
-//#define MAX_HUBS 2
 
+// TODO check the list of attributes for ChannelConf 
 typedef struct {
     int BER;
     int delay;
@@ -115,7 +113,6 @@ struct GlobalParams {
     static double qos;
     static bool show_buffer_stats;
     static bool use_winoc;
-    static char winoc_cfg_fname[128];
     static int channels_num;
     static int hubs_num;
     static ChannelConf *channel_conf;

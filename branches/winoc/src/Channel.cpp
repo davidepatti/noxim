@@ -3,7 +3,7 @@
   tlm::tlm_sync_enum Channel::nb_transport_fw(int id,
       tlm::tlm_generic_payload& trans, tlm::tlm_phase& phase, sc_time& delay)
   {
-    assert (id < targ_socket.size());
+    assert (id < (int)targ_socket.size());
 
     // Forward path
     m_id_map[ &trans ] = id;
@@ -32,7 +32,7 @@
   tlm::tlm_sync_enum Channel::nb_transport_bw(int id,
       tlm::tlm_generic_payload& trans, tlm::tlm_phase& phase, sc_time& delay)
   {
-    assert (id < init_socket.size());
+    assert (id < (int)init_socket.size());
 
     // Backward path
 
@@ -45,7 +45,7 @@
 
   void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& delay )
   {
-    assert (id < targ_socket.size());
+    assert (id < (int)targ_socket.size());
 
     // Forward path
     sc_dt::uint64 address = trans.get_address();

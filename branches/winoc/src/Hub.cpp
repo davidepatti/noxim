@@ -9,7 +9,7 @@ void Hub::rxProcess()
 {
     if (reset.read()) 
     {
-	for (int i = 0; i < MAX_HUB_PORTS; i++) 
+	for (int i = 0; i < num_ports; i++) 
 	{
 	    //cout << "TESTTTT " << ack_rx[i].size() << " i " << endl;
 	    ack_rx[i]->write(0);
@@ -27,7 +27,7 @@ void Hub::rxProcess()
 	    ////////////////////////////////////////////////////////////////
 	    // For each port decide if a new flit can be accepted
 
-	    for (int i = 0; i < MAX_HUB_PORTS; i++) 
+	    for (int i = 0; i < num_ports; i++) 
 	    {
 		if ((req_rx[i]->read() == 1 - current_level_rx[i]) && !buffer[i].IsFull()) 
 		{
@@ -64,7 +64,7 @@ void Hub::txProcess()
 {
     if (reset.read()) 
     {
-	for (int i = 0; i < MAX_HUB_PORTS; i++) 
+	for (int i = 0; i < num_ports; i++) 
 	{
 	    req_tx[i]->write(0);
 	    current_level_tx[i] = 0;
@@ -73,9 +73,9 @@ void Hub::txProcess()
     else 
     {
 	// 1st phase: Reservation
-	for (int j = 0; j < MAX_HUB_PORTS; j++) 
+	for (int j = 0; j < num_ports; j++) 
 	{
-	    int i = (start_from_port + j) % (MAX_HUB_PORTS);
+	    int i = (start_from_port + j) % (num_ports);
 
 	    if (!buffer[i].IsEmpty()) 
 	    {
@@ -105,7 +105,7 @@ void Hub::txProcess()
 	start_from_port++;
 
 	// 2nd phase: Forwarding
-	for (int i = 0; i < MAX_HUB_PORTS; i++) 
+	for (int i = 0; i < num_ports; i++) 
 	{
 	    if (!buffer[i].IsEmpty()) 
 	    {     

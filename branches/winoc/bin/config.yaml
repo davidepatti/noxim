@@ -93,4 +93,3 @@ low_power_link_strategy: false
 qos: 1.0
 show_buffer_stats: false
 use_winoc: false
-winoc_cfg_filename: ""

@@ -38,7 +38,6 @@ bool GlobalParams::low_power_link_strategy;
 double GlobalParams::qos;
 bool GlobalParams::show_buffer_stats;
 bool GlobalParams::use_winoc;
-char GlobalParams::winoc_cfg_fname[128];
 int GlobalParams::channels_num;
 int GlobalParams::hubs_num;
 ChannelConf * GlobalParams::channel_conf;
