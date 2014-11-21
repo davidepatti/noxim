@@ -29,73 +29,90 @@
 
 SC_MODULE(Hub)
 {
-
+    SC_HAS_PROCESS(Hub);
+    
     // I/O Ports
-    sc_in_clk clock;		                // The input clock for the tile
-    sc_in <bool> reset;	                        // The reset signal for the tile
+    sc_in_clk clock; // The input clock for the tile
+    sc_in <bool> reset; // The reset signal for the tile
 
-   // sc_in <Flit,MAX_HUB_PORTS,SC_ZERO_OR_MORE_BOUND> flit_rx[MAX_HUB_PORTS];	// The input channels
-    sc_port<sc_signal_in_if<Flit>, 1 ,SC_ZERO_OR_MORE_BOUND> flit_rx[MAX_HUB_PORTS+1];
-    sc_port<sc_signal_in_if<bool>, 1 ,SC_ZERO_OR_MORE_BOUND> req_rx[MAX_HUB_PORTS+1];	   
-    sc_port<sc_signal_inout_if<bool>, 1 ,SC_ZERO_OR_MORE_BOUND> ack_rx[MAX_HUB_PORTS+1];	  
+    int local_id; // Unique ID
+    int num_ports;
+    int num_rx_channels;
+    int num_tx_channels;
 
-    sc_port<sc_signal_inout_if<Flit>, 1 ,SC_ZERO_OR_MORE_BOUND> flit_tx[MAX_HUB_PORTS+1];
-    sc_port<sc_signal_inout_if<bool>, 1 ,SC_ZERO_OR_MORE_BOUND> req_tx[MAX_HUB_PORTS+1];	   
-    sc_port<sc_signal_in_if<bool>, 1 ,SC_ZERO_OR_MORE_BOUND> ack_tx[MAX_HUB_PORTS+1];	  
+    sc_in<Flit>* flit_rx;
+    sc_in<bool>* req_rx;
+    sc_out<bool>* ack_rx;
 
+    sc_out<Flit>* flit_tx;
+    sc_out<bool>* req_tx;	   
+    sc_in<bool>* ack_tx;	  
 
-    int local_id;		                // Unique ID
-    Buffer buffer[MAX_HUB_PORTS];	        // Buffer for each port
-    bool current_level_rx[MAX_HUB_PORTS];	// Current level for ABP
-    bool current_level_tx[MAX_HUB_PORTS];	// Current level for ABP
+    Buffer* buffer;	        // Buffer for each port
+    bool* current_level_rx;	// Current level for ABP
+    bool* current_level_tx;	// Current level for ABP
 
-    Initiator* init[MAX_HUB_CHANNELS];
-    Target* target[MAX_HUB_CHANNELS];
+    Initiator** init;
+    Target** target;
 
-    int start_from_port;	                // Port from which to start the reservation cycle
+    int start_from_port; // Port from which to start the reservation cycle
 
     // TODO: use different table or extend in order to support also
     // Hubs
     ReservationTable reservation_table;	// Switch reservation table
 
-    void rxProcess();		// The receiving process
-    void txProcess();		// The transmitting process
+    void rxProcess(); // The receiving process
+    void txProcess(); // The transmitting process
 
     void setup();
 
     // Constructor
 
-    SC_CTOR(Hub) 
-    {
+    Hub(sc_module_name nm, int id): sc_module(nm) {
+        SC_METHOD(rxProcess);
+        sensitive << reset;
+        sensitive << clock.pos();
 
-	SC_METHOD(rxProcess);
-	sensitive << reset;
-	sensitive << clock.pos();
+        SC_METHOD(txProcess);
+        sensitive << reset;
+        sensitive << clock.pos();
 
-	SC_METHOD(txProcess);
-	sensitive << reset;
-	sensitive << clock.pos();
+        local_id = id;
+        num_ports = GlobalParams::hub_conf[local_id].attachedNodes_num;
+        num_rx_channels = GlobalParams::hub_conf[local_id].rxChannels_num;
+        num_tx_channels = GlobalParams::hub_conf[local_id].txChannels_num;
 
-	for (int i = 0; i < MAX_HUB_CHANNELS; i++)
-	{
-	    char txt[20];
-	    sprintf(txt, "init_%d", i);
-	    init[i] = new Initiator(txt);
-	    // actual bus binding in buildMesh()
-	    //init[i]->socket.bind( bus->targ_socket );
-	}
+        flit_rx = new sc_in<Flit>[num_ports];
+        req_rx = new sc_in<bool>[num_ports];
+        ack_rx = new sc_out<bool>[num_ports];
 
-	for (int i = 0; i < MAX_HUB_CHANNELS; i++)
-	{
-	    char txt[20];
-	    sprintf(txt, "target_%d", i);
-	    target[i] = new Target(txt);
-	    // actual bus binding in buildMesh()
-	    // bus->init_socket.bind( target[i]->socket );
-	}
+        flit_tx = new sc_out<Flit>[num_ports];
+        req_tx = new sc_out<bool>[num_ports];
+        ack_tx = new sc_in<bool>[num_ports];
 
+        buffer = new Buffer[num_ports];
+        current_level_rx = new bool[num_ports];
+        current_level_tx = new bool[num_ports];
+
+        init = new Initiator*[num_tx_channels];
+        target = new Target*[num_rx_channels];
+
+        for (int i = 0; i < num_tx_channels; i++) {
+            char txt[20];
+            sprintf(txt, "init_%d", i);
+            init[i] = new Initiator(txt);
+            // actual bus binding in buildMesh()
+            //init[i]->socket.bind( bus->targ_socket );
+        }
+
+        for (int i = 0; i < num_rx_channels; i++) {
+            char txt[20];
+            sprintf(txt, "target_%d", i);
+            target[i] = new Target(txt);
+            // actual bus binding in buildMesh()
+            // bus->init_socket.bind( target[i]->socket );
+        }
     }
-
 };
 
 #endif

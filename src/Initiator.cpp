@@ -11,7 +11,7 @@
       while (1)
       {
 
-	  cout << "\n" << name() << " ****** Initiator - waiting transmissions" << endl;
+	  cout << "\n" << name() << " ****** Initiator - waiting for transmissions" << endl;
 
 	  // TODO: check
 	  wait(start_request_event);

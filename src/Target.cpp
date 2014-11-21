@@ -8,7 +8,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
     unsigned char*   ptr = trans.get_data_ptr();
     unsigned int     len = trans.get_data_length();
     unsigned char*   byt = trans.get_byte_enable_ptr();
-    unsigned int     wid = trans.get_streaming_width();
+    //unsigned int     wid = trans.get_streaming_width();
 
     // Obliged to check address range and check for unsupported features,
     //   i.e. byte enables, streaming, and bursts

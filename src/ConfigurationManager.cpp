@@ -24,12 +24,12 @@ void loadConfiguration() {
     GlobalParams::min_packet_size = config["min_packet_size"].as<int>();
     GlobalParams::max_packet_size = config["max_packet_size"].as<int>();
     GlobalParams::routing_algorithm = config["routing_algorithm"].as<int>();
-    strcpy(GlobalParams::routing_table_filename, config["routing_table_filename"].as<string>().c_str()); //DEFAULT_ROUTING_TABLE_FILENAME;
+    strcpy(GlobalParams::routing_table_filename, config["routing_table_filename"].as<string>().c_str()); 
     GlobalParams::selection_strategy = config["selection_strategy"].as<int>();
     GlobalParams::packet_injection_rate = config["packet_injection_rate"].as<float>();
     GlobalParams::probability_of_retransmission = config["probability_of_retransmission"].as<float>();
     GlobalParams::traffic_distribution = config["traffic_distribution"].as<int>();
-    strcpy(GlobalParams::traffic_table_filename, config["traffic_table_filename"].as<string>().c_str()); // DEFAULT_TRAFFIC_TABLE_FILENAME;
+    strcpy(GlobalParams::traffic_table_filename, config["traffic_table_filename"].as<string>().c_str());
     GlobalParams::simulation_time = config["simulation_time"].as<int>();
     GlobalParams::reset_time = config["reset_time"].as<int>();
     GlobalParams::stats_warm_up_time = config["stats_warm_up_time"].as<int>();
@@ -38,16 +38,15 @@ void loadConfiguration() {
     GlobalParams::dyad_threshold = config["dyad_threshold"].as<float>();
     GlobalParams::max_volume_to_be_drained = config["max_volume_to_be_drained"].as<unsigned int>();
     //GlobalParams::hotspots;
-    strcpy(GlobalParams::router_power_filename, config["router_power_filename"].as<string>().c_str()); //DEFAULT_ROUTER_PWR_FILENAME;
+    strcpy(GlobalParams::router_power_filename, config["router_power_filename"].as<string>().c_str()); 
     GlobalParams::low_power_link_strategy = config["low_power_link_strategy"].as<bool>();
     GlobalParams::qos = config["qos"].as<double>();
     GlobalParams::show_buffer_stats = config["show_buffer_stats"].as<bool>();
     GlobalParams::use_winoc = config["use_winoc"].as<bool>();
-    strcpy(GlobalParams::winoc_cfg_fname, config["traffic_table_filename"].as<string>().c_str()); //DEFAULT_WINOC_CFG_FILENAME;
     GlobalParams::channels_num = config["Channels"].size();
     GlobalParams::hubs_num = config["Hubs"].size();
-    GlobalParams::channel_conf = (ChannelConf *) malloc (config["Channels"].size() * sizeof(ChannelConf));
-    GlobalParams::hub_conf = (HubConf*) malloc (config["Hubs"].size() * sizeof(HubConf));
+    GlobalParams::channel_conf = new ChannelConf[config["Channels"].size()];
+    GlobalParams::hub_conf = new HubConf[config["Hubs"].size()];
     
     for(YAML::const_iterator hubs_it = config["Hubs"].begin(); 
         hubs_it != config["Hubs"].end();
@@ -60,9 +59,9 @@ void loadConfiguration() {
         GlobalParams::hub_conf[hub_id].txChannels_num = hub["txChannels"].size();
         GlobalParams::hub_conf[hub_id].rxChannels_num = hub["rxChannels"].size();
 
-        GlobalParams::hub_conf[hub_id].attachedNodes = (int *) malloc(GlobalParams::hub_conf[hub_id].attachedNodes_num  * sizeof(int));
-        GlobalParams::hub_conf[hub_id].txChannels = (int *) malloc(GlobalParams::hub_conf[hub_id].txChannels_num * sizeof(int));
-        GlobalParams::hub_conf[hub_id].rxChannels = (int *) malloc(GlobalParams::hub_conf[hub_id].rxChannels_num * sizeof(int));
+        GlobalParams::hub_conf[hub_id].attachedNodes = new int[GlobalParams::hub_conf[hub_id].attachedNodes_num];
+        GlobalParams::hub_conf[hub_id].txChannels = new int[GlobalParams::hub_conf[hub_id].txChannels_num];
+        GlobalParams::hub_conf[hub_id].rxChannels = new int[GlobalParams::hub_conf[hub_id].rxChannels_num];
 
         // Determine, from configuration file, which Hub is connected to which Tile
         for (size_t i = 0; i < hub["attachedNodes"].size(); i++){

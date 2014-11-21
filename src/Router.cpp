@@ -405,11 +405,11 @@ int Router::selectionNoP(const vector < int >&directions,
     }
 
     // check for direction with higher score
-    int max_direction = directions[0];
+    //int max_direction = directions[0];
     int max = score[0];
     for (unsigned int i = 0; i < directions.size(); i++) {
 	if (score[i] > max) {
-	    max_direction = directions[i];
+	//    max_direction = directions[i];
 	    max = score[i];
 	}
     }
