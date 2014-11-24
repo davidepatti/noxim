@@ -6,7 +6,7 @@
 
 //#include "MM.h"
 #include "Utils.h"
-#include "Main.h"
+#include "DataStructs.h"
 
 using namespace sc_core;
 using namespace std;

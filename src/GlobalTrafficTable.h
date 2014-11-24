@@ -14,7 +14,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-#include "Main.h"
+#include "DataStructs.h"
+
 using namespace std;
 
 // Structure used to store information into the table

@@ -1,5 +1,4 @@
 #include "Target.h"
-#include "Main.h"
 
 void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 {

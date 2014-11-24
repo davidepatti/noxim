@@ -12,12 +12,14 @@
 #define __NOXIMROUTER_H__
 
 #include <systemc.h>
-#include "Main.h"
+#include "DataStructs.h"
 #include "Buffer.h"
 #include "Stats.h"
 #include "GlobalRoutingTable.h"
 #include "LocalRoutingTable.h"
 #include "ReservationTable.h"
+#include "Utils.h"
+
 using namespace std;
 
 extern unsigned int drained_volume;

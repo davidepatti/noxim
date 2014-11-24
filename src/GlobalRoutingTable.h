@@ -20,7 +20,7 @@
 #include <cstring>
 #include <cassert>
 #include <fstream>
-#include "Main.h"
+#include "DataStructs.h"
 using namespace std;
 
 // Pair of source, destination node
