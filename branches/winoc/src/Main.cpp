@@ -96,20 +96,17 @@ int sc_main(int arg_num, char *arg_vet[])
     if ((GlobalParams::max_volume_to_be_drained > 0) &&
 	(sc_time_stamp().to_double() / 1000 >=
 	 GlobalParams::simulation_time)) {
-	cout <<
-	    "\nWARNING! the number of flits specified with -volume option"
-	    << endl;
-	cout << "has not been reached. ( " << drained_volume <<
-	    " instead of " << GlobalParams::
-	    max_volume_to_be_drained << " )" << endl;
-	cout <<
-	    "You might want to try an higher value of simulation cycles" <<
-	    endl;
-	cout << "using -sim option." << endl;
+	cout << endl
+         << "WARNING! the number of flits specified with -volume option" << endl
+	     << "has not been reached. ( " << drained_volume << " instead of " << GlobalParams::max_volume_to_be_drained << " )" << endl
+         << "You might want to try an higher value of simulation cycles" << endl
+	     << "using -sim option." << endl;
+
 #ifdef TESTING
-	cout << "\n Sum of local drained flits: " << gs.
-	    drained_total << endl;
-	cout << "\n Effective drained volume: " << drained_volume;
+	cout << endl
+         << " Sum of local drained flits: " << gs.drained_total << endl
+	     << endl
+         << " Effective drained volume: " << drained_volume;
 #endif
     }
 
