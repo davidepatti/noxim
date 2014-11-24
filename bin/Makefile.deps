@@ -1,65 +1,59 @@
 # DO NOT DELETE
 
-./Buffer.o: ../src/Buffer.h ../src/Main.h ../src/ConfigurationManager.h
-./Buffer.o: ../src/GlobalParams.h
+./Buffer.o: ../src/Buffer.h ../src/DataStructs.h ../src/GlobalParams.h
 ./Channel.o: ../src/Channel.h
 ./ConfigurationManager.o: ../src/ConfigurationManager.h
 ./ConfigurationManager.o: ../src/GlobalParams.h
 ./GlobalParams.o: ../src/GlobalParams.h
-./GlobalRoutingTable.o: ../src/GlobalRoutingTable.h ../src/Main.h
-./GlobalRoutingTable.o: ../src/ConfigurationManager.h
+./GlobalRoutingTable.o: ../src/GlobalRoutingTable.h ../src/DataStructs.h
 ./GlobalRoutingTable.o: ../src/GlobalParams.h
 ./GlobalStats.o: ../src/GlobalStats.h ../src/NoC.h ../src/Tile.h
-./GlobalStats.o: ../src/Router.h ../src/Main.h
-./GlobalStats.o: ../src/ConfigurationManager.h ../src/GlobalParams.h
-./GlobalStats.o: ../src/Buffer.h ../src/Stats.h ../src/Power.h
-./GlobalStats.o: ../src/GlobalRoutingTable.h ../src/LocalRoutingTable.h
-./GlobalStats.o: ../src/ReservationTable.h ../src/ProcessingElement.h
+./GlobalStats.o: ../src/Router.h ../src/DataStructs.h
+./GlobalStats.o: ../src/GlobalParams.h ../src/Buffer.h ../src/Stats.h
+./GlobalStats.o: ../src/Power.h ../src/GlobalRoutingTable.h
+./GlobalStats.o: ../src/LocalRoutingTable.h ../src/ReservationTable.h
+./GlobalStats.o: ../src/Utils.h ../src/ProcessingElement.h
 ./GlobalStats.o: ../src/GlobalTrafficTable.h ../src/Hub.h
-./GlobalStats.o: ../src/Initiator.h ../src/Utils.h ../src/Target.h
-./GlobalStats.o: ../src/Channel.h
-./GlobalTrafficTable.o: ../src/GlobalTrafficTable.h ../src/Main.h
-./GlobalTrafficTable.o: ../src/ConfigurationManager.h
+./GlobalStats.o: ../src/Initiator.h ../src/Target.h ../src/Channel.h
+./GlobalTrafficTable.o: ../src/GlobalTrafficTable.h ../src/DataStructs.h
 ./GlobalTrafficTable.o: ../src/GlobalParams.h
-./Hub.o: ../src/Hub.h ../src/Main.h ../src/ConfigurationManager.h
-./Hub.o: ../src/GlobalParams.h ../src/Buffer.h ../src/ReservationTable.h
-./Hub.o: ../src/Initiator.h ../src/Utils.h ../src/Target.h
-./Initiator.o: ../src/Initiator.h ../src/Utils.h ../src/Main.h
-./Initiator.o: ../src/ConfigurationManager.h ../src/GlobalParams.h
-./LocalRoutingTable.o: ../src/LocalRoutingTable.h ../src/Main.h
-./LocalRoutingTable.o: ../src/ConfigurationManager.h
-./LocalRoutingTable.o: ../src/GlobalParams.h ../src/GlobalRoutingTable.h
+./Hub.o: ../src/Hub.h ../src/DataStructs.h ../src/GlobalParams.h
+./Hub.o: ../src/Buffer.h ../src/ReservationTable.h ../src/Initiator.h
+./Hub.o: ../src/Utils.h ../src/Target.h
+./Initiator.o: ../src/Initiator.h ../src/Utils.h ../src/DataStructs.h
+./Initiator.o: ../src/GlobalParams.h
+./LocalRoutingTable.o: ../src/LocalRoutingTable.h
+./LocalRoutingTable.o: ../src/GlobalRoutingTable.h ../src/DataStructs.h
+./LocalRoutingTable.o: ../src/GlobalParams.h
 ./MM.o: ../src/MM.h
-./Main.o: ../src/Main.h ../src/ConfigurationManager.h
-./Main.o: ../src/GlobalParams.h ../src/NoC.h ../src/Tile.h
-./Main.o: ../src/Router.h ../src/Buffer.h ../src/Stats.h ../src/Power.h
-./Main.o: ../src/GlobalRoutingTable.h ../src/LocalRoutingTable.h
-./Main.o: ../src/ReservationTable.h ../src/ProcessingElement.h
+./Main.o: ../src/ConfigurationManager.h ../src/GlobalParams.h
+./Main.o: ../src/NoC.h ../src/Tile.h ../src/Router.h
+./Main.o: ../src/DataStructs.h ../src/Buffer.h ../src/Stats.h
+./Main.o: ../src/Power.h ../src/GlobalRoutingTable.h
+./Main.o: ../src/LocalRoutingTable.h ../src/ReservationTable.h
+./Main.o: ../src/Utils.h ../src/ProcessingElement.h
 ./Main.o: ../src/GlobalTrafficTable.h ../src/Hub.h ../src/Initiator.h
-./Main.o: ../src/Utils.h ../src/Target.h ../src/Channel.h
-./Main.o: ../src/GlobalStats.h
-./NoC.o: ../src/NoC.h ../src/Tile.h ../src/Router.h ../src/Main.h
-./NoC.o: ../src/ConfigurationManager.h ../src/GlobalParams.h
-./NoC.o: ../src/Buffer.h ../src/Stats.h ../src/Power.h
-./NoC.o: ../src/GlobalRoutingTable.h ../src/LocalRoutingTable.h
-./NoC.o: ../src/ReservationTable.h ../src/ProcessingElement.h
+./Main.o: ../src/Target.h ../src/Channel.h ../src/GlobalStats.h
+./NoC.o: ../src/NoC.h ../src/Tile.h ../src/Router.h ../src/DataStructs.h
+./NoC.o: ../src/GlobalParams.h ../src/Buffer.h ../src/Stats.h
+./NoC.o: ../src/Power.h ../src/GlobalRoutingTable.h
+./NoC.o: ../src/LocalRoutingTable.h ../src/ReservationTable.h
+./NoC.o: ../src/Utils.h ../src/ProcessingElement.h
 ./NoC.o: ../src/GlobalTrafficTable.h ../src/Hub.h ../src/Initiator.h
-./NoC.o: ../src/Utils.h ../src/Target.h ../src/Channel.h
-./Power.o: ../src/Main.h ../src/ConfigurationManager.h
-./Power.o: ../src/GlobalParams.h ../src/Power.h
-./ProcessingElement.o: ../src/ProcessingElement.h ../src/Main.h
-./ProcessingElement.o: ../src/ConfigurationManager.h
+./NoC.o: ../src/Target.h ../src/Channel.h
+./Power.o: ../src/Power.h ../src/DataStructs.h ../src/GlobalParams.h
+./ProcessingElement.o: ../src/ProcessingElement.h ../src/DataStructs.h
 ./ProcessingElement.o: ../src/GlobalParams.h ../src/GlobalTrafficTable.h
-./ReservationTable.o: ../src/ReservationTable.h ../src/Main.h
-./ReservationTable.o: ../src/ConfigurationManager.h
+./ProcessingElement.o: ../src/Utils.h
+./ReservationTable.o: ../src/ReservationTable.h ../src/DataStructs.h
 ./ReservationTable.o: ../src/GlobalParams.h
-./Router.o: ../src/Router.h ../src/Main.h ../src/ConfigurationManager.h
-./Router.o: ../src/GlobalParams.h ../src/Buffer.h ../src/Stats.h
-./Router.o: ../src/Power.h ../src/GlobalRoutingTable.h
-./Router.o: ../src/LocalRoutingTable.h ../src/ReservationTable.h
-./Stats.o: ../src/Stats.h ../src/Main.h ../src/ConfigurationManager.h
-./Stats.o: ../src/GlobalParams.h ../src/Power.h
-./Target.o: ../src/Target.h ../src/Utils.h ../src/Main.h
-./Target.o: ../src/ConfigurationManager.h ../src/GlobalParams.h
+./Router.o: ../src/Router.h ../src/DataStructs.h ../src/GlobalParams.h
+./Router.o: ../src/Buffer.h ../src/Stats.h ../src/Power.h
+./Router.o: ../src/GlobalRoutingTable.h ../src/LocalRoutingTable.h
+./Router.o: ../src/ReservationTable.h ../src/Utils.h
+./Stats.o: ../src/Stats.h ../src/DataStructs.h ../src/GlobalParams.h
+./Stats.o: ../src/Power.h
+./Target.o: ../src/Target.h ../src/Utils.h ../src/DataStructs.h
+./Target.o: ../src/GlobalParams.h
 ./TokenRing.o: ../src/TokenRing.h
-./Utils.o: ../src/Utils.h
+./Utils.o: ../src/Utils.h ../src/DataStructs.h ../src/GlobalParams.h
