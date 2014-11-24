@@ -217,7 +217,7 @@ Packet ProcessingElement::trafficRandom()
 	p.dst_id = randInt(0, max_id);
 
 	// check for hotspot destination
-	for (uint i = 0; i < GlobalParams::hotspots.size(); i++) {
+	for (size_t i = 0; i < GlobalParams::hotspots.size(); i++) {
 	    //cout << sc_time_stamp().to_double()/1000 << " PE " << local_id << " Checking node " << GlobalParams::hotspots[i].first << " with P = " << GlobalParams::hotspots[i].second << endl;
 
 	    if (rnd >= range_start

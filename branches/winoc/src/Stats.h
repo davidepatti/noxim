@@ -14,7 +14,7 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
-#include "Main.h"
+#include "DataStructs.h"
 #include "Power.h"
 using namespace std;
 

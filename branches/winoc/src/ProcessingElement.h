@@ -13,8 +13,11 @@
 
 #include <queue>
 #include <systemc.h>
-#include "Main.h"
+
+#include "DataStructs.h"
 #include "GlobalTrafficTable.h"
+#include "Utils.h"
+
 using namespace std;
 
 SC_MODULE(ProcessingElement)

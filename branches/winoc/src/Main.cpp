@@ -8,9 +8,10 @@
  * This file contains the implementation of the top-level of Noxim
  */
 
-#include "Main.h"
+#include "ConfigurationManager.h"
 #include "NoC.h"
 #include "GlobalStats.h"
+#include "DataStructs.h"
 
 using namespace std;
 

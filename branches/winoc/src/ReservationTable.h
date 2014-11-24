@@ -12,7 +12,7 @@
 #define __NOXIMRESERVATIONTABLE_H__
 
 #include <cassert>
-#include "Main.h"
+#include "DataStructs.h"
 using namespace std;
 
 class ReservationTable {

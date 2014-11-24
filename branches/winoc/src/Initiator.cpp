@@ -1,5 +1,4 @@
 #include "Initiator.h"
-#include "Main.h"
 
   void Initiator::thread_process()
   {

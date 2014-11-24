@@ -382,7 +382,7 @@ int Router::selectionNoP(const vector < int >&directions,
 
     int current_id = route_data.current_id;
 
-    for (uint i = 0; i < directions.size(); i++) {
+    for (size_t i = 0; i < directions.size(); i++) {
 	// get id of adjacent candidate
 	int candidate_id = getNeighborId(current_id, directions[i]);
 

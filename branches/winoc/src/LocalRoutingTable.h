@@ -11,8 +11,8 @@
 #ifndef __NOXIMLOCALROUTINGTABLE_H__
 #define __NOXIMLOCALROUTINGTABLE_H__
 
-#include "Main.h"
 #include "GlobalRoutingTable.h"
+#include "DataStructs.h"
 
 class LocalRoutingTable {
 

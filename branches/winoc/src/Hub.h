@@ -19,7 +19,7 @@
 #include "tlm_utils/peq_with_cb_and_phase.h"
 
 #include <systemc.h>
-#include "Main.h"
+#include "DataStructs.h"
 #include "Buffer.h"
 #include "ReservationTable.h"
 

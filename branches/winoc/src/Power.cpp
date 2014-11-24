@@ -9,7 +9,6 @@
  */
 
 #include <iostream>
-#include "Main.h"
 #include "Power.h"
 using namespace std;
 

@@ -13,7 +13,7 @@
 
 #include <cassert>
 #include <queue>
-#include "Main.h"
+#include "DataStructs.h"
 using namespace std;
 
 class Buffer {

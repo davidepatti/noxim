@@ -5,7 +5,7 @@
 #include "tlm_utils/multi_passthrough_target_socket.h"
 
 #include "Utils.h"
-#include "Main.h"
+#include "DataStructs.h"
 #include <queue>
 
 using namespace sc_core;
