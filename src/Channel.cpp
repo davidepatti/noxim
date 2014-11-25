@@ -1,48 +1,4 @@
 #include "Channel.h"
-
-  tlm::tlm_sync_enum Channel::nb_transport_fw(int id,
-      tlm::tlm_generic_payload& trans, tlm::tlm_phase& phase, sc_time& delay)
-  {
-    assert (id < (int)targ_socket.size());
-
-    // Forward path
-    m_id_map[ &trans ] = id;
-
-    sc_dt::uint64 address = trans.get_address();
-    sc_dt::uint64 masked_address;
-    unsigned int target_nr = decode_address( address, masked_address);
-
-    if (target_nr < init_socket.size())
-    {
-      // Modify address within transaction
-      trans.set_address( masked_address );
-
-      // Forward transaction to appropriate target
-      tlm::tlm_sync_enum status = init_socket[target_nr]->nb_transport_fw(trans, phase, delay);
-
-      if (status == tlm::TLM_COMPLETED)
-        // Put back original address
-        trans.set_address( address );
-      return status;
-    }
-    else
-      return tlm::TLM_COMPLETED;
-  }
-
-  tlm::tlm_sync_enum Channel::nb_transport_bw(int id,
-      tlm::tlm_generic_payload& trans, tlm::tlm_phase& phase, sc_time& delay)
-  {
-    assert (id < (int)init_socket.size());
-
-    // Backward path
-
-    // Replace original address
-    sc_dt::uint64 address = trans.get_address();
-    trans.set_address( compose_address( id, address ) );
-
-    return targ_socket[ m_id_map[ &trans ] ]->nb_transport_bw(trans, phase, delay);
-  }
-
   void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& delay )
   {
     assert (id < (int)targ_socket.size());

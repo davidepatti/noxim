@@ -33,23 +33,13 @@ struct Channel: sc_module
   SC_CTOR(Channel)
   : targ_socket("targ_socket"), init_socket("init_socket")
   {
-    targ_socket.register_nb_transport_fw(   this, &Channel::nb_transport_fw);
     targ_socket.register_b_transport(       this, &Channel::b_transport);
     targ_socket.register_get_direct_mem_ptr(this, &Channel::get_direct_mem_ptr);
     targ_socket.register_transport_dbg(     this, &Channel::transport_dbg);
 
-    init_socket.register_nb_transport_bw(          this, &Channel::nb_transport_bw);
     init_socket.register_invalidate_direct_mem_ptr(this, &Channel::invalidate_direct_mem_ptr);
   }
 
-
-  // Tagged non-blocking transport forward method
-  virtual tlm::tlm_sync_enum nb_transport_fw(int id,
-      tlm::tlm_generic_payload& trans, tlm::tlm_phase& phase, sc_time& delay);
-
-  // Tagged non-blocking transport backward method
-  virtual tlm::tlm_sync_enum nb_transport_bw(int id,
-      tlm::tlm_generic_payload& trans, tlm::tlm_phase& phase, sc_time& delay);
 
   // Tagged TLM-2 blocking transport method
   virtual void b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& delay );
