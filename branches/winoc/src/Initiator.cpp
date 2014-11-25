@@ -10,12 +10,12 @@
       while (1)
       {
 
-	  cout << "\n" << name() << " ****** Initiator - waiting for transmissions" << endl;
+	  cout << name() << " ****** Initiator - waiting for transmissions" << endl;
 
 	  // TODO: check
 	  wait(start_request_event);
 
-	  cout << "\n" << name() << " ****** Initiator - starting blocking transmissions" << endl;
+	  cout << name() << " ****** Initiator - starting blocking transmissions" << endl;
 
 	  // TODO: fixed address!
 	  int i = 0;
@@ -26,10 +26,10 @@
 
 	  trans->set_command(cmd);
 	  trans->set_address( i );
-	  //trans->set_data_ptr( reinterpret_cast<unsigned char*>(&data) );
-	  //trans->set_data_length( 4 );
-	  trans->set_data_ptr( reinterpret_cast<unsigned char*>(&flit_payload) );
-	  trans->set_data_length( sizeof(Flit) );
+	  trans->set_data_ptr( reinterpret_cast<unsigned char*>(&data) );
+	  trans->set_data_length( 4 );
+	  //trans->set_data_ptr( reinterpret_cast<unsigned char*>(&flit_payload) );
+	  //trans->set_data_length( sizeof(Flit) );
 	  trans->set_streaming_width( 4 ); // = data_length to indicate no streaming
 	  trans->set_byte_enable_ptr( 0 ); // 0 indicates unused
 	  trans->set_dmi_allowed( false ); // Mandatory initial value
