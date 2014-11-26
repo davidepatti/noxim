@@ -100,7 +100,7 @@ bool ProcessingElement::canShot(Packet & packet)
 
     double now = sc_time_stamp().to_double() / 1000;
 
-    // TODO WIRELESS: enabling only some transmissions from 0 toward
+    // TODO: This test enables only some transmissions from 0 towards
     // node 3, thus requiring wireless
     if (GlobalParams::use_winoc) 
     {
@@ -238,7 +238,7 @@ Packet ProcessingElement::trafficRandom()
 
     return p;
 }
-// TODO WIRELESS: for testing only
+// TODO: for testing only
 Packet ProcessingElement::trafficTest()
 {
     Packet p;

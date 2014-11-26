@@ -100,13 +100,13 @@ SC_MODULE(Tile)
 
 
 	// hub related
-	r->flit_rx[DIRECTION_WIRELESS] (hub_flit_rx);
-	r->req_rx[DIRECTION_WIRELESS] (hub_req_rx);
-	r->ack_rx[DIRECTION_WIRELESS] (hub_ack_rx);
+	r->flit_rx[DIRECTION_HUB] (hub_flit_rx);
+	r->req_rx[DIRECTION_HUB] (hub_req_rx);
+	r->ack_rx[DIRECTION_HUB] (hub_ack_rx);
 
-	r->flit_tx[DIRECTION_WIRELESS] (hub_flit_tx);
-	r->req_tx[DIRECTION_WIRELESS] (hub_req_tx);
-	r->ack_tx[DIRECTION_WIRELESS] (hub_ack_tx);
+	r->flit_tx[DIRECTION_HUB] (hub_flit_tx);
+	r->req_tx[DIRECTION_HUB] (hub_req_tx);
+	r->ack_tx[DIRECTION_HUB] (hub_ack_tx);
 
 
 	// Processing Element pin assignments

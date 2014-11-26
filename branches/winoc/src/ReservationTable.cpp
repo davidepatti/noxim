@@ -24,7 +24,7 @@ void ReservationTable::clear()
   rtable.push_back(NOT_RESERVED); // this is for DIRECTION_WEST
   rtable.push_back(NOT_RESERVED); // this is for DIRECTION_LOCAL
 
-  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_WIRELESS
+  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_HUB
 
   /* old code - TODO: remove
     rtable.resize(DIRECTIONS + 1);
