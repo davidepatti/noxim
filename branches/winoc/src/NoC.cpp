@@ -230,6 +230,7 @@ void NoC::buildMesh(char const * cfg_fname)
 	NoP_data_to_west[GlobalParams::mesh_dim_x][j].write(tmp_NoP);
 
     }
+    
 
     // invalidate reservation table entries for non-exhistent channels
     for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {

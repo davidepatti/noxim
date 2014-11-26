@@ -12,33 +12,30 @@
 
 ReservationTable::ReservationTable()
 {
-    clear();
+  rtable.clear();
 }
 
-void ReservationTable::clear()
+
+void ReservationTable::init(int size)
 {
-  rtable.clear();
-  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_NORTH
-  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_EAST
-  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_SOUTH
-  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_WEST
-  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_LOCAL
+    assert(size>0);
+    assert(directions()==0);
 
-  rtable.push_back(NOT_RESERVED); // this is for DIRECTION_HUB
+    rtable.clear();
 
-  /* old code - TODO: remove
-    rtable.resize(DIRECTIONS + 1);
+    for (int i=0;i<size;i++)
+	rtable.push_back(NOT_RESERVED); 
 
-    // note that NOT_VALID entries should remain untouched
-    for (int i = 0; i < DIRECTIONS + 1; i++)
-	if (rtable[i] != NOT_VALID)
-	    rtable[i] = NOT_RESERVED;
-	    */
+}
+
+int ReservationTable::directions() const
+{
+    return rtable.size();
 }
 
 bool ReservationTable::isAvailable(const int port_out) const
 {
-    assert(port_out >= 0 && port_out < DIRECTIONS + 2);
+    assert(port_out >= 0 && port_out < directions());
 
     return ((rtable[port_out] == NOT_RESERVED));
 }
@@ -60,18 +57,18 @@ void ReservationTable::reserve(const int port_in, const int port_out)
 
 void ReservationTable::release(const int port_out)
 {
-    assert(port_out >= 0 && port_out < DIRECTIONS + 2);
+    assert(port_out >= 0 && port_out < directions());
     // there is a valid reservation on port_out
-    assert(rtable[port_out] >= 0 && rtable[port_out] < DIRECTIONS + 2);
+    assert(rtable[port_out] >= 0 && rtable[port_out] < directions());
 
     rtable[port_out] = NOT_RESERVED;
 }
 
 int ReservationTable::getOutputPort(const int port_in) const
 {
-    assert(port_in >= 0 && port_in < DIRECTIONS + 2);
+    assert(port_in >= 0 && port_in < directions());
 
-    for (int i = 0; i < DIRECTIONS + 2; i++)
+    for (int i = 0; i < directions(); i++)
 	if (rtable[i] == port_in)
 	    return i;		// port_in reserved outport i
 
@@ -82,5 +79,6 @@ int ReservationTable::getOutputPort(const int port_in) const
 // makes port_out no longer available for reservation/release
 void ReservationTable::invalidate(const int port_out)
 {
+    assert(port_out < directions());
     rtable[port_out] = NOT_VALID;
 }

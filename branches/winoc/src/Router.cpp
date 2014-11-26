@@ -18,7 +18,6 @@ void Router::rxProcess()
 	    ack_rx[i].write(0);
 	    current_level_rx[i] = 0;
 	}
-	reservation_table.clear();
 	routed_flits = 0;
 	local_drained = 0;
     } else {
@@ -748,6 +747,7 @@ void Router::configure(const int _id,
       buffer[DIRECTION_WEST].Disable();
     if (col == GlobalParams::mesh_dim_x-1)
       buffer[DIRECTION_EAST].Disable();
+
 }
 
 unsigned long Router::getRoutedFlits()

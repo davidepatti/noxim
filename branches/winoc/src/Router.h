@@ -91,6 +91,9 @@ SC_MODULE(Router)
 	SC_METHOD(bufferMonitor);
 	sensitive << reset;
 	sensitive << clock.pos();
+	
+	// Initialize reservation table
+	reservation_table.init(DIRECTIONS+2);
     }
 
   private:
