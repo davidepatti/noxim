@@ -23,7 +23,8 @@ using namespace std;
 #define DIRECTION_SOUTH        2
 #define DIRECTION_WEST         3
 #define DIRECTION_LOCAL        4
-#define DIRECTION_WIRELESS     5
+#define DIRECTION_HUB          5
+#define DIRECTION_WIRELESS     747
 
 // Generic not reserved resource
 #define NOT_RESERVED          -2

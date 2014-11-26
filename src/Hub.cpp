@@ -35,7 +35,7 @@ void Hub::radioProcess()
 
 	    if (!(target[i]->buffer_rx.IsEmpty()) ) 
 	    {
-		cout << name() << " buffer_rx not empty..." << endl;
+		cout << name() << "::radioProcess() buffer_rx not empty..." << endl;
 		Flit received_flit = target[i]->buffer_rx.Pop();
 
 		buffer[port].Push(received_flit);
@@ -91,6 +91,11 @@ void Hub::txProcess()
 {
     if (reset.read()) 
     {
+	// TODO: fix this, since wireles direction is defined as 5,
+	// six or more ports conflicts with reservation table entries
+	// for wireless 
+	assert(num_ports<6);
+
 	for (int i = 0; i < num_ports; i++) 
 	{
 	    req_tx[i]->write(0);

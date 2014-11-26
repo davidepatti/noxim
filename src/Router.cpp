@@ -93,9 +93,9 @@ void Router::txProcess()
 
 		  int o = route(route_data);
 
-		  if ( o==DIRECTION_WIRELESS)
+		  if ( o==DIRECTION_HUB)
 		  {
-		      cout << name() << " ready to reserve wireless direction ..." << endl;
+		      cout << name() << " ready to reserve HUB direction ..." << endl;
 
 		  }
 
@@ -131,9 +131,9 @@ void Router::txProcess()
 	      {
 		  if (current_level_tx[o] == ack_tx[o].read()) 
 		  {
-		    if (o == DIRECTION_WIRELESS)
+		    if (o == DIRECTION_HUB)
 		    {
-			  cout << name() << " forwarding to wireless " << endl;
+			  cout << name() << " forwarding to HUB " << endl;
 		  /* TODO: adapt code to new model
 			// Forward flit to WiNoC
 			if (winoc->CanTransmit(local_id))
@@ -275,13 +275,13 @@ vector < int > Router::routingFunction(const RouteData & route_data)
   // If WiNoC available, check for intercluster communication
   if (GlobalParams::use_winoc)
   {
-    // TODO WIRELESS: replace using configuration file
+    // TODO wirelss: replace using configuration file
     if (!SameRadioHub(local_id, route_data.dst_id))
     {
 	cout << name() << " routingFunction setting direction wireless to reach destination node " << route_data.dst_id << endl;
 
 	vector<int> dirv;
-	dirv.push_back(DIRECTION_WIRELESS);
+	dirv.push_back(DIRECTION_HUB);
 	return dirv;
     }
   }
