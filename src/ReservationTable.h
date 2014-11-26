@@ -20,8 +20,8 @@ class ReservationTable {
 
     ReservationTable();
 
-    // Clear reservation table
-    void clear();
+    // Initialize to a given number of directions
+    void init(int);
 
     // check if port_out is reservable
     bool isAvailable(const int port_out) const;
@@ -38,6 +38,8 @@ class ReservationTable {
 
     // Makes output port no longer available for reservation/release
     void invalidate(const int port_out);
+
+    int directions() const;
 
   private:
 

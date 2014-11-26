@@ -118,6 +118,7 @@ SC_MODULE(Hub)
             // actual bus binding in buildMesh()
             // bus->init_socket.bind( target[i]->socket );
         }
+        reservation_table.init(num_ports);
     }
 };
 

@@ -53,7 +53,6 @@ void Hub::rxProcess()
             ack_rx[i]->write(0);
             current_level_rx[i] = 0;
         }
-        reservation_table.clear();
     } 
     else 
     {
