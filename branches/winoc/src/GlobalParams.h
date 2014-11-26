@@ -66,9 +66,6 @@ using namespace std;
 #define VERBOSE_MEDIUM         2
 #define VERBOSE_HIGH           3
 
-// TODO by Fafa - this MUST be removed!!! Use only STL vectors instead!!!
-#define MAX_STATIC_DIM 32
-
 // TODO check the list of attributes for ChannelConf 
 typedef struct {
     int BER;

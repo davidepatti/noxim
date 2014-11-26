@@ -115,6 +115,8 @@ SC_MODULE(Hub)
             sprintf(txt, "target_%d", i);
             target[i] = new Target(txt);
         }
+
+        start_from_port = 0;
         reservation_table.init(num_ports);
         wireless_reservation_table.init(num_tx_channels);
     }

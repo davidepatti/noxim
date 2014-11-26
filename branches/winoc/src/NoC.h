@@ -28,48 +28,45 @@ SC_MODULE(NoC)
     sc_in < bool > reset;	// The reset signal for the NoC
 
     // Signals
-    sc_signal <bool> req_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <bool> req_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <bool> req_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <bool> req_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> **req_to_east;
+    sc_signal <bool> **req_to_west;
+    sc_signal <bool> **req_to_south;
+    sc_signal <bool> **req_to_north;
 
-    sc_signal <bool> ack_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <bool> ack_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <bool> ack_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <bool> ack_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> **ack_to_east;
+    sc_signal <bool> **ack_to_west;
+    sc_signal <bool> **ack_to_south;
+    sc_signal <bool> **ack_to_north;
 
+ 	sc_signal <Flit> **flit_to_east;
+    sc_signal <Flit> **flit_to_west;
+    sc_signal <Flit> **flit_to_south;
+    sc_signal <Flit> **flit_to_north;
 
-    sc_signal <Flit> flit_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <Flit> flit_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <Flit> flit_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <Flit> flit_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-
-    sc_signal <int> free_slots_to_east[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <int> free_slots_to_west[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <int> free_slots_to_south[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <int> free_slots_to_north[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+ 	sc_signal <int> **free_slots_to_east;
+    sc_signal <int> **free_slots_to_west;
+    sc_signal <int> **free_slots_to_south;
+    sc_signal <int> **free_slots_to_north;
 
     // Wireless Hub
-    sc_signal <bool> req_to_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <bool> ack_to_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <Flit> flit_to_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> **req_to_hub;
+    sc_signal <bool> **ack_to_hub;
+    sc_signal <Flit> **flit_to_hub;
 
-    sc_signal <bool> req_from_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <bool> ack_from_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
-    sc_signal <Flit> flit_from_hub[MAX_STATIC_DIM + 1][MAX_STATIC_DIM + 1];
+    sc_signal <bool> **req_from_hub;
+    sc_signal <bool> **ack_from_hub;
+    sc_signal <Flit> **flit_from_hub;
 
     // NoP
-    sc_signal <NoP_data> NoP_data_to_east[MAX_STATIC_DIM][MAX_STATIC_DIM];
-    sc_signal <NoP_data> NoP_data_to_west[MAX_STATIC_DIM][MAX_STATIC_DIM];
-    sc_signal <NoP_data> NoP_data_to_south[MAX_STATIC_DIM][MAX_STATIC_DIM];
-    sc_signal <NoP_data> NoP_data_to_north[MAX_STATIC_DIM][MAX_STATIC_DIM];
+    sc_signal <NoP_data> **NoP_data_to_east;
+    sc_signal <NoP_data> **NoP_data_to_west;
+    sc_signal <NoP_data> **NoP_data_to_south;
+    sc_signal <NoP_data> **NoP_data_to_north;
 
     // Matrix of tiles
-    Tile *t[MAX_STATIC_DIM][MAX_STATIC_DIM];
-    
-    //Hub *h[MAX_HUBS];
-    Hub **h;
+    Tile ***t;
 
+    Hub **h;
     Channel **channel;
 
     // Global tables

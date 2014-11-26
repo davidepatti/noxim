@@ -12,7 +12,7 @@
 
 void NoC::buildMesh(char const * cfg_fname)
 {
-    char channel_name[15];
+    char channel_name[16];
     channel = new Channel*[GlobalParams::channels_num];
     for (int i = 0; i < GlobalParams::channels_num; i++) {
         sprintf(channel_name, "Channel_%d", i);
@@ -20,7 +20,7 @@ void NoC::buildMesh(char const * cfg_fname)
         channel[i] = new Channel(channel_name);
     }
 
-    char hub_name[15];
+    char hub_name[16];
     h = new Hub*[GlobalParams::hubs_num];
 
     for (int i = 0; i < GlobalParams::hubs_num; i++) {
@@ -80,6 +80,79 @@ void NoC::buildMesh(char const * cfg_fname)
     // Var to track Hub connected ports
     int * hub_connected_ports = (int *) calloc(GlobalParams::hubs_num, sizeof(int));
 
+    // Initialize signals
+    req_to_east = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+    req_to_west = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+    req_to_south = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+    req_to_north = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+
+    ack_to_east = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+    ack_to_west = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+    ack_to_south = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+    ack_to_north = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+
+    flit_to_east = new sc_signal<Flit>*[GlobalParams::mesh_dim_x + 1];
+    flit_to_west = new sc_signal<Flit>*[GlobalParams::mesh_dim_x + 1];
+    flit_to_south = new sc_signal<Flit>*[GlobalParams::mesh_dim_x + 1];
+    flit_to_north = new sc_signal<Flit>*[GlobalParams::mesh_dim_x + 1];
+
+    free_slots_to_east = new sc_signal<int>*[GlobalParams::mesh_dim_x + 1];
+    free_slots_to_west = new sc_signal<int>*[GlobalParams::mesh_dim_x + 1];
+    free_slots_to_south = new sc_signal<int>*[GlobalParams::mesh_dim_x + 1];
+    free_slots_to_north = new sc_signal<int>*[GlobalParams::mesh_dim_x + 1];
+
+    req_to_hub = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+    ack_to_hub = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+    flit_to_hub = new sc_signal<Flit>*[GlobalParams::mesh_dim_x + 1];
+
+    req_from_hub = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+    ack_from_hub = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+    flit_from_hub = new sc_signal<Flit>*[GlobalParams::mesh_dim_x + 1];
+
+    NoP_data_to_east = new sc_signal<NoP_data>*[GlobalParams::mesh_dim_x + 1];
+    NoP_data_to_west = new sc_signal<NoP_data>*[GlobalParams::mesh_dim_x + 1];
+    NoP_data_to_south = new sc_signal<NoP_data>*[GlobalParams::mesh_dim_x + 1];
+    NoP_data_to_north = new sc_signal<NoP_data>*[GlobalParams::mesh_dim_x + 1];
+
+    for (int i=0; i < GlobalParams::mesh_dim_x + 1; i++) {
+    	req_to_east[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
+    	req_to_west[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
+    	req_to_south[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
+    	req_to_north[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
+
+        ack_to_east[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
+        ack_to_west[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
+        ack_to_south[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
+        ack_to_north[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
+
+        flit_to_east[i] = new sc_signal<Flit>[GlobalParams::mesh_dim_y + 1];
+        flit_to_west[i] = new sc_signal<Flit>[GlobalParams::mesh_dim_y + 1];
+        flit_to_south[i] = new sc_signal<Flit>[GlobalParams::mesh_dim_y + 1];
+        flit_to_north[i] = new sc_signal<Flit>[GlobalParams::mesh_dim_y + 1];
+
+        free_slots_to_east[i] = new sc_signal<int>[GlobalParams::mesh_dim_y + 1];
+        free_slots_to_west[i] = new sc_signal<int>[GlobalParams::mesh_dim_y + 1];
+        free_slots_to_south[i] = new sc_signal<int>[GlobalParams::mesh_dim_y + 1];
+        free_slots_to_north[i] = new sc_signal<int>[GlobalParams::mesh_dim_y + 1];
+
+        req_to_hub[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
+        ack_to_hub[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
+        flit_to_hub[i] = new sc_signal<Flit>[GlobalParams::mesh_dim_y + 1];
+
+        req_from_hub[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
+        ack_from_hub[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
+        flit_from_hub[i] = new sc_signal<Flit>[GlobalParams::mesh_dim_y + 1];
+
+        NoP_data_to_east[i] = new sc_signal<NoP_data>[GlobalParams::mesh_dim_y + 1];
+        NoP_data_to_west[i] = new sc_signal<NoP_data>[GlobalParams::mesh_dim_y + 1];
+        NoP_data_to_south[i] = new sc_signal<NoP_data>[GlobalParams::mesh_dim_y + 1];
+        NoP_data_to_north[i] = new sc_signal<NoP_data>[GlobalParams::mesh_dim_y + 1];
+    }
+
+    t = new Tile**[GlobalParams::mesh_dim_x];
+    for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
+    	t[i] = new Tile*[GlobalParams::mesh_dim_y];
+    }
 
     // Create the mesh as a matrix of tiles
     for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
