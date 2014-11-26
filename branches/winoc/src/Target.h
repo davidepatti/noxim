@@ -6,6 +6,7 @@
 
 #include "Utils.h"
 #include "DataStructs.h"
+#include "Buffer.h"
 #include <queue>
 
 using namespace sc_core;
@@ -23,6 +24,8 @@ struct Target: sc_module
   // TLM-2 socket, defaults to 32-bits wide, base protocol
   tlm_utils::simple_target_socket<Target> socket;
 
+
+
   SC_CTOR(Target)
   : socket("socket")
   {
@@ -37,6 +40,8 @@ struct Target: sc_module
 
   int   n_trans;
   bool  response_in_progress;
+
+  Buffer buffer_rx;
 
   Flit get_payload();
 };

@@ -268,8 +268,7 @@ void Router::bufferMonitor()
     }
 }
 
-vector <
-    int >Router::routingFunction(const RouteData & route_data)
+vector < int > Router::routingFunction(const RouteData & route_data)
 {
 
     // TODO: check 
@@ -279,7 +278,7 @@ vector <
     // TODO WIRELESS: replace using configuration file
     if (!SameRadioHub(local_id, route_data.dst_id))
     {
-	cout << name() << " setting wireless direction to reach node " << route_data.dst_id << " of different Hub..." << endl;
+	cout << name() << " routingFunction setting direction wireless to reach destination node " << route_data.dst_id << endl;
 
 	vector<int> dirv;
 	dirv.push_back(DIRECTION_WIRELESS);
