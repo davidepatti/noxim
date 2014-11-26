@@ -24,7 +24,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
     else if ( cmd == tlm::TLM_WRITE_COMMAND )
 	memcpy(&mem[adr], ptr, len);
 
-    cout << name() << "Time: " << sc_time_stamp()  << " *** WIRELESS TEST: Target received " <<  mem[0] << endl;
+    cout << name() << " Time: " << sc_time_stamp()  << " >>>> Target received " <<  mem[0] << endl;
 
     Flit f = get_payload();
 
@@ -36,9 +36,26 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 
 Flit Target::get_payload()
 {
+    static int seq = 0;
+
+
     Flit f;
-    cout << name() << " TEST returning dummy payload flit with src_id = 0" << endl;
+    cout << name() << "::get_payload() returning fake flit with src_id = 0, seq " << seq << endl;
     f.src_id = 0;
+    f.sequence_no = seq;
+
+    // seed 0, flit HBBT
+    if (seq==0)
+	f.flit_type = FLIT_TYPE_HEAD;
+    else if (seq==3)
+	f.flit_type = FLIT_TYPE_TAIL;
+    else
+	f.flit_type = FLIT_TYPE_BODY;
+
+    seq++;
+
+    if (seq==4) seq = 0;
+
     return f;
 }
 

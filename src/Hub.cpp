@@ -12,11 +12,11 @@ int Hub::route(Flit& f)
     // HUB 0 simply send on wireless, other Hubs move to first port 0
     if (local_id == 0)
     {
-	cout << name() << " TEST routing, sending to wireless channel 0" << endl;
+	cout << name() << " TEST routing, returning  wireless channel 0" << endl;
 	return DIRECTION_WIRELESS;
     }
 
-    cout << name() << " TEST routing, sending to port 0" << endl;
+    cout << name() << " TEST routing, returning port 0" << endl;
     return 0;
 
 }
@@ -35,7 +35,7 @@ void Hub::radioProcess()
 
 	    if (!(target[i]->buffer_rx.IsEmpty()) ) 
 	    {
-		cout << name() << "::radioProcess() buffer_rx not empty..." << endl;
+		cout << name() << "::radioProcess() wireless buffer_rx not empty, moving flit to buffer port " << port << endl;
 		Flit received_flit = target[i]->buffer_rx.Pop();
 
 		buffer[port].Push(received_flit);
@@ -63,6 +63,7 @@ void Hub::rxProcess()
 	{
 	    if ((req_rx[i]->read() == 1 - current_level_rx[i]) && !buffer[i].IsFull()) 
 	    {
+		cout << name() << "::rxProcess() reading flit on port " << i << endl;
 		Flit received_flit = flit_rx[i]->read();
 
 		buffer[i].Push(received_flit);
@@ -90,10 +91,6 @@ void Hub::txProcess()
 {
     if (reset.read()) 
     {
-	// TODO: fix this, since wireles direction is defined as 5,
-	// six or more ports conflicts with reservation table entries
-	// for wireless 
-	assert(num_ports<6);
 
 	for (int i = 0; i < num_ports; i++) 
 	{
@@ -103,6 +100,11 @@ void Hub::txProcess()
     } 
     else 
     {
+	// stores routing decision
+	// need a vector to use this info to choose between the two
+	// tables
+	int * r = new int[num_ports];
+
 	// 1st phase: Reservation
 	for (int j = 0; j < num_ports; j++) 
 	{
@@ -110,19 +112,31 @@ void Hub::txProcess()
 
 	    if (!buffer[i].IsEmpty()) 
 	    {
-		cout << name() << " buffer not empty on port " << i << endl;
-		// TODO: put code to handle TLM transmission
-		//
+		cout << name() << "::txProcess() reservation: buffer not empty on port " << i << endl;
+
 		Flit flit = buffer[i].Front();
 
-		int o = route(flit);
+		r[i] = route(flit);
 
 		if (flit.flit_type == FLIT_TYPE_HEAD) 
 		{
-		    if (reservation_table.isAvailable(o)) 
+		    if (r[i]==DIRECTION_WIRELESS)
 		    {
-			reservation_table.reserve(i, o);
+			// TODO: use actual channel
+			int channel = 0;
+			if (wireless_reservation_table.isAvailable(channel)) 
+			{
+			    wireless_reservation_table.reserve(i, channel);
+			}
+			else
+			cout << name() << "::txProcess() reservation:  wireless channel " << channel << " not available ..." << endl;
 		    }
+		    else if (reservation_table.isAvailable(r[i])) 
+		    {
+			reservation_table.reserve(i, r[i]);
+		    }
+		    else
+			cout << name() << "::txProcess() reservation: no available port to route dir " << r[i] << endl;
 		}
 	    }
 	}
@@ -135,40 +149,57 @@ void Hub::txProcess()
 	    {     
 		Flit flit = buffer[i].Front();
 
-		int o = reservation_table.getOutputPort(i);
-		if (o != NOT_RESERVED) 
+		if (r[i] == DIRECTION_WIRELESS)
 		{
-		    cout << name() << " inject to RH: Hub ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
-		    cout << name() << " port[" << i << "] forward to direction [" << o << "], flit: "
-			<< flit << endl;
-
-		    if (o==DIRECTION_WIRELESS)
+		    int channel = wireless_reservation_table.getOutputPort(i);
+		    if (channel != NOT_RESERVED) 
 		    {
+			cout << name() << " inject to RH: Hub ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
+			cout << name() << " port[" << i << "] forward to channel [" << channel << "], flit: "
+			    << flit << endl;
 
-			cout << name() << " forwarding to wireless channel 0" << endl;
-			init[0]->set_payload(flit);
-			init[0]->start_request_event.notify();
+
+			cout << name() << "::txProcess() forwarding to wireless channel " << channel << endl;
+			init[channel]->set_payload(flit);
+			init[channel]->start_request_event.notify();
+
+			buffer[i].Pop();
+
+			if (flit.flit_type == FLIT_TYPE_TAIL) wireless_reservation_table.release(channel);
+
 		    }
 		    else
 		    {
+			cout << name() << "::txProcess() forwarding: No channel reserved for port direction " << i  << endl;
+		    }
+		}
+		else // not wireless
+		{
+		    int d = reservation_table.getOutputPort(i);
+		    if (d != NOT_RESERVED) 
+		    {
+			cout << name() << " inject to RH: Hub ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
+			cout << name() << " port[" << i << "] forward to direction [" << d << "], flit: "
+			    << flit << endl;
+
 			// TODO: put code that writes signals to the
 			// tile
-			cout << name() << " forwarding to port 0" << endl;
+			cout << name() << "::txProcess() forwarding to port " << d << endl;
+
+			buffer[i].Pop();
+
+			if (flit.flit_type == FLIT_TYPE_TAIL) reservation_table.release(d);
+
 		    }
-
-		    buffer[i].Pop();
-
-		    if (flit.flit_type == FLIT_TYPE_TAIL) reservation_table.release(o);
-
-		}
-		else
-		{
-		    cout << name() << " output port for direction " << i  << " is not reserved ..." << endl;
+		    else
+		    {
+			cout << name() << "::txProcess() forwarding: No output port reserved for input port " << i  <<  endl;
+		    }
 		}
 
-	    }
-	} //if
-    }				// for
+	    } //if buffer not empty
+	}// for all the ports
+    } 
 }
 
 

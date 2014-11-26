@@ -35,6 +35,7 @@ int ReservationTable::directions() const
 
 bool ReservationTable::isAvailable(const int port_out) const
 {
+    cout << " checking availability of out port " << port_out << endl;
     assert(port_out >= 0 && port_out < directions());
 
     return ((rtable[port_out] == NOT_RESERVED));

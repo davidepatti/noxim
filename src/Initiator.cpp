@@ -10,12 +10,12 @@
       while (1)
       {
 
-	  cout << name() << "Time: " << sc_time_stamp() << " ****** Initiator - waiting for transmissions" << endl;
+	  cout << name() << " Time: " << sc_time_stamp() << " ****** Initiator - waiting for transmissions" << endl;
 
 	  // TODO: check
 	  wait(start_request_event);
 
-	  cout << name() << "Time: " << sc_time_stamp() << " ****** Initiator - starting blocking transmissions" << endl;
+	  cout << name() << " Time: " << sc_time_stamp() << " ****** Initiator - starting blocking transmissions" << endl;
 
 	  // TODO: fixed address!
 	  int i = 1;
@@ -37,7 +37,7 @@
 
 	  delay = sc_time(rand_ps(), SC_PS);
 
-	  cout << name() << "Calling b_transport at " << sc_time_stamp() << " with delay = " << delay << endl;
+	  cout << name() << " Time " << sc_time_stamp() << " calling blocking transport with delay = " << delay << endl;
 
 	  // Call b_transport to demonstrate the b/nb conversion by the simple_target_socket
 	  socket->b_transport( *trans, delay );
