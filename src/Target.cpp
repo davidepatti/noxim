@@ -24,7 +24,11 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
     else if ( cmd == tlm::TLM_WRITE_COMMAND )
 	memcpy(&mem[adr], ptr, len);
 
-    cout << "\n" << name() << " *** WIRELESS TEST: Target received " <<  mem[0] << endl;
+    cout << name() << "Time: " << sc_time_stamp()  << " *** WIRELESS TEST: Target received " <<  mem[0] << endl;
+
+    Flit f = get_payload();
+
+    buffer_rx.Push(f);
 
     // Obliged to set response status to indicate successful completion
     trans.set_response_status( tlm::TLM_OK_RESPONSE );
@@ -33,7 +37,8 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 Flit Target::get_payload()
 {
     Flit f;
-    cout << name() << " returning dummy payload flit " << endl;
+    cout << name() << " TEST returning dummy payload flit with src_id = 0" << endl;
+    f.src_id = 0;
     return f;
 }
 

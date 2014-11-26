@@ -63,8 +63,10 @@ SC_MODULE(Hub)
 
     void rxProcess(); // The receiving process
     void txProcess(); // The transmitting process
+    void radioProcess(); // The radio transceiver process
 
     void setup();
+    int route(Flit&);
 
     // Constructor
 
@@ -74,6 +76,10 @@ SC_MODULE(Hub)
         sensitive << clock.pos();
 
         SC_METHOD(txProcess);
+        sensitive << reset;
+        sensitive << clock.pos();
+
+        SC_METHOD(radioProcess);
         sensitive << reset;
         sensitive << clock.pos();
 
