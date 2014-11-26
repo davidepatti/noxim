@@ -57,9 +57,8 @@ SC_MODULE(Hub)
 
     int start_from_port; // Port from which to start the reservation cycle
 
-    // TODO: use different table or extend in order to support also
-    // Hubs
     ReservationTable reservation_table;	// Switch reservation table
+    ReservationTable wireless_reservation_table;// Wireless reservation table
 
     void rxProcess(); // The receiving process
     void txProcess(); // The transmitting process
@@ -115,10 +114,9 @@ SC_MODULE(Hub)
             char txt[20];
             sprintf(txt, "target_%d", i);
             target[i] = new Target(txt);
-            // actual bus binding in buildMesh()
-            // bus->init_socket.bind( target[i]->socket );
         }
         reservation_table.init(num_ports);
+        wireless_reservation_table.init(num_tx_channels);
     }
 };
 
