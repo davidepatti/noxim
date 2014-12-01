@@ -102,6 +102,8 @@ SC_MODULE(Hub)
         init = new Initiator*[num_tx_channels];
         target = new Target*[num_rx_channels];
 
+	start_from_port = 0;
+
         for (int i = 0; i < num_tx_channels; i++) {
             char txt[20];
             sprintf(txt, "init_%d", i);

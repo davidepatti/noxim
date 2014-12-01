@@ -26,11 +26,13 @@
 
 	  trans->set_command(cmd);
 	  trans->set_address( i );
-	  trans->set_data_ptr( reinterpret_cast<unsigned char*>(&data) );
-	  trans->set_data_length( 4 );
-	  //trans->set_data_ptr( reinterpret_cast<unsigned char*>(&flit_payload) );
-	  //trans->set_data_length( sizeof(Flit) );
-	  trans->set_streaming_width( 4 ); // = data_length to indicate no streaming
+
+	  //trans->set_data_ptr( reinterpret_cast<unsigned char*>(&data) );
+	  //trans->set_data_length( 4 );
+	  trans->set_data_ptr( reinterpret_cast<unsigned char*>(&flit_payload) );
+	  trans->set_data_length( sizeof(Flit) );
+	  //trans->set_streaming_width( 4 ); // = data_length to indicate no streaming
+	  trans->set_streaming_width( sizeof(Flit) ); // = data_length to indicate no streaming
 	  trans->set_byte_enable_ptr( 0 ); // 0 indicates unused
 	  trans->set_dmi_allowed( false ); // Mandatory initial value
 	  trans->set_response_status( tlm::TLM_INCOMPLETE_RESPONSE ); // Mandatory initial value
