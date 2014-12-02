@@ -66,6 +66,7 @@ SC_MODULE(Hub)
 
     void setup();
     int route(Flit&);
+    int idToPort(int) const;
 
     // Constructor
 

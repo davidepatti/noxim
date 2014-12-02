@@ -6,6 +6,13 @@ void Hub::setup()
 }
 
 
+int Hub::idToPort(int id) const
+{
+    // node 3
+    return 1;
+}
+
+
 int Hub::route(Flit& f)
 {
     // TODO: dummy test code
@@ -14,6 +21,13 @@ int Hub::route(Flit& f)
     {
 	cout << name() << " TEST routing, returning  wireless channel 0" << endl;
 	return DIRECTION_WIRELESS;
+    }
+
+    if (local_id == 3)
+    {
+	int port = idToPort(f.dst_id);
+	cout << name() << " TEST routing, id " << f.dst_id << " mapped to port  " << port << endl;
+
     }
 
     cout << name() << " TEST routing, returning port 0" << endl;
@@ -186,6 +200,9 @@ void Hub::txProcess()
 			// tile
 			cout << name() << "::txProcess() forwarding to port " << d << endl;
 
+			flit_tx[d].write(flit);
+			current_level_tx[d] = 1 - current_level_tx[d];
+			req_tx[d].write(current_level_tx[d]);
 			buffer[i].Pop();
 
 			if (flit.flit_type == FLIT_TYPE_TAIL) reservation_table.release(d);
