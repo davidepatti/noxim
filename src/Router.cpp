@@ -189,6 +189,7 @@ void Router::txProcess()
 		    // Update stats
 		    if (o == DIRECTION_LOCAL) 
 		    {
+			cout << name() << " consumed flit src " << flit.src_id << " dst = " << flit.dst_id << endl;
 			stats.receivedFlit(sc_time_stamp().
 				to_double() / 1000, flit);
 			if (GlobalParams::
