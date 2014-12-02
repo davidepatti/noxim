@@ -24,7 +24,8 @@ DEBUG    := -g
 OTHER    := -Wall# -Wno-deprecated
 CXXFLAGS := $(OPT) $(OTHER)# $(DEBUG)
 
-INCDIR := -I$(SRCDIR) -I$(SYSTEMC)/include -I$(YAML)/include
+#INCDIR := -I$(SRCDIR) -I$(SYSTEMC)/include -I$(YAML)/include
+INCDIR := -I$(SRCDIR) -isystem $(SYSTEMC)/include -I$(YAML)/include
 LIBDIR := -L$(SRCDIR) -L$(SYSTEMC)/lib-$(TARGET_ARCH) -L$(YAML)/lib
 
 LIBS := -lsystemc -lm -lyaml-cpp 
