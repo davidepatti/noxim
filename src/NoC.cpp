@@ -159,8 +159,12 @@ void NoC::buildMesh(char const * cfg_fname)
 	for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
 	    // Create the single Tile with a proper name
 	    char tile_name[20];
-	    sprintf(tile_name, "Tile[%02d][%02d]", i, j);
-	    t[i][j] = new Tile(tile_name);
+        Coord c;
+        c.x = i;
+        c.y = j;
+        int id = coord2Id(c);
+	    sprintf(tile_name, "Tile[%02d][%02d]_(#%d)", i, j, id);
+	    t[i][j] = new Tile(tile_name, id);
 
 	    cout << "> Setting " << tile_name << endl;
 
@@ -231,6 +235,8 @@ void NoC::buildMesh(char const * cfg_fname)
         // The next time that the same HUB is considered, the next
         // port will be connected
         int port = hub_connected_ports[hub_id]++;
+
+        h[hub_id]->tile2port_mapping[t[i][j]->local_id] = port;
 
         h[hub_id]->req_rx[port](req_to_hub[i][j]);
         h[hub_id]->flit_rx[port](flit_to_hub[i][j]);

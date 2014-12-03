@@ -133,12 +133,27 @@ inline int coord2Id(const Coord & coord)
 
 inline bool SameRadioHub(int id1, int id2)
 {
-    // TODO WIRELSS: replace with actual choice based on topology
+    int h_id = NOT_VALID;
 
-    if (id1==0 && id2==3)
-	return false;
+    //TODO change implementation
+    for(int hub_id = 0; hub_id < GlobalParams::hubs_num; hub_id++) {
+        for (int i = 0; i < GlobalParams::hub_conf[hub_id].attachedNodes_num; i++){
+            if (GlobalParams::hub_conf[hub_id].attachedNodes[i] == id1){
+                h_id = hub_id;
+                break;
+            }
+        }
+    }
+    
+    assert(h_id != NOT_VALID && "Tile not connected to any Hub");
 
-    return true;
+    for (int i = 0; i < GlobalParams::hub_conf[h_id].attachedNodes_num; i++){
+        if (GlobalParams::hub_conf[h_id].attachedNodes[i] == id2){
+            return true;
+        }
+    }
+
+    return false;
 }
 
 #endif
