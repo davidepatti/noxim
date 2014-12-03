@@ -178,8 +178,9 @@ void Hub::txProcess()
 			cout << name() << " port[" << i << "] forward to channel [" << channel << "], flit: "
 			    << flit << endl;
 
-
-			cout << name() << "::txProcess() forwarding to wireless channel " << channel << endl;
+            int destHub = tile2Hub(flit.dst_id);
+			cout << name() << "::txProcess() forwarding to wireless channel " << channel << " to reach HUB_" << destHub <<  endl;
+            init[channel]->set_target_address(destHub);
 			init[channel]->set_payload(flit);
 			init[channel]->start_request_event.notify();
 
