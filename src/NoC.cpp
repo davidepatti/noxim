@@ -155,14 +155,14 @@ void NoC::buildMesh(char const * cfg_fname)
     }
 
     // Create the mesh as a matrix of tiles
-    for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
-	for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
+    for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
+	for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
 	    // Create the single Tile with a proper name
 	    char tile_name[20];
-        Coord c;
-        c.x = i;
-        c.y = j;
-        int id = coord2Id(c);
+	    Coord c;
+	    c.x = i;
+	    c.y = j;
+	    int id = coord2Id(c);
 	    sprintf(tile_name, "Tile[%02d][%02d]_(#%d)", i, j, id);
 	    t[i][j] = new Tile(tile_name, id);
 
