@@ -285,6 +285,7 @@ vector < int > Router::routingFunction(const RouteData & route_data)
 	return dirv;
     }
   }
+    cout << name() << " wired routing for dst = " << route_data.dst_id << endl;
     Coord position = id2Coord(route_data.current_id);
     Coord src_coord = id2Coord(route_data.src_id);
     Coord dst_coord = id2Coord(route_data.dst_id);

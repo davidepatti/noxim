@@ -243,7 +243,7 @@ Packet ProcessingElement::trafficTest()
 {
     Packet p;
     p.src_id = local_id;
-    p.dst_id = 3;
+    p.dst_id = 14;
 
     p.timestamp = sc_time_stamp().to_double() / 1000;
     p.size = p.flit_left = getRandomSize();

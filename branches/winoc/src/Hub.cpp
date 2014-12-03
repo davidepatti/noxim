@@ -8,6 +8,7 @@ void Hub::setup()
 
 int Hub::tile2Port(int id)
 {
+    cout << name() << " tile2Port " << tile2port_mapping[id] << endl;
     return tile2port_mapping[id];
 }
 
@@ -36,15 +37,10 @@ int Hub::route(Flit& f)
 	return DIRECTION_WIRELESS;
     }
 
-    if (local_id == 3)
-    {
-	int port = tile2Port(f.dst_id);
-	cout << name() << " TEST routing, id " << f.dst_id << " mapped to port  " << port << endl;
+    int port = tile2Port(f.dst_id);
+    cout << name() << " TEST routing, id " << f.dst_id << " mapped to port  " << port << endl;
 
-    }
-
-    cout << name() << " TEST routing, returning port 0" << endl;
-    return 0;
+    return port;
 }
 
 void Hub::radioProcess()
@@ -56,13 +52,11 @@ void Hub::radioProcess()
     {
 	for (int i = 0; i < num_rx_channels; i++) 
 	{
-	    // TODO: fixed to first port
-	    int port = 0;
-
 	    if (!(target[i]->buffer_rx.IsEmpty()) ) 
 	    {
-		cout << name() << "::radioProcess() wireless buffer_rx not empty, moving flit to buffer port " << port << endl;
 		Flit received_flit = target[i]->buffer_rx.Pop();
+		int port = tile2Port(received_flit.dst_id);
+		cout << name() << "::radioProcess() wireless buffer_rx not empty, moving flit to buffer port " << port << endl;
 
 		buffer[port].Push(received_flit);
 	    }
