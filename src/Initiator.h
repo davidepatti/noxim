@@ -2,9 +2,7 @@
 #define __NOXIMTLMINITIATOR_H__
 
 #include "tlm_utils/simple_initiator_socket.h"
-#include "tlm_utils/multi_passthrough_initiator_socket.h"
 
-//#include "MM.h"
 #include "Utils.h"
 #include "DataStructs.h"
 
