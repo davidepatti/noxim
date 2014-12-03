@@ -11,13 +11,6 @@
 #ifndef __NOXIMHUB_H__
 #define __NOXIMHUB_H__
 
-// Needed for the simple_target_socket
-#define SC_INCLUDE_DYNAMIC_PROCESSES
-
-#include "tlm_utils/simple_initiator_socket.h"
-#include "tlm_utils/simple_target_socket.h"
-#include "tlm_utils/peq_with_cb_and_phase.h"
-
 #include <systemc.h>
 #include "DataStructs.h"
 #include "Buffer.h"
