@@ -11,6 +11,7 @@
 #ifndef __NOXIMHUB_H__
 #define __NOXIMHUB_H__
 
+#include <map>
 #include <systemc.h>
 #include "DataStructs.h"
 #include "Buffer.h"
@@ -19,6 +20,7 @@
 #include "Initiator.h"
 #include "Target.h"
 
+using namespace std;
 
 SC_MODULE(Hub)
 {
@@ -48,6 +50,9 @@ SC_MODULE(Hub)
     Initiator** init;
     Target** target;
 
+    map<int, int> tile2port_mapping;
+    map<int, int> tile2hub_mapping;
+
     int start_from_port; // Port from which to start the reservation cycle
 
     ReservationTable reservation_table;	// Switch reservation table
@@ -59,7 +64,8 @@ SC_MODULE(Hub)
 
     void setup();
     int route(Flit&);
-    int idToPort(int) const;
+    int tile2Port(int);
+    int tile2Hub(int);
 
     // Constructor
 
