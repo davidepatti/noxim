@@ -17,15 +17,12 @@
 
 	  cout << name() << " Time: " << sc_time_stamp() << " ****** Initiator - starting blocking transmissions" << endl;
 
-	  // TODO: fixed address!
-	  int i = 1;
-
 	  tlm::tlm_command cmd = tlm::TLM_WRITE_COMMAND;
 
 	  data = 42;
 
 	  trans->set_command(cmd);
-	  trans->set_address( i );
+	  trans->set_address(target_address);
 
 	  //trans->set_data_ptr( reinterpret_cast<unsigned char*>(&data) );
 	  //trans->set_data_length( 4 );
@@ -39,7 +36,7 @@
 
 	  delay = sc_time(rand_ps(), SC_PS);
 
-	  cout << name() << " Time " << sc_time_stamp() << " calling blocking transport with delay = " << delay << endl;
+	  cout << name() << " Time " << sc_time_stamp() << " calling blocking transport with delay = " << delay << " and target_address = " << target_address << endl;
 
 	  // Call b_transport to demonstrate the b/nb conversion by the simple_target_socket
 	  socket->b_transport( *trans, delay );
@@ -48,7 +45,7 @@
 	  if ( trans->is_response_error() )
 	      SC_REPORT_ERROR("TLM-2", "Response error from b_transport");
 
-	  cout << "trans = { " << (cmd ? 'W' : 'R') << ", " << hex << i
+	  cout << "trans = { " << (cmd ? 'W' : 'R') << ", " << hex << target_address
 	      << " } , data = " << hex << data << " at time " << sc_time_stamp()
 	      << " delay = " << delay << endl;
 
@@ -67,3 +64,7 @@ void Initiator::set_payload(Flit& payload)
     this->flit_payload = payload;
 }
 
+void Initiator::set_target_address(int addr)
+{
+    this->target_address = addr;
+}

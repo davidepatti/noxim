@@ -29,11 +29,13 @@ struct Initiator: sc_module
   void check_transaction(tlm::tlm_generic_payload& trans);
 
   int  data;
+  int target_address;
   sc_event end_request_event;
 
   // custom
   sc_event start_request_event;
 
+  void set_target_address(int);
   void set_payload(Flit&);
   Flit flit_payload;
 };
