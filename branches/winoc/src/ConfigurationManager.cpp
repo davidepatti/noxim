@@ -14,6 +14,7 @@
 void loadConfiguration() {
 
     YAML::Node config = YAML::LoadFile("config.yaml");
+
     // Initialize global configuration parameters (can be overridden with command-line arguments)
     GlobalParams::verbose_mode = config["verbose_mode"].as<int>();
     GlobalParams::trace_mode = config["trace_mode"].as<bool>();
@@ -43,38 +44,34 @@ void loadConfiguration() {
     GlobalParams::qos = config["qos"].as<double>();
     GlobalParams::show_buffer_stats = config["show_buffer_stats"].as<bool>();
     GlobalParams::use_winoc = config["use_winoc"].as<bool>();
-    GlobalParams::channels_num = config["Channels"].size();
-    GlobalParams::hubs_num = config["Hubs"].size();
-    GlobalParams::channel_conf = new ChannelConf[config["Channels"].size()];
-    GlobalParams::hub_conf = new HubConf[config["Hubs"].size()];
     
     for(YAML::const_iterator hubs_it = config["Hubs"].begin(); 
         hubs_it != config["Hubs"].end();
-        ++hubs_it) {
-        
+        ++hubs_it)
+    {   
         int hub_id = hubs_it->first.as<int>();
-        YAML::Node hub = hubs_it->second;
-        
-        GlobalParams::hub_conf[hub_id].attachedNodes_num = hub["attachedNodes"].size();
-        GlobalParams::hub_conf[hub_id].txChannels_num = hub["txChannels"].size();
-        GlobalParams::hub_conf[hub_id].rxChannels_num = hub["rxChannels"].size();
+        YAML::Node hub_config_node = hubs_it->second;
 
-        GlobalParams::hub_conf[hub_id].attachedNodes = new int[GlobalParams::hub_conf[hub_id].attachedNodes_num];
-        GlobalParams::hub_conf[hub_id].txChannels = new int[GlobalParams::hub_conf[hub_id].txChannels_num];
-        GlobalParams::hub_conf[hub_id].rxChannels = new int[GlobalParams::hub_conf[hub_id].rxChannels_num];
+        GlobalParams::hub_configuration[hub_id] = hub_config_node.as<HubConfig>(); 
 
-        // Determine, from configuration file, which Hub is connected to which Tile
-        for (size_t i = 0; i < hub["attachedNodes"].size(); i++){
-            GlobalParams::hub_conf[hub_id].attachedNodes[i] = hub["attachedNodes"][i].as<int>();
-        }
-        // Determine, from configuration file, which Hub is connected to which Channel
-        for (size_t i = 0; i < hub["txChannels"].size(); i++){
-            GlobalParams::hub_conf[hub_id].txChannels[i] = hub["txChannels"][i].as<int>();
-        }
-        for (size_t i = 0; i < hub["rxChannels"].size(); i++){
-            GlobalParams::hub_conf[hub_id].rxChannels[i] = hub["rxChannels"][i].as<int>();
-        }
-    } 
+        YAML::Node node;
+        node[hub_id] = GlobalParams::hub_configuration[hub_id];
+        cout << node[hub_id] << endl;
+    }
+
+    for(YAML::const_iterator channels_it= config["Channels"].begin(); 
+        channels_it != config["Channels"].end();
+        ++channels_it)
+    {    
+        int channel_id = channels_it->first.as<int>();
+        YAML::Node channel_config_node = channels_it->second;
+
+        GlobalParams::channel_configuration[channel_id] = channel_config_node.as<ChannelConfig>(); 
+
+        YAML::Node node;
+        node[channel_id] = GlobalParams::channel_configuration[channel_id];
+        cout << node[channel_id] << endl;
+    }
 }
 
 void showHelp(char selfname[])

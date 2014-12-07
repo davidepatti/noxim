@@ -12,6 +12,8 @@
 #ifndef __NOXIMGLOBALPARAMS_H__
 #define __NOXIMGLOBALPARAMS_H__ 
 
+#include <map>
+#include <utility>
 #include <vector>
 
 using namespace std;
@@ -66,20 +68,17 @@ using namespace std;
 #define VERBOSE_MEDIUM         2
 #define VERBOSE_HIGH           3
 
-// TODO check the list of attributes for ChannelConf 
+// TODO check the list of attributes for ChannelConfig 
 typedef struct {
-    int BER;
-    int delay;
-} ChannelConf;
+    pair<int, int> ber;
+    pair<int, int> delay;
+} ChannelConfig;
 
 typedef struct {
-    int * attachedNodes;
-    int * txChannels;
-    int * rxChannels;
-    int attachedNodes_num;
-    int txChannels_num;
-    int rxChannels_num;
-} HubConf;
+    vector<int> attachedNodes;
+    vector<int> txChannels;
+    vector<int> rxChannels;
+} HubConfig;
 
 
 struct GlobalParams {
@@ -111,10 +110,9 @@ struct GlobalParams {
     static double qos;
     static bool show_buffer_stats;
     static bool use_winoc;
-    static int channels_num;
-    static int hubs_num;
-    static ChannelConf *channel_conf;
-    static HubConf *hub_conf;
+    static map<int, ChannelConfig> channel_configuration;
+    static map<int, HubConfig> hub_configuration;
+    static map<int, int> hub_for_tile;
 };
 
 #endif

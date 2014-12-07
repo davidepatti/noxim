@@ -66,8 +66,8 @@ SC_MODULE(NoC)
     // Matrix of tiles
     Tile ***t;
 
-    Hub **h;
-    Channel **channel;
+    map<int, Hub*> hub;
+    map<int, Channel*> channel;
 
     // Global tables
     GlobalRoutingTable grtable;
