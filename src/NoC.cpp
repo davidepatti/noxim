@@ -13,22 +13,68 @@
 void NoC::buildMesh(char const * cfg_fname)
 {
     char channel_name[16];
-    channel = new Channel*[GlobalParams::channels_num];
-    for (int i = 0; i < GlobalParams::channels_num; i++) {
-        sprintf(channel_name, "Channel_%d", i);
+    for (map<int, ChannelConfig>::iterator it = GlobalParams::channel_configuration.begin();
+            it != GlobalParams::channel_configuration.end();
+            ++it)
+    {
+        int channel_id = it->first;
+        sprintf(channel_name, "Channel_%d", channel_id);
         cout << "Creating " << channel_name << endl;
-        channel[i] = new Channel(channel_name);
+        channel[channel_id] = new Channel(channel_name, channel_id);
     }
 
     char hub_name[16];
-    h = new Hub*[GlobalParams::hubs_num];
+    for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();
+            it != GlobalParams::hub_configuration.end();
+            ++it)
+    {
+        int hub_id = it->first;
+        HubConfig hub_config = it->second;
 
-    for (int i = 0; i < GlobalParams::hubs_num; i++) {
-        sprintf(hub_name, "HUB_%d", i);
+        sprintf(hub_name, "Hub_%d", hub_id);
         cout << "Creating " << hub_name << endl;
-        h[i] = new Hub(hub_name, i);
-        h[i]->clock(clock);
-        h[i]->reset(reset);
+        hub[hub_id] = new Hub(hub_name, hub_id);
+        hub[hub_id]->clock(clock);
+        hub[hub_id]->reset(reset);
+
+        // Determine, from configuration file, which Hub is connected to which Tile
+        for(vector<int>::iterator iit = hub_config.attachedNodes.begin(); 
+                iit != hub_config.attachedNodes.end(); 
+                ++iit) 
+        {
+            GlobalParams::hub_for_tile[*iit] = hub_id;
+        }
+
+        // Determine, from configuration file, which Hub is connected to which Channel
+        for(vector<int>::iterator iit = hub_config.txChannels.begin(); 
+                iit != hub_config.txChannels.end(); 
+                ++iit) 
+        {
+            int channel_id = *iit;
+            cout << "Binding " << hub[hub_id]->name() << " to txChannel " << channel_id << endl;
+            hub[hub_id]->init[channel_id]->socket.bind(channel[channel_id]->targ_socket);
+        }
+
+        for(vector<int>::iterator iit = hub_config.rxChannels.begin(); 
+                iit != hub_config.rxChannels.end(); 
+                ++iit) 
+        {
+            int channel_id = *iit;
+            cout << "Binding " << hub[hub_id]->name() << " to rxChannel " << channel_id << endl;
+            channel[channel_id]->init_socket.bind(hub[hub_id]->target[channel_id]->socket);
+        }
+    }
+
+    // DEBUG Print Tile / Hub connections 
+    for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
+	    for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
+            Coord c;
+            c.x = i;
+            c.y = j;
+            map<int, int>::iterator it = GlobalParams::hub_for_tile.find(coord2Id(c));
+            assert(it != GlobalParams::hub_for_tile.end());
+            cout << "Tile [" << i << "][" << j << "] will be connected to " << hub[it->second]->name() << endl;
+        }
     }
 
     // Check for routing table availability
@@ -39,46 +85,8 @@ void NoC::buildMesh(char const * cfg_fname)
     if (GlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
 	assert(gttable.load(GlobalParams::traffic_table_filename));
 
-    int **hub_for_tile;
-
-    hub_for_tile = new int*[GlobalParams::mesh_dim_y];
-    assert(hub_for_tile != NULL);
-
-    for(int i = 0; i < GlobalParams::mesh_dim_y; i++) {
-        hub_for_tile[i] = new int[GlobalParams::mesh_dim_x];
-        assert(hub_for_tile[i] != NULL);
-    }
-
-    for(int hub_id = 0; hub_id < GlobalParams::hubs_num; hub_id++) {
-        // Determine, from configuration file, which Hub is connected to which Tile
-        for (int i = 0; i < GlobalParams::hub_conf[hub_id].attachedNodes_num; i++){
-            int tile_id = GlobalParams::hub_conf[hub_id].attachedNodes[i];
-            hub_for_tile[tile_id % GlobalParams::mesh_dim_x][tile_id / GlobalParams::mesh_dim_x] = hub_id;
-        }
-        // Determine, from configuration file, which Hub is connected to which Channel
-        //for (int i = 0; i < GlobalParams::hub_conf[hub_id].txChannels; i++){
-        for (int i = 0; i < GlobalParams::hub_conf[hub_id].txChannels_num; i++){
-            int channel_id = GlobalParams::hub_conf[hub_id].txChannels[i];
-            cout << "Binding HUB_" << hub_id << " to txChannel " << channel_id << endl;
-            h[hub_id]->init[channel_id]->socket.bind(channel[channel_id]->targ_socket);
-        }
-        //for (int i = 0; i < GlobalParams::hub_conf[hub_id].rxChannels; i++){
-        for (int i = 0; i < GlobalParams::hub_conf[hub_id].rxChannels_num; i++){
-            int channel_id = GlobalParams::hub_conf[hub_id].rxChannels[i];
-            cout << "Binding HUB_" << hub_id << " to rxChannel " << channel_id << endl;
-            channel[channel_id]->init_socket.bind(h[hub_id]->target[channel_id]->socket);
-        }
-    } 
-
-    // DEBUG Print Tile / Hub connections 
-    for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
-	    for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
-            cout << "Tile [" << i << "][" << j << "] is connected to HUB_" << hub_for_tile[i][j] << endl;
-        }
-    }
-
     // Var to track Hub connected ports
-    int * hub_connected_ports = (int *) calloc(GlobalParams::hubs_num, sizeof(int));
+    int * hub_connected_ports = (int *) calloc(GlobalParams::hub_configuration.size(), sizeof(int));
 
     // Initialize signals
     req_to_east = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
@@ -159,12 +167,12 @@ void NoC::buildMesh(char const * cfg_fname)
 	for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
 	    // Create the single Tile with a proper name
 	    char tile_name[20];
-	    Coord c;
-	    c.x = i;
-	    c.y = j;
-	    int id = coord2Id(c);
-	    sprintf(tile_name, "Tile[%02d][%02d]_(#%d)", i, j, id);
-	    t[i][j] = new Tile(tile_name, id);
+	    Coord tile_coord;
+	    tile_coord.x = i;
+	    tile_coord.y = j;
+	    int tile_id = coord2Id(tile_coord);
+	    sprintf(tile_name, "Tile[%02d][%02d]_(#%d)", i, j, tile_id);
+	    t[i][j] = new Tile(tile_name, tile_id);
 
 	    cout << "> Setting " << tile_name << endl;
 
@@ -230,21 +238,21 @@ void NoC::buildMesh(char const * cfg_fname)
 	    t[i][j]->hub_ack_tx(ack_from_hub[i][j]);
 
         // TODO: Review port index. Connect each Hub to all its Channels 
-        int hub_id = hub_for_tile[i][j];
+        int hub_id = GlobalParams::hub_for_tile[tile_id];
 	
         // The next time that the same HUB is considered, the next
         // port will be connected
         int port = hub_connected_ports[hub_id]++;
 
-        h[hub_id]->tile2port_mapping[t[i][j]->local_id] = port;
+        hub[hub_id]->tile2port_mapping[t[i][j]->local_id] = port;
 
-        h[hub_id]->req_rx[port](req_to_hub[i][j]);
-        h[hub_id]->flit_rx[port](flit_to_hub[i][j]);
-        h[hub_id]->ack_rx[port](ack_from_hub[i][j]);
+        hub[hub_id]->req_rx[port](req_to_hub[i][j]);
+        hub[hub_id]->flit_rx[port](flit_to_hub[i][j]);
+        hub[hub_id]->ack_rx[port](ack_from_hub[i][j]);
 
-        h[hub_id]->flit_tx[port](flit_from_hub[i][j]);
-        h[hub_id]->req_tx[port](req_from_hub[i][j]);
-        h[hub_id]->ack_tx[port](ack_to_hub[i][j]);
+        hub[hub_id]->flit_tx[port](flit_from_hub[i][j]);
+        hub[hub_id]->req_tx[port](req_from_hub[i][j]);
+        hub[hub_id]->ack_tx[port](ack_to_hub[i][j]);
 
         // Map buffer level signals (analogy with req_tx/rx port mapping)
 	    t[i][j]->free_slots[DIRECTION_NORTH] (free_slots_to_north[i][j]);

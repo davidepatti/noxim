@@ -83,9 +83,9 @@ SC_MODULE(Hub)
         sensitive << clock.pos();
 
         local_id = id;
-        num_ports = GlobalParams::hub_conf[local_id].attachedNodes_num;
-        num_rx_channels = GlobalParams::hub_conf[local_id].rxChannels_num;
-        num_tx_channels = GlobalParams::hub_conf[local_id].txChannels_num;
+        num_ports = GlobalParams::hub_configuration[local_id].attachedNodes.size();
+        num_rx_channels = GlobalParams::hub_configuration[local_id].rxChannels.size();
+        num_tx_channels = GlobalParams::hub_configuration[local_id].txChannels.size();
 
         flit_rx = new sc_in<Flit>[num_ports];
         req_rx = new sc_in<bool>[num_ports];
@@ -102,7 +102,7 @@ SC_MODULE(Hub)
         init = new Initiator*[num_tx_channels];
         target = new Target*[num_rx_channels];
 
-	start_from_port = 0;
+        start_from_port = 0;
 
         for (int i = 0; i < num_tx_channels; i++) {
             char txt[20];

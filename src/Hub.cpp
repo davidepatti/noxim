@@ -16,14 +16,9 @@ int Hub::tile2Port(int id)
 int Hub::tile2Hub(int id)
 {
     //TODO add support multiple channels
-    for(int hub_id = 0; hub_id < GlobalParams::hubs_num; hub_id++) {
-        for (int i = 0; i < GlobalParams::hub_conf[hub_id].attachedNodes_num; i++){
-            if (GlobalParams::hub_conf[hub_id].attachedNodes[i] == id)
-                return hub_id;
-        }
-    }
-    assert(false && "Specified Tile is not connected to any Hub");
-    return NOT_VALID;
+    map<int, int>::iterator it = GlobalParams::hub_for_tile.find(id); 
+    assert( (it != GlobalParams::hub_for_tile.end()) && "Specified Tile is not connected to any Hub");
+    return it->second;
 }
 
 

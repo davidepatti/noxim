@@ -22,6 +22,7 @@ using namespace std;
 
 struct Channel: sc_module
 {
+  SC_HAS_PROCESS(Channel);
   // ***********************************************************
   // Each multi-socket can be bound to multiple sockets
   // No need for an array-of-sockets
@@ -30,9 +31,12 @@ struct Channel: sc_module
   tlm_utils::multi_passthrough_target_socket<Channel>    targ_socket;
   tlm_utils::multi_passthrough_initiator_socket<Channel> init_socket;
 
-  SC_CTOR(Channel)
-  : targ_socket("targ_socket"), init_socket("init_socket")
+  int local_id; // Unique ID
+
+  Channel(sc_module_name nm, int id)
+  : sc_module(nm), targ_socket("targ_socket"), init_socket("init_socket")
   {
+    local_id = id;
     targ_socket.register_b_transport(       this, &Channel::b_transport);
     targ_socket.register_get_direct_mem_ptr(this, &Channel::get_direct_mem_ptr);
     targ_socket.register_transport_dbg(     this, &Channel::transport_dbg);

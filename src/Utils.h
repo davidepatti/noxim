@@ -133,27 +133,13 @@ inline int coord2Id(const Coord & coord)
 
 inline bool SameRadioHub(int id1, int id2)
 {
-    int h_id = NOT_VALID;
-
-    //TODO change implementation
-    for(int hub_id = 0; hub_id < GlobalParams::hubs_num; hub_id++) {
-        for (int i = 0; i < GlobalParams::hub_conf[hub_id].attachedNodes_num; i++){
-            if (GlobalParams::hub_conf[hub_id].attachedNodes[i] == id1){
-                h_id = hub_id;
-                break;
-            }
-        }
-    }
+    map<int, int>::iterator it1 = GlobalParams::hub_for_tile.find(id1); 
+    map<int, int>::iterator it2 = GlobalParams::hub_for_tile.find(id2); 
     
-    assert(h_id != NOT_VALID && "Tile not connected to any Hub");
+    assert( (it1 != GlobalParams::hub_for_tile.end()) && "Specified Tile is not connected to any Hub");
+    assert( (it2 != GlobalParams::hub_for_tile.end()) && "Specified Tile is not connected to any Hub");
 
-    for (int i = 0; i < GlobalParams::hub_conf[h_id].attachedNodes_num; i++){
-        if (GlobalParams::hub_conf[h_id].attachedNodes[i] == id2){
-            return true;
-        }
-    }
-
-    return false;
+    return (it1->second == it2->second);
 }
 
 #endif
