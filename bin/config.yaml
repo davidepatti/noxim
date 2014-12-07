@@ -22,8 +22,8 @@ Hubs:
 Channels:
     0:
       # Prop: [RX_value, TX_value]
-        BER: [0, 0]
-        Delay: [0, 0]
+        ber: [0, 0]
+        delay: [0, 0]
 
 #
 #  Other configurations
