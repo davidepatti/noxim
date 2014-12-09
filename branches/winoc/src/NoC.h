@@ -20,48 +20,41 @@
 
 using namespace std;
 
+template <typename T>
+struct sc_signal_NSWE
+{
+    sc_signal<T> east;
+    sc_signal<T> west;
+    sc_signal<T> south;
+    sc_signal<T> north;
+};
+
+template <typename T>
+struct sc_signal_NSWEH
+{
+    sc_signal<T> east;
+    sc_signal<T> west;
+    sc_signal<T> south;
+    sc_signal<T> north;
+    sc_signal<T> to_hub;
+    sc_signal<T> from_hub;
+};
+
+
 SC_MODULE(NoC)
 {
-
     // I/O Ports
     sc_in_clk clock;		// The input clock for the NoC
     sc_in < bool > reset;	// The reset signal for the NoC
 
     // Signals
-    sc_signal <bool> **req_to_east;
-    sc_signal <bool> **req_to_west;
-    sc_signal <bool> **req_to_south;
-    sc_signal <bool> **req_to_north;
-
-    sc_signal <bool> **ack_to_east;
-    sc_signal <bool> **ack_to_west;
-    sc_signal <bool> **ack_to_south;
-    sc_signal <bool> **ack_to_north;
-
- 	sc_signal <Flit> **flit_to_east;
-    sc_signal <Flit> **flit_to_west;
-    sc_signal <Flit> **flit_to_south;
-    sc_signal <Flit> **flit_to_north;
-
- 	sc_signal <int> **free_slots_to_east;
-    sc_signal <int> **free_slots_to_west;
-    sc_signal <int> **free_slots_to_south;
-    sc_signal <int> **free_slots_to_north;
-
-    // Wireless Hub
-    sc_signal <bool> **req_to_hub;
-    sc_signal <bool> **ack_to_hub;
-    sc_signal <Flit> **flit_to_hub;
-
-    sc_signal <bool> **req_from_hub;
-    sc_signal <bool> **ack_from_hub;
-    sc_signal <Flit> **flit_from_hub;
+    sc_signal_NSWEH<bool> **req;
+    sc_signal_NSWEH<bool> **ack;
+    sc_signal_NSWEH<Flit> **flit;
+    sc_signal_NSWE<int> **free_slots;
 
     // NoP
-    sc_signal <NoP_data> **NoP_data_to_east;
-    sc_signal <NoP_data> **NoP_data_to_west;
-    sc_signal <NoP_data> **NoP_data_to_south;
-    sc_signal <NoP_data> **NoP_data_to_north;
+    sc_signal_NSWE<NoP_data> **nop_data;
 
     // Matrix of tiles
     Tile ***t;
@@ -111,7 +104,6 @@ SC_MODULE(NoC)
   private:
 
     void buildMesh(char const * cfg_fname);
-
 };
 
 #endif
