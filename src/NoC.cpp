@@ -89,72 +89,23 @@ void NoC::buildMesh(char const * cfg_fname)
     int * hub_connected_ports = (int *) calloc(GlobalParams::hub_configuration.size(), sizeof(int));
 
     // Initialize signals
-    req_to_east = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
-    req_to_west = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
-    req_to_south = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
-    req_to_north = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+    int dimX = GlobalParams::mesh_dim_x + 1;
+    int dimY = GlobalParams::mesh_dim_y + 1;
 
-    ack_to_east = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
-    ack_to_west = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
-    ack_to_south = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
-    ack_to_north = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
+    req = new sc_signal_NSWEH<bool>*[dimX];
+    ack = new sc_signal_NSWEH<bool>*[dimX];
+    flit = new sc_signal_NSWEH<Flit>*[dimX];
 
-    flit_to_east = new sc_signal<Flit>*[GlobalParams::mesh_dim_x + 1];
-    flit_to_west = new sc_signal<Flit>*[GlobalParams::mesh_dim_x + 1];
-    flit_to_south = new sc_signal<Flit>*[GlobalParams::mesh_dim_x + 1];
-    flit_to_north = new sc_signal<Flit>*[GlobalParams::mesh_dim_x + 1];
+    free_slots = new sc_signal_NSWE<int>*[dimX];
+    nop_data = new sc_signal_NSWE<NoP_data>*[dimX];
 
-    free_slots_to_east = new sc_signal<int>*[GlobalParams::mesh_dim_x + 1];
-    free_slots_to_west = new sc_signal<int>*[GlobalParams::mesh_dim_x + 1];
-    free_slots_to_south = new sc_signal<int>*[GlobalParams::mesh_dim_x + 1];
-    free_slots_to_north = new sc_signal<int>*[GlobalParams::mesh_dim_x + 1];
+    for (int i=0; i < dimX; i++) {
+        req[i] = new sc_signal_NSWEH<bool>[dimY];
+        ack[i] = new sc_signal_NSWEH<bool>[dimY];
+        flit[i] = new sc_signal_NSWEH<Flit>[dimY];
 
-    req_to_hub = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
-    ack_to_hub = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
-    flit_to_hub = new sc_signal<Flit>*[GlobalParams::mesh_dim_x + 1];
-
-    req_from_hub = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
-    ack_from_hub = new sc_signal<bool>*[GlobalParams::mesh_dim_x + 1];
-    flit_from_hub = new sc_signal<Flit>*[GlobalParams::mesh_dim_x + 1];
-
-    NoP_data_to_east = new sc_signal<NoP_data>*[GlobalParams::mesh_dim_x + 1];
-    NoP_data_to_west = new sc_signal<NoP_data>*[GlobalParams::mesh_dim_x + 1];
-    NoP_data_to_south = new sc_signal<NoP_data>*[GlobalParams::mesh_dim_x + 1];
-    NoP_data_to_north = new sc_signal<NoP_data>*[GlobalParams::mesh_dim_x + 1];
-
-    for (int i=0; i < GlobalParams::mesh_dim_x + 1; i++) {
-    	req_to_east[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
-    	req_to_west[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
-    	req_to_south[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
-    	req_to_north[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
-
-        ack_to_east[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
-        ack_to_west[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
-        ack_to_south[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
-        ack_to_north[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
-
-        flit_to_east[i] = new sc_signal<Flit>[GlobalParams::mesh_dim_y + 1];
-        flit_to_west[i] = new sc_signal<Flit>[GlobalParams::mesh_dim_y + 1];
-        flit_to_south[i] = new sc_signal<Flit>[GlobalParams::mesh_dim_y + 1];
-        flit_to_north[i] = new sc_signal<Flit>[GlobalParams::mesh_dim_y + 1];
-
-        free_slots_to_east[i] = new sc_signal<int>[GlobalParams::mesh_dim_y + 1];
-        free_slots_to_west[i] = new sc_signal<int>[GlobalParams::mesh_dim_y + 1];
-        free_slots_to_south[i] = new sc_signal<int>[GlobalParams::mesh_dim_y + 1];
-        free_slots_to_north[i] = new sc_signal<int>[GlobalParams::mesh_dim_y + 1];
-
-        req_to_hub[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
-        ack_to_hub[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
-        flit_to_hub[i] = new sc_signal<Flit>[GlobalParams::mesh_dim_y + 1];
-
-        req_from_hub[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
-        ack_from_hub[i] = new sc_signal<bool>[GlobalParams::mesh_dim_y + 1];
-        flit_from_hub[i] = new sc_signal<Flit>[GlobalParams::mesh_dim_y + 1];
-
-        NoP_data_to_east[i] = new sc_signal<NoP_data>[GlobalParams::mesh_dim_y + 1];
-        NoP_data_to_west[i] = new sc_signal<NoP_data>[GlobalParams::mesh_dim_y + 1];
-        NoP_data_to_south[i] = new sc_signal<NoP_data>[GlobalParams::mesh_dim_y + 1];
-        NoP_data_to_north[i] = new sc_signal<NoP_data>[GlobalParams::mesh_dim_y + 1];
+        free_slots[i] = new sc_signal_NSWE<int>[dimY];
+        nop_data[i] = new sc_signal_NSWE<NoP_data>[dimY];
     }
 
     t = new Tile**[GlobalParams::mesh_dim_x];
@@ -193,49 +144,49 @@ void NoC::buildMesh(char const * cfg_fname)
 	    t[i][j]->reset(reset);
 
 	    // Map Rx signals
-	    t[i][j]->req_rx[DIRECTION_NORTH] (req_to_south[i][j]);
-	    t[i][j]->flit_rx[DIRECTION_NORTH] (flit_to_south[i][j]);
-	    t[i][j]->ack_rx[DIRECTION_NORTH] (ack_to_north[i][j]);
+	    t[i][j]->req_rx[DIRECTION_NORTH] (req[i][j].south);
+	    t[i][j]->flit_rx[DIRECTION_NORTH] (flit[i][j].south);
+	    t[i][j]->ack_rx[DIRECTION_NORTH] (ack[i][j].north);
 
-	    t[i][j]->req_rx[DIRECTION_EAST] (req_to_west[i + 1][j]);
-	    t[i][j]->flit_rx[DIRECTION_EAST] (flit_to_west[i + 1][j]);
-	    t[i][j]->ack_rx[DIRECTION_EAST] (ack_to_east[i + 1][j]);
+	    t[i][j]->req_rx[DIRECTION_EAST] (req[i + 1][j].west);
+	    t[i][j]->flit_rx[DIRECTION_EAST] (flit[i + 1][j].west);
+	    t[i][j]->ack_rx[DIRECTION_EAST] (ack[i + 1][j].east);
 
-	    t[i][j]->req_rx[DIRECTION_SOUTH] (req_to_north[i][j + 1]);
-	    t[i][j]->flit_rx[DIRECTION_SOUTH] (flit_to_north[i][j + 1]);
-	    t[i][j]->ack_rx[DIRECTION_SOUTH] (ack_to_south[i][j + 1]);
+	    t[i][j]->req_rx[DIRECTION_SOUTH] (req[i][j + 1].north);
+	    t[i][j]->flit_rx[DIRECTION_SOUTH] (flit[i][j + 1].north);
+	    t[i][j]->ack_rx[DIRECTION_SOUTH] (ack[i][j + 1].south);
 
-	    t[i][j]->req_rx[DIRECTION_WEST] (req_to_east[i][j]);
-	    t[i][j]->flit_rx[DIRECTION_WEST] (flit_to_east[i][j]);
-	    t[i][j]->ack_rx[DIRECTION_WEST] (ack_to_west[i][j]);
+	    t[i][j]->req_rx[DIRECTION_WEST] (req[i][j].east);
+	    t[i][j]->flit_rx[DIRECTION_WEST] (flit[i][j].east);
+	    t[i][j]->ack_rx[DIRECTION_WEST] (ack[i][j].west);
 
 	    // Map Tx signals
-	    t[i][j]->req_tx[DIRECTION_NORTH] (req_to_north[i][j]);
-	    t[i][j]->flit_tx[DIRECTION_NORTH] (flit_to_north[i][j]);
-	    t[i][j]->ack_tx[DIRECTION_NORTH] (ack_to_south[i][j]);
+	    t[i][j]->req_tx[DIRECTION_NORTH] (req[i][j].north);
+	    t[i][j]->flit_tx[DIRECTION_NORTH] (flit[i][j].north);
+	    t[i][j]->ack_tx[DIRECTION_NORTH] (ack[i][j].south);
 
-	    t[i][j]->req_tx[DIRECTION_EAST] (req_to_east[i + 1][j]);
-	    t[i][j]->flit_tx[DIRECTION_EAST] (flit_to_east[i + 1][j]);
-	    t[i][j]->ack_tx[DIRECTION_EAST] (ack_to_west[i + 1][j]);
+	    t[i][j]->req_tx[DIRECTION_EAST] (req[i + 1][j].east);
+	    t[i][j]->flit_tx[DIRECTION_EAST] (flit[i + 1][j].east);
+	    t[i][j]->ack_tx[DIRECTION_EAST] (ack[i + 1][j].west);
 
-	    t[i][j]->req_tx[DIRECTION_SOUTH] (req_to_south[i][j + 1]);
-	    t[i][j]->flit_tx[DIRECTION_SOUTH] (flit_to_south[i][j + 1]);
-	    t[i][j]->ack_tx[DIRECTION_SOUTH] (ack_to_north[i][j + 1]);
+	    t[i][j]->req_tx[DIRECTION_SOUTH] (req[i][j + 1].south);
+	    t[i][j]->flit_tx[DIRECTION_SOUTH] (flit[i][j + 1].south);
+	    t[i][j]->ack_tx[DIRECTION_SOUTH] (ack[i][j + 1].north);
 
-	    t[i][j]->req_tx[DIRECTION_WEST] (req_to_west[i][j]);
-	    t[i][j]->flit_tx[DIRECTION_WEST] (flit_to_west[i][j]);
-	    t[i][j]->ack_tx[DIRECTION_WEST] (ack_to_east[i][j]);
+	    t[i][j]->req_tx[DIRECTION_WEST] (req[i][j].west);
+	    t[i][j]->flit_tx[DIRECTION_WEST] (flit[i][j].west);
+	    t[i][j]->ack_tx[DIRECTION_WEST] (ack[i][j].east);
 
 	    // TODO: check if hub signal is always required
 	    // signals/port when tile receives(rx) from hub
-	    t[i][j]->hub_req_rx(req_from_hub[i][j]);
-	    t[i][j]->hub_flit_rx(flit_from_hub[i][j]);
-	    t[i][j]->hub_ack_rx(ack_to_hub[i][j]);
+	    t[i][j]->hub_req_rx(req[i][j].from_hub);
+	    t[i][j]->hub_flit_rx(flit[i][j].from_hub);
+	    t[i][j]->hub_ack_rx(ack[i][j].to_hub);
 
 	    // signals/port when tile transmits(tx) to hub
-	    t[i][j]->hub_req_tx(req_to_hub[i][j]); // 7, sc_out
-	    t[i][j]->hub_flit_tx(flit_to_hub[i][j]);
-	    t[i][j]->hub_ack_tx(ack_from_hub[i][j]);
+	    t[i][j]->hub_req_tx(req[i][j].to_hub); // 7, sc_out
+	    t[i][j]->hub_flit_tx(flit[i][j].to_hub);
+	    t[i][j]->hub_ack_tx(ack[i][j].from_hub);
 
         // TODO: Review port index. Connect each Hub to all its Channels 
         int hub_id = GlobalParams::hub_for_tile[tile_id];
@@ -246,35 +197,35 @@ void NoC::buildMesh(char const * cfg_fname)
 
         hub[hub_id]->tile2port_mapping[t[i][j]->local_id] = port;
 
-        hub[hub_id]->req_rx[port](req_to_hub[i][j]);
-        hub[hub_id]->flit_rx[port](flit_to_hub[i][j]);
-        hub[hub_id]->ack_rx[port](ack_from_hub[i][j]);
+        hub[hub_id]->req_rx[port](req[i][j].to_hub);
+        hub[hub_id]->flit_rx[port](flit[i][j].to_hub);
+        hub[hub_id]->ack_rx[port](ack[i][j].from_hub);
 
-        hub[hub_id]->flit_tx[port](flit_from_hub[i][j]);
-        hub[hub_id]->req_tx[port](req_from_hub[i][j]);
-        hub[hub_id]->ack_tx[port](ack_to_hub[i][j]);
+        hub[hub_id]->flit_tx[port](flit[i][j].from_hub);
+        hub[hub_id]->req_tx[port](req[i][j].from_hub);
+        hub[hub_id]->ack_tx[port](ack[i][j].to_hub);
 
         // Map buffer level signals (analogy with req_tx/rx port mapping)
-	    t[i][j]->free_slots[DIRECTION_NORTH] (free_slots_to_north[i][j]);
-	    t[i][j]->free_slots[DIRECTION_EAST] (free_slots_to_east[i + 1][j]);
-	    t[i][j]->free_slots[DIRECTION_SOUTH] (free_slots_to_south[i][j + 1]);
-	    t[i][j]->free_slots[DIRECTION_WEST] (free_slots_to_west[i][j]);
+	    t[i][j]->free_slots[DIRECTION_NORTH] (free_slots[i][j].north);
+	    t[i][j]->free_slots[DIRECTION_EAST] (free_slots[i + 1][j].east);
+	    t[i][j]->free_slots[DIRECTION_SOUTH] (free_slots[i][j + 1].south);
+	    t[i][j]->free_slots[DIRECTION_WEST] (free_slots[i][j].west);
 
-	    t[i][j]->free_slots_neighbor[DIRECTION_NORTH] (free_slots_to_south[i][j]);
-	    t[i][j]->free_slots_neighbor[DIRECTION_EAST] (free_slots_to_west[i + 1][j]);
-	    t[i][j]->free_slots_neighbor[DIRECTION_SOUTH] (free_slots_to_north[i][j + 1]);
-	    t[i][j]->free_slots_neighbor[DIRECTION_WEST] (free_slots_to_east[i][j]);
+	    t[i][j]->free_slots_neighbor[DIRECTION_NORTH] (free_slots[i][j].south);
+	    t[i][j]->free_slots_neighbor[DIRECTION_EAST] (free_slots[i + 1][j].west);
+	    t[i][j]->free_slots_neighbor[DIRECTION_SOUTH] (free_slots[i][j + 1].north);
+	    t[i][j]->free_slots_neighbor[DIRECTION_WEST] (free_slots[i][j].east);
 
 	    // NoP 
-	    t[i][j]->NoP_data_out[DIRECTION_NORTH] (NoP_data_to_north[i][j]);
-	    t[i][j]->NoP_data_out[DIRECTION_EAST] (NoP_data_to_east[i + 1][j]);
-	    t[i][j]->NoP_data_out[DIRECTION_SOUTH] (NoP_data_to_south[i][j + 1]);
-	    t[i][j]->NoP_data_out[DIRECTION_WEST] (NoP_data_to_west[i][j]);
+	    t[i][j]->NoP_data_out[DIRECTION_NORTH] (nop_data[i][j].north);
+	    t[i][j]->NoP_data_out[DIRECTION_EAST] (nop_data[i + 1][j].east);
+	    t[i][j]->NoP_data_out[DIRECTION_SOUTH] (nop_data[i][j + 1].south);
+	    t[i][j]->NoP_data_out[DIRECTION_WEST] (nop_data[i][j].west);
 
-	    t[i][j]->NoP_data_in[DIRECTION_NORTH] (NoP_data_to_south[i][j]);
-	    t[i][j]->NoP_data_in[DIRECTION_EAST] (NoP_data_to_west[i + 1][j]);
-	    t[i][j]->NoP_data_in[DIRECTION_SOUTH] (NoP_data_to_north[i][j + 1]);
-	    t[i][j]->NoP_data_in[DIRECTION_WEST] (NoP_data_to_east[i][j]);
+	    t[i][j]->NoP_data_in[DIRECTION_NORTH] (nop_data[i][j].south);
+	    t[i][j]->NoP_data_in[DIRECTION_EAST] (nop_data[i + 1][j].west);
+	    t[i][j]->NoP_data_in[DIRECTION_SOUTH] (nop_data[i][j + 1].north);
+	    t[i][j]->NoP_data_in[DIRECTION_WEST] (nop_data[i][j].east);
 
 	}
     }
@@ -291,30 +242,30 @@ void NoC::buildMesh(char const * cfg_fname)
 
     // Clear signals for borderline nodes
     for (int i = 0; i <= GlobalParams::mesh_dim_x; i++) {
-	req_to_south[i][0] = 0;
-	ack_to_north[i][0] = 0;
-	req_to_north[i][GlobalParams::mesh_dim_y] = 0;
-	ack_to_south[i][GlobalParams::mesh_dim_y] = 0;
+	req[i][0].south = 0;
+	ack[i][0].north = 0;
+	req[i][GlobalParams::mesh_dim_y].north = 0;
+	ack[i][GlobalParams::mesh_dim_y].south = 0;
 
-	free_slots_to_south[i][0].write(NOT_VALID);
-	free_slots_to_north[i][GlobalParams::mesh_dim_y].write(NOT_VALID);
+	free_slots[i][0].south.write(NOT_VALID);
+	free_slots[i][GlobalParams::mesh_dim_y].north.write(NOT_VALID);
 
-	NoP_data_to_south[i][0].write(tmp_NoP);
-	NoP_data_to_north[i][GlobalParams::mesh_dim_y].write(tmp_NoP);
+	nop_data[i][0].south.write(tmp_NoP);
+	nop_data[i][GlobalParams::mesh_dim_y].north.write(tmp_NoP);
 
     }
 
     for (int j = 0; j <= GlobalParams::mesh_dim_y; j++) {
-	req_to_east[0][j] = 0;
-	ack_to_west[0][j] = 0;
-	req_to_west[GlobalParams::mesh_dim_x][j] = 0;
-	ack_to_east[GlobalParams::mesh_dim_x][j] = 0;
+	req[0][j].east = 0;
+	ack[0][j].west = 0;
+	req[GlobalParams::mesh_dim_x][j].west = 0;
+	ack[GlobalParams::mesh_dim_x][j].east = 0;
 
-	free_slots_to_east[0][j].write(NOT_VALID);
-	free_slots_to_west[GlobalParams::mesh_dim_x][j].write(NOT_VALID);
+	free_slots[0][j].east.write(NOT_VALID);
+	free_slots[GlobalParams::mesh_dim_x][j].west.write(NOT_VALID);
 
-	NoP_data_to_east[0][j].write(tmp_NoP);
-	NoP_data_to_west[GlobalParams::mesh_dim_x][j].write(tmp_NoP);
+	nop_data[0][j].east.write(tmp_NoP);
+	nop_data[GlobalParams::mesh_dim_x][j].west.write(tmp_NoP);
 
     }
     
