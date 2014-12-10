@@ -24,18 +24,18 @@ int Hub::tile2Hub(int id)
 
 int Hub::route(Flit& f)
 {
-    // TODO: dummy test code
-    // HUB 0 simply send on wireless, other Hubs move to first port 0
-    if (local_id == 0)
+    for (int i=0; i< GlobalParams::hub_configuration[local_id].attachedNodes.size();i++)
     {
-	cout << name() << " TEST routing, returning  wireless channel 0" << endl;
-	return DIRECTION_WIRELESS;
+	if (GlobalParams::hub_configuration[local_id].attachedNodes[i]==f.dst_id)
+	{
+	    cout << name() << " destination tile " << f.dst_id << " is connected to this hub " << endl;
+	    return tile2Port(f.dst_id);
+	}
     }
 
-    int port = tile2Port(f.dst_id);
-    cout << name() << " TEST routing, id " << f.dst_id << " mapped to port  " << port << endl;
+    cout << name() << " destination tile " << f.dst_id << " is not connected to this hub " << endl;
+    return DIRECTION_WIRELESS;
 
-    return port;
 }
 
 void Hub::radioProcess()
@@ -45,16 +45,20 @@ void Hub::radioProcess()
     } 
     else 
     {
+	int port;
 	for (int i = 0; i < num_rx_channels; i++) 
 	{
-	    if (!(target[i]->buffer_rx.IsEmpty()) ) 
+	    if (!(target[i]->buffer_rx.IsEmpty()) && !buffer[port].IsFull() ) 
 	    {
 		Flit received_flit = target[i]->buffer_rx.Pop();
-		int port = tile2Port(received_flit.dst_id);
+		port = tile2Port(received_flit.dst_id);
 		cout << name() << "::radioProcess() wireless buffer_rx not empty, moving flit to buffer port " << port << endl;
 
 		buffer[port].Push(received_flit);
 	    }
+	    // TODO: remove
+	    else if (buffer[port].IsFull())
+		cout << name() << " WARNING, buffer full for port " << port << endl;
 	}
     }
 }

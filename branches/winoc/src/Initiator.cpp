@@ -45,8 +45,8 @@
 	  if ( trans->is_response_error() )
 	      SC_REPORT_ERROR("TLM-2", "Response error from b_transport");
 
-	  cout << "trans = { " << (cmd ? 'W' : 'R') << ", " << hex << target_address
-	      << " } , data = " << hex << data << " at time " << sc_time_stamp()
+	  cout << "trans = { " << (cmd ? 'W' : 'R') << ", " << target_address
+	      << " } , data = " << data << " at time " << sc_time_stamp()
 	      << " delay = " << delay << endl;
 
 	  // Realize the delay annotated onto the transport call

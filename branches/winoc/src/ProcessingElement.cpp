@@ -102,10 +102,12 @@ bool ProcessingElement::canShot(Packet & packet)
 
     // TODO: This test enables only some transmissions from 0 towards
     // node 3, thus requiring wireless
+    /*
     if (GlobalParams::use_winoc) 
     {
 	if (once) return false;
 	once = true;
+
 	if (local_id==0 && (int)now%1000 ==0)
 	{
 	    packet = trafficTest();
@@ -114,6 +116,7 @@ bool ProcessingElement::canShot(Packet & packet)
 	else
 	    return false;
     }
+    */
 
     if (GlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED) {
 	if (!transmittedAtPreviousCycle)
