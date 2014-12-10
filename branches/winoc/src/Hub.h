@@ -62,10 +62,8 @@ SC_MODULE(Hub)
     void txProcess(); // The transmitting process
     void radioProcess(); // The radio transceiver process
 
-    void setup();
     int route(Flit&);
     int tile2Port(int);
-    int tile2Hub(int);
 
     // Constructor
 
