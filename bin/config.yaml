@@ -79,8 +79,8 @@ probability_of_retransmission: 0.01
 #   TRAFFIC_BIT_REVERSAL   5
 #   TRAFFIC_SHUFFLE        6
 #   TRAFFIC_BUTTERFLY      7
-traffic_distribution: 0
-traffic_table_filename: ""
+traffic_distribution: 4
+traffic_table_filename: "tt.txt"
 
 reset_time: 1000
 simulation_time: 10000
