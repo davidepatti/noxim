@@ -96,13 +96,14 @@ bool ProcessingElement::canShot(Packet & packet)
 {
     bool shot;
     double threshold;
-    static bool once = false;
 
     double now = sc_time_stamp().to_double() / 1000;
 
     // TODO: This test enables only some transmissions from 0 towards
     // node 3, thus requiring wireless
     /*
+    static bool once = false;
+
     if (GlobalParams::use_winoc) 
     {
 	if (once) return false;
