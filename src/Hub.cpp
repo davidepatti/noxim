@@ -1,9 +1,5 @@
 #include "Hub.h"
 
-void Hub::setup()
-{
-
-}
 
 
 int Hub::tile2Port(int id)
@@ -13,13 +9,6 @@ int Hub::tile2Port(int id)
 }
 
 
-int Hub::tile2Hub(int id)
-{
-    //TODO add support multiple channels
-    map<int, int>::iterator it = GlobalParams::hub_for_tile.find(id); 
-    assert( (it != GlobalParams::hub_for_tile.end()) && "Specified Tile is not connected to any Hub");
-    return it->second;
-}
 
 
 int Hub::route(Flit& f)
@@ -173,19 +162,17 @@ void Hub::txProcess()
 		    int channel = wireless_reservation_table.getOutputPort(i);
 		    if (channel != NOT_RESERVED) 
 		    {
-			cout << name() << " inject to RH: Hub ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
-			cout << name() << " port[" << i << "] forward to channel [" << channel << "], flit: "
-			    << flit << endl;
 
-            int destHub = tile2Hub(flit.dst_id);
-			cout << name() << "::txProcess() forwarding to wireless channel " << channel << " to reach HUB_" << destHub <<  endl;
-            init[channel]->set_target_address(destHub);
-			init[channel]->set_payload(flit);
+			if (!(init[channel]->buffer_tx.IsFull()) )
+			{
+			    cout << name() << " flit moved from buffer["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
+			    buffer[i].Pop();
+			    init[channel]->buffer_tx.Push(flit);
+			    if (flit.flit_type == FLIT_TYPE_TAIL) wireless_reservation_table.release(channel);
+			}
+
 			init[channel]->start_request_event.notify();
 
-			buffer[i].Pop();
-
-			if (flit.flit_type == FLIT_TYPE_TAIL) wireless_reservation_table.release(channel);
 
 		    }
 		    else

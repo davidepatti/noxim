@@ -5,6 +5,7 @@
 
 #include "Utils.h"
 #include "DataStructs.h"
+#include "Buffer.h"
 
 using namespace sc_core;
 using namespace std;
@@ -28,16 +29,13 @@ struct Initiator: sc_module
   void thread_process();
   void check_transaction(tlm::tlm_generic_payload& trans);
 
-  int  data;
-  int target_address;
   sc_event end_request_event;
 
   // custom
   sc_event start_request_event;
 
-  void set_target_address(int);
-  void set_payload(Flit&);
-  Flit flit_payload;
+  Buffer buffer_tx;
+  Flit flit_payload; 
 };
 
 #endif

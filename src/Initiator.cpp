@@ -18,17 +18,16 @@
 	  cout << name() << " Time: " << sc_time_stamp() << " ****** Initiator - starting blocking transmissions" << endl;
 
 	  tlm::tlm_command cmd = tlm::TLM_WRITE_COMMAND;
+	  flit_payload = buffer_tx.Front();
 
-	  data = 42;
+	  int destHub = tile2Hub(flit_payload.dst_id);
+	  cout << name() << " forwarding to wireless to reach HUB_" << destHub <<  endl;
 
 	  trans->set_command(cmd);
-	  trans->set_address(target_address);
+	  trans->set_address(destHub);
 
-	  //trans->set_data_ptr( reinterpret_cast<unsigned char*>(&data) );
-	  //trans->set_data_length( 4 );
 	  trans->set_data_ptr( reinterpret_cast<unsigned char*>(&flit_payload) );
 	  trans->set_data_length( sizeof(Flit) );
-	  //trans->set_streaming_width( 4 ); // = data_length to indicate no streaming
 	  trans->set_streaming_width( sizeof(Flit) ); // = data_length to indicate no streaming
 	  trans->set_byte_enable_ptr( 0 ); // 0 indicates unused
 	  trans->set_dmi_allowed( false ); // Mandatory initial value
@@ -36,7 +35,7 @@
 
 	  delay = sc_time(rand_ps(), SC_PS);
 
-	  cout << name() << " Time " << sc_time_stamp() << " calling blocking transport with delay = " << delay << " and target_address = " << target_address << endl;
+	  cout << name() << " Time " << sc_time_stamp() << " calling blocking transport with delay = " << delay << " and target address = " << destHub << endl;
 
 	  // Call b_transport to demonstrate the b/nb conversion by the simple_target_socket
 	  socket->b_transport( *trans, delay );
@@ -45,8 +44,8 @@
 	  if ( trans->is_response_error() )
 	      SC_REPORT_ERROR("TLM-2", "Response error from b_transport");
 
-	  cout << "trans = { " << (cmd ? 'W' : 'R') << ", " << target_address
-	      << " } , data = " << data << " at time " << sc_time_stamp()
+	  cout << "trans = { " << (cmd ? 'W' : 'R') << ", " << destHub
+	      << " } , " <<  " at time " << sc_time_stamp()
 	      << " delay = " << delay << endl;
 
 	  // Realize the delay annotated onto the transport call
@@ -59,12 +58,3 @@
 
 
 
-void Initiator::set_payload(Flit& payload)
-{
-    this->flit_payload = payload;
-}
-
-void Initiator::set_target_address(int addr)
-{
-    this->target_address = addr;
-}

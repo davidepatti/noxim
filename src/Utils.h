@@ -141,5 +141,12 @@ inline bool SameRadioHub(int id1, int id2)
 
     return (it1->second == it2->second);
 }
+inline int tile2Hub(int id)
+{
+    //TODO add support multiple channels
+    map<int, int>::iterator it = GlobalParams::hub_for_tile.find(id); 
+    assert( (it != GlobalParams::hub_for_tile.end()) && "Specified Tile is not connected to any Hub");
+    return it->second;
+}
 
 #endif
