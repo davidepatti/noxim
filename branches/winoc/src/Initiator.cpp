@@ -40,9 +40,17 @@
 	  // Call b_transport to demonstrate the b/nb conversion by the simple_target_socket
 	  socket->b_transport( *trans, delay );
 
+
 	  // Initiator obliged to check response status and delay
-	  if ( trans->is_response_error() )
-	      SC_REPORT_ERROR("TLM-2", "Response error from b_transport");
+	  if ( !trans->is_response_error() )
+	  {
+	      buffer_tx.Pop();
+	  }
+	  else
+	  {
+		cout << name() << " WARNING: incomplete transaction " << endl;
+	  }
+
 
 	  cout << "trans = { " << (cmd ? 'W' : 'R') << ", " << destHub
 	      << " } , " <<  " at time " << sc_time_stamp()
