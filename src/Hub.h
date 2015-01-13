@@ -56,6 +56,7 @@ SC_MODULE(Hub)
     int start_from_port; // Port from which to start the reservation cycle
 
     ReservationTable reservation_table;	// Switch reservation table
+    ReservationTable in_reservation_table;	// Switch reservation table
     ReservationTable wireless_reservation_table;// Wireless reservation table
 
     void rxProcess(); // The receiving process
@@ -118,6 +119,7 @@ SC_MODULE(Hub)
 
         start_from_port = 0;
         reservation_table.init(num_ports);
+        in_reservation_table.init(num_ports);
         wireless_reservation_table.init(num_tx_channels);
     }
 };
