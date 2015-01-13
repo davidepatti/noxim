@@ -44,5 +44,8 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 	cout << name() << " WARNING: buffer_rx is full " << endl;
     }
 
+
+    // FIXME: controlla commento in RadioProcess 
+
 }
 

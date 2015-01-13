@@ -34,25 +34,63 @@ void Hub::radioProcess()
     } 
     else 
     {
-        int port;
-        for (int i = 0; i < num_rx_channels; i++) 
-        {
-            if (!(target[i]->buffer_rx.IsEmpty()))
-            {
-                Flit received_flit = target[i]->buffer_rx.Front();
-                port = tile2Port(received_flit.dst_id);
+	// stores routing decision
+	// need a vector to use this info to choose between the two
+	// tables
+	int * r = new int[num_rx_channels];
 
-                if ( !buffer[port].IsFull() ) 
-                {
-                    target[i]->buffer_rx.Pop();
-                    cout << name() << "::radioProcess() wireless buffer_rx not empty, moving flit to buffer port " << port << endl;
+	for (int i = 0; i < num_rx_channels; i++) 
+	{
+	    if (!(target[i]->buffer_rx.IsEmpty()))
+	    {
+		cout << name() << " buffer_rx not empty for channel " << i << endl;
+		Flit received_flit = target[i]->buffer_rx.Front();
+		r[i] = tile2Port(received_flit.dst_id);
 
-                    buffer[port].Push(received_flit);
-                }
-                else 
-                    cout << name() << " WARNING, buffer full for port " << port << endl;
-            }
-        }
+
+		if (received_flit.flit_type==FLIT_TYPE_HEAD)
+		{
+		    if (in_reservation_table.isAvailable(r[i]))
+		    {
+			cout << name() << " reserving output port " << r[i] << " for channel " << i << endl;
+			in_reservation_table.reserve(i, r[i]);
+		    }
+
+		}
+	    }
+	}
+
+	for (int i = 0; i < num_rx_channels; i++) 
+	{
+	    if (!(target[i]->buffer_rx.IsEmpty()))
+	    {
+		Flit received_flit = target[i]->buffer_rx.Front();
+
+		// direction has been reserved 
+		if (!in_reservation_table.isAvailable(r[i])) 
+		{
+		    if ( !buffer[r[i]].IsFull() ) 
+		    {
+			target[i]->buffer_rx.Pop();
+			cout << name() << "::radioProcess() moving flit from buffer_rx to buffer port " << r[i] << endl;
+
+			buffer[r[i]].Push(received_flit);
+		    }
+		    else 
+			cout << name() << " WARNING, buffer full for port " << r[i] << endl;
+		    if (received_flit.flit_type == FLIT_TYPE_TAIL) 
+		    {
+			cout << name() << "::radioProcess() releasing reservation for output port " << r[i] << endl;
+			in_reservation_table.release(r[i]);
+		    }
+
+		}
+		else
+		{
+		    cout << name() << " WARNING, output port " << r[i] << " not reserved for channel " << i << endl;
+		}
+	    }
+	}
     }
 }
 

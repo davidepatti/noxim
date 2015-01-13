@@ -48,11 +48,14 @@ void ReservationTable::reserve(const int port_in, const int port_out)
     // should be assured by ReservationTable users
     assert(isAvailable(port_out));
 
+    /* TOFIX: deprecated
+     * Non-sense after the previous assert
     // check for previous reservation to be released
     int port = getOutputPort(port_in);
 
     if (port != NOT_RESERVED)
 	release(port);
+	*/
 
     rtable[port_out] = port_in;
 }
