@@ -47,7 +47,8 @@ void Hub::radioProcess()
 		Flit received_flit = target[i]->buffer_rx.Front();
 		r[i] = tile2Port(received_flit.dst_id);
 
-
+		/* moved to Target
+		 *
 		if (received_flit.flit_type==FLIT_TYPE_HEAD)
 		{
 		    if (in_reservation_table.isAvailable(r[i]))
@@ -57,6 +58,7 @@ void Hub::radioProcess()
 		    }
 
 		}
+		*/
 	    }
 	}
 
@@ -78,11 +80,14 @@ void Hub::radioProcess()
 		    }
 		    else 
 			cout << name() << " WARNING, buffer full for port " << r[i] << endl;
+
+		    /*
 		    if (received_flit.flit_type == FLIT_TYPE_TAIL) 
 		    {
 			cout << name() << "::radioProcess() releasing reservation for output port " << r[i] << endl;
 			in_reservation_table.release(r[i]);
 		    }
+		    */
 
 		}
 		else

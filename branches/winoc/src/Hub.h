@@ -114,7 +114,7 @@ SC_MODULE(Hub)
         for (int i = 0; i < num_rx_channels; i++) {
             char txt[20];
             sprintf(txt, "target_%d", i);
-            target[i] = new Target(txt);
+            target[i] = new Target(txt, this);
         }
 
         start_from_port = 0;

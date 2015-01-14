@@ -106,4 +106,6 @@ SC_MODULE(NoC)
     void buildMesh(char const * cfg_fname);
 };
 
+//Hub * dd;
+
 #endif
