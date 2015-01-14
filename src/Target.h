@@ -5,12 +5,15 @@
 #include "Utils.h"
 #include "DataStructs.h"
 #include "Buffer.h"
+
 #include <queue>
 
 using namespace sc_core;
 using namespace std;
 
 #define MEM_SIZE 256
+
+struct Hub;
 
 // **************************************************************************************
 // Target module able to handle two pipelined transactions
@@ -20,12 +23,14 @@ using namespace std;
 struct Target: sc_module
 {
   // TLM-2 socket, defaults to 32-bits wide, base protocol
+  Hub* hub;
   tlm_utils::simple_target_socket<Target> socket;
 
+  SC_HAS_PROCESS(Target);
 
-
-  SC_CTOR(Target)
-  : socket("socket")
+  //SC_CTOR(Target)
+  //: socket("socket")
+  Target(sc_module_name nm, Hub* h): sc_module(nm), hub(h), socket("socket")
   {
 
     // Register callback for incoming b_transport interface method call
@@ -42,6 +47,8 @@ struct Target: sc_module
   Buffer buffer_rx;
 
   Flit get_payload();
+
+
 };
 
 

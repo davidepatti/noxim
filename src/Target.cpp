@@ -1,4 +1,7 @@
+#include "Hub.h"
 #include "Target.h"
+
+
 
 void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 {
@@ -34,6 +37,33 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 
     if (!buffer_rx.IsFull())
     {
+	/*
+	// TODO: use actual channel
+	int i = 0;
+	int dst_port = hub->tile2Port(my_flit->dst_id);
+
+	if (my_flit->flit_type==FLIT_TYPE_HEAD)
+	{
+	    if (hub->in_reservation_table.isAvailable(dst_port))
+	    {
+		cout << name() << " reserving output port " << dst_port << " for channel " << i << endl;
+		hub->in_reservation_table.reserve(i, dst_port);
+	    }
+	    else
+	    {
+		cout << name() << " WARNING: cannot reserve output port " << dst_port << " for channel " << i << endl;
+		return;
+	    }
+
+	}
+
+	if (my_flit->flit_type == FLIT_TYPE_TAIL) 
+	{
+	    cout << name() << " releasing reservation for output port " << dst_port << endl;
+	    hub->in_reservation_table.release(dst_port);
+	}
+	*/
+
 	cout << name() << " flit moved to rx_buffer " << endl;
 	buffer_rx.Push(*my_flit);
 	// Obliged to set response status to indicate successful completion
