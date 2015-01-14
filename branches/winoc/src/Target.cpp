@@ -37,7 +37,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 
     if (!buffer_rx.IsFull())
     {
-	/*
+	
 	// TODO: use actual channel
 	int i = 0;
 	int dst_port = hub->tile2Port(my_flit->dst_id);
@@ -62,7 +62,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 	    cout << name() << " releasing reservation for output port " << dst_port << endl;
 	    hub->in_reservation_table.release(dst_port);
 	}
-	*/
+	
 
 	cout << name() << " flit moved to rx_buffer " << endl;
 	buffer_rx.Push(*my_flit);
