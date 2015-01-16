@@ -273,18 +273,20 @@ vector < int > Router::routingFunction(const RouteData & route_data)
 
     // TODO: check 
   // If WiNoC available, check for intercluster communication
-  if (GlobalParams::use_winoc)
-  {
-    // TODO wirelss: replace using configuration file
-    if (!SameRadioHub(local_id, route_data.dst_id))
+    if (GlobalParams::use_winoc)
     {
-	cout << name() << " routingFunction setting direction wireless to reach destination node " << route_data.dst_id << endl;
+	if (hasRadioHub(local_id) &&
+		hasRadioHub(route_data.dst_id) &&
+		!sameRadioHub(local_id,route_data.dst_id)
+	   )
+	{
+	    cout << name() << " routingFunction setting direction hub to reach destination node " << route_data.dst_id << endl;
 
-	vector<int> dirv;
-	dirv.push_back(DIRECTION_HUB);
-	return dirv;
+	    vector<int> dirv;
+	    dirv.push_back(DIRECTION_HUB);
+	    return dirv;
+	}
     }
-  }
     cout << name() << " wired routing for dst = " << route_data.dst_id << endl;
     Coord position = id2Coord(route_data.current_id);
     Coord src_coord = id2Coord(route_data.src_id);
