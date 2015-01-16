@@ -72,8 +72,10 @@ void NoC::buildMesh(char const * cfg_fname)
             c.x = i;
             c.y = j;
             map<int, int>::iterator it = GlobalParams::hub_for_tile.find(coord2Id(c));
-            assert(it != GlobalParams::hub_for_tile.end());
-            cout << "Tile [" << i << "][" << j << "] will be connected to " << hub[it->second]->name() << endl;
+            if (it != GlobalParams::hub_for_tile.end())
+                cout << "Tile [" << i << "][" << j << "] will be connected to " << hub[it->second]->name() << endl;
+            else
+                cout << "Tile [" << i << "][" << j << "] will not be connected to any Hub" << endl;
         }
     }
 
@@ -189,21 +191,25 @@ void NoC::buildMesh(char const * cfg_fname)
 	    t[i][j]->hub_ack_tx(ack[i][j].from_hub);
 
         // TODO: Review port index. Connect each Hub to all its Channels 
-        int hub_id = GlobalParams::hub_for_tile[tile_id];
-	
-        // The next time that the same HUB is considered, the next
-        // port will be connected
-        int port = hub_connected_ports[hub_id]++;
+        map<int, int>::iterator it = GlobalParams::hub_for_tile.find(tile_id);
+        if (it != GlobalParams::hub_for_tile.end())
+        {
+            int hub_id = GlobalParams::hub_for_tile[tile_id];
 
-        hub[hub_id]->tile2port_mapping[t[i][j]->local_id] = port;
+            // The next time that the same HUB is considered, the next
+            // port will be connected
+            int port = hub_connected_ports[hub_id]++;
 
-        hub[hub_id]->req_rx[port](req[i][j].to_hub);
-        hub[hub_id]->flit_rx[port](flit[i][j].to_hub);
-        hub[hub_id]->ack_rx[port](ack[i][j].from_hub);
+            hub[hub_id]->tile2port_mapping[t[i][j]->local_id] = port;
 
-        hub[hub_id]->flit_tx[port](flit[i][j].from_hub);
-        hub[hub_id]->req_tx[port](req[i][j].from_hub);
-        hub[hub_id]->ack_tx[port](ack[i][j].to_hub);
+            hub[hub_id]->req_rx[port](req[i][j].to_hub);
+            hub[hub_id]->flit_rx[port](flit[i][j].to_hub);
+            hub[hub_id]->ack_rx[port](ack[i][j].from_hub);
+
+            hub[hub_id]->flit_tx[port](flit[i][j].from_hub);
+            hub[hub_id]->req_tx[port](req[i][j].from_hub);
+            hub[hub_id]->ack_tx[port](ack[i][j].to_hub);
+        }
 
         // Map buffer level signals (analogy with req_tx/rx port mapping)
 	    t[i][j]->free_slots[DIRECTION_NORTH] (free_slots[i][j].north);
