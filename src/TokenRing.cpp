@@ -5,105 +5,41 @@
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
- * This file contains the implementation of the buffer
+ * This file contains the implementation of the processing element
  */
 
-#include <iostream>
-#include <cassert>
 #include "TokenRing.h"
 
 
-// ---------------------------------------------------------------------------
-
-void TokenRing::AddElement(int radio_hub_id, int hold_cycles)
+void TokenRing::updateToken()
 {
-  map<int,int>::iterator i = ring.find(radio_hub_id);
+    if (reset.read()) {
+	
+    } else {
 
-  if (i != ring.end())
-    cerr << "Warning: radio_hub " << radio_hub_id << " already present in tokenring" << endl;
+	hold_count--;
+	if (hold_count==0)
+	{
+	    hold_count = max_hold_cycles;
 
-  if (hold_cycles < 1)
-  {
-    cerr << "hold_cycles must be >= 1" << endl;
-    assert(false);
-  }
+	    current_token = (current_token+1)%num_hubs;
 
-  ring[radio_hub_id] = hold_cycles;
-  
-  // Initialize the token ring with the last element inserted
-  token = radio_hub_id;
-  hold_count = hold_cycles;
+	    cout << name() << " ****** token assigned to " << current_token << endl;
+	}
+    }
 }
 
-// ---------------------------------------------------------------------------
 
-bool TokenRing::HasToken(int radio_hub_id)
+void TokenRing::configure(int start_token,int _max_hold_cycles)
 {
-  return (token == radio_hub_id);
+    current_token = start_token;
+    max_hold_cycles = _max_hold_cycles;
+    hold_count = max_hold_cycles;
 }
 
-// ---------------------------------------------------------------------------
 
-void TokenRing::Update()
+int TokenRing::currentToken()
 {
-  hold_count--;
-
-  if (hold_count == 0)
-  {
-    map<int,int>::iterator i = ring.find(token);
-    i++;
-    if (i == ring.end())
-      i = ring.begin();
-    
-    token = i->first;
-    hold_count = i->second;
-  }
+    return current_token;
 }
 
-// ---------------------------------------------------------------------------
-
-void TokenRing::Update(set<int>& ready_rh)
-{
-  if (ready_rh.find(token) != ready_rh.end())
-  {
-    hold_count--;
-
-    if (hold_count == 0)
-      MoveTokenToNextReadyRH(ready_rh);
-  }
-  else
-    MoveTokenToNextReadyRH(ready_rh);
-}
-
-// ---------------------------------------------------------------------------
-
-void TokenRing::MoveTokenToNextReadyRH(set<int>& ready_rh)
-{
-  map<int,int>::iterator icurrent = ring.find(token);  
-  map<int,int>::iterator i = icurrent;
-  
-  do {
-    i++;
-    if (i == ring.end())
-      i = ring.begin();
-
-    if (ready_rh.find(i->first) != ready_rh.end())
-      break;
-  } while (i != icurrent);
-
-  token = i->first;
-  hold_count = i->second;
-}
-
-// ---------------------------------------------------------------------------
-
-
-void TokenRing::ShowConfiguration(char *prefix)
-{
-  cout << prefix << "Ring: [rhub_id (hold_cycles)]: ";
-  for (map<int,int>::iterator i = ring.begin(); i != ring.end(); i++)
-    cout << i->first << " (" << i->second << "), ";
-  cout << endl;
-  cout << prefix << "\ttoken: " << token << ", hold count: " << hold_count 
-       << endl;
-}
