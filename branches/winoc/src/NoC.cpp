@@ -12,6 +12,14 @@
 
 void NoC::buildMesh(char const * cfg_fname)
 {
+
+    token_ring = new TokenRing("tokenring");
+    // TURI FIX
+    token_ring->configure(0,8);
+
+    token_ring->clock(clock);
+    token_ring->reset(reset);
+
     char channel_name[16];
     for (map<int, ChannelConfig>::iterator it = GlobalParams::channel_configuration.begin();
             it != GlobalParams::channel_configuration.end();
@@ -33,7 +41,7 @@ void NoC::buildMesh(char const * cfg_fname)
 
         sprintf(hub_name, "Hub_%d", hub_id);
         cout << "Creating " << hub_name << endl;
-        hub[hub_id] = new Hub(hub_name, hub_id);
+        hub[hub_id] = new Hub(hub_name, hub_id,token_ring);
         hub[hub_id]->clock(clock);
         hub[hub_id]->reset(reset);
 

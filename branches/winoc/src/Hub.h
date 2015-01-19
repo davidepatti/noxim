@@ -19,6 +19,7 @@
 
 #include "Initiator.h"
 #include "Target.h"
+#include "TokenRing.h"
 
 using namespace std;
 
@@ -31,6 +32,7 @@ SC_MODULE(Hub)
     sc_in <bool> reset; // The reset signal for the tile
 
     int local_id; // Unique ID
+    TokenRing* token_ring;
     int num_ports;
     int num_rx_channels;
     int num_tx_channels;
@@ -68,7 +70,7 @@ SC_MODULE(Hub)
 
     // Constructor
 
-    Hub(sc_module_name nm, int id): sc_module(nm) {
+    Hub(sc_module_name nm, int id, TokenRing * tr): sc_module(nm) {
         SC_METHOD(rxProcess);
         sensitive << reset;
         sensitive << clock.pos();
@@ -82,6 +84,7 @@ SC_MODULE(Hub)
         sensitive << clock.pos();
 
         local_id = id;
+	token_ring = tr;
         num_ports = GlobalParams::hub_configuration[local_id].attachedNodes.size();
         num_rx_channels = GlobalParams::hub_configuration[local_id].rxChannels.size();
         num_tx_channels = GlobalParams::hub_configuration[local_id].txChannels.size();

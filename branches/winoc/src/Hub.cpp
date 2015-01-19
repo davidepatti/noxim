@@ -55,15 +55,15 @@ void Hub::radioProcess()
 	    {
 		Flit received_flit = target[i]->buffer_rx.Front();
 
-		    if ( !buffer[r[i]].IsFull() ) 
-		    {
-			target[i]->buffer_rx.Pop();
-			cout << name() << "::radioProcess() moving flit from buffer_rx to buffer port " << r[i] << endl;
+		if ( !buffer[r[i]].IsFull() ) 
+		{
+		    target[i]->buffer_rx.Pop();
+		    cout << name() << "::radioProcess() moving flit from buffer_rx to buffer port " << r[i] << endl;
 
-			buffer[r[i]].Push(received_flit);
-		    }
-		    else 
-			cout << name() << " WARNING, buffer full for port " << r[i] << endl;
+		    buffer[r[i]].Push(received_flit);
+		}
+		else 
+		    cout << name() << " WARNING, buffer full for port " << r[i] << endl;
 
 	    }
 	}
@@ -148,14 +148,17 @@ void Hub::txProcess()
 		{
 		    if (r[i]==DIRECTION_WIRELESS)
 		    {
-			// TODO: use actual channel
-			int channel = 0;
-			if (wireless_reservation_table.isAvailable(channel)) 
+			if (token_ring->currentToken() == local_id)
 			{
-			    wireless_reservation_table.reserve(i, channel);
+			    // TODO: use actual channel
+			    int channel = 0;
+			    if (wireless_reservation_table.isAvailable(channel)) 
+			    {
+				wireless_reservation_table.reserve(i, channel);
+			    }
+			    else
+			    cout << name() << "::txProcess() reservation:  wireless channel " << channel << " not available ..." << endl;
 			}
-			else
-			cout << name() << "::txProcess() reservation:  wireless channel " << channel << " not available ..." << endl;
 		    }
 		    else if (reservation_table.isAvailable(r[i])) 
 		    {
@@ -177,25 +180,28 @@ void Hub::txProcess()
 
 		if (r[i] == DIRECTION_WIRELESS)
 		{
-		    int channel = wireless_reservation_table.getOutputPort(i);
-		    if (channel != NOT_RESERVED) 
+		    if (token_ring->currentToken() == local_id)
 		    {
+			int channel = wireless_reservation_table.getOutputPort(i);
 
-			if (!(init[channel]->buffer_tx.IsFull()) )
+			if (channel != NOT_RESERVED) 
 			{
-			    cout << name() << " flit moved from buffer["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
-			    buffer[i].Pop();
-			    init[channel]->buffer_tx.Push(flit);
-			    if (flit.flit_type == FLIT_TYPE_TAIL) wireless_reservation_table.release(channel);
+			    if (!(init[channel]->buffer_tx.IsFull()) )
+			    {
+				cout << name() << " flit moved from buffer["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
+				buffer[i].Pop();
+				init[channel]->buffer_tx.Push(flit);
+				if (flit.flit_type == FLIT_TYPE_TAIL) wireless_reservation_table.release(channel);
+			    }
+
+			    init[channel]->start_request_event.notify();
+
+
 			}
-
-			init[channel]->start_request_event.notify();
-
-
-		    }
-		    else
-		    {
-			cout << name() << "::txProcess() forwarding: No channel reserved for port direction " << i  << endl;
+			else
+			{
+			    cout << name() << "::txProcess() forwarding: No channel reserved for port direction " << i  << endl;
+			}
 		    }
 		}
 		else // not wireless

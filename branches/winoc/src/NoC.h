@@ -17,6 +17,7 @@
 #include "GlobalTrafficTable.h"
 #include "Hub.h"
 #include "Channel.h"
+#include "TokenRing.h"
 
 using namespace std;
 
@@ -61,6 +62,8 @@ SC_MODULE(NoC)
 
     map<int, Hub*> hub;
     map<int, Channel*> channel;
+
+    TokenRing* token_ring;
 
     // Global tables
     GlobalRoutingTable grtable;
