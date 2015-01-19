@@ -13,12 +13,16 @@
 
 #include <cassert>
 #include "DataStructs.h"
+#include "Utils.h"
+
 using namespace std;
 
 class ReservationTable {
   public:
 
     ReservationTable();
+
+    inline string name() const {return "ReservationTable";};
 
     // Initialize to a given number of directions
     void init(int);

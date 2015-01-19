@@ -5,6 +5,9 @@
 #include <tlm>
 
 #include "DataStructs.h"
+#include <iomanip>
+
+#define LOG (std::cout << std::setw(7) << left << sc_time_stamp().to_double() / 1000 << " " << name() << "::" << __func__<< "() => ")
 
 int rand_ps();
 
@@ -74,7 +77,7 @@ inline ostream & operator <<(ostream & os, const NoP_data & NoP_data)
     for (int j = 0; j < DIRECTIONS; j++)
 	os << NoP_data.channel_status_neighbor[j] << " ";
 
-    cout << "]" << endl;
+    os << "]" << endl;
     return os;
 }
 

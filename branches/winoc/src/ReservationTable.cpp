@@ -18,7 +18,7 @@ ReservationTable::ReservationTable()
 
 void ReservationTable::init(int size)
 {
-    cout << "Initializing reservation table with size " << size << endl;
+    LOG << "Initializing reservation table with size " << size << endl;
     assert(size>0);
     assert(directions()==0);
 
@@ -36,7 +36,7 @@ int ReservationTable::directions() const
 
 bool ReservationTable::isAvailable(const int port_out) const
 {
-    cout << " checking availability of out port " << port_out << endl;
+    LOG << "Checking availability of out port " << port_out << endl;
     assert(port_out >= 0 && port_out < directions());
 
     return ((rtable[port_out] == NOT_RESERVED));
@@ -71,7 +71,7 @@ void ReservationTable::release(const int port_out)
 
 int ReservationTable::getOutputPort(const int port_in) const
 {
-//    cout << " getOutputPort invoked with port_in = " << port_in << endl;
+//    LOG << "GetOutputPort invoked with port_in = " << port_in << endl;
 
     for (int i = 0; i < directions(); i++)
 	if (rtable[i] == port_in)

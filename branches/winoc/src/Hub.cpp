@@ -4,7 +4,7 @@
 
 int Hub::tile2Port(int id)
 {
-    cout << name() << " tile2Port " << tile2port_mapping[id] << endl;
+    LOG << " tileID = " << id << " => portID = " << tile2port_mapping[id] << endl;
     return tile2port_mapping[id];
 }
 
@@ -17,12 +17,12 @@ int Hub::route(Flit& f)
     {
 	if (GlobalParams::hub_configuration[local_id].attachedNodes[i]==f.dst_id)
 	{
-	    cout << name() << " destination tile " << f.dst_id << " is connected to this hub " << endl;
+	    LOG << "Destination tile " << f.dst_id << " is connected to this hub " << endl;
 	    return tile2Port(f.dst_id);
 	}
     }
 
-    cout << name() << " destination tile " << f.dst_id << " is not connected to this hub " << endl;
+    LOG << "Destination tile " << f.dst_id << " is not connected to this hub " << endl;
     return DIRECTION_WIRELESS;
 
 }
@@ -43,7 +43,7 @@ void Hub::radioProcess()
 	{
 	    if (!(target[i]->buffer_rx.IsEmpty()))
 	    {
-		cout << name() << " buffer_rx not empty for channel " << i << endl;
+		LOG << "Buffer_rx is not empty for channel " << i << endl;
 		Flit received_flit = target[i]->buffer_rx.Front();
 		r[i] = tile2Port(received_flit.dst_id);
 	    }
@@ -58,12 +58,12 @@ void Hub::radioProcess()
 		if ( !buffer[r[i]].IsFull() ) 
 		{
 		    target[i]->buffer_rx.Pop();
-		    cout << name() << "::radioProcess() moving flit from buffer_rx to buffer port " << r[i] << endl;
+		    LOG << "Moving flit from buffer_rx to buffer port " << r[i] << endl;
 
 		    buffer[r[i]].Push(received_flit);
 		}
 		else 
-		    cout << name() << " WARNING, buffer full for port " << r[i] << endl;
+		    LOG << "WARNING, buffer full for port " << r[i] << endl;
 
 	    }
 	}
@@ -89,7 +89,7 @@ void Hub::rxProcess()
 	{
 	    if ((req_rx[i]->read() == 1 - current_level_rx[i]) && !buffer[i].IsFull()) 
 	    {
-		cout << name() << "::rxProcess() reading flit on port " << i << endl;
+		LOG << "Reading flit on port " << i << endl;
 		Flit received_flit = flit_rx[i]->read();
 
 		buffer[i].Push(received_flit);
@@ -138,7 +138,7 @@ void Hub::txProcess()
 
 	    if (!buffer[i].IsEmpty()) 
 	    {
-		cout << name() << "::txProcess() reservation: buffer not empty on port " << i << endl;
+		LOG << "Reservation: buffer not empty on port " << i << endl;
 
 		Flit flit = buffer[i].Front();
 
@@ -157,7 +157,7 @@ void Hub::txProcess()
 				wireless_reservation_table.reserve(i, channel);
 			    }
 			    else
-			    cout << name() << "::txProcess() reservation:  wireless channel " << channel << " not available ..." << endl;
+			    LOG << "Reservation:  wireless channel " << channel << " not available ..." << endl;
 			}
 		    }
 		    else if (reservation_table.isAvailable(r[i])) 
@@ -165,7 +165,7 @@ void Hub::txProcess()
 			reservation_table.reserve(i, r[i]);
 		    }
 		    else
-			cout << name() << "::txProcess() reservation: no available port to route dir " << r[i] << endl;
+			LOG << "Reservation: no available port to route dir " << r[i] << endl;
 		}
 	    }
 	}
@@ -188,7 +188,7 @@ void Hub::txProcess()
 			{
 			    if (!(init[channel]->buffer_tx.IsFull()) )
 			    {
-				cout << name() << " flit moved from buffer["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
+				LOG << "Flit moved from buffer["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
 				buffer[i].Pop();
 				init[channel]->buffer_tx.Push(flit);
 				if (flit.flit_type == FLIT_TYPE_TAIL) wireless_reservation_table.release(channel);
@@ -200,7 +200,7 @@ void Hub::txProcess()
 			}
 			else
 			{
-			    cout << name() << "::txProcess() forwarding: No channel reserved for port direction " << i  << endl;
+			    LOG << "Forwarding: No channel reserved for port direction " << i  << endl;
 			}
 		    }
 		}
@@ -209,13 +209,12 @@ void Hub::txProcess()
 		    int d = reservation_table.getOutputPort(i);
 		    if (d != NOT_RESERVED) 
 		    {
-			cout << name() << " inject to RH: Hub ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
-			cout << name() << " port[" << i << "] forward to direction [" << d << "], flit: "
-			    << flit << endl;
+			LOG << "Inject to RH: Hub ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
+			LOG << "port[" << i << "] forward to direction [" << d << "], flit: " << flit << endl;
 
 			// TODO: put code that writes signals to the
 			// tile
-			cout << name() << "::txProcess() forwarding to port " << d << endl;
+			LOG << "Forwarding to port " << d << endl;
 
 			flit_tx[d].write(flit);
 			current_level_tx[d] = 1 - current_level_tx[d];
@@ -227,7 +226,7 @@ void Hub::txProcess()
 		    }
 		    else
 		    {
-			cout << name() << "::txProcess() forwarding: No output port reserved for input port " << i  <<  endl;
+			LOG << "Forwarding: No output port reserved for input port " << i  <<  endl;
 		    }
 		}
 

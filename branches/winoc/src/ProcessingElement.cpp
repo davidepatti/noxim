@@ -25,8 +25,7 @@ void ProcessingElement::rxProcess()
 	if (req_rx.read() == 1 - current_level_rx) {
 	    Flit flit_tmp = flit_rx.read();
 	    if (GlobalParams::verbose_mode > VERBOSE_OFF) {
-		cout << sc_simulation_time() << ": ProcessingElement[" <<
-		    local_id << "] RECEIVING " << flit_tmp << endl;
+		LOG << "RECEIVING " << flit_tmp << endl;
 	    }
 	    current_level_rx = 1 - current_level_rx;	// Negate the old value for Alternating Bit Protocol (ABP)
 	}
@@ -54,8 +53,7 @@ void ProcessingElement::txProcess()
 	    if (!packet_queue.empty()) {
 		Flit flit = nextFlit();	// Generate a new flit
 		if (GlobalParams::verbose_mode > VERBOSE_OFF) {
-		    cout << sc_time_stamp().to_double() / 1000 << ": ProcessingElement[" << local_id <<
-			"] SENDING " << flit << endl;
+		    LOG << "SENDING " << flit << endl;
 		}
 		flit_tx->write(flit);	// Send the generated flit
 		current_level_tx = 1 - current_level_tx;	// Negate the old value for Alternating Bit Protocol (ABP)
@@ -210,7 +208,7 @@ Packet ProcessingElement::trafficRandom()
     double rnd = rand() / (double) RAND_MAX;
     double range_start = 0.0;
 
-    //cout << "\n " << sc_time_stamp().to_double()/1000 << " PE " << local_id << " rnd = " << rnd << endl;
+    //LOG << "rnd = " << rnd << endl;
 
     int max_id =
 	(GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) -
@@ -222,13 +220,13 @@ Packet ProcessingElement::trafficRandom()
 
 	// check for hotspot destination
 	for (size_t i = 0; i < GlobalParams::hotspots.size(); i++) {
-	    //cout << sc_time_stamp().to_double()/1000 << " PE " << local_id << " Checking node " << GlobalParams::hotspots[i].first << " with P = " << GlobalParams::hotspots[i].second << endl;
+	    //LOG << "Checking node " << GlobalParams::hotspots[i].first << " with P = " << GlobalParams::hotspots[i].second << endl;
 
 	    if (rnd >= range_start
 		&& rnd <
 		range_start + GlobalParams::hotspots[i].second) {
 		if (local_id != GlobalParams::hotspots[i].first) {
-		    //cout << sc_time_stamp().to_double()/1000 << " PE " << local_id <<" That is ! " << endl;
+		    //LOG << "That is ! " << endl;
 		    p.dst_id = GlobalParams::hotspots[i].first;
 		}
 		break;

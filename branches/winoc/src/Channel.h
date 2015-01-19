@@ -1,6 +1,7 @@
 #ifndef __BUS_H__
 #define __BUS_H__
 
+#include "Utils.h"
 #include "tlm_utils/simple_initiator_socket.h"
 #include "tlm_utils/simple_target_socket.h"
 #include "tlm_utils/multi_passthrough_initiator_socket.h"
@@ -67,7 +68,7 @@ struct Channel: sc_module
   {
     unsigned int target_nr = static_cast<unsigned int>( address );
     masked_address = address;
-    cout << name() << " target_nr " << target_nr << " masked_address " << masked_address << endl;
+    LOG << " target_nr " << target_nr << " masked_address " << masked_address << endl;
     return target_nr;
   }
 

@@ -24,7 +24,7 @@ void TokenRing::updateToken()
 
 	    current_token = (current_token+1)%num_hubs;
 
-	    cout << name() << " ****** token assigned to " << current_token << endl;
+	    LOG << "Token assigned to " << current_token << endl;
 	}
     }
 }

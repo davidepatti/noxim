@@ -37,9 +37,7 @@ void Router::rxProcess()
 		Flit received_flit = flit_rx[i].read();
 
 		if (GlobalParams::verbose_mode > VERBOSE_OFF) {
-		    cout << sc_time_stamp().to_double() /
-			1000 << ": Router[" << local_id << "], Input[" << i
-			<< "], Received flit: " << received_flit << endl;
+			LOG << "Input[" << i << "], Received flit: " << received_flit << endl;
 		}
 		// Store the incoming flit in the circular buffer
 		buffer[i].Push(received_flit);
@@ -94,7 +92,7 @@ void Router::txProcess()
 
 		  if ( o==DIRECTION_HUB)
 		  {
-		      cout << name() << " ready to reserve HUB direction ..." << endl;
+		      LOG << "Ready to reserve HUB direction ..." << endl;
 
 		  }
 
@@ -106,9 +104,7 @@ void Router::txProcess()
 		      reservation_table.reserve(i, o);
 		      if (GlobalParams::verbose_mode > VERBOSE_OFF) 
 		      {
-			  cout << sc_time_stamp().to_double() / 1000
-			      << ": Router[" << local_id
-			      << "], Input[" << i << "] (" << buffer[i].
+			      LOG << "Input[" << i << "] (" << buffer[i].
 			      Size() << " flits)" << ", reserved Output["
 			      << o << "], flit: " << flit << endl;
 		      }
@@ -132,20 +128,18 @@ void Router::txProcess()
 		  {
 		    if (o == DIRECTION_HUB)
 		    {
-			  cout << name() << " forwarding to HUB " << endl;
+			  LOG << "Forwarding to HUB " << endl;
 		  /* TODO: adapt code to new model
 			// Forward flit to WiNoC
 			if (winoc->CanTransmit(local_id))
 			{
 			    if (GlobalParams::verbose_mode > VERBOSE_OFF) 
 			    {
-				cout << sc_time_stamp().to_double() / 1000
-				    << ": Router[" << local_id
-				    << "], Input[" << i <<
+				    LOG << "Input[" << i <<
 				    "] forward to Output[" << o << "], flit: "
 				    << flit << endl;
 			    }
-			    // cout << "Inject to RH: Router ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
+			    // LOG << "Inject to RH: Router ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
 
 			    winoc->InjectToRadioHub(local_id, flit);
 			    buffer[i].Pop();
@@ -157,9 +151,7 @@ void Router::txProcess()
 		    }
 		    if (GlobalParams::verbose_mode > VERBOSE_OFF) 
 		    {
-			cout << sc_time_stamp().to_double() / 1000
-			    << ": Router[" << local_id
-			    << "], Input[" << i <<
+			    LOG << "Input[" << i <<
 			    "] forward to Output[" << o << "], flit: "
 			    << flit << endl;
 		    }
@@ -189,7 +181,7 @@ void Router::txProcess()
 		    // Update stats
 		    if (o == DIRECTION_LOCAL) 
 		    {
-			cout << name() << " time " << sc_time_stamp().to_double()/1000 << " consumed flit src " << flit.src_id << " dst = " << flit.dst_id << endl;
+			LOG << "Consumed flit src " << flit.src_id << " dst = " << flit.dst_id << endl;
 			stats.receivedFlit(sc_time_stamp().
 				to_double() / 1000, flit);
 			if (GlobalParams::
@@ -280,14 +272,14 @@ vector < int > Router::routingFunction(const RouteData & route_data)
 		!sameRadioHub(local_id,route_data.dst_id)
 	   )
 	{
-	    cout << name() << " routingFunction setting direction hub to reach destination node " << route_data.dst_id << endl;
+	    LOG << "Setting direction hub to reach destination node " << route_data.dst_id << endl;
 
 	    vector<int> dirv;
 	    dirv.push_back(DIRECTION_HUB);
 	    return dirv;
 	}
     }
-    cout << name() << " wired routing for dst = " << route_data.dst_id << endl;
+    LOG << "Wired routing for dst = " << route_data.dst_id << endl;
     Coord position = id2Coord(route_data.current_id);
     Coord src_coord = id2Coord(route_data.src_id);
     Coord dst_coord = id2Coord(route_data.dst_id);
@@ -341,8 +333,7 @@ int Router::route(const RouteData & route_data)
 void Router::NoP_report() const
 {
     NoP_data NoP_tmp;
-    cout << sc_time_stamp().to_double() /
-	1000 << ": Router[" << local_id << "] NoP report: " << endl;
+	LOG << "NoP report: " << endl;
 
     for (int i = 0; i < DIRECTIONS; i++) {
 	NoP_tmp = NoP_data_in[i].read();
@@ -477,7 +468,7 @@ int Router::selectionBufferLevel(const vector < int >&directions)
 //     {
 //       ChannelStatus tmp;
 
-//       cout << sc_time_stamp().to_double()/1000 << ": Router[" << local_id << "] SELECTION between: " << endl;
+//       LOG << "SELECTION between: " << endl;
 //       for (unsigned int i=0;i<directions.size();i++)
 //      {
 //        tmp.free_slots = free_slots_neighbor[directions[i]].read();
@@ -643,10 +634,10 @@ vector < int >Router::routingOddEven(const Coord & current,
     }
 
     if (!(directions.size() > 0 && directions.size() <= 2)) {
-	cout << "\n PICCININI, CECCONI & ... :";	// STAMPACCHIA
-	cout << source << endl;
-	cout << destination << endl;
-	cout << current << endl;
+	LOG << "\n PICCININI, CECCONI & ... :" << endl	// STAMPACCHIA
+        << source << endl
+        << destination << endl
+        << current << endl;
 
     }
     assert(directions.size() > 0 && directions.size() <= 2);
@@ -703,7 +694,7 @@ vector < int >Router::routingTableBased(const int dir_in,
 	routing_table.getAdmissibleOutputs(dir_in, coord2Id(destination));
 
     if (ao.size() == 0) {
-	cout << "dir: " << dir_in << ", (" << current.x << "," << current.
+	LOG << "dir: " << dir_in << ", (" << current.x << "," << current.
 	    y << ") --> " << "(" << destination.x << "," << destination.
 	    y << ")" << endl << coord2Id(current) << "->" <<
 	    coord2Id(destination) << endl;
@@ -714,7 +705,7 @@ vector < int >Router::routingTableBased(const int dir_in,
     //-----
     /*
        vector<int> aov = admissibleOutputsSet2Vector(ao);
-       cout << "dir: " << dir_in << ", (" << current.x << "," << current.y << ") --> "
+       LOG << "dir: " << dir_in << ", (" << current.x << "," << current.y << ") --> "
        << "(" << destination.x << "," << destination.y << "), outputs: ";
        for (int i=0; i<aov.size(); i++)
        cout << aov[i] << ", ";
@@ -816,7 +807,7 @@ int Router::getNeighborId(int _id, int direction) const
 	my_coord.x--;
 	break;
     default:
-	cout << "direction not valid : " << direction;
+	LOG << "Direction not valid : " << direction;
 	assert(false);
     }
 
