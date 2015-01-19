@@ -27,7 +27,7 @@ void NoC::buildMesh(char const * cfg_fname)
     {
         int channel_id = it->first;
         sprintf(channel_name, "Channel_%d", channel_id);
-        cout << "Creating " << channel_name << endl;
+        LOG << "Creating " << channel_name << endl;
         channel[channel_id] = new Channel(channel_name, channel_id);
     }
 
@@ -40,7 +40,7 @@ void NoC::buildMesh(char const * cfg_fname)
         HubConfig hub_config = it->second;
 
         sprintf(hub_name, "Hub_%d", hub_id);
-        cout << "Creating " << hub_name << endl;
+        LOG << "Creating " << hub_name << endl;
         hub[hub_id] = new Hub(hub_name, hub_id,token_ring);
         hub[hub_id]->clock(clock);
         hub[hub_id]->reset(reset);
@@ -59,7 +59,7 @@ void NoC::buildMesh(char const * cfg_fname)
                 ++iit) 
         {
             int channel_id = *iit;
-            cout << "Binding " << hub[hub_id]->name() << " to txChannel " << channel_id << endl;
+            LOG << "Binding " << hub[hub_id]->name() << " to txChannel " << channel_id << endl;
             hub[hub_id]->init[channel_id]->socket.bind(channel[channel_id]->targ_socket);
         }
 
@@ -68,7 +68,7 @@ void NoC::buildMesh(char const * cfg_fname)
                 ++iit) 
         {
             int channel_id = *iit;
-            cout << "Binding " << hub[hub_id]->name() << " to rxChannel " << channel_id << endl;
+            LOG << "Binding " << hub[hub_id]->name() << " to rxChannel " << channel_id << endl;
             channel[channel_id]->init_socket.bind(hub[hub_id]->target[channel_id]->socket);
         }
     }
@@ -81,9 +81,9 @@ void NoC::buildMesh(char const * cfg_fname)
             c.y = j;
             map<int, int>::iterator it = GlobalParams::hub_for_tile.find(coord2Id(c));
             if (it != GlobalParams::hub_for_tile.end())
-                cout << "Tile [" << i << "][" << j << "] will be connected to " << hub[it->second]->name() << endl;
+                LOG << "Tile [" << i << "][" << j << "] will be connected to " << hub[it->second]->name() << endl;
             else
-                cout << "Tile [" << i << "][" << j << "] will not be connected to any Hub" << endl;
+                LOG << "Tile [" << i << "][" << j << "] will not be connected to any Hub" << endl;
         }
     }
 
@@ -135,7 +135,7 @@ void NoC::buildMesh(char const * cfg_fname)
 	    sprintf(tile_name, "Tile[%02d][%02d]_(#%d)", i, j, tile_id);
 	    t[i][j] = new Tile(tile_name, tile_id);
 
-	    cout << "> Setting " << tile_name << endl;
+	    LOG << "Setting " << tile_name << endl;
 
 	    // Tell to the router its coordinates
 	    t[i][j]->r->configure(j * GlobalParams::mesh_dim_x + i,

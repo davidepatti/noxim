@@ -12,7 +12,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
     //unsigned char*   byt = trans.get_byte_enable_ptr();
     //unsigned int     wid = trans.get_streaming_width();
 
-    cout << name() << "::b_transport() received data with size " << len << endl;
+    LOG << "Received data with size " << len << endl;
     // Obliged to check address range and check for unsupported features,
     //   i.e. byte enables, streaming, and bursts
     // Can ignore DMI hint and extensions
@@ -33,7 +33,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
     Flit * my_flit;
     my_flit = (Flit*)(&mem[0]);
 
-    cout << name() << " Time: " << sc_time_stamp()  << " >>>> Target received Flit , Type " << my_flit->flit_type << ", " << my_flit->src_id << "-->" << my_flit->dst_id << " flit: " << *my_flit << endl;
+    LOG << ">>>> Target received flit: Type " << my_flit->flit_type << ", " << my_flit->src_id << "-->" << my_flit->dst_id << " flit: " << *my_flit << endl;
 
     if (!buffer_rx.IsFull())
     {
@@ -46,12 +46,12 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 	{
 	    if (hub->in_reservation_table.isAvailable(dst_port))
 	    {
-		cout << name() << " reserving output port " << dst_port << " for channel " << i << endl;
+		LOG << "Reserving output port " << dst_port << " for channel " << i << endl;
 		hub->in_reservation_table.reserve(i, dst_port);
 	    }
 	    else
 	    {
-		cout << name() << " WARNING: cannot reserve output port " << dst_port << " for channel " << i << endl;
+		LOG << "WARNING: cannot reserve output port " << dst_port << " for channel " << i << endl;
 		return;
 	    }
 
@@ -59,19 +59,19 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 
 	if (my_flit->flit_type == FLIT_TYPE_TAIL) 
 	{
-	    cout << name() << " releasing reservation for output port " << dst_port << endl;
+	    LOG << "Releasing reservation for output port " << dst_port << endl;
 	    hub->in_reservation_table.release(dst_port);
 	}
 	
 
-	cout << name() << " flit moved to rx_buffer " << endl;
+	LOG << "Flit moved to rx_buffer " << endl;
 	buffer_rx.Push(*my_flit);
 	// Obliged to set response status to indicate successful completion
 	trans.set_response_status( tlm::TLM_OK_RESPONSE );
     }
     else
     {
-	cout << name() << " WARNING: buffer_rx is full " << endl;
+	LOG << "WARNING: buffer_rx is full " << endl;
     }
 
 

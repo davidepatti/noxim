@@ -74,7 +74,7 @@ int sc_main(int arg_num, char *arg_vet[])
     }
     // Reset the chip and run the simulation
     reset.write(1);
-    cout << "Reset...";
+    cout << "Reset..." << endl;
     srand(GlobalParams::rnd_generator_seed);	// time(NULL));
     sc_start(GlobalParams::reset_time, SC_NS);
     reset.write(0);

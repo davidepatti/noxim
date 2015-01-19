@@ -18,10 +18,10 @@
 ./GlobalTrafficTable.o: ../src/GlobalTrafficTable.h ../src/DataStructs.h
 ./GlobalTrafficTable.o: ../src/GlobalParams.h
 ./Hub.o: ../src/Hub.h ../src/DataStructs.h ../src/GlobalParams.h
-./Hub.o: ../src/Buffer.h ../src/ReservationTable.h ../src/Initiator.h
-./Hub.o: ../src/Utils.h ../src/Target.h
+./Hub.o: ../src/Buffer.h ../src/ReservationTable.h ../src/Utils.h
+./Hub.o: ../src/Initiator.h ../src/Target.h
 ./Initiator.o: ../src/Initiator.h ../src/Utils.h ../src/DataStructs.h
-./Initiator.o: ../src/GlobalParams.h
+./Initiator.o: ../src/GlobalParams.h ../src/Buffer.h
 ./LocalRoutingTable.o: ../src/LocalRoutingTable.h
 ./LocalRoutingTable.o: ../src/GlobalRoutingTable.h ../src/DataStructs.h
 ./LocalRoutingTable.o: ../src/GlobalParams.h
@@ -46,14 +46,16 @@
 ./ProcessingElement.o: ../src/GlobalParams.h ../src/GlobalTrafficTable.h
 ./ProcessingElement.o: ../src/Utils.h
 ./ReservationTable.o: ../src/ReservationTable.h ../src/DataStructs.h
-./ReservationTable.o: ../src/GlobalParams.h
+./ReservationTable.o: ../src/GlobalParams.h ../src/Utils.h
 ./Router.o: ../src/Router.h ../src/DataStructs.h ../src/GlobalParams.h
 ./Router.o: ../src/Buffer.h ../src/Stats.h ../src/Power.h
 ./Router.o: ../src/GlobalRoutingTable.h ../src/LocalRoutingTable.h
 ./Router.o: ../src/ReservationTable.h ../src/Utils.h
 ./Stats.o: ../src/Stats.h ../src/DataStructs.h ../src/GlobalParams.h
 ./Stats.o: ../src/Power.h
-./Target.o: ../src/Target.h ../src/Utils.h ../src/DataStructs.h
-./Target.o: ../src/GlobalParams.h
-./TokenRing.o: ../src/TokenRing.h
+./Target.o: ../src/Hub.h ../src/DataStructs.h ../src/GlobalParams.h
+./Target.o: ../src/Buffer.h ../src/ReservationTable.h ../src/Utils.h
+./Target.o: ../src/Initiator.h ../src/Target.h
+./TokenRing.o: ../src/TokenRing.h ../src/Utils.h ../src/DataStructs.h
+./TokenRing.o: ../src/GlobalParams.h
 ./Utils.o: ../src/Utils.h ../src/DataStructs.h ../src/GlobalParams.h

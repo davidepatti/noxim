@@ -80,7 +80,7 @@ SC_MODULE(NoC)
 	    for (int i = 0; i < GlobalParams::mesh_dim_x; i++)
 		for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
 		    count += t[i][j]->r->getFlitsCount();
-	    cout << count << endl;
+	    LOG << count << endl;
 	}
     }
     //---------- Mau experiment <stop>

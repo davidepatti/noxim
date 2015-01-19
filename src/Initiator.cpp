@@ -10,18 +10,18 @@
       while (1)
       {
 
-	  cout << name() << " Time: " << sc_time_stamp() << " ****** Initiator - waiting for transmissions" << endl;
+	  LOG << " ****** Initiator - waiting for transmissions" << endl;
 
 	  // TODO: check
 	  wait(start_request_event);
 
-	  cout << name() << " Time: " << sc_time_stamp() << " ****** Initiator - starting blocking transmissions" << endl;
+	  LOG << " ****** Initiator - starting blocking transmissions" << endl;
 
 	  tlm::tlm_command cmd = tlm::TLM_WRITE_COMMAND;
 	  flit_payload = buffer_tx.Front();
 
 	  int destHub = tile2Hub(flit_payload.dst_id);
-	  cout << name() << " forwarding to wireless to reach HUB_" << destHub <<  endl;
+	  LOG << "Forwarding to wireless to reach Hub_" << destHub <<  endl;
 
 	  trans->set_command(cmd);
 	  trans->set_address(destHub);
@@ -35,7 +35,7 @@
 
 	  delay = sc_time(rand_ps(), SC_PS);
 
-	  cout << name() << " Time " << sc_time_stamp() << " calling blocking transport with delay = " << delay << " and target address = " << destHub << endl;
+	  LOG << "Calling blocking transport with delay = " << delay << " and target address = " << destHub << endl;
 
 	  // Call b_transport to demonstrate the b/nb conversion by the simple_target_socket
 	  socket->b_transport( *trans, delay );
@@ -48,11 +48,11 @@
 	  }
 	  else
 	  {
-		cout << name() << " WARNING: incomplete transaction " << endl;
+		LOG << " WARNING: incomplete transaction " << endl;
 	  }
 
 
-	  cout << "trans = { " << (cmd ? 'W' : 'R') << ", " << destHub
+	  LOG << "trans = { " << (cmd ? 'W' : 'R') << ", " << destHub
 	      << " } , " <<  " at time " << sc_time_stamp()
 	      << " delay = " << delay << endl;
 
