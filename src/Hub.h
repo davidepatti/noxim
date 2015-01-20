@@ -63,7 +63,8 @@ SC_MODULE(Hub)
 
     void rxProcess(); // The receiving process
     void txProcess(); // The transmitting process
-    void radioProcess(); // The radio transceiver process
+    void rxRadioProcess(); // The radio transceiver process
+    void txRadioProcess(); // The radio transceiver process
 
     int route(Flit&);
     int tile2Port(int);
@@ -79,7 +80,11 @@ SC_MODULE(Hub)
         sensitive << reset;
         sensitive << clock.pos();
 
-        SC_METHOD(radioProcess);
+        SC_METHOD(rxRadioProcess);
+        sensitive << reset;
+        sensitive << clock.pos();
+
+        SC_METHOD(txRadioProcess);
         sensitive << reset;
         sensitive << clock.pos();
 
