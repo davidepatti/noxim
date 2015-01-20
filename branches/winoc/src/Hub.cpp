@@ -27,7 +27,29 @@ int Hub::route(Flit& f)
 
 }
 
-void Hub::radioProcess()
+void Hub::txRadioProcess()
+{
+    if (reset.read()) 
+    {
+    } 
+    else 
+    {
+	if (token_ring->currentToken() == local_id)
+	{
+	    for (int i = 0; i < num_tx_channels; i++) 
+	    {
+		if (!(init[i]->buffer_tx.IsEmpty()))
+		{
+		    LOG << "Buffer_tx is not empty for channel " << i << endl;
+		    init[i]->start_request_event.notify();
+
+		}
+	    }
+	}
+
+    }
+}
+void Hub::rxRadioProcess()
 {
     if (reset.read()) 
     {
@@ -87,6 +109,7 @@ void Hub::rxProcess()
 
 	for (int i = 0; i < num_ports; i++) 
 	{
+
 	    if ((req_rx[i]->read() == 1 - current_level_rx[i]) && !buffer[i].IsFull()) 
 	    {
 		LOG << "Reading flit on port " << i << endl;
@@ -131,6 +154,7 @@ void Hub::txProcess()
 	// tables
 	int * r = new int[num_ports];
 
+	if (local_id==0) buffer[0].Print("XXX HUB");
 	// 1st phase: Reservation
 	for (int j = 0; j < num_ports; j++) 
 	{
@@ -148,8 +172,6 @@ void Hub::txProcess()
 		{
 		    if (r[i]==DIRECTION_WIRELESS)
 		    {
-			if (token_ring->currentToken() == local_id)
-			{
 			    // TODO: use actual channel
 			    int channel = 0;
 			    if (wireless_reservation_table.isAvailable(channel)) 
@@ -158,7 +180,6 @@ void Hub::txProcess()
 			    }
 			    else
 			    LOG << "Reservation:  wireless channel " << channel << " not available ..." << endl;
-			}
 		    }
 		    else if (reservation_table.isAvailable(r[i])) 
 		    {
@@ -180,8 +201,6 @@ void Hub::txProcess()
 
 		if (r[i] == DIRECTION_WIRELESS)
 		{
-		    if (token_ring->currentToken() == local_id)
-		    {
 			int channel = wireless_reservation_table.getOutputPort(i);
 
 			if (channel != NOT_RESERVED) 
@@ -194,15 +213,12 @@ void Hub::txProcess()
 				if (flit.flit_type == FLIT_TYPE_TAIL) wireless_reservation_table.release(channel);
 			    }
 
-			    init[channel]->start_request_event.notify();
-
 
 			}
 			else
 			{
 			    LOG << "Forwarding: No channel reserved for port direction " << i  << endl;
 			}
-		    }
 		}
 		else // not wireless
 		{

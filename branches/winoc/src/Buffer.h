@@ -49,6 +49,13 @@ class Buffer {
 
     void Disable();
 
+
+    void Print(char*);
+
+
+    inline string name() { return "Buffer";};
+
+
   private:
 
     bool true_buffer;

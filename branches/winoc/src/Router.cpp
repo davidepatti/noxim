@@ -70,6 +70,7 @@ void Router::txProcess()
     } 
   else 
     {
+	if (local_id==0) buffer[DIRECTION_LOCAL].Print("XXX ROUTER");
       // 1st phase: Reservation
       for (int j = 0; j < DIRECTIONS + 2; j++) 
 	{
@@ -77,6 +78,7 @@ void Router::txProcess()
 
 	  if (!buffer[i].IsEmpty()) 
 	    {
+
 	      Flit flit = buffer[i].Front();
 
 	      if (flit.flit_type == FLIT_TYPE_HEAD) 

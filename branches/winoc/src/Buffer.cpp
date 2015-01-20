@@ -9,6 +9,7 @@
  */
 
 #include "Buffer.h"
+#include "Utils.h"
 
 Buffer::Buffer()
 {
@@ -21,6 +22,25 @@ Buffer::Buffer()
   mean_occupancy = 0.0;
   true_buffer = true;
 }
+
+void Buffer::Print(char *prefix)
+{
+    queue<Flit> m = buffer;
+
+
+    string bstr = "";
+
+    char  t[] = "HBT";
+
+    while (!(m.empty()))
+    {
+	Flit f = m.front();
+	m.pop();
+	bstr = bstr + t[f.flit_type]+to_string(f.sequence_no) + "|";
+    }
+    LOG << prefix << " |" << bstr << endl;
+}
+
 
 void Buffer::Disable()
 {
