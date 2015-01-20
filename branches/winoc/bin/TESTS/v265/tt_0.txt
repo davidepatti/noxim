@@ -1,0 +1,1520 @@
+
+		Noxim - the NoC Simulator
+		(C) University of Catania
+
+txChannels:
+  - 0
+attachedNodes:
+  - 1
+  - 4
+  - 5
+rxChannels:
+  - 0
+attachedNodes:
+  - 2
+  - 3
+  - 6
+  - 7
+txChannels:
+  - 0
+rxChannels:
+  - 0
+attachedNodes:
+  - 8
+  - 9
+  - 12
+  - 13
+txChannels:
+  - 0
+rxChannels:
+  - 0
+attachedNodes:
+  - 10
+  - 11
+  - 14
+  - 15
+txChannels:
+  - 0
+rxChannels:
+  - 0
+ber:
+  - 0
+  - 0
+delay:
+  - 0
+  - 0
+Creating Channel_0
+Creating Hub_0
+Initializing reservation table with size 3
+Initializing reservation table with size 3
+Initializing reservation table with size 1
+Binding NoC.Hub_0 to txChannel 0
+Binding NoC.Hub_0 to rxChannel 0
+Creating Hub_1
+Initializing reservation table with size 4
+Initializing reservation table with size 4
+Initializing reservation table with size 1
+Binding NoC.Hub_1 to txChannel 0
+Binding NoC.Hub_1 to rxChannel 0
+Creating Hub_2
+Initializing reservation table with size 4
+Initializing reservation table with size 4
+Initializing reservation table with size 1
+Binding NoC.Hub_2 to txChannel 0
+Binding NoC.Hub_2 to rxChannel 0
+Creating Hub_3
+Initializing reservation table with size 4
+Initializing reservation table with size 4
+Initializing reservation table with size 1
+Binding NoC.Hub_3 to txChannel 0
+Binding NoC.Hub_3 to rxChannel 0
+Tile [0][0] will not be connected to any Hub
+Tile [0][1] will be connected to NoC.Hub_0
+Tile [0][2] will be connected to NoC.Hub_2
+Tile [0][3] will be connected to NoC.Hub_2
+Tile [1][0] will be connected to NoC.Hub_0
+Tile [1][1] will be connected to NoC.Hub_0
+Tile [1][2] will be connected to NoC.Hub_2
+Tile [1][3] will be connected to NoC.Hub_2
+Tile [2][0] will be connected to NoC.Hub_1
+Tile [2][1] will be connected to NoC.Hub_1
+Tile [2][2] will be connected to NoC.Hub_3
+Tile [2][3] will be connected to NoC.Hub_3
+Tile [3][0] will be connected to NoC.Hub_1
+Tile [3][1] will be connected to NoC.Hub_1
+Tile [3][2] will be connected to NoC.Hub_3
+Tile [3][3] will be connected to NoC.Hub_3
+Initializing reservation table with size 6
+> Setting Tile[00][00]_(#0)
+Initializing reservation table with size 6
+> Setting Tile[01][00]_(#1)
+Initializing reservation table with size 6
+> Setting Tile[02][00]_(#2)
+Initializing reservation table with size 6
+> Setting Tile[03][00]_(#3)
+Initializing reservation table with size 6
+> Setting Tile[00][01]_(#4)
+Initializing reservation table with size 6
+> Setting Tile[01][01]_(#5)
+Initializing reservation table with size 6
+> Setting Tile[02][01]_(#6)
+Initializing reservation table with size 6
+> Setting Tile[03][01]_(#7)
+Initializing reservation table with size 6
+> Setting Tile[00][02]_(#8)
+Initializing reservation table with size 6
+> Setting Tile[01][02]_(#9)
+Initializing reservation table with size 6
+> Setting Tile[02][02]_(#10)
+Initializing reservation table with size 6
+> Setting Tile[03][02]_(#11)
+Initializing reservation table with size 6
+> Setting Tile[00][03]_(#12)
+Initializing reservation table with size 6
+> Setting Tile[01][03]_(#13)
+Initializing reservation table with size 6
+> Setting Tile[02][03]_(#14)
+Initializing reservation table with size 6
+> Setting Tile[03][03]_(#15)
+Reset...NoC.Hub_0.init_0 Time: 0 s ****** Initiator - waiting for transmissions
+NoC.Hub_1.init_0 Time: 0 s ****** Initiator - waiting for transmissions
+NoC.Hub_2.init_0 Time: 0 s ****** Initiator - waiting for transmissions
+NoC.Hub_3.init_0 Time: 0 s ****** Initiator - waiting for transmissions
+ done! Now running for 10000 cycles...
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[00][00]_(#0).Router wired routing for dst = 1
+ checking availability of out port 1
+ checking availability of out port 1
+ checking availability of out port 4
+ checking availability of out port 4
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+NoC.Tile[01][00]_(#1).Router consumed flit src 0 dst = 1
+Noxim simulation completed.
+ ( 11000 cycles executed)
+% Total received packets: 112
+% Total received flits: 694
+% Global average delay (cycles): 6.07143
+% Global average throughput (flits/cycle): 0.0697067
+% Throughput (flits/cycle/IP): 0.0771111
+% Max delay (cycles): 33
+% Total energy (J): 6.52418e-07
