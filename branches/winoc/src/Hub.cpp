@@ -154,7 +154,6 @@ void Hub::txProcess()
 	// tables
 	int * r = new int[num_ports];
 
-	if (local_id==0) buffer[0].Print("XXX HUB");
 	// 1st phase: Reservation
 	for (int j = 0; j < num_ports; j++) 
 	{
