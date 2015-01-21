@@ -155,10 +155,32 @@ inline bool hasRadioHub(int id)
 
 inline int tile2Hub(int id)
 {
-    //TODO add support multiple channels
     map<int, int>::iterator it = GlobalParams::hub_for_tile.find(id); 
     assert( (it != GlobalParams::hub_for_tile.end()) && "Specified Tile is not connected to any Hub");
     return it->second;
+}
+
+inline int selectChannel(int src_hub, int dst_hub)
+{  
+    
+    vector<int> & first = GlobalParams::hub_configuration[src_hub].txChannels;
+    vector<int> & second = GlobalParams::hub_configuration[dst_hub].rxChannels;
+
+    vector<int> intersection;
+
+    for (int i=0;i<first.size();i++)
+    {
+	for (int j=0;j<second.size();j++)
+	{
+	    if (first[i]==second[j])
+		intersection.push_back(first[i]);
+	}
+    }
+
+    if (intersection.size()==0) return NOT_VALID;
+
+    return intersection[0];
+
 }
 
 #endif

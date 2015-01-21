@@ -27,11 +27,13 @@ struct Target: sc_module
   tlm_utils::simple_target_socket<Target> socket;
 
   SC_HAS_PROCESS(Target);
+  int local_id;
 
   //SC_CTOR(Target)
   //: socket("socket")
-  Target(sc_module_name nm, Hub* h): sc_module(nm), hub(h), socket("socket")
+  Target(sc_module_name nm, int id, Hub* h): sc_module(nm), hub(h), socket("socket")
   {
+      local_id = id;
 
     // Register callback for incoming b_transport interface method call
       socket.register_b_transport(this, &Target::b_transport);

@@ -34,8 +34,9 @@ SC_MODULE(Hub)
     int local_id; // Unique ID
     TokenRing* token_ring;
     int num_ports;
-    int num_rx_channels;
-    int num_tx_channels;
+    vector<int> attachedNodes;
+    vector<int> txChannels;
+    vector<int> rxChannels;
 
     sc_in<Flit>* flit_rx;
     sc_in<bool>* req_rx;
@@ -91,8 +92,9 @@ SC_MODULE(Hub)
         local_id = id;
 	token_ring = tr;
         num_ports = GlobalParams::hub_configuration[local_id].attachedNodes.size();
-        num_rx_channels = GlobalParams::hub_configuration[local_id].rxChannels.size();
-        num_tx_channels = GlobalParams::hub_configuration[local_id].txChannels.size();
+        attachedNodes = GlobalParams::hub_configuration[local_id].attachedNodes;
+        txChannels = GlobalParams::hub_configuration[local_id].txChannels;
+        rxChannels = GlobalParams::hub_configuration[local_id].rxChannels;
 
         flit_rx = new sc_in<Flit>[num_ports];
         req_rx = new sc_in<bool>[num_ports];
@@ -108,24 +110,22 @@ SC_MODULE(Hub)
 
         start_from_port = 0;
 
-        for (int i = 0; i < num_tx_channels; i++) {
+        for (unsigned int i = 0; i < txChannels.size(); i++) {
             char txt[20];
-            int id = GlobalParams::hub_configuration[local_id].txChannels[i];
-            sprintf(txt, "init_%d", id);
-            init[id] = new Initiator(txt);
+            sprintf(txt, "init_%d", txChannels[i]);
+            init[txChannels[i]] = new Initiator(txt);
         }
 
-        for (int i = 0; i < num_rx_channels; i++) {
+        for (unsigned int i = 0; i < rxChannels.size(); i++) {
             char txt[20];
-            int id = GlobalParams::hub_configuration[local_id].rxChannels[i];
-            sprintf(txt, "target_%d", id);
-            target[i] = new Target(txt, this);
+            sprintf(txt, "target_%d", rxChannels[i]);
+            target[rxChannels[i]] = new Target(txt, rxChannels[i], this);
         }
 
         start_from_port = 0;
         reservation_table.init(num_ports);
         in_reservation_table.init(num_ports);
-        wireless_reservation_table.init(num_tx_channels);
+        wireless_reservation_table.init(txChannels.size());
     }
 };
 
