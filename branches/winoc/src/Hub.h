@@ -49,8 +49,8 @@ SC_MODULE(Hub)
     bool* current_level_rx;	// Current level for ABP
     bool* current_level_tx;	// Current level for ABP
 
-    Initiator** init;
-    Target** target;
+    map<int, Initiator*> init;
+    map<int, Target*> target;
 
     map<int, int> tile2port_mapping;
     map<int, int> tile2hub_mapping;
@@ -106,22 +106,19 @@ SC_MODULE(Hub)
         current_level_rx = new bool[num_ports];
         current_level_tx = new bool[num_ports];
 
-        init = new Initiator*[num_tx_channels];
-        target = new Target*[num_rx_channels];
-
         start_from_port = 0;
 
         for (int i = 0; i < num_tx_channels; i++) {
             char txt[20];
-            sprintf(txt, "init_%d", i);
-            init[i] = new Initiator(txt);
-            // actual bus binding in buildMesh()
-            //init[i]->socket.bind( bus->targ_socket );
+            int id = GlobalParams::hub_configuration[local_id].txChannels[i];
+            sprintf(txt, "init_%d", id);
+            init[id] = new Initiator(txt);
         }
 
         for (int i = 0; i < num_rx_channels; i++) {
             char txt[20];
-            sprintf(txt, "target_%d", i);
+            int id = GlobalParams::hub_configuration[local_id].rxChannels[i];
+            sprintf(txt, "target_%d", id);
             target[i] = new Target(txt, this);
         }
 

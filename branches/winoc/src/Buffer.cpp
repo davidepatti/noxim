@@ -32,13 +32,14 @@ void Buffer::Print(char *prefix)
 
     char  t[] = "HBT";
 
+    LOG << prefix << " | ";
     while (!(m.empty()))
     {
 	Flit f = m.front();
 	m.pop();
-	bstr = bstr + t[f.flit_type]+to_string(f.sequence_no) + "|";
+	cout << bstr << t[f.flit_type] << f.sequence_no <<  " | ";
     }
-    LOG << prefix << " |" << bstr << endl;
+    cout << endl;
 }
 
 
