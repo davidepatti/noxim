@@ -36,13 +36,14 @@ void Hub::txRadioProcess()
     {
 	if (token_ring->currentToken() == local_id)
 	{
-	    for (int i = 0; i < num_tx_channels; i++) 
-	    {
-		if (!(init[i]->buffer_tx.IsEmpty()))
-		{
-		    LOG << "Buffer_tx is not empty for channel " << i << endl;
-		    init[i]->start_request_event.notify();
 
+	    for (unsigned int i =0 ;i<txChannels.size();i++)
+	    {
+		int channel = txChannels[i];
+		if (!init[channel]->buffer_tx.IsEmpty())
+		{
+		    LOG << "Buffer_tx is not empty for channel " << channel << endl;
+		    init[channel]->start_request_event.notify();
 		}
 	    }
 	}
@@ -59,27 +60,31 @@ void Hub::rxRadioProcess()
 	// stores routing decision
 	// need a vector to use this info to choose between the two
 	// tables
-	int * r = new int[num_rx_channels];
+	int * r = new int[rxChannels.size()];
 
-	for (int i = 0; i < num_rx_channels; i++) 
+
+	for (unsigned int i=0;i<rxChannels.size();i++)
 	{
-	    if (!(target[i]->buffer_rx.IsEmpty()))
+	    int channel = rxChannels[i];
+	    if (!(target[channel]->buffer_rx.IsEmpty()))
 	    {
-		LOG << "Buffer_rx is not empty for channel " << i << endl;
-		Flit received_flit = target[i]->buffer_rx.Front();
+		LOG << "Buffer_rx is not empty for channel " << channel << endl;
+		Flit received_flit = target[channel]->buffer_rx.Front();
 		r[i] = tile2Port(received_flit.dst_id);
 	    }
 	}
 
-	for (int i = 0; i < num_rx_channels; i++) 
+	for (unsigned int i = 0; i < rxChannels.size(); i++) 
 	{
-	    if (!(target[i]->buffer_rx.IsEmpty()))
+	    int channel = rxChannels[i];
+
+	    if (!(target[channel]->buffer_rx.IsEmpty()))
 	    {
-		Flit received_flit = target[i]->buffer_rx.Front();
+		Flit received_flit = target[channel]->buffer_rx.Front();
 
 		if ( !buffer[r[i]].IsFull() ) 
 		{
-		    target[i]->buffer_rx.Pop();
+		    target[channel]->buffer_rx.Pop();
 		    LOG << "Moving flit from buffer_rx to buffer port " << r[i] << endl;
 
 		    buffer[r[i]].Push(received_flit);
@@ -171,8 +176,10 @@ void Hub::txProcess()
 		{
 		    if (r[i]==DIRECTION_WIRELESS)
 		    {
-			    // TODO: use actual channel
-			    int channel = 0;
+			int channel = selectChannel(local_id,tile2Hub(flit.dst_id));
+
+			assert(channel!=NOT_VALID && "hubs are connected by any channel");
+
 			    if (wireless_reservation_table.isAvailable(channel)) 
 			    {
 				wireless_reservation_table.reserve(i, channel);

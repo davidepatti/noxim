@@ -2,11 +2,6 @@
 
 int rand_ps()
 {
-    //return 10000;
+    // where the value 2000 has been randomly chosen
     return 2000;
-/*
-  int n = rand() % 100;
-  n = n * n * n;
-  return n / 100;
-  */
 }

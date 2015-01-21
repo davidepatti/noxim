@@ -38,20 +38,18 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
     if (!buffer_rx.IsFull())
     {
 	
-	// TODO: use actual channel
-	int i = 0;
 	int dst_port = hub->tile2Port(my_flit->dst_id);
 
 	if (my_flit->flit_type==FLIT_TYPE_HEAD)
 	{
 	    if (hub->in_reservation_table.isAvailable(dst_port))
 	    {
-		LOG << "Reserving output port " << dst_port << " for channel " << i << endl;
-		hub->in_reservation_table.reserve(i, dst_port);
+		LOG << "Reserving output port " << dst_port << " for channel " << local_id << endl;
+		hub->in_reservation_table.reserve(local_id, dst_port);
 	    }
 	    else
 	    {
-		LOG << "WARNING: cannot reserve output port " << dst_port << " for channel " << i << endl;
+		LOG << "WARNING: cannot reserve output port " << dst_port << " for channel " << local_id << endl;
 		return;
 	    }
 
