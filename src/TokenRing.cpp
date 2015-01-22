@@ -11,7 +11,7 @@
 #include "TokenRing.h"
 
 
-void TokenRing::updateToken()
+void TokenRing::updateTokens()
 {
     if (reset.read()) {
 	
@@ -22,24 +22,40 @@ void TokenRing::updateToken()
 	{
 	    hold_count = max_hold_cycles;
 
-	    current_token = (current_token+1)%num_hubs;
+	    for (map<int,ChannelConfig>::iterator i = GlobalParams::channel_configuration.begin();
+		    i!=GlobalParams::channel_configuration.end(); 
+		    i++)
+	    {
+		// number of hubs of the ring
+		int num_hubs = rings_mapping[i->first].size();
 
-	    LOG << "Token assigned to " << current_token << endl;
+		ch_token_position[i->first] = (ch_token_position[i->first]+1)%num_hubs;
+		LOG << "Token of channel " << i->first << " has been assigned to hub " <<  rings_mapping[i->first][ch_token_position[i->first]] << endl;
+	    }
+
 	}
     }
 }
 
 
-void TokenRing::configure(int start_token,int _max_hold_cycles)
+void TokenRing::configure(int _max_hold_cycles)
 {
-    current_token = start_token;
     max_hold_cycles = _max_hold_cycles;
     hold_count = max_hold_cycles;
 }
 
 
-int TokenRing::currentToken()
+int TokenRing::currentTokenHolder(int channel)
 {
-    return current_token;
+    int token_position = ch_token_position[channel];
+    return rings_mapping[channel][token_position];
+
+}
+
+void TokenRing::attachHub(int channel,int hub)
+{
+    LOG << "Attaching Hub " << hub << " to the token ring for channel " << channel << endl;
+    rings_mapping[channel].push_back(hub);
+
 }
 

@@ -24,11 +24,9 @@ class ReservationTable {
 
     inline string name() const {return "ReservationTable";};
 
-    // Initialize to a given number of directions
-    void init(int);
 
     // check if port_out is reservable
-    bool isAvailable(const int port_out) const;
+    bool isAvailable(const int port_out);
 
     // Connects port_in with port_out. Asserts if port_out is reserved
     void reserve(const int port_in, const int port_out);
@@ -38,16 +36,16 @@ class ReservationTable {
     void release(const int port_out);
 
     // Returns the output port connected to port_in.
-    int getOutputPort(const int port_in) const;
+    int getOutputPort(const int port_in);
 
     // Makes output port no longer available for reservation/release
     void invalidate(const int port_out);
 
-    int directions() const;
 
   private:
 
-     vector < int >rtable;	// reservation vector: rtable[i] gives the input
+
+     map<int,int> rtable;	// reservation vector: rtable[i] gives the input
     // port whose output port 'i' is connected to
 };
 

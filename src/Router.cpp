@@ -222,7 +222,7 @@ void Router::txProcess()
   stats.power.Leakage();
 }
 
-NoP_data Router::getCurrentNoPData() const
+NoP_data Router::getCurrentNoPData()
 {
     NoP_data NoP_data;
 

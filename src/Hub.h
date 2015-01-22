@@ -114,6 +114,7 @@ SC_MODULE(Hub)
             char txt[20];
             sprintf(txt, "init_%d", txChannels[i]);
             init[txChannels[i]] = new Initiator(txt);
+	    token_ring->attachHub(txChannels[i],local_id);
         }
 
         for (unsigned int i = 0; i < rxChannels.size(); i++) {
@@ -123,9 +124,6 @@ SC_MODULE(Hub)
         }
 
         start_from_port = 0;
-        reservation_table.init(num_ports);
-        in_reservation_table.init(num_ports);
-        wireless_reservation_table.init(txChannels.size());
     }
 };
 
