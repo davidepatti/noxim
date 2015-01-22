@@ -92,8 +92,6 @@ SC_MODULE(Router)
 	sensitive << reset;
 	sensitive << clock.pos();
 	
-	// Initialize reservation table
-	reservation_table.init(DIRECTIONS+2);
     }
 
   private:
@@ -134,7 +132,7 @@ SC_MODULE(Router)
     vector < int >routingTableBased(const int dir_in,
 				    const Coord & current,
 				    const Coord & destination);
-    NoP_data getCurrentNoPData() const;
+    NoP_data getCurrentNoPData();
     void NoP_report() const;
     int NoPScore(const NoP_data & nop_data, const vector <int> & nop_channels) const;
     int reflexDirection(int direction) const;

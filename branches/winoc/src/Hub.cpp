@@ -34,12 +34,12 @@ void Hub::txRadioProcess()
     } 
     else 
     {
-	if (token_ring->currentToken() == local_id)
+	for (unsigned int i =0 ;i<txChannels.size();i++)
 	{
+	    int channel = txChannels[i];
 
-	    for (unsigned int i =0 ;i<txChannels.size();i++)
+	    if (token_ring->currentTokenHolder(channel) == local_id)
 	    {
-		int channel = txChannels[i];
 		if (!init[channel]->buffer_tx.IsEmpty())
 		{
 		    LOG << "Buffer_tx is not empty for channel " << channel << endl;

@@ -15,7 +15,7 @@ void NoC::buildMesh(char const * cfg_fname)
 
     token_ring = new TokenRing("tokenring");
     // TURI FIX
-    token_ring->configure(0,8);
+    token_ring->configure(8);
 
     token_ring->clock(clock);
     token_ring->reset(reset);

@@ -24,30 +24,34 @@ SC_MODULE(TokenRing)
     sc_in_clk clock;	
     sc_in < bool > reset;
 
-    int currentToken();
+    int currentTokenHolder(int channel);
+
+
 
     // TURI FIX, file config
-    void configure(int start_token,int _max_hold_cycles);
+    void configure(int _max_hold_cycles);
 
-    void updateToken();
+    void attachHub(int channel, int hub);
+
+    void updateTokens();
 
     // Constructor
     SC_CTOR(TokenRing) {
-	SC_METHOD(updateToken);
+	SC_METHOD(updateTokens);
 	sensitive << reset;
 	sensitive << clock.pos();
-
-	// TURI FIX
-	num_hubs = 4;
     }
 
     private:
 
-    int current_token;
+    // ring of a channel -> list of hubs
+    map<int,vector<int> > rings_mapping;
+
+    // ring of a channel -> token position in the ring
+    map<int,int> ch_token_position;
+
     int hold_count;
     int max_hold_cycles;
-
-    int num_hubs;
 
    
 
