@@ -10,7 +10,7 @@
 
 #include "NoC.h"
 
-void NoC::buildMesh(char const * cfg_fname)
+void NoC::buildMesh()
 {
 
     token_ring = new TokenRing("tokenring");

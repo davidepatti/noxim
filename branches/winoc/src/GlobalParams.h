@@ -18,6 +18,8 @@
 
 using namespace std;
 
+#define CONFIG_FILENAME        "config.yaml"
+
 // Define the directions as numbers
 #define DIRECTIONS             4
 #define DIRECTION_NORTH        0
@@ -97,6 +99,7 @@ struct GlobalParams {
     static float probability_of_retransmission;
     static int traffic_distribution;
     static char traffic_table_filename[128];
+    static char config_filename[128];
     static int simulation_time;
     static int reset_time;
     static int stats_warm_up_time;
