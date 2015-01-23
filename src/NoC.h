@@ -98,7 +98,7 @@ SC_MODULE(NoC)
 	//---------- Mau experiment <stop>
 
 	// Build the Mesh
-	buildMesh("config.yaml");
+	buildMesh();
     }
 
     // Support methods
@@ -106,7 +106,7 @@ SC_MODULE(NoC)
 
   private:
 
-    void buildMesh(char const * cfg_fname);
+    void buildMesh();
 };
 
 //Hub * dd;

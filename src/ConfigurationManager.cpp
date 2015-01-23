@@ -13,7 +13,8 @@
 
 void loadConfiguration() {
 
-    YAML::Node config = YAML::LoadFile("config.yaml");
+    cout << "Loading configuration from file " << GlobalParams::config_filename << endl;
+    YAML::Node config = YAML::LoadFile(GlobalParams::config_filename);
 
     // Initialize global configuration parameters (can be overridden with command-line arguments)
     GlobalParams::verbose_mode = config["verbose_mode"].as<int>();
@@ -79,6 +80,7 @@ void showHelp(char selfname[])
     cout << "Usage: " << selfname << " [options]" << endl
          << "Where [options] is one or more of the following ones:" << endl
          << "\t-help\t\tShow this help and exit" << endl
+         << "\t-config\t\tLoad the specified configuration file" << endl
          << "\t-verbose N\tVerbosity level (1=low, 2=medium, 3=high, default off)" << endl
          << "\t-trace FILENAME\tTrace signals to a VCD file named 'FILENAME.vcd' (default off)" << endl
          << "\t-dimx N\t\tSet the mesh X dimension to the specified integer value (default " << GlobalParams::mesh_dim_x << ")" << endl
@@ -260,7 +262,9 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 	    if (!strcmp(arg_vet[i], "-help")) {
 		showHelp(arg_vet[0]);
 		exit(0);
-	    } else if (!strcmp(arg_vet[i], "-verbose"))
+	    } else if (!strcmp(arg_vet[i], "-config")){
+            i++;
+        } else if (!strcmp(arg_vet[i], "-verbose"))
 		GlobalParams::verbose_mode = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-trace")) {
 		GlobalParams::trace_mode = true;
@@ -405,6 +409,26 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 
 
 void configure(int arg_num, char *arg_vet[]) {
+
+    bool config_found = false;
+
+    for (int i = 1; i < arg_num; i++) {
+	    if (!strcmp(arg_vet[i], "-config")) {
+            strcpy(GlobalParams::config_filename, arg_vet[++i]);
+            config_found = true;
+            break;
+        }
+    }
+
+    if (!config_found)
+    {
+        std::ifstream infile(CONFIG_FILENAME);
+        if (infile.good())
+            strcpy(GlobalParams::config_filename, CONFIG_FILENAME);
+        else
+            cerr << "No configuration file found!" << endl;
+    }
+
     loadConfiguration();
     parseCmdLine(arg_num, arg_vet);
 
