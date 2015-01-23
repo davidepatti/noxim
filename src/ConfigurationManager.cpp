@@ -426,7 +426,10 @@ void configure(int arg_num, char *arg_vet[]) {
         if (infile.good())
             strcpy(GlobalParams::config_filename, CONFIG_FILENAME);
         else
+        {
             cerr << "No configuration file found!" << endl;
+            exit(0);
+        }
     }
 
     loadConfiguration();
