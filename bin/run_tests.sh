@@ -1,29 +1,31 @@
 #!/bin/bash
 
-OUT_DIR=out_tt
-IN_DIR=tt
-FILE_PREFIX=tt_
-FILE_POSTFIX=.txt
+IN_FOLDER=TESTS
+SCENARIO_PREFIX=scenario
+TT_FOLDER=traffic_tables
+OUT_FOLDER=out
+SVER=v`svnversion -n`
 
 mkdir -p $OUT_DIR
 
 if [ $# -eq 0 ]
 then
-    for F in $IN_DIR/*
-    do
-        echo "Traffic Table" $F "is:"
-        cat "$F"
-
-        ./noxim -seed 0 -winoc -traffic table "$F" > "$OUT_DIR/$(basename $F)"
-        echo
-    done
+    NUM=*
 else
-    for VAR in "$@"
+    NUM=$1
+fi
+
+for SCENARIO in $IN_FOLDER/$SCENARIO_PREFIX$NUM
+do
+    echo "Current Scenario is : " $SCENARIO
+    for TT in $SCENARIO/$TT_FOLDER/*
     do
-        FILENAME=$FILE_PREFIX$VAR$FILE_POSTFIX
-        echo "Traffic Table" $FILENAME "is:"
-        cat "$IN_DIR/$FILENAME"
-        ./noxim -seed 0 -winoc -traffic table "$IN_DIR/$FILENAME" > "$OUT_DIR/$FILENAME"
+        echo "Traffic Table" $TT "is:"
+        cat "$TT"
+
+        mkdir -p $SCENARIO/$OUT_FOLDER/$SVER/
+        ./noxim -config $SCENARIO/config.yaml -seed 0 -winoc -traffic table "$TT" > "$SCENARIO/$OUT_FOLDER/$SVER/$(basename $TT)"
         echo
     done
-fi
+done
+
