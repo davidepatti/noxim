@@ -168,9 +168,9 @@ inline int selectChannel(int src_hub, int dst_hub)
 
     vector<int> intersection;
 
-    for (int i=0;i<first.size();i++)
+    for (unsigned int i=0;i<first.size();i++)
     {
-	for (int j=0;j<second.size();j++)
+	for (unsigned int j=0;j<second.size();j++)
 	{
 	    if (first[i]==second[j])
 		intersection.push_back(first[i]);
