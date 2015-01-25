@@ -13,10 +13,7 @@
 void NoC::buildMesh()
 {
 
-    token_ring = new TokenRing("tokenring");
-    // TURI FIX
-    token_ring->configure(8);
-
+    token_ring = new TokenRing("tokenring", GlobalParams::max_hold_cycles);
     token_ring->clock(clock);
     token_ring->reset(reset);
 

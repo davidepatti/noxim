@@ -82,6 +82,9 @@ probability_of_retransmission: 0.01
 traffic_distribution: 4
 traffic_table_filename: "tt.txt"
 
+# TokenRing
+max_hold_cycles: 8
+
 reset_time: 1000
 simulation_time: 10000
 stats_warm_up_time: 1000
