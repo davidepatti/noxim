@@ -19,6 +19,10 @@ using namespace std;
 
 SC_MODULE(TokenRing)
 {
+    SC_HAS_PROCESS(TokenRing);
+
+    int max_hold_cycles;
+    int hold_count;
 
     // I/O Ports
     sc_in_clk clock;	
@@ -26,20 +30,16 @@ SC_MODULE(TokenRing)
 
     int currentTokenHolder(int channel);
 
-
-
-    // TURI FIX, file config
-    void configure(int _max_hold_cycles);
-
     void attachHub(int channel, int hub);
 
     void updateTokens();
 
-    // Constructor
-    SC_CTOR(TokenRing) {
-	SC_METHOD(updateTokens);
-	sensitive << reset;
-	sensitive << clock.pos();
+    TokenRing(sc_module_name nm, int _max_hold_cycles): sc_module(nm) {
+        SC_METHOD(updateTokens);
+        sensitive << reset;
+        sensitive << clock.pos();
+        max_hold_cycles = _max_hold_cycles;
+        hold_count = _max_hold_cycles;
     }
 
     private:
@@ -49,11 +49,6 @@ SC_MODULE(TokenRing)
 
     // ring of a channel -> token position in the ring
     map<int,int> ch_token_position;
-
-    int hold_count;
-    int max_hold_cycles;
-
-   
 
 };
 

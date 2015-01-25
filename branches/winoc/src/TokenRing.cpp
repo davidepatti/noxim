@@ -37,14 +37,6 @@ void TokenRing::updateTokens()
     }
 }
 
-
-void TokenRing::configure(int _max_hold_cycles)
-{
-    max_hold_cycles = _max_hold_cycles;
-    hold_count = max_hold_cycles;
-}
-
-
 int TokenRing::currentTokenHolder(int channel)
 {
     int token_position = ch_token_position[channel];
