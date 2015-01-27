@@ -23,6 +23,11 @@ using namespace std;
 
 struct Channel: sc_module
 {
+
+    vector<int> hubs;
+
+    void addHub(int);
+
   SC_HAS_PROCESS(Channel);
   // ***********************************************************
   // Each multi-socket can be bound to multiple sockets
@@ -66,10 +71,22 @@ struct Channel: sc_module
   // In this example, for clarity, the address is passed through unmodified to the target
   inline unsigned int decode_address( sc_dt::uint64 address, sc_dt::uint64& masked_address )
   {
-    unsigned int target_nr = static_cast<unsigned int>( address );
-    masked_address = address;
-    LOG << " target_nr " << target_nr << " masked_address " << masked_address << endl;
-    return target_nr;
+      //unsigned int target_nr = static_cast<unsigned int>( address );
+      unsigned int target_nr = NOT_VALID;
+
+      masked_address = address;
+
+      for (unsigned int i=0;i<hubs.size();i++)
+      {
+	  if (hubs[i]==static_cast<unsigned int>(masked_address))
+	  {
+	      target_nr = i;
+	      break;
+	  }	  
+      }
+      LOG << "Address " << masked_address << "(Hub_"<<masked_address<<") in this channel corresponds to target_nr " << target_nr << endl;
+      assert(target_nr!=NOT_VALID);
+      return target_nr;
   }
 
   inline sc_dt::uint64 compose_address( unsigned int target_nr, sc_dt::uint64 address)

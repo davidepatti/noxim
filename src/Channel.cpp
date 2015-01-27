@@ -65,3 +65,11 @@
     for (unsigned int i = 0; i < targ_socket.size(); i++)
       targ_socket[i]->invalidate_direct_mem_ptr(bw_start_range, bw_end_range);
   }
+
+
+void Channel::addHub(int h)
+{
+    hubs.push_back(h);
+
+    LOG << "Adding hub " << h << " to Channel " <<  local_id << endl;
+}
