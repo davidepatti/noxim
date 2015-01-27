@@ -67,6 +67,7 @@ void NoC::buildMesh()
             int channel_id = *iit;
             LOG << "Binding " << hub[hub_id]->name() << " to rxChannel " << channel_id << endl;
             channel[channel_id]->init_socket.bind(hub[hub_id]->target[channel_id]->socket);
+	    channel[channel_id]->addHub(hub_id);
         }
     }
 
