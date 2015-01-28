@@ -125,13 +125,17 @@ SC_MODULE(Hub)
             char txt[20];
             sprintf(txt, "init_%d", txChannels[i]);
             init[txChannels[i]] = new Initiator(txt);
-	    token_ring->attachHub(txChannels[i],local_id);
+            init[txChannels[i]]->buffer_tx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].txBufferSize);
+            LOG << "Size of buffer_tx = " << init[txChannels[i]]->buffer_tx.GetMaxBufferSize() << " for Channel_"<< txChannels[i] << endl;
+            token_ring->attachHub(txChannels[i],local_id);
         }
 
         for (unsigned int i = 0; i < rxChannels.size(); i++) {
             char txt[20];
             sprintf(txt, "target_%d", rxChannels[i]);
             target[rxChannels[i]] = new Target(txt, rxChannels[i], this);
+            target[rxChannels[i]]->buffer_rx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].rxBufferSize);
+            LOG << "Size of buffer_rx = " << target[rxChannels[i]]->buffer_rx.GetMaxBufferSize() << " for Channel_"<< rxChannels[i] << endl;
         }
 
         start_from_port = 0;
