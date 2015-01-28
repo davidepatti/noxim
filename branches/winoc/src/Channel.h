@@ -72,13 +72,13 @@ struct Channel: sc_module
   inline unsigned int decode_address( sc_dt::uint64 address, sc_dt::uint64& masked_address )
   {
       //unsigned int target_nr = static_cast<unsigned int>( address );
-      unsigned int target_nr = NOT_VALID;
+      int target_nr = NOT_VALID;
 
       masked_address = address;
 
       for (unsigned int i=0;i<hubs.size();i++)
       {
-	  if (hubs[i]==static_cast<unsigned int>(masked_address))
+	  if (hubs[i]==static_cast<int>(masked_address))
 	  {
 	      target_nr = i;
 	      break;
