@@ -107,6 +107,15 @@ SC_MODULE(Hub)
 
         buffer_from_tile = new Buffer[num_ports];
         buffer_to_tile = new Buffer[num_ports];
+        
+        for(int i = 0; i < num_ports; i++)
+        {
+            buffer_from_tile[i].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].fromTileBufferSize);
+            buffer_to_tile[i].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].toTileBufferSize);
+        }
+        LOG << "Size of buffers for data from tiles = " << buffer_from_tile[0].GetMaxBufferSize() << endl; 
+        LOG << "size of buffer for data to tiles = " << buffer_to_tile[0].GetMaxBufferSize() << endl; 
+
         current_level_rx = new bool[num_ports];
         current_level_tx = new bool[num_ports];
 

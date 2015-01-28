@@ -30,7 +30,8 @@ namespace YAML {
             node["attachedNodes"] = hubConfig.attachedNodes;
             node["txChannels"] = hubConfig.txChannels;
             node["rxChannels"] = hubConfig.rxChannels;
-            node["portBufferSize"] = hubConfig.portBufferSize;
+            node["toTileBufferSize"] = hubConfig.toTileBufferSize;
+            node["fromTileBufferSize"] = hubConfig.fromTileBufferSize;
             node["txBufferSize"] = hubConfig.txBufferSize;
             node["rxBufferSize"] = hubConfig.rxBufferSize;
             return node;
@@ -40,7 +41,8 @@ namespace YAML {
             hubConfig.attachedNodes = node["attachedNodes"].as<std::vector<int> >(GlobalParams::default_hub_configuration.attachedNodes);
             hubConfig.txChannels = node["txChannels"].as<std::vector<int> >(GlobalParams::default_hub_configuration.txChannels);
             hubConfig.rxChannels = node["rxChannels"].as<std::vector<int> >(GlobalParams::default_hub_configuration.rxChannels);
-            hubConfig.portBufferSize = node["portBufferSize"].as<int>(GlobalParams::default_hub_configuration.portBufferSize);
+            hubConfig.toTileBufferSize = node["toTileBufferSize"].as<int>(GlobalParams::default_hub_configuration.toTileBufferSize);
+            hubConfig.fromTileBufferSize = node["fromTileBufferSize"].as<int>(GlobalParams::default_hub_configuration.fromTileBufferSize);
             hubConfig.txBufferSize = node["txBufferSize"].as<int>(GlobalParams::default_hub_configuration.txBufferSize);
             hubConfig.rxBufferSize = node["rxBufferSize"].as<int>(GlobalParams::default_hub_configuration.rxBufferSize);
             return true;

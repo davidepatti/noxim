@@ -1,8 +1,9 @@
 Hubs:
     defaults:
-        portBufferSize: 32
-        rxBufferSize: 32
-        txBufferSize: 32
+        toTileBufferSize: 4
+        fromTileBufferSize: 4
+        rxBufferSize: 4
+        txBufferSize: 4
 
     0:
         rxChannels: [0]
