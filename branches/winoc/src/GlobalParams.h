@@ -80,7 +80,8 @@ typedef struct {
     vector<int> attachedNodes;
     vector<int> txChannels;
     vector<int> rxChannels;
-    int portBufferSize;
+    int toTileBufferSize;
+    int fromTileBufferSize;
     int txBufferSize;
     int rxBufferSize;
 } HubConfig;

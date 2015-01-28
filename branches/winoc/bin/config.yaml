@@ -3,9 +3,10 @@ Hubs:
         rxChannels: [0]
         txChannels: [0]
         attachedNodes: []
-        portBufferSize: 32
-        rxBufferSize: 32
-        txBufferSize: 32
+        toTileBufferSize: 4
+        fromTileBufferSize: 4
+        rxBufferSize: 4
+        txBufferSize: 4
 
     0:
         attachedNodes: [0,1,4,5]
