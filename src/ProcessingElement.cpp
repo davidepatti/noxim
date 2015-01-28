@@ -97,26 +97,6 @@ bool ProcessingElement::canShot(Packet & packet)
 
     double now = sc_time_stamp().to_double() / 1000;
 
-    // TODO: This test enables only some transmissions from 0 towards
-    // node 3, thus requiring wireless
-    /*
-    static bool once = false;
-
-    if (GlobalParams::use_winoc) 
-    {
-	if (once) return false;
-	once = true;
-
-	if (local_id==0 && (int)now%1000 ==0)
-	{
-	    packet = trafficTest();
-	    return true;
-	}
-	else
-	    return false;
-    }
-    */
-
     if (GlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED) {
 	if (!transmittedAtPreviousCycle)
 	    threshold = GlobalParams::packet_injection_rate;
@@ -127,6 +107,7 @@ bool ProcessingElement::canShot(Packet & packet)
 	if (shot) {
 	    switch (GlobalParams::traffic_distribution) {
 	    case TRAFFIC_RANDOM:
+		if (local_id!=0 && local_id!=1 && local_id!=2) return false;
 		packet = trafficRandom();
 		break;
 
@@ -210,9 +191,7 @@ Packet ProcessingElement::trafficRandom()
 
     //LOG << "rnd = " << rnd << endl;
 
-    int max_id =
-	(GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) -
-	1;
+    int max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) - 1;
 
     // Random destination distribution
     do {
