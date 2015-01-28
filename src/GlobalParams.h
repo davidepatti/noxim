@@ -73,13 +73,16 @@ using namespace std;
 // TODO check the list of attributes for ChannelConfig 
 typedef struct {
     pair<int, int> ber;
-    pair<int, int> delay;
+    int dataRate;
 } ChannelConfig;
 
 typedef struct {
     vector<int> attachedNodes;
     vector<int> txChannels;
     vector<int> rxChannels;
+    int portBufferSize;
+    int txBufferSize;
+    int rxBufferSize;
 } HubConfig;
 
 
@@ -90,6 +93,7 @@ struct GlobalParams {
     static int mesh_dim_x;
     static int mesh_dim_y;
     static int buffer_depth;
+    static int flit_size;
     static int min_packet_size;
     static int max_packet_size;
     static int routing_algorithm;
@@ -114,7 +118,9 @@ struct GlobalParams {
     static double qos;
     static bool show_buffer_stats;
     static bool use_winoc;
+    static ChannelConfig default_channel_configuration;
     static map<int, ChannelConfig> channel_configuration;
+    static HubConfig default_hub_configuration;
     static map<int, HubConfig> hub_configuration;
     static map<int, int> hub_for_tile;
 };

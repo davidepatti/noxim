@@ -30,13 +30,19 @@ namespace YAML {
             node["attachedNodes"] = hubConfig.attachedNodes;
             node["txChannels"] = hubConfig.txChannels;
             node["rxChannels"] = hubConfig.rxChannels;
+            node["portBufferSize"] = hubConfig.portBufferSize;
+            node["txBufferSize"] = hubConfig.txBufferSize;
+            node["rxBufferSize"] = hubConfig.rxBufferSize;
             return node;
         }
 
         static bool decode(const Node& node, HubConfig& hubConfig) {
-            hubConfig.attachedNodes = node["attachedNodes"].as<std::vector<int> >();
-            hubConfig.txChannels = node["txChannels"].as<std::vector<int> >();
-            hubConfig.rxChannels = node["rxChannels"].as<std::vector<int> >();
+            hubConfig.attachedNodes = node["attachedNodes"].as<std::vector<int> >(GlobalParams::default_hub_configuration.attachedNodes);
+            hubConfig.txChannels = node["txChannels"].as<std::vector<int> >(GlobalParams::default_hub_configuration.txChannels);
+            hubConfig.rxChannels = node["rxChannels"].as<std::vector<int> >(GlobalParams::default_hub_configuration.rxChannels);
+            hubConfig.portBufferSize = node["portBufferSize"].as<int>(GlobalParams::default_hub_configuration.portBufferSize);
+            hubConfig.txBufferSize = node["txBufferSize"].as<int>(GlobalParams::default_hub_configuration.txBufferSize);
+            hubConfig.rxBufferSize = node["rxBufferSize"].as<int>(GlobalParams::default_hub_configuration.rxBufferSize);
             return true;
         }
     };
@@ -46,13 +52,13 @@ namespace YAML {
         static Node encode(const ChannelConfig& channelConfig) {
             Node node;
             node["ber"] = channelConfig.ber;
-            node["delay"] = channelConfig.delay;
+            node["dataRate"] = channelConfig.dataRate;
             return node;
         }
 
         static bool decode(const Node& node, ChannelConfig& channelConfig) {
-            channelConfig.ber = node["ber"].as<pair<int, int> >();
-            channelConfig.delay = node["delay"].as<pair<int, int> >();
+            channelConfig.ber = node["ber"].as<pair<int, int> >(GlobalParams::default_channel_configuration.ber);
+            channelConfig.dataRate = node["dataRate"].as<int>(GlobalParams::default_channel_configuration.dataRate);
             return true;
         }
     };

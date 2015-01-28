@@ -1,29 +1,31 @@
 Hubs:
-    0:
+    defaults:
         rxChannels: [0]
         txChannels: [0]
+        attachedNodes: []
+        portBufferSize: 32
+        rxBufferSize: 32
+        txBufferSize: 32
+
+    0:
         attachedNodes: [0,1,4,5]
 
     1:
-        rxChannels: [0]
-        txChannels: [0]
         attachedNodes: [2,3,6,7]
 
     2:
-        rxChannels: [0]
-        txChannels: [0]
         attachedNodes : [8,9,12,13]
 
     3:
-        rxChannels: [0]
-        txChannels: [0]
         attachedNodes: [10,11,14,15]
 
 Channels:
+    defaults:
+        dataRate: 16
+        ber: [,]
+
     0:
-      # Prop: [RX_value, TX_value]
         ber: [0, 0]
-        delay: [0, 0]
 
 #
 #  Other configurations
@@ -46,6 +48,7 @@ trace_filename: ""
 mesh_dim_x: 4
 mesh_dim_y: 4
 buffer_depth: 4
+flit_size: 32
 max_packet_size: 10
 min_packet_size: 2
 
@@ -95,4 +98,6 @@ router_power_filename: "default_router.yaml"
 low_power_link_strategy: false
 qos: 1.0
 show_buffer_stats: false
+
+# Winoc
 use_winoc: false
