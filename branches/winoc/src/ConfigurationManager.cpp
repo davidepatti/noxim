@@ -23,6 +23,7 @@ void loadConfiguration() {
     GlobalParams::mesh_dim_x = config["mesh_dim_x"].as<int>();
     GlobalParams::mesh_dim_y = config["mesh_dim_y"].as<int>();
     GlobalParams::buffer_depth = config["buffer_depth"].as<int>();
+    GlobalParams::flit_size = config["flit_size"].as<int>();
     GlobalParams::min_packet_size = config["min_packet_size"].as<int>();
     GlobalParams::max_packet_size = config["max_packet_size"].as<int>();
     GlobalParams::routing_algorithm = config["routing_algorithm"].as<int>();
@@ -47,11 +48,16 @@ void loadConfiguration() {
     GlobalParams::show_buffer_stats = config["show_buffer_stats"].as<bool>();
     GlobalParams::use_winoc = config["use_winoc"].as<bool>();
     
+    GlobalParams::default_hub_configuration = config["Hubs"]["defaults"].as<HubConfig>();
+
     for(YAML::const_iterator hubs_it = config["Hubs"].begin(); 
         hubs_it != config["Hubs"].end();
         ++hubs_it)
     {   
-        int hub_id = hubs_it->first.as<int>();
+        int hub_id = hubs_it->first.as<int>(-1);
+        if (hub_id < 0)
+            continue;
+
         YAML::Node hub_config_node = hubs_it->second;
 
         GlobalParams::hub_configuration[hub_id] = hub_config_node.as<HubConfig>(); 
@@ -61,11 +67,16 @@ void loadConfiguration() {
         cout << node[hub_id] << endl;
     }
 
+    GlobalParams::default_channel_configuration = config["Channels"]["defaults"].as<ChannelConfig>();
+
     for(YAML::const_iterator channels_it= config["Channels"].begin(); 
         channels_it != config["Channels"].end();
         ++channels_it)
     {    
-        int channel_id = channels_it->first.as<int>();
+        int channel_id = channels_it->first.as<int>(-1);
+        if (channel_id < 0)
+            continue;
+
         YAML::Node channel_config_node = channels_it->second;
 
         GlobalParams::channel_configuration[channel_id] = channel_config_node.as<ChannelConfig>(); 
