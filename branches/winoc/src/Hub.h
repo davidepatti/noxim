@@ -46,7 +46,8 @@ SC_MODULE(Hub)
     sc_out<bool>* req_tx;	   
     sc_in<bool>* ack_tx;	  
 
-    Buffer* buffer;	        // Buffer for each port
+    Buffer* buffer_from_tile;   // Buffer for each port
+    Buffer* buffer_to_tile;     // Buffer for each port
     bool* current_level_rx;	// Current level for ABP
     bool* current_level_tx;	// Current level for ABP
 
@@ -104,7 +105,8 @@ SC_MODULE(Hub)
         req_tx = new sc_out<bool>[num_ports];
         ack_tx = new sc_in<bool>[num_ports];
 
-        buffer = new Buffer[num_ports];
+        buffer_from_tile = new Buffer[num_ports];
+        buffer_to_tile = new Buffer[num_ports];
         current_level_rx = new bool[num_ports];
         current_level_tx = new bool[num_ports];
 
