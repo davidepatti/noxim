@@ -56,8 +56,6 @@
 	      << " } , " <<  " at time " << sc_time_stamp()
 	      << " delay = " << delay << endl;
 
-	  // Realize the delay annotated onto the transport call
-	  wait(delay);
 	  //check_transaction( *trans );
 
       }
