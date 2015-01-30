@@ -1,0 +1,180 @@
+
+        SystemC 2.3.1-Accellera --- Oct 22 2014 13:00:37
+        Copyright (c) 1996-2014 by all Contributors,
+        ALL RIGHTS RESERVED
+
+		Noxim - the NoC Simulator
+		(C) University of Catania
+
+Loading configuration from file TESTS/scenario1/config.yaml
+attachedNodes:
+  - 0
+  - 1
+  - 4
+  - 5
+txChannels:
+  - 0
+rxChannels:
+  - 0
+toTileBufferSize: 4
+fromTileBufferSize: 4
+txBufferSize: 4
+rxBufferSize: 4
+attachedNodes:
+  - 2
+  - 3
+  - 6
+  - 7
+txChannels:
+  - 0
+  - 5
+rxChannels:
+  - 0
+  - 5
+toTileBufferSize: 4
+fromTileBufferSize: 4
+txBufferSize: 4
+rxBufferSize: 4
+attachedNodes:
+  - 8
+  - 9
+  - 12
+  - 13
+txChannels:
+  - 0
+  - 5
+rxChannels:
+  - 0
+  - 5
+toTileBufferSize: 4
+fromTileBufferSize: 4
+txBufferSize: 4
+rxBufferSize: 4
+attachedNodes:
+  - 10
+  - 11
+  - 14
+  - 15
+txChannels:
+  - 5
+rxChannels:
+  - 5
+toTileBufferSize: 4
+fromTileBufferSize: 4
+txBufferSize: 4
+rxBufferSize: 4
+ber:
+  - 0
+  - 0
+dataRate: 16
+ber:
+  - 0
+  - 0
+dataRate: 16
+0       NoC::buildMesh() => Creating Channel_0
+0       NoC.Channel_0::Channel() => data rate 16 transmission delay 2000 ps 
+0       NoC::buildMesh() => Creating Channel_5
+0       NoC.Channel_5::Channel() => data rate 16 transmission delay 2000 ps 
+0       NoC::buildMesh() => Creating Hub_0
+0       NoC.Hub_0::Hub() => Size of buffers for data from tiles = 4
+0       NoC.Hub_0::Hub() => size of buffer for data to tiles = 4
+0       NoC.Hub_0::Hub() => Size of buffer_tx = 4 for Channel_0
+0       NoC.tokenring::attachHub() => Attaching Hub 0 to the token ring for channel 0
+0       NoC.Hub_0::Hub() => Size of buffer_rx = 4 for Channel_0
+0       NoC::buildMesh() => Binding NoC.Hub_0 to txChannel 0
+0       NoC::buildMesh() => Binding NoC.Hub_0 to rxChannel 0
+0       NoC.Channel_0::addHub() => Adding hub 0 to Channel 0
+0       NoC::buildMesh() => Creating Hub_1
+0       NoC.Hub_1::Hub() => Size of buffers for data from tiles = 4
+0       NoC.Hub_1::Hub() => size of buffer for data to tiles = 4
+0       NoC.Hub_1::Hub() => Size of buffer_tx = 4 for Channel_0
+0       NoC.tokenring::attachHub() => Attaching Hub 1 to the token ring for channel 0
+0       NoC.Hub_1::Hub() => Size of buffer_tx = 4 for Channel_5
+0       NoC.tokenring::attachHub() => Attaching Hub 1 to the token ring for channel 5
+0       NoC.Hub_1::Hub() => Size of buffer_rx = 4 for Channel_0
+0       NoC.Hub_1::Hub() => Size of buffer_rx = 4 for Channel_5
+0       NoC::buildMesh() => Binding NoC.Hub_1 to txChannel 0
+0       NoC::buildMesh() => Binding NoC.Hub_1 to txChannel 5
+0       NoC::buildMesh() => Binding NoC.Hub_1 to rxChannel 0
+0       NoC.Channel_0::addHub() => Adding hub 1 to Channel 0
+0       NoC::buildMesh() => Binding NoC.Hub_1 to rxChannel 5
+0       NoC.Channel_5::addHub() => Adding hub 1 to Channel 5
+0       NoC::buildMesh() => Creating Hub_2
+0       NoC.Hub_2::Hub() => Size of buffers for data from tiles = 4
+0       NoC.Hub_2::Hub() => size of buffer for data to tiles = 4
+0       NoC.Hub_2::Hub() => Size of buffer_tx = 4 for Channel_0
+0       NoC.tokenring::attachHub() => Attaching Hub 2 to the token ring for channel 0
+0       NoC.Hub_2::Hub() => Size of buffer_tx = 4 for Channel_5
+0       NoC.tokenring::attachHub() => Attaching Hub 2 to the token ring for channel 5
+0       NoC.Hub_2::Hub() => Size of buffer_rx = 4 for Channel_0
+0       NoC.Hub_2::Hub() => Size of buffer_rx = 4 for Channel_5
+0       NoC::buildMesh() => Binding NoC.Hub_2 to txChannel 0
+0       NoC::buildMesh() => Binding NoC.Hub_2 to txChannel 5
+0       NoC::buildMesh() => Binding NoC.Hub_2 to rxChannel 0
+0       NoC.Channel_0::addHub() => Adding hub 2 to Channel 0
+0       NoC::buildMesh() => Binding NoC.Hub_2 to rxChannel 5
+0       NoC.Channel_5::addHub() => Adding hub 2 to Channel 5
+0       NoC::buildMesh() => Creating Hub_3
+0       NoC.Hub_3::Hub() => Size of buffers for data from tiles = 4
+0       NoC.Hub_3::Hub() => size of buffer for data to tiles = 4
+0       NoC.Hub_3::Hub() => Size of buffer_tx = 4 for Channel_5
+0       NoC.tokenring::attachHub() => Attaching Hub 3 to the token ring for channel 5
+0       NoC.Hub_3::Hub() => Size of buffer_rx = 4 for Channel_5
+0       NoC::buildMesh() => Binding NoC.Hub_3 to txChannel 5
+0       NoC::buildMesh() => Binding NoC.Hub_3 to rxChannel 5
+0       NoC.Channel_5::addHub() => Adding hub 3 to Channel 5
+0       NoC::buildMesh() => Tile [0][0] will be connected to NoC.Hub_0
+0       NoC::buildMesh() => Tile [0][1] will be connected to NoC.Hub_0
+0       NoC::buildMesh() => Tile [0][2] will be connected to NoC.Hub_2
+0       NoC::buildMesh() => Tile [0][3] will be connected to NoC.Hub_2
+0       NoC::buildMesh() => Tile [1][0] will be connected to NoC.Hub_0
+0       NoC::buildMesh() => Tile [1][1] will be connected to NoC.Hub_0
+0       NoC::buildMesh() => Tile [1][2] will be connected to NoC.Hub_2
+0       NoC::buildMesh() => Tile [1][3] will be connected to NoC.Hub_2
+0       NoC::buildMesh() => Tile [2][0] will be connected to NoC.Hub_1
+0       NoC::buildMesh() => Tile [2][1] will be connected to NoC.Hub_1
+0       NoC::buildMesh() => Tile [2][2] will be connected to NoC.Hub_3
+0       NoC::buildMesh() => Tile [2][3] will be connected to NoC.Hub_3
+0       NoC::buildMesh() => Tile [3][0] will be connected to NoC.Hub_1
+0       NoC::buildMesh() => Tile [3][1] will be connected to NoC.Hub_1
+0       NoC::buildMesh() => Tile [3][2] will be connected to NoC.Hub_3
+0       NoC::buildMesh() => Tile [3][3] will be connected to NoC.Hub_3
+0       NoC::buildMesh() => Setting Tile[00][00]_(#0)
+0       NoC::buildMesh() => Setting Tile[01][00]_(#1)
+0       NoC::buildMesh() => Setting Tile[02][00]_(#2)
+0       NoC::buildMesh() => Setting Tile[03][00]_(#3)
+0       NoC::buildMesh() => Setting Tile[00][01]_(#4)
+0       NoC::buildMesh() => Setting Tile[01][01]_(#5)
+0       NoC::buildMesh() => Setting Tile[02][01]_(#6)
+0       NoC::buildMesh() => Setting Tile[03][01]_(#7)
+0       NoC::buildMesh() => Setting Tile[00][02]_(#8)
+0       NoC::buildMesh() => Setting Tile[01][02]_(#9)
+0       NoC::buildMesh() => Setting Tile[02][02]_(#10)
+0       NoC::buildMesh() => Setting Tile[03][02]_(#11)
+0       NoC::buildMesh() => Setting Tile[00][03]_(#12)
+0       NoC::buildMesh() => Setting Tile[01][03]_(#13)
+0       NoC::buildMesh() => Setting Tile[02][03]_(#14)
+0       NoC::buildMesh() => Setting Tile[03][03]_(#15)
+Reset...
+0       NoC.Hub_0.init_0::thread_process() =>  ****** Initiator - waiting for transmissions
+0       NoC.Hub_1.init_0::thread_process() =>  ****** Initiator - waiting for transmissions
+0       NoC.Hub_1.init_5::thread_process() =>  ****** Initiator - waiting for transmissions
+0       NoC.Hub_2.init_0::thread_process() =>  ****** Initiator - waiting for transmissions
+0       NoC.Hub_2.init_5::thread_process() =>  ****** Initiator - waiting for transmissions
+0       NoC.Hub_3.init_5::thread_process() =>  ****** Initiator - waiting for transmissions
+ done! Now running for 10000 cycles...
+1007    NoC.tokenring::updateTokens() => Token of channel 0 has been assigned to hub 1
+1007    NoC.tokenring::updateTokens() => Token of channel 5 has been assigned to hub 2
+1015    NoC.tokenring::updateTokens() => Token of channel 0 has been assigned to hub 2
+1015    NoC.tokenring::updateTokens() => Token of channel 5 has been assigned to hub 3
+1023    NoC.tokenring::updateTokens() => Token of channel 0 has been assigned to hub 0
+1023    NoC.tokenring::updateTokens() => Token of channel 5 has been assigned to hub 1
+1028    NoC.Tile[00][00]_(#0).Router::routingFunction() => Setting direction hub to reach destination node 10
+1028    NoC.Tile[00][00]_(#0).Router::txProcess() => Ready to reserve HUB direction ...
+1028    ReservationTable::isAvailable() => Checking availability of out port 5
+1028    ReservationTable::isAvailable() => Checking availability of out port 5
+1028    NoC.Tile[00][00]_(#0).Router::txProcess() => Forwarding to HUB 
+1029    NoC.Hub_0::rxProcess() => Reading flit on port 0
+1030    NoC.Hub_0::txProcess() => Reservation: buffer_from_tile not empty on port 0
+1030    NoC.Hub_0::route() => Destination tile 10 is not connected to this hub 
+Assertion failed: (channel!=NOT_VALID && "hubs are connected by any channel"), function txProcess, file ../src/Hub.cpp, line 181.
