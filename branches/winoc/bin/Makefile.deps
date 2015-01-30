@@ -1,6 +1,7 @@
 # DO NOT DELETE
 
 ./Buffer.o: ../src/Buffer.h ../src/DataStructs.h ../src/GlobalParams.h
+./Buffer.o: ../src/Utils.h
 ./Channel.o: ../src/Channel.h ../src/Utils.h ../src/DataStructs.h
 ./Channel.o: ../src/GlobalParams.h
 ./ConfigurationManager.o: ../src/ConfigurationManager.h
@@ -61,4 +62,3 @@
 ./Target.o: ../src/Initiator.h ../src/Target.h ../src/TokenRing.h
 ./TokenRing.o: ../src/TokenRing.h ../src/Utils.h ../src/DataStructs.h
 ./TokenRing.o: ../src/GlobalParams.h
-./Utils.o: ../src/Utils.h ../src/DataStructs.h ../src/GlobalParams.h
