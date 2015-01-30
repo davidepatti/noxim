@@ -28,6 +28,8 @@ struct Channel: sc_module
 
     void addHub(int);
 
+    int delay; // in ps
+
   SC_HAS_PROCESS(Channel);
   // ***********************************************************
   // Each multi-socket can be bound to multiple sockets
@@ -48,6 +50,8 @@ struct Channel: sc_module
     targ_socket.register_transport_dbg(     this, &Channel::transport_dbg);
 
     init_socket.register_invalidate_direct_mem_ptr(this, &Channel::invalidate_direct_mem_ptr);
+    delay = 1000*GlobalParams::flit_size/GlobalParams::channel_configuration[local_id].dataRate;
+    LOG << "data rate " << GlobalParams::channel_configuration[local_id].dataRate << " Gbps, transmission delay " << delay << " ps " << endl; 
   }
 
 

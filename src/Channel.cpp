@@ -1,6 +1,11 @@
 #include "Channel.h"
-  void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& delay )
-  {
+void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& delay )
+{
+
+    // the total transmission delay is due to TLM Initiator delay +
+    // channel delay
+    delay += sc_time(this->delay, SC_PS);
+
     assert (id < (int)targ_socket.size());
 
     // Forward path
@@ -10,16 +15,16 @@
 
     if (target_nr < init_socket.size())
     {
-      // Modify address within transaction
-      trans.set_address( masked_address );
+	// Modify address within transaction
+	trans.set_address( masked_address );
 
-      // Forward transaction to appropriate target
-      init_socket[target_nr]->b_transport(trans, delay);
+	// Forward transaction to appropriate target
+	init_socket[target_nr]->b_transport(trans, delay);
 
-      // Replace original address
-      trans.set_address( address );
+	// Replace original address
+	trans.set_address( address );
     }
-  }
+}
 
   bool Channel::get_direct_mem_ptr(int id,
                                   tlm::tlm_generic_payload& trans,
