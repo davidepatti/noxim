@@ -18,6 +18,9 @@ void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& del
 	// Modify address within transaction
 	trans.set_address( masked_address );
 
+	// Realize the delay annotated onto the transport call
+	wait(delay);
+
 	// Forward transaction to appropriate target
 	init_socket[target_nr]->b_transport(trans, delay);
 
