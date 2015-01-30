@@ -33,12 +33,12 @@
 	  trans->set_dmi_allowed( false ); // Mandatory initial value
 	  trans->set_response_status( tlm::TLM_INCOMPLETE_RESPONSE ); // Mandatory initial value
 
-	  delay = sc_time(rand_ps(), SC_PS);
+	  delay = sc_time(0, SC_PS);
 
-	  LOG << "Calling blocking transport with delay = " << delay << " and target address = " << destHub << endl;
+	  LOG << "Calling blocking transport with target address = " << destHub << endl;
 
 	  // Call b_transport to demonstrate the b/nb conversion by the simple_target_socket
-	  socket->b_transport( *trans, delay );
+	  socket->b_transport( *trans, delay);
 
 
 	  // Initiator obliged to check response status and delay
