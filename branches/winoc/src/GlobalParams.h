@@ -118,8 +118,6 @@ struct GlobalParams {
     static float dyad_threshold;
     static unsigned int max_volume_to_be_drained;
     static char router_power_filename[128];
-    static bool low_power_link_strategy;
-    static double qos;
     static bool show_buffer_stats;
     static bool use_winoc;
     static ChannelConfig default_channel_configuration;
