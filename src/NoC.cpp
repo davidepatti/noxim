@@ -13,7 +13,7 @@
 void NoC::buildMesh()
 {
 
-    token_ring = new TokenRing("tokenring", GlobalParams::max_hold_cycles);
+    token_ring = new TokenRing("tokenring");
     token_ring->clock(clock);
     token_ring->reset(reset);
 
@@ -51,11 +51,11 @@ void NoC::buildMesh()
         }
 
         // Determine, from configuration file, which Hub is connected to which Channel
-        for(vector<int>::iterator iit = hub_config.txChannels.begin(); 
+        for(map<int, TxChannelConfig>::iterator iit = hub_config.txChannels.begin(); 
                 iit != hub_config.txChannels.end(); 
                 ++iit) 
         {
-            int channel_id = *iit;
+            int channel_id = iit->first;
             LOG << "Binding " << hub[hub_id]->name() << " to txChannel " << channel_id << endl;
             hub[hub_id]->init[channel_id]->socket.bind(channel[channel_id]->targ_socket);
         }

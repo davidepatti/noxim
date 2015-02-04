@@ -23,6 +23,21 @@ using namespace std;
 void configure(int arg_num, char *arg_vet[]);
 
 namespace YAML {
+
+    template<>
+    struct convert<TxChannelConfig> {
+        static Node encode(const TxChannelConfig& txChannelConfig) {
+            Node node;
+            node["max_hold_cycles"] = txChannelConfig.maxHoldCycles;
+            return node;
+        }
+
+        static bool decode(const Node& node, TxChannelConfig& txChannelConfig) {
+            txChannelConfig.maxHoldCycles = node["max_hold_cycles"].as<int>();
+            return true;
+        }
+    };
+
     template<>
     struct convert<HubConfig> {
         static Node encode(const HubConfig& hubConfig) {
@@ -39,7 +54,25 @@ namespace YAML {
 
         static bool decode(const Node& node, HubConfig& hubConfig) {
             hubConfig.attachedNodes = node["attachedNodes"].as<std::vector<int> >(GlobalParams::default_hub_configuration.attachedNodes);
-            hubConfig.txChannels = node["txChannels"].as<std::vector<int> >(GlobalParams::default_hub_configuration.txChannels);
+            hubConfig.txChannels = GlobalParams::default_hub_configuration.txChannels;
+            
+            for(YAML::const_iterator it = node["txChannels"].begin(); 
+                    it != node["txChannels"].end();
+                    ++it)
+            { 
+                if (it == node["txChannels"].begin())
+                    hubConfig.txChannels.clear();
+
+                int txChannel_id = it->first.as<int>(-1);
+                if (txChannel_id < 0)
+                    continue;
+                
+                YAML::Node txChannel_config_node = it->second;
+
+                hubConfig.txChannels[txChannel_id] = txChannel_config_node.as<TxChannelConfig>
+                    (GlobalParams::default_hub_configuration.txChannels[txChannel_id]);
+            }
+
             hubConfig.rxChannels = node["rxChannels"].as<std::vector<int> >(GlobalParams::default_hub_configuration.rxChannels);
             hubConfig.toTileBufferSize = node["toTileBufferSize"].as<int>(GlobalParams::default_hub_configuration.toTileBufferSize);
             hubConfig.fromTileBufferSize = node["fromTileBufferSize"].as<int>(GlobalParams::default_hub_configuration.fromTileBufferSize);

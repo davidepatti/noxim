@@ -70,6 +70,10 @@ using namespace std;
 #define VERBOSE_MEDIUM         2
 #define VERBOSE_HIGH           3
 
+typedef struct {
+    int maxHoldCycles;
+} TxChannelConfig;
+
 // TODO check the list of attributes for ChannelConfig 
 typedef struct {
     pair<int, int> ber;
@@ -78,7 +82,7 @@ typedef struct {
 
 typedef struct {
     vector<int> attachedNodes;
-    vector<int> txChannels;
+    map<int, TxChannelConfig> txChannels;
     vector<int> rxChannels;
     int toTileBufferSize;
     int fromTileBufferSize;
@@ -105,7 +109,6 @@ struct GlobalParams {
     static int traffic_distribution;
     static char traffic_table_filename[128];
     static char config_filename[128];
-    static int max_hold_cycles;
     static int simulation_time;
     static int reset_time;
     static int stats_warm_up_time;

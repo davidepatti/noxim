@@ -33,7 +33,6 @@ void loadConfiguration() {
     GlobalParams::probability_of_retransmission = config["probability_of_retransmission"].as<float>();
     GlobalParams::traffic_distribution = config["traffic_distribution"].as<int>();
     strcpy(GlobalParams::traffic_table_filename, config["traffic_table_filename"].as<string>().c_str());
-    GlobalParams::max_hold_cycles = config["max_hold_cycles"].as<int>();
     GlobalParams::simulation_time = config["simulation_time"].as<int>();
     GlobalParams::reset_time = config["reset_time"].as<int>();
     GlobalParams::stats_warm_up_time = config["stats_warm_up_time"].as<int>();
