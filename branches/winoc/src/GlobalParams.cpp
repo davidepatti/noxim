@@ -37,8 +37,6 @@ float GlobalParams::dyad_threshold;
 unsigned int GlobalParams::max_volume_to_be_drained;
 vector <pair <int, double> > GlobalParams::hotspots;
 char GlobalParams::router_power_filename[128];
-bool GlobalParams::low_power_link_strategy;
-double GlobalParams::qos;
 bool GlobalParams::show_buffer_stats;
 bool GlobalParams::use_winoc;
 ChannelConfig GlobalParams::default_channel_configuration;

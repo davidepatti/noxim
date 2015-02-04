@@ -105,8 +105,6 @@ void Router::txProcess()
 
 		  }
 
-		  stats.power.Arbitration();
-
 		  if (reservation_table.isAvailable(o)) 
 		  {
 		      stats.power.Crossbar();
@@ -170,16 +168,7 @@ void Router::txProcess()
 		    req_tx[o].write(current_level_tx[o]);
 		    buffer[i].Pop();
 
-		    if (GlobalParams::low_power_link_strategy)
-		    {
-			if (flit.flit_type == FLIT_TYPE_HEAD || 
-				flit.use_low_voltage_path == false)
-			    stats.power.Link(false);
-			else
-			    stats.power.Link(true);
-		    }
-		    else
-			stats.power.Link(false);
+		    stats.power.Link();
 
 		    if (flit.dst_id == local_id)
 			stats.power.EndToEnd();

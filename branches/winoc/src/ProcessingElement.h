@@ -57,7 +57,6 @@ SC_MODULE(ProcessingElement)
     Packet trafficShuffle();	// Shuffle destination distribution
     Packet trafficButterfly();	// Butterfly destination distribution
 
-    void setUseLowVoltagePath(Packet& packet);
 
     GlobalTrafficTable *traffic_table;	// Reference to the Global traffic Table
     bool never_transmit;	// true if the PE does not transmit any packet 

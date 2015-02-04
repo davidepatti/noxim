@@ -74,7 +74,6 @@ Flit ProcessingElement::nextFlit()
     flit.sequence_no = packet.size - packet.flit_left;
     flit.hop_no = 0;
     //  flit.payload     = DEFAULT_PAYLOAD;
-    flit.use_low_voltage_path = packet.use_low_voltage_path;
 
     if (packet.size == packet.flit_left)
 	flit.flit_type = FLIT_TYPE_HEAD;
@@ -134,7 +133,6 @@ bool ProcessingElement::canShot(Packet & packet)
 	    default:
 		assert(false);
 	    }
-	    setUseLowVoltagePath(packet);
 	}
     } else {			// Table based communication traffic
 	if (never_transmit)
@@ -142,10 +140,9 @@ bool ProcessingElement::canShot(Packet & packet)
 
 	bool use_pir = (transmittedAtPreviousCycle == false);
 	vector < pair < int, double > > dst_prob;
-	vector <bool> use_low_voltage_path;
 	double threshold =
 	    traffic_table->getCumulativePirPor(local_id, (int) now,
-					       use_pir, dst_prob, use_low_voltage_path);
+					       use_pir, dst_prob);
 
 	double prob = (double) rand() / RAND_MAX;
 	shot = (prob < threshold);
@@ -154,7 +151,6 @@ bool ProcessingElement::canShot(Packet & packet)
 		if (prob < dst_prob[i].second) {
 		    packet.make(local_id, dst_prob[i].first, now,
 				getRandomSize());
-		    packet.use_low_voltage_path = use_low_voltage_path[i];
 		    break;
 		}
 	    }
@@ -164,23 +160,6 @@ bool ProcessingElement::canShot(Packet & packet)
     return shot;
 }
 
-void ProcessingElement::setUseLowVoltagePath(Packet& packet)
-{
-  if (GlobalParams::qos < 1.0)
-    {
-      double rnd = (double)rand() / (double)RAND_MAX;
-
-      packet.use_low_voltage_path = (rnd >= GlobalParams::qos);
-      /*
-      if (rnd >= GlobalParams::qos)
-	packet.use_low_voltage_path = true;
-      else
-	packet.use_low_voltage_path = false;
-      */
-    }
-  else
-    packet.use_low_voltage_path = false;
-}
 
 Packet ProcessingElement::trafficRandom()
 {
