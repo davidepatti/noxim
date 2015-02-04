@@ -60,9 +60,8 @@ class Power {
     void Buffering();
     void Routing();
     void Selection();
-    void Arbitration();
     void Crossbar();
-    void Link(bool low_voltage);
+    void Link();
     void EndToEnd();
     void Leakage();
 
@@ -91,9 +90,6 @@ class Power {
 	return pwr_buffering;
     }
     
-    double getArbitration() {
-	return pwr_arbitration;
-    }
 
     double getCrossbar() {
 	return pwr_crossbar;
@@ -127,7 +123,6 @@ class Power {
     static double pwr_buffering;
     static double pwr_routing;
     static double pwr_selection;
-    static double pwr_arbitration;
     static double pwr_crossbar;
     static double pwr_link;
     static double pwr_link_lv;

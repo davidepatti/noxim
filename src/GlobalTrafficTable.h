@@ -27,7 +27,6 @@ struct Communication {
   int t_on;			// Time (in cycles) at which activity begins
   int t_off;			// Time (in cycles) at which activity ends
   int t_period;		        // Period after which activity starts again
-  bool use_low_voltage_path;
 };
 
 class GlobalTrafficTable {
@@ -45,8 +44,7 @@ class GlobalTrafficTable {
     double getCumulativePirPor(const int src_id,
 			       const int ccycle,
 			       const bool pir_not_por,
-			       vector < pair < int, double > > &dst_prob,
-			       vector <bool> &use_low_voltage_path);
+			       vector < pair < int, double > > &dst_prob);
 
     // Returns the number of occurrences of soruce src_id in the traffic
     // table

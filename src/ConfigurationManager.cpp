@@ -43,8 +43,6 @@ void loadConfiguration() {
     GlobalParams::max_volume_to_be_drained = config["max_volume_to_be_drained"].as<unsigned int>();
     //GlobalParams::hotspots;
     strcpy(GlobalParams::router_power_filename, config["router_power_filename"].as<string>().c_str()); 
-    GlobalParams::low_power_link_strategy = config["low_power_link_strategy"].as<bool>();
-    GlobalParams::qos = config["qos"].as<double>();
     GlobalParams::show_buffer_stats = config["show_buffer_stats"].as<bool>();
     GlobalParams::use_winoc = config["use_winoc"].as<bool>();
     
@@ -129,8 +127,6 @@ void showHelp(char selfname[])
          <<	"\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file" << endl
          << "\t-hs ID P\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)" << endl
          << "\t-pwr FILENAME\tRouter and link power data (default " << GlobalParams::router_power_filename << ")" << endl
-         << "\t-lpls\t\tEnable low power link strategy (default " << GlobalParams::low_power_link_strategy << ")" << endl
-         << "\t-qos PERCENTAGE\tPercentage of communication that have to be routed on regular links (default " << GlobalParams::qos << ")" << endl
          << "\t-warmup N\tStart to collect statistics after N cycles (default " << GlobalParams::stats_warm_up_time << ")" << endl
          << "\t-seed N\t\tSet the seed of the random generator (default time())" << endl
          << "\t-detailed\tShow detailed statistics" << endl
@@ -252,15 +248,7 @@ void checkConfiguration()
 	exit(1);
     }
 
-    if (GlobalParams::qos < 1.0 && 
-	!GlobalParams::low_power_link_strategy) {
-      cerr << "Warning: it makes no sense using -qos without -lpls option enabled" << endl;
-    }
 
-    if (GlobalParams::qos > 1.0 || GlobalParams::qos < 0.0) {
-	cerr << "Error: qos must be in the range [0,1]" << endl;
-	exit(1);
-    }
 }
 
 void parseCmdLine(int arg_num, char *arg_vet[])
@@ -405,10 +393,6 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::simulation_time = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-pwr"))
 	      strcpy(GlobalParams::router_power_filename, arg_vet[++i]);
-	    else if (!strcmp(arg_vet[i], "-lpls"))
-	      GlobalParams::low_power_link_strategy = true;
-	    else if (!strcmp(arg_vet[i], "-qos"))
-		GlobalParams::qos = atof(arg_vet[++i]);
 	    else {
 		cerr << "Error: Invalid option: " << arg_vet[i] << endl;
 		exit(1);

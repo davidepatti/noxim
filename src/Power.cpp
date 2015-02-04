@@ -15,10 +15,8 @@ using namespace std;
 double Power::pwr_buffering   = 0.0;
 double Power::pwr_routing     = 0.0;
 double Power::pwr_selection   = 0.0;
-double Power::pwr_arbitration = 0.0;
 double Power::pwr_crossbar    = 0.0;
 double Power::pwr_link        = 0.0;
-double Power::pwr_link_lv     = 0.0;
 double Power::pwr_leakage     = 0.0;
 double Power::pwr_end2end     = 0.0;
 double Power::pwr_rhtxwifi    = 0.0;
@@ -54,15 +52,11 @@ void Power::Buffering()
   pwr += pwr_buffering;
 }
 
-void Power::Link(bool low_voltage)
+void Power::Link()
 {
-  pwr += low_voltage ? pwr_link_lv : pwr_link;
+  pwr += pwr_link;
 }
 
-void Power::Arbitration()
-{
-  pwr += pwr_arbitration;
-}
 
 void Power::Crossbar()
 {
@@ -104,10 +98,8 @@ bool Power::LoadPowerData(const char *fname)
   pwr_routing = router["Routing"].as<double>();
   pwr_buffering = router["Buffering"].as<double>();
   pwr_selection = router["Selection"].as<double>();
-  pwr_arbitration = router["Arbitration"].as<double>();
   pwr_crossbar = router["Crossbar"].as<double>();
   pwr_link = router["Link"].as<double>();
-  pwr_link_lv = router["Link_LV"].as<double>();
   pwr_leakage = router["Leakage"].as<double>();
   pwr_end2end = router["End2end"].as<double>();
   pwr_rhtxwifi = radio_hub["DefaultPower"].as<double>();
