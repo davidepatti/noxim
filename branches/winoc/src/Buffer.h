@@ -51,6 +51,8 @@ class Buffer {
 
 
     void Print(char*);
+    
+    bool checkDeadlock();
 
 
     inline string name() { return "Buffer";};
@@ -59,6 +61,10 @@ class Buffer {
   private:
 
     bool true_buffer;
+
+
+    int full_cycles_counter;
+    int last_front_flit_seq;
 
     unsigned int max_buffer_size;
 

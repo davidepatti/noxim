@@ -10,6 +10,7 @@
 
 #include "Router.h"
 
+
 void Router::rxProcess()
 {
     if (reset.read()) {
@@ -57,6 +58,8 @@ void Router::rxProcess()
     stats.power.Leakage();
 }
 
+
+
 void Router::txProcess()
 {
   if (reset.read()) 
@@ -74,6 +77,11 @@ void Router::txProcess()
       for (int j = 0; j < DIRECTIONS + 2; j++) 
 	{
 	  int i = (start_from_port + j) % (DIRECTIONS + 2);
+	 
+	  if (!buffer[i].checkDeadlock())
+	  {
+	      LOG << " deadlock on buffer " << i << endl;
+	  }
 
 	  if (!buffer[i].IsEmpty()) 
 	    {

@@ -21,6 +21,8 @@ Buffer::Buffer()
   previous_occupancy = 0;
   mean_occupancy = 0.0;
   true_buffer = true;
+  full_cycles_counter = 0;
+  last_front_flit_seq = NOT_VALID;
 }
 
 void Buffer::Print(char *prefix)
@@ -42,6 +44,31 @@ void Buffer::Print(char *prefix)
     cout << endl;
 }
 
+bool Buffer::checkDeadlock()
+{
+    if (IsEmpty()) return true;
+
+    Flit f = buffer.front();
+    
+    int seq = f.sequence_no;
+
+
+    if (last_front_flit_seq==seq)
+    {
+	full_cycles_counter++;
+    }
+    else
+    {
+	last_front_flit_seq = seq;
+	full_cycles_counter=0;
+    }
+
+    if (full_cycles_counter>2000) 
+	return false;
+
+    return true;
+
+}
 
 void Buffer::Disable()
 {
