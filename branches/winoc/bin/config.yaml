@@ -1,7 +1,9 @@
 Hubs:
     defaults:
         rxChannels: [0]
-        txChannels: [0]
+        txChannels:
+            0:
+                max_hold_cycles: 8
         attachedNodes: []
         toTileBufferSize: 4
         fromTileBufferSize: 4
@@ -10,6 +12,9 @@ Hubs:
 
     0:
         attachedNodes: [0,1,4,5]
+        txChannels:
+            0:
+                max_hold_cycles: 16
 
     1:
         attachedNodes: [2,3,6,7]
@@ -85,9 +90,6 @@ probability_of_retransmission: 0.01
 #   TRAFFIC_BUTTERFLY      7
 traffic_distribution: 4
 traffic_table_filename: "tt.txt"
-
-# TokenRing
-max_hold_cycles: 8
 
 reset_time: 1000
 simulation_time: 10000

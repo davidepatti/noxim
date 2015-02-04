@@ -163,17 +163,17 @@ inline int tile2Hub(int id)
 inline int selectChannel(int src_hub, int dst_hub)
 {  
     
-    vector<int> & first = GlobalParams::hub_configuration[src_hub].txChannels;
+    map<int, TxChannelConfig> & first = GlobalParams::hub_configuration[src_hub].txChannels;
     vector<int> & second = GlobalParams::hub_configuration[dst_hub].rxChannels;
 
     vector<int> intersection;
 
-    for (unsigned int i=0;i<first.size();i++)
+    for (map<int, TxChannelConfig>::iterator i = first.begin(); i != first.end(); i++)
     {
 	for (unsigned int j=0;j<second.size();j++)
 	{
-	    if (first[i]==second[j])
-		intersection.push_back(first[i]);
+	    if (i->first ==second[j])
+		intersection.push_back(i->first);
 	}
     }
 

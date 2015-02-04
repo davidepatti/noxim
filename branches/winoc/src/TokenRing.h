@@ -34,18 +34,16 @@ SC_MODULE(TokenRing)
 
     void updateTokens();
 
-    TokenRing(sc_module_name nm, int _max_hold_cycles): sc_module(nm) {
+    TokenRing(sc_module_name nm): sc_module(nm) {
         SC_METHOD(updateTokens);
         sensitive << reset;
         sensitive << clock.pos();
-        max_hold_cycles = _max_hold_cycles;
-        hold_count = _max_hold_cycles;
     }
 
     private:
 
-    // ring of a channel -> list of hubs
-    map<int,vector<int> > rings_mapping;
+    // ring of a channel -> list of pairs < hubs , hold counts >
+    map<int,vector<pair<int,int> > > rings_mapping;
 
     // ring of a channel -> token position in the ring
     map<int,int> ch_token_position;

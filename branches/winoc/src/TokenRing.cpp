@@ -14,40 +14,38 @@
 void TokenRing::updateTokens()
 {
     if (reset.read()) {
-	
+
     } else {
 
-	hold_count--;
-	if (hold_count==0)
-	{
-	    hold_count = max_hold_cycles;
+        for (map<int,ChannelConfig>::iterator i = GlobalParams::channel_configuration.begin();
+                i!=GlobalParams::channel_configuration.end(); 
+                i++)
+        {
+            int token_position = ch_token_position[i->first];
+            if (--rings_mapping[i->first][token_position].second == 0)
+            {
+                rings_mapping[i->first][token_position].second =
+                    GlobalParams::hub_configuration[rings_mapping[i->first][token_position].first].txChannels[i->first].maxHoldCycles;
+                // number of hubs of the ring
+                int num_hubs = rings_mapping[i->first].size();
 
-	    for (map<int,ChannelConfig>::iterator i = GlobalParams::channel_configuration.begin();
-		    i!=GlobalParams::channel_configuration.end(); 
-		    i++)
-	    {
-		// number of hubs of the ring
-		int num_hubs = rings_mapping[i->first].size();
-
-		ch_token_position[i->first] = (ch_token_position[i->first]+1)%num_hubs;
-		LOG << "Token of channel " << i->first << " has been assigned to hub " <<  rings_mapping[i->first][ch_token_position[i->first]] << endl;
-	    }
-
-	}
+                ch_token_position[i->first] = (ch_token_position[i->first]+1)%num_hubs;
+                LOG << "Token of channel " << i->first << " has been assigned to hub " <<  rings_mapping[i->first][ch_token_position[i->first]].first << endl;
+            }
+        }
     }
 }
 
 int TokenRing::currentTokenHolder(int channel)
 {
     int token_position = ch_token_position[channel];
-    return rings_mapping[channel][token_position];
+    return rings_mapping[channel][token_position].first;
 
 }
 
 void TokenRing::attachHub(int channel,int hub)
 {
     LOG << "Attaching Hub " << hub << " to the token ring for channel " << channel << endl;
-    rings_mapping[channel].push_back(hub);
-
+    rings_mapping[channel].push_back(pair<int, int>(hub, GlobalParams::hub_configuration[hub].txChannels[channel].maxHoldCycles));
 }
 

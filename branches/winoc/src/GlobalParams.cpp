@@ -27,7 +27,6 @@ float GlobalParams::probability_of_retransmission;
 int GlobalParams::traffic_distribution;
 char GlobalParams::traffic_table_filename[128];
 char GlobalParams::config_filename[128];
-int GlobalParams::max_hold_cycles;
 int GlobalParams::simulation_time;
 int GlobalParams::reset_time;
 int GlobalParams::stats_warm_up_time;

@@ -1,28 +1,25 @@
 Hubs:
     defaults:
+        rxChannels: [0]
+        txChannels:
+            0:
+                max_hold_cycles: 8
+        attachedNodes: []
         toTileBufferSize: 4
         fromTileBufferSize: 4
         rxBufferSize: 4
         txBufferSize: 4
 
     0:
-        rxChannels: [0]
-        txChannels: [0]
         attachedNodes: [0,1,4,5]
 
     1:
-        rxChannels: [0]
-        txChannels: [0]
         attachedNodes: [2,3,6,7]
 
     2:
-        rxChannels: [0]
-        txChannels: [0]
         attachedNodes : [8,9,12,13]
 
     3:
-        rxChannels: [0]
-        txChannels: [0]
         attachedNodes: [10,11,14,15]
 
 Channels:

@@ -94,7 +94,11 @@ SC_MODULE(Hub)
 	token_ring = tr;
         num_ports = GlobalParams::hub_configuration[local_id].attachedNodes.size();
         attachedNodes = GlobalParams::hub_configuration[local_id].attachedNodes;
-        txChannels = GlobalParams::hub_configuration[local_id].txChannels;
+
+        for(map<int, TxChannelConfig>::iterator it = GlobalParams::hub_configuration[local_id].txChannels.begin();
+                it != GlobalParams::hub_configuration[local_id].txChannels.end(); ++it) {
+            txChannels.push_back(it->first);
+        }
         rxChannels = GlobalParams::hub_configuration[local_id].rxChannels;
 
         flit_rx = new sc_in<Flit>[num_ports];
