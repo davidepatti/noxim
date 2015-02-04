@@ -98,8 +98,6 @@ detailed: false
 dyad_threshold: 0.6
 max_volume_to_be_drained: 0
 router_power_filename: "default_router.yaml"
-low_power_link_strategy: false
-qos: 1.0
 show_buffer_stats: false
 
 # Winoc
