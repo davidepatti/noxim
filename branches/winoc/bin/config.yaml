@@ -14,7 +14,7 @@ Hubs:
         attachedNodes: [0,1,4,5]
         txChannels:
             0:
-                max_hold_cycles: 16
+                max_hold_cycles: 8
 
     1:
         attachedNodes: [2,3,6,7]
@@ -58,16 +58,16 @@ flit_size: 32
 max_packet_size: 10
 min_packet_size: 2
 
-# Routing algorithms
-#   ROUTING_XY             0
-#   ROUTING_WEST_FIRST     1
-#   ROUTING_NORTH_LAST     2
-#   ROUTING_NEGATIVE_FIRST 3
-#   ROUTING_ODD_EVEN       4
-#   ROUTING_DYAD           5
-#   ROUTING_FULLY_ADAPTIVE 8
-#   ROUTING_TABLE_BASED    9
-routing_algorithm: 0
+# Routing algorithms:
+#   XY
+#   WEST_FIRST
+#   NORTH_LAST
+#   NEGATIVE_FIRST
+#   ODD_EVEN
+#   DYAD
+#   FULLY_ADAPTIVE
+#   TABLE_BASED
+routing_algorithm: "XY"
 routing_table_filename: ""
 
 # Selection Strategies

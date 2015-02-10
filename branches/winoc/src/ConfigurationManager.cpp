@@ -26,7 +26,7 @@ void loadConfiguration() {
     GlobalParams::flit_size = config["flit_size"].as<int>();
     GlobalParams::min_packet_size = config["min_packet_size"].as<int>();
     GlobalParams::max_packet_size = config["max_packet_size"].as<int>();
-    GlobalParams::routing_algorithm = config["routing_algorithm"].as<int>();
+    strcpy(GlobalParams::routing_algorithm, config["routing_algorithm"].as<string>().c_str());
     strcpy(GlobalParams::routing_table_filename, config["routing_table_filename"].as<string>().c_str()); 
     GlobalParams::selection_strategy = config["selection_strategy"].as<int>();
     GlobalParams::packet_injection_rate = config["packet_injection_rate"].as<float>();
@@ -98,14 +98,14 @@ void showHelp(char selfname[])
          << "\t-winoc enable radio hub wireless transmission" << endl
          << "\t-size Nmin Nmax\tSet the minimum and maximum packet size to the specified integer values [flits] (default min=" << GlobalParams::min_packet_size << ", max=" << GlobalParams::max_packet_size << ")" << endl
          << "\t-routing TYPE\tSet the routing algorithm to TYPE where TYPE is one of the following (default " << GlobalParams::routing_algorithm << "):" << endl
-         << "\t\txy\t\tXY routing algorithm" << endl
-         << "\t\twestfirst\tWest-First routing algorithm" << endl
-         << "\t\tnorthlast\tNorth-Last routing algorithm" << endl
-         << "\t\tnegativefirst\tNegative-First routing algorithm" << endl
-         << "\t\toddeven\t\tOdd-Even routing algorithm" << endl
-         << "\t\tdyad T\t\tDyAD routing algorithm with threshold T" << endl
-         << "\t\tfullyadaptive\tFully-Adaptive routing algorithm" << endl
-         << "\t\ttable FILENAME\tRouting Table Based routing algorithm with table in the specified file" << endl
+         << "\t\tXY\t\tXY routing algorithm" << endl
+         << "\t\tWEST_FIRST\tWest-First routing algorithm" << endl
+         << "\t\tNORTH_LAST\tNorth-Last routing algorithm" << endl
+         << "\t\tNEGATIVE_FIRST\tNegative-First routing algorithm" << endl
+         << "\t\tODD_EVEN\t\tOdd-Even routing algorithm" << endl
+         << "\t\tDYAD T\t\tDyAD routing algorithm with threshold T" << endl
+         << "\t\tFULLY_ADAPTIVE\tFully-Adaptive routing algorithm" << endl
+         << "\t\tTABLE_BASED FILENAME\tRouting Table Based routing algorithm with table in the specified file" << endl
          << "\t-sel TYPE\tSet the selection strategy to TYPE where TYPE is one of the following (default " << GlobalParams::selection_strategy << "):" << endl
          << "\t\trandom\t\tRandom selection strategy" << endl
          << "\t\tbufferlevel\tBuffer-Level Based selection strategy" << endl
@@ -187,11 +187,6 @@ void checkConfiguration()
 	GlobalParams::max_packet_size) {
 	cerr << "Error: min packet size must be less than max packet size"
 	    << endl;
-	exit(1);
-    }
-
-    if (GlobalParams::routing_algorithm == INVALID_ROUTING) {
-	cerr << "Error: invalid routing algorithm" << endl;
 	exit(1);
     }
 
@@ -282,34 +277,13 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::max_packet_size = atoi(arg_vet[++i]);
 	    } else if (!strcmp(arg_vet[i], "-routing")) {
 		char *routing = arg_vet[++i];
-		if (!strcmp(routing, "xy"))
-		    GlobalParams::routing_algorithm = ROUTING_XY;
-		else if (!strcmp(routing, "westfirst"))
-		    GlobalParams::routing_algorithm =
-			ROUTING_WEST_FIRST;
-		else if (!strcmp(routing, "northlast"))
-		    GlobalParams::routing_algorithm =
-			ROUTING_NORTH_LAST;
-		else if (!strcmp(routing, "negativefirst"))
-		    GlobalParams::routing_algorithm =
-			ROUTING_NEGATIVE_FIRST;
-		else if (!strcmp(routing, "oddeven"))
-		    GlobalParams::routing_algorithm =
-			ROUTING_ODD_EVEN;
-		else if (!strcmp(routing, "dyad")) {
-		    GlobalParams::routing_algorithm = ROUTING_DYAD;
+		strcpy(GlobalParams::routing_algorithm, routing);
+		if (!strcmp(routing, ROUTING_DYAD))
 		    GlobalParams::dyad_threshold = atof(arg_vet[++i]);
-		} else if (!strcmp(routing, "fullyadaptive"))
-		    GlobalParams::routing_algorithm =
-			ROUTING_FULLY_ADAPTIVE;
-		else if (!strcmp(routing, "table")) {
-		    GlobalParams::routing_algorithm =
-			ROUTING_TABLE_BASED;
-		    strcpy(GlobalParams::routing_table_filename,
-			   arg_vet[++i]);
-		    GlobalParams::packet_injection_rate = 0;	// ??? why ???
-		} else
-		    GlobalParams::routing_algorithm = INVALID_ROUTING;
+		else if (!strcmp(routing, ROUTING_TABLE_BASED)) {
+		    strcpy(GlobalParams::routing_table_filename, arg_vet[++i]);
+		    GlobalParams::packet_injection_rate = 0;
+		} 
 	    } else if (!strcmp(arg_vet[i], "-sel")) {
 		char *selection = arg_vet[++i];
 		if (!strcmp(selection, "random"))

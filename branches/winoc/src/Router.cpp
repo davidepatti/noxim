@@ -9,6 +9,7 @@
  */
 
 #include "Router.h"
+#include "routingAlgorithms/RoutingAlgorithms.h"
 
 
 void Router::rxProcess()
@@ -260,60 +261,30 @@ void Router::bufferMonitor()
 
 vector < int > Router::routingFunction(const RouteData & route_data)
 {
-
     // TODO: check 
-  // If WiNoC available, check for intercluster communication
+    // If WiNoC available, check for intercluster communication
     if (GlobalParams::use_winoc)
     {
-	if (hasRadioHub(local_id) &&
-		hasRadioHub(route_data.dst_id) &&
-		!sameRadioHub(local_id,route_data.dst_id)
-	   )
-	{
-	    LOG << "Setting direction hub to reach destination node " << route_data.dst_id << endl;
+        if (hasRadioHub(local_id) &&
+                hasRadioHub(route_data.dst_id) &&
+                !sameRadioHub(local_id,route_data.dst_id)
+           )
+        {
+            LOG << "Setting direction hub to reach destination node " << route_data.dst_id << endl;
 
-	    vector<int> dirv;
-	    dirv.push_back(DIRECTION_HUB);
-	    return dirv;
-	}
+            vector<int> dirv;
+            dirv.push_back(DIRECTION_HUB);
+            return dirv;
+        }
     }
     LOG << "Wired routing for dst = " << route_data.dst_id << endl;
-    Coord position = id2Coord(route_data.current_id);
-    Coord src_coord = id2Coord(route_data.src_id);
-    Coord dst_coord = id2Coord(route_data.dst_id);
-    int dir_in = route_data.dir_in;
 
-    switch (GlobalParams::routing_algorithm) {
-    case ROUTING_XY:
-	return routingXY(position, dst_coord);
+    RoutingAlgorithm * routingAlgorithm = RoutingAlgorithms::get(GlobalParams::routing_algorithm);
 
-    case ROUTING_WEST_FIRST:
-	return routingWestFirst(position, dst_coord);
+    if (routingAlgorithm == 0)
+        assert(false);
 
-    case ROUTING_NORTH_LAST:
-	return routingNorthLast(position, dst_coord);
-
-    case ROUTING_NEGATIVE_FIRST:
-	return routingNegativeFirst(position, dst_coord);
-
-    case ROUTING_ODD_EVEN:
-	return routingOddEven(position, src_coord, dst_coord);
-
-    case ROUTING_DYAD:
-	return routingDyAD(position, src_coord, dst_coord);
-
-    case ROUTING_FULLY_ADAPTIVE:
-	return routingFullyAdaptive(position, dst_coord);
-
-    case ROUTING_TABLE_BASED:
-	return routingTableBased(dir_in, position, dst_coord);
-
-    default:
-	assert(false);
-    }
-
-    // something weird happened, you shouldn't be here
-    return (vector < int >) (0);
+    return routingAlgorithm->route(this, route_data);
 }
 
 int Router::route(const RouteData & route_data)
@@ -508,212 +479,6 @@ int Router::selectionFunction(const vector < int >&directions,
     return 0;
 }
 
-vector < int >Router::routingXY(const Coord & current,
-				     const Coord & destination)
-{
-    vector < int >directions;
-
-    if (destination.x > current.x)
-	directions.push_back(DIRECTION_EAST);
-    else if (destination.x < current.x)
-	directions.push_back(DIRECTION_WEST);
-    else if (destination.y > current.y)
-	directions.push_back(DIRECTION_SOUTH);
-    else
-	directions.push_back(DIRECTION_NORTH);
-
-    return directions;
-}
-
-vector < int >Router::routingWestFirst(const Coord & current,
-					    const Coord & destination)
-{
-    vector < int >directions;
-
-    if (destination.x <= current.x || destination.y == current.y)
-	return routingXY(current, destination);
-
-    if (destination.y < current.y) {
-	directions.push_back(DIRECTION_NORTH);
-	directions.push_back(DIRECTION_EAST);
-    } else {
-	directions.push_back(DIRECTION_SOUTH);
-	directions.push_back(DIRECTION_EAST);
-    }
-
-    return directions;
-}
-
-vector < int >Router::routingNorthLast(const Coord & current,
-					    const Coord & destination)
-{
-    vector < int >directions;
-
-    if (destination.x == current.x || destination.y <= current.y)
-	return routingXY(current, destination);
-
-    if (destination.x < current.x) {
-	directions.push_back(DIRECTION_SOUTH);
-	directions.push_back(DIRECTION_WEST);
-    } else {
-	directions.push_back(DIRECTION_SOUTH);
-	directions.push_back(DIRECTION_EAST);
-    }
-
-    return directions;
-}
-
-vector < int >Router::routingNegativeFirst(const Coord & current,
-						const Coord &
-						destination)
-{
-    vector < int >directions;
-
-    if ((destination.x <= current.x && destination.y <= current.y) ||
-	(destination.x >= current.x && destination.y >= current.y))
-	return routingXY(current, destination);
-
-    if (destination.x > current.x && destination.y < current.y) {
-	directions.push_back(DIRECTION_NORTH);
-	directions.push_back(DIRECTION_EAST);
-    } else {
-	directions.push_back(DIRECTION_SOUTH);
-	directions.push_back(DIRECTION_WEST);
-    }
-
-    return directions;
-}
-
-vector < int >Router::routingOddEven(const Coord & current,
-					  const Coord & source,
-					  const Coord & destination)
-{
-    vector < int >directions;
-
-    int c0 = current.x;
-    int c1 = current.y;
-    int s0 = source.x;
-    //  int s1 = source.y;
-    int d0 = destination.x;
-    int d1 = destination.y;
-    int e0, e1;
-
-    e0 = d0 - c0;
-    e1 = -(d1 - c1);
-
-    if (e0 == 0) {
-	if (e1 > 0)
-	    directions.push_back(DIRECTION_NORTH);
-	else
-	    directions.push_back(DIRECTION_SOUTH);
-    } else {
-	if (e0 > 0) {
-	    if (e1 == 0)
-		directions.push_back(DIRECTION_EAST);
-	    else {
-		if ((c0 % 2 == 1) || (c0 == s0)) {
-		    if (e1 > 0)
-			directions.push_back(DIRECTION_NORTH);
-		    else
-			directions.push_back(DIRECTION_SOUTH);
-		}
-		if ((d0 % 2 == 1) || (e0 != 1))
-		    directions.push_back(DIRECTION_EAST);
-	    }
-	} else {
-	    directions.push_back(DIRECTION_WEST);
-	    if (c0 % 2 == 0) {
-		if (e1 > 0)
-		    directions.push_back(DIRECTION_NORTH);
-		if (e1 < 0)
-		    directions.push_back(DIRECTION_SOUTH);
-	    }
-	}
-    }
-
-    if (!(directions.size() > 0 && directions.size() <= 2)) {
-	LOG << "\n PICCININI, CECCONI & ... :" << endl	// STAMPACCHIA
-        << source << endl
-        << destination << endl
-        << current << endl;
-
-    }
-    assert(directions.size() > 0 && directions.size() <= 2);
-
-    return directions;
-}
-
-vector < int >Router::routingDyAD(const Coord & current,
-				       const Coord & source,
-				       const Coord & destination)
-{
-    vector < int >directions;
-
-    directions = routingOddEven(current, source, destination);
-
-    if (!inCongestion())
-	directions.resize(1);
-
-    return directions;
-}
-
-vector < int >Router::routingFullyAdaptive(const Coord & current,
-						const Coord &
-						destination)
-{
-    vector < int >directions;
-
-    if (destination.x == current.x || destination.y == current.y)
-	return routingXY(current, destination);
-
-    if (destination.x > current.x && destination.y < current.y) {
-	directions.push_back(DIRECTION_NORTH);
-	directions.push_back(DIRECTION_EAST);
-    } else if (destination.x > current.x && destination.y > current.y) {
-	directions.push_back(DIRECTION_SOUTH);
-	directions.push_back(DIRECTION_EAST);
-    } else if (destination.x < current.x && destination.y > current.y) {
-	directions.push_back(DIRECTION_SOUTH);
-	directions.push_back(DIRECTION_WEST);
-    } else {
-	directions.push_back(DIRECTION_NORTH);
-	directions.push_back(DIRECTION_WEST);
-    }
-
-    return directions;
-}
-
-vector < int >Router::routingTableBased(const int dir_in,
-					     const Coord & current,
-					     const Coord &
-					     destination)
-{
-    AdmissibleOutputs ao =
-	routing_table.getAdmissibleOutputs(dir_in, coord2Id(destination));
-
-    if (ao.size() == 0) {
-	LOG << "dir: " << dir_in << ", (" << current.x << "," << current.
-	    y << ") --> " << "(" << destination.x << "," << destination.
-	    y << ")" << endl << coord2Id(current) << "->" <<
-	    coord2Id(destination) << endl;
-    }
-
-    assert(ao.size() > 0);
-
-    //-----
-    /*
-       vector<int> aov = admissibleOutputsSet2Vector(ao);
-       LOG << "dir: " << dir_in << ", (" << current.x << "," << current.y << ") --> "
-       << "(" << destination.x << "," << destination.y << "), outputs: ";
-       for (int i=0; i<aov.size(); i++)
-       cout << aov[i] << ", ";
-       cout << endl;
-     */
-    //-----
-
-    return admissibleOutputsSet2Vector(ao);
-}
-
 void Router::configure(const int _id,
 			    const double _warm_up_time,
 			    const unsigned int _max_buffer_size,
@@ -740,7 +505,6 @@ void Router::configure(const int _id,
       buffer[DIRECTION_WEST].Disable();
     if (col == GlobalParams::mesh_dim_x-1)
       buffer[DIRECTION_EAST].Disable();
-
 }
 
 unsigned long Router::getRoutedFlits()

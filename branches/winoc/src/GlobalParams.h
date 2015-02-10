@@ -37,15 +37,8 @@ using namespace std;
 #define NOT_VALID             -1
 
 // Routing algorithms
-#define ROUTING_XY             0
-#define ROUTING_WEST_FIRST     1
-#define ROUTING_NORTH_LAST     2
-#define ROUTING_NEGATIVE_FIRST 3
-#define ROUTING_ODD_EVEN       4
-#define ROUTING_DYAD           5
-#define ROUTING_FULLY_ADAPTIVE 8
-#define ROUTING_TABLE_BASED    9
-#define INVALID_ROUTING       -1
+#define ROUTING_DYAD           "DYAD"
+#define ROUTING_TABLE_BASED    "TABLE_BASED"
 
 // Selection strategies
 #define SEL_RANDOM             0
@@ -101,7 +94,7 @@ struct GlobalParams {
     static int flit_size;
     static int min_packet_size;
     static int max_packet_size;
-    static int routing_algorithm;
+    static char routing_algorithm[128];
     static char routing_table_filename[128];
     static int selection_strategy;
     static float packet_injection_rate;

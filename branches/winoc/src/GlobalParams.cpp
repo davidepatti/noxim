@@ -19,7 +19,7 @@ int GlobalParams::buffer_depth;
 int GlobalParams::flit_size;
 int GlobalParams::min_packet_size;
 int GlobalParams::max_packet_size;
-int GlobalParams::routing_algorithm;
+char GlobalParams::routing_algorithm[128];
 char GlobalParams::routing_table_filename[128];
 int GlobalParams::selection_strategy;
 float GlobalParams::packet_injection_rate;
