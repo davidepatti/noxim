@@ -86,7 +86,7 @@ void NoC::buildMesh()
     }
 
     // Check for routing table availability
-    if (GlobalParams::routing_algorithm == ROUTING_TABLE_BASED)
+    if (!strcmp(GlobalParams::routing_algorithm, ROUTING_TABLE_BASED))
 	assert(grtable.load(GlobalParams::routing_table_filename));
 
     // Check for traffic table availability

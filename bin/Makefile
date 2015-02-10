@@ -8,9 +8,10 @@ YAML		:= /opt/local
 ##### DIRECTORIES #####
 
 SRCDIR := ../src
-OBJDIR := .
+SUBDIRS := $(filter %/,$(wildcard $(SRCDIR)/*/))
+OBJDIR := ./build
 
-SRCS := $(wildcard $(SRCDIR)/*.cpp)
+SRCS := $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(addsuffix *.cpp,$(SUBDIRS)))
 OBJS := $(subst $(SRCDIR),$(OBJDIR),$(SRCS:.cpp=.o))
 
 MODULE := noxim
@@ -24,23 +25,25 @@ DEBUG    := -g
 OTHER    := -Wall# -Wno-deprecated
 CXXFLAGS := $(OPT) $(OTHER)# $(DEBUG)
 
-#INCDIR := -I$(SRCDIR) -I$(SYSTEMC)/include -I$(YAML)/include
 INCDIR := -I$(SRCDIR) -isystem $(SYSTEMC)/include -I$(YAML)/include
 LIBDIR := -L$(SRCDIR) -L$(SYSTEMC)/lib-$(TARGET_ARCH) -L$(YAML)/lib
 
 LIBS := -lsystemc -lm -lyaml-cpp 
 
+SPACE := $(subst ,, )
+VPATH := $(SRCDIR):$(subst $(SPACE),:,$(SUBDIRS))
 
 ##### RULES #####
 
 $(MODULE): $(OBJS)
 	$(CXX) $(LIBDIR) $^ $(LIBS) -o $@ 2>&1 | c++filt
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CXX) $(CXXFLAGS) $(INCDIR) -c $<
+$(OBJDIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(INCDIR) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) *~ $(MODULE)
+	rm -f $(OBJS) $(MODULE) *~
 
 depend: 
 	makedepend $(SRCS) -Y -f- 2>/dev/null | sed 's_$(SRCDIR)_$(OBJDIR)_' > Makefile.deps

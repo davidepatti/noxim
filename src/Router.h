@@ -110,39 +110,17 @@ SC_MODULE(Router)
     int selectionNoP(const vector <int> & directions,
 		     const RouteData & route_data);
 
-    // routing functions
-    vector < int >routingXY(const Coord & current,
-			    const Coord & destination);
-    vector < int >routingWestFirst(const Coord & current,
-				   const Coord & destination);
-    vector < int >routingNorthLast(const Coord & current,
-				   const Coord & destination);
-    vector < int >routingNegativeFirst(const Coord & current,
-				       const Coord & destination);
-    vector < int >routingOddEven(const Coord & current,
-				 const Coord & source,
-				 const Coord & destination);
-    vector < int >routingDyAD(const Coord & current,
-			      const Coord & source,
-			      const Coord & destination);
-    vector < int >routingLookAhead(const Coord & current,
-				   const Coord & destination);
-    vector < int >routingFullyAdaptive(const Coord & current,
-				       const Coord & destination);
-    vector < int >routingTableBased(const int dir_in,
-				    const Coord & current,
-				    const Coord & destination);
     NoP_data getCurrentNoPData();
     void NoP_report() const;
     int NoPScore(const NoP_data & nop_data, const vector <int> & nop_channels) const;
     int reflexDirection(int direction) const;
     int getNeighborId(int _id, int direction) const;
-    bool inCongestion();
 
   public:
 
     unsigned int local_drained;
 
+    bool inCongestion();
     void ShowBuffersStats(std::ostream & out);
 };
 
