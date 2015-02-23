@@ -7,6 +7,7 @@ Routing_ODD_EVEN * Routing_ODD_EVEN::routing_ODD_EVEN = 0;
 Routing_ODD_EVEN * Routing_ODD_EVEN::getInstance() {
 	if ( routing_ODD_EVEN == 0 )
 		routing_ODD_EVEN = new Routing_ODD_EVEN();
+    
 	return routing_ODD_EVEN;
 }
 

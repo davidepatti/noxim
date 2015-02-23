@@ -19,6 +19,8 @@
 #include "LocalRoutingTable.h"
 #include "ReservationTable.h"
 #include "Utils.h"
+#include "routingAlgorithms/RoutingAlgorithm.h"
+#include "routingAlgorithms/RoutingAlgorithms.h"
 
 using namespace std;
 
@@ -63,7 +65,8 @@ SC_MODULE(Router)
     ReservationTable reservation_table;	// Switch reservation table
     int start_from_port;	                // Port from which to start the reservation cycle
     unsigned long routed_flits;
-
+    RoutingAlgorithm * routingAlgorithm; 
+    
     // Functions
 
     void rxProcess();		// The receiving process
@@ -92,6 +95,11 @@ SC_MODULE(Router)
 	sensitive << reset;
 	sensitive << clock.pos();
 	
+    routingAlgorithm = RoutingAlgorithms::get(GlobalParams::routing_algorithm);
+
+    if (routingAlgorithm == 0)
+        assert(false);
+
     }
 
   private:

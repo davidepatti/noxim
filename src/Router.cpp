@@ -9,8 +9,6 @@
  */
 
 #include "Router.h"
-#include "routingAlgorithms/RoutingAlgorithms.h"
-
 
 void Router::rxProcess()
 {
@@ -278,11 +276,6 @@ vector < int > Router::routingFunction(const RouteData & route_data)
         }
     }
     LOG << "Wired routing for dst = " << route_data.dst_id << endl;
-
-    RoutingAlgorithm * routingAlgorithm = RoutingAlgorithms::get(GlobalParams::routing_algorithm);
-
-    if (routingAlgorithm == 0)
-        assert(false);
 
     return routingAlgorithm->route(this, route_data);
 }

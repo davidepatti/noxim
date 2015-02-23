@@ -3,6 +3,7 @@
 
 #include "RoutingAlgorithm.h"
 #include "RoutingAlgorithms.h"
+#include "../Router.h"
 
 using namespace std;
 

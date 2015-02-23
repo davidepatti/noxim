@@ -3,6 +3,7 @@
 
 #include "RoutingAlgorithm.h"
 #include "RoutingAlgorithms.h"
+#include "../Router.h"
 
 using namespace std;
 
@@ -18,6 +19,7 @@ class Routing_FULLY_ADAPTIVE : RoutingAlgorithm {
 
 		static Routing_FULLY_ADAPTIVE * routing_FULLY_ADAPTIVE;
 		static RoutingAlgorithmsRegister routingAlgorithmsRegister;
+        static RoutingAlgorithm * xy;
 };
 
 #endif

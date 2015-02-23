@@ -3,6 +3,7 @@
 
 #include "RoutingAlgorithm.h"
 #include "RoutingAlgorithms.h"
+#include "../Router.h"
 
 using namespace std;
 
@@ -18,6 +19,7 @@ class Routing_NORTH_LAST : RoutingAlgorithm {
 
 		static Routing_NORTH_LAST * routing_NORTH_LAST;
 		static RoutingAlgorithmsRegister routingAlgorithmsRegister;
+        static RoutingAlgorithm * xy;
 };
 
 #endif
