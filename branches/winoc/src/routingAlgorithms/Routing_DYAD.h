@@ -3,6 +3,7 @@
 
 #include "RoutingAlgorithm.h"
 #include "RoutingAlgorithms.h"
+#include "../Router.h"
 
 using namespace std;
 
@@ -18,6 +19,7 @@ class Routing_DYAD : RoutingAlgorithm {
 
 		static Routing_DYAD * routing_DYAD;
 		static RoutingAlgorithmsRegister routingAlgorithmsRegister;
+        static RoutingAlgorithm * odd_even;
 };
 
 #endif

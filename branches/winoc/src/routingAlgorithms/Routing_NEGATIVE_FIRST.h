@@ -3,6 +3,7 @@
 
 #include "RoutingAlgorithm.h"
 #include "RoutingAlgorithms.h"
+#include "../Router.h"
 
 using namespace std;
 
@@ -18,6 +19,7 @@ class Routing_NEGATIVE_FIRST : RoutingAlgorithm {
 
 		static Routing_NEGATIVE_FIRST * routing_NEGATIVE_FIRST;
 		static RoutingAlgorithmsRegister routingAlgorithmsRegister;
+        static RoutingAlgorithm * xy;
 };
 
 #endif

@@ -7,6 +7,7 @@ Routing_XY * Routing_XY::routing_XY = 0;
 Routing_XY * Routing_XY::getInstance() {
 	if ( routing_XY == 0 )
 		routing_XY = new Routing_XY();
+    
 	return routing_XY;
 }
 

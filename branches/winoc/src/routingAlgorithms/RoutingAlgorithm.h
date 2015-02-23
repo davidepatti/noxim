@@ -3,10 +3,11 @@
 
 #include <vector>
 #include "../DataStructs.h"
-#include "../Router.h"
 #include "../Utils.h"
 
 using namespace std;
+
+struct Router;
 
 class RoutingAlgorithm
 {

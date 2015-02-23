@@ -3,11 +3,13 @@
 RoutingAlgorithmsRegister Routing_FULLY_ADAPTIVE::routingAlgorithmsRegister("FULLY_ADAPTIVE", getInstance());
 
 Routing_FULLY_ADAPTIVE * Routing_FULLY_ADAPTIVE::routing_FULLY_ADAPTIVE = 0;
+RoutingAlgorithm * Routing_FULLY_ADAPTIVE::xy = 0;
 
 Routing_FULLY_ADAPTIVE * Routing_FULLY_ADAPTIVE::getInstance() {
 	if ( routing_FULLY_ADAPTIVE == 0 )
-		routing_FULLY_ADAPTIVE = new Routing_FULLY_ADAPTIVE();
-	return routing_FULLY_ADAPTIVE;
+        routing_FULLY_ADAPTIVE = new Routing_FULLY_ADAPTIVE();
+    
+    return routing_FULLY_ADAPTIVE;
 }
 
 vector<int> Routing_FULLY_ADAPTIVE::route(Router * router, const RouteData & routeData)
@@ -18,11 +20,14 @@ vector<int> Routing_FULLY_ADAPTIVE::route(Router * router, const RouteData & rou
 
     if (destination.x == current.x || destination.y == current.y)
     {
-        RoutingAlgorithm * xy = RoutingAlgorithms::get("XY");
-
-        if (xy == 0)
-            assert(false);
-
+        if(!xy)
+        {
+            xy = RoutingAlgorithms::get("XY");
+            
+            if (!xy)
+                assert(false);
+        }
+        
         return xy->route(router, routeData);
     }
     if (destination.x > current.x && destination.y < current.y) 

@@ -7,6 +7,7 @@ Routing_TABLE_BASED * Routing_TABLE_BASED::routing_TABLE_BASED = 0;
 Routing_TABLE_BASED * Routing_TABLE_BASED::getInstance() {
 	if ( routing_TABLE_BASED == 0 )
 		routing_TABLE_BASED = new Routing_TABLE_BASED();
+
 	return routing_TABLE_BASED;
 }
 

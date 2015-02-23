@@ -3,6 +3,7 @@
 
 #include "RoutingAlgorithm.h"
 #include "RoutingAlgorithms.h"
+#include "../Router.h"
 
 #include "../GlobalRoutingTable.h"
 
