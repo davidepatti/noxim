@@ -99,10 +99,7 @@ class Power {
 	return pwr_leakage;
     }
 
-    double getPwrLink(bool low_voltage) {
-      if (low_voltage)
-	return pwr_link_lv;
-      else
+    double getPwrLink() {
 	return pwr_link;
     }
 
