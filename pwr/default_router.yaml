@@ -5,7 +5,6 @@ Router:
     Arbitration: 3.71035e-13
     Crossbar: 1.0258e-11
     Link: 11.0e-12
-    Link_LV: 11.0e-12
     Leakage: 1.75635e-12
     End2end: 0.0
 
