@@ -30,12 +30,42 @@ Power::Power()
 {
   pwr = 0.0;
 
+
   if (!power_data_loaded)
     {
       assert(LoadPowerData(GlobalParams::router_power_filename));
       power_data_loaded = true;
     }
 }
+
+void Power::configureRouter(int link_width,
+	int buffer_depth,
+	int buffer_size,
+	string routing_function,
+	string selection_function)
+{
+
+    pair<int,int> key = pair<int,int>(buffer_depth,buffer_size);
+
+    assert(buffer_push_pm.find(key)!=buffer_push_pm.end());
+    assert(buffer_pop_pm.find(key)!=buffer_pop_pm.end());
+    assert(buffer_front_pm.find(key)!=buffer_front_pm.end());
+
+    buffer_push_pwr = buffer_push_pm[key];
+    buffer_pop_pwr = buffer_pop_pm[key];
+    buffer_front_pwr = buffer_front_pm[key];
+
+    assert(routing_pm.find(routing_function)!=routing_pm.end());
+    routing_pwr = routing_pm[routing_function];
+
+    assert(selection_pm.find(selection_function)!=selection_pm.end());
+    selection_pwr = selection_pm[selection_function];
+
+    link_pwr = link_width * bit_line_pwr;
+
+
+}
+
 
 void Power::Routing()
 {

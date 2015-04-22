@@ -57,7 +57,26 @@ class Power {
 
     Power();
 
-    void Buffering();
+
+    void configureRouter(int link_width,
+	                 int buffer_depth,
+			 int buffer_size,
+			 string routing_function,
+			 string selection_function);
+
+    void configureHub(int link_width,
+	              int txrx_buffer_depth,
+	              int txrx_buffer_size,
+	              int buffer_depth,
+		      int buffer_size);
+
+    void bufferPush();
+    void bufferPop();
+    void bufferFront();
+    void aBufferPush();
+    void aBufferPop();
+    void aBufferFront();
+
     void Routing();
     void Selection();
     void Crossbar();

@@ -498,6 +498,7 @@ void Router::configure(const int _id,
       buffer[DIRECTION_WEST].Disable();
     if (col == GlobalParams::mesh_dim_x-1)
       buffer[DIRECTION_EAST].Disable();
+
 }
 
 unsigned long Router::getRoutedFlits()
