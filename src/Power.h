@@ -76,84 +76,58 @@ class Power {
     void aBufferPush();
     void aBufferPop();
     void aBufferFront();
+    void wirelessTx(int src,int dst);
+    void wirelessRx();
 
-    void Routing();
-    void Selection();
-    void Crossbar();
-    void Link();
-    void EndToEnd();
-    void Leakage();
+    void routing();
+    void selection();
+    void crossBar();
+    void link();
+    void networkInterface();
 
-    void RHTransmitWiFi(int rh_src_id, int rh_dst_id);
-    void RHTransmitElec();
+    void leakage();
 
-    bool LoadPowerData(const char *fname);
 
     double getPower() {
 	return pwr;
     } 
 
-    double getPowerRH() const {
-	return pwr_rh;
-    }
-
-    double getPwrRouting() {
-	return pwr_routing;
-    }
-    
-    double getPwrSelection() {
-	return pwr_selection;
-    }
-    
-    double getPwrBuffering() {
-	return pwr_buffering;
-    }
-    
-
-    double getCrossbar() {
-	return pwr_crossbar;
-    }
-
-    double getLeakage() {
-	return pwr_leakage;
-    }
-
-    double getPwrLink() {
-	return pwr_link;
-    }
-
-    double getPwrEndToEnd() {
-      return pwr_end2end;
-    }
-
-    double getPwrRHTxWiFi() const {
-	return pwr_rhtxwifi;
-    }
-
-    double getPwrRHTxElec() const {
-	return pwr_rhtxelec;
-    }
 
   private:
+
+    double total_power_d;
+    double total_power_s;
+
+    double buffer_push_pwr_d;
+    double buffer_pop_pwr_d;
+    double buffer_front_pwr_d;
+    double buffer_pwr_s;
     
-    static double pwr_buffering;
-    static double pwr_routing;
-    static double pwr_selection;
-    static double pwr_crossbar;
-    static double pwr_link;
-    static double pwr_link_lv;
-    static double pwr_leakage;
-    static double pwr_end2end;
+    double antenna_buffer_push_pwr_d;
+    double antenna_buffer_pop_pwr_d;
+    double antenna_buffer_front_pwr_d;
+    double antenna_buffer_pwr_s;
 
-    static double pwr_rhtxwifi;
-    static double pwr_rhtxelec;
+    double bit_wireless_tx_pwr;
+    double flit_wireless_rx_pwr;
+    double transceiver_pwr_s;
 
-    static bool   power_data_loaded;
+    double routing_pwr_d;
+    double routing_pwr_s;
 
-    static map<pair<int,int>, double> rh_power_map;
+    double selection_pwr_d;
+    double selection_pwr_s;
 
-    double pwr;
-    double pwr_rh;
+    double crossbar_pwr_d;
+    double crossbar_pwr_s;
+
+    double link_pwr_d;
+    double link_pwr_s;
+
+    double ni_pwr_d;
+    double ni_pwr_s;
+   
+    
 };
 
 #endif

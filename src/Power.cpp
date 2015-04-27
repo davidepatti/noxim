@@ -28,14 +28,17 @@ map<pair<int,int>, double> Power::rh_power_map;
 
 Power::Power()
 {
-  pwr = 0.0;
+   total_power_d = 0.0;
+   total_power_s = 0.0;
+   buffer_pwr_s = 0.0;
+   antenna_buffer_pwr_s = 0.0;
+   routing_pwr_s = 0.0;
+   selection_pwr_s = 0.0;
+   crossbar_pwr_s = 0.0;
+   link_pwr_s = 0.0;
+   transceiver_pwr_s = 0.0;
+   ni_pwr_s = 0.0;
 
-
-  if (!power_data_loaded)
-    {
-      assert(LoadPowerData(GlobalParams::router_power_filename));
-      power_data_loaded = true;
-    }
 }
 
 void Power::configureRouter(int link_width,
@@ -47,7 +50,7 @@ void Power::configureRouter(int link_width,
 
 // (s)tatic, (d)ynamic power
 
-// Buffer //////////////////////////////////
+    // Buffer 
     pair<int,int> key = pair<int,int>(buffer_depth,buffer_size);
 
     assert(buffer_push_pm.find(key)!=buffer_push_pm.end());
@@ -61,24 +64,36 @@ void Power::configureRouter(int link_width,
     buffer_pwr_s = buffer_leakage_pm[key];
 
 
-// Routing //////////////////////////////////
-
+    // Routing 
     assert(routing_pm_s.find(routing_function)!=routing_pm_s.end());
     assert(routing_pm_d.find(routing_function)!=routing_pm_d.end());
 
     routing_pwr_d = routing_pm_d[routing_function];
     routing_pwr_s = routing_pm_s[routing_function];
 
-// Selection //////////////////////////////////
+    // Selection 
     assert(selection_pm_s.find(selection_function)!=selection_pm_s.end());
     assert(selection_pm_d.find(selection_function)!=selection_pm_d.end());
 
     selection_pwr_d = selection_pm_d[selection_function];
     selection_pwr_s = selection_pm_s[selection_function];
 
+    // CrossBar
+    crossbar_pwr_s = crossbar_pwr_s;
+    crossbar_pwr_d = crossbar_pwr_d;
+
+
+
+
 // Link 
     link_pwr_s = link_width * bit_line_pwr_s;
     link_pwr_d = link_width * bit_line_pwr_d;
+
+// NetworkInterface
+    ni_pwr_s = ni_pwr_s_TURI_SCEGLI_NOME;
+    ni_pwr_d = ni_pwr_d_TURI_SCEGLI_NOME;
+
+
 
 
 }
@@ -122,84 +137,94 @@ void Power::configureHub(int link_width,
     // non e' una mappa, e' indipendente da sorgente e destinazione
     flit_wireless_rx_pwr = antenna_buffer_size * bit_wireless_rx;
 
-    transceiver_pwr_s = transceiver_pwd_s_TURI_SCEGLI_NOME;
+    transceiver_pwr_s = transceiver_pwr_s_TURI_SCEGLI_NOME;
 
 }
 
 
-void Power::Routing()
+void Power::bufferPush()
 {
-  pwr += pwr_routing;
+    total_power_d+= buffer_push_pwr_d;
 }
 
-void Power::Selection()
+void Power::bufferPop()
 {
-  pwr += pwr_selection;
+    total_power_d+= buffer_pop_pwr_d;
 }
 
-void Power::Buffering()
+void Power::bufferFront()
 {
-  pwr += pwr_buffering;
+    total_power_d+= buffer_front_pwr_d;
 }
 
-void Power::Link()
+void Power::antennaBufferPush()
 {
-  pwr += pwr_link;
+    total_power_d+= antenna_buffer_push_pwr_d;
 }
 
-
-void Power::Crossbar()
+void Power::antennaBufferPop()
 {
-  pwr += pwr_crossbar;
+    total_power_d+= antenna_buffer_pop_pwr_d;
 }
 
-void Power::Leakage()
+void Power::antennaBufferFront()
 {
-  pwr += pwr_leakage;
+    total_power_d+= antenna_buffer_front_pwr_d;
 }
 
-void Power::EndToEnd()
+void Power::routing()
 {
-  pwr += pwr_end2end;
+    total_power_d+= routing_pwr_d;
 }
 
-void Power::RHTransmitWiFi(int rh_src_id, int rh_dst_id)
+void Power::selection()
 {
-  pair<int,int> key(rh_src_id, rh_dst_id);
-  map<pair<int,int>, double>::iterator i = rh_power_map.find(key);
-
-  if (i == rh_power_map.end())
-    pwr_rh += pwr_rhtxwifi;
-  else
-    pwr_rh += i->second;
+    total_power_d+= selection_pwr_d;
 }
 
-void Power::RHTransmitElec()
+void Power::crossBar()
 {
-  pwr_rh += pwr_rhtxelec;
+    total_power_d+=crossbar_pwr_d;
 }
 
-bool Power::LoadPowerData(const char *fname)
+void Power::link()
 {
-  YAML::Node config = YAML::LoadFile(fname);
-  YAML::Node router = config["Router"];
-  YAML::Node radio_hub = config["RadioHub"];
-
-  pwr_routing = router["Routing"].as<double>();
-  pwr_buffering = router["Buffering"].as<double>();
-  pwr_selection = router["Selection"].as<double>();
-  pwr_crossbar = router["Crossbar"].as<double>();
-  pwr_link = router["Link"].as<double>();
-  pwr_leakage = router["Leakage"].as<double>();
-  pwr_end2end = router["End2end"].as<double>();
-  pwr_rhtxwifi = radio_hub["DefaultPower"].as<double>();
-  pwr_rhtxelec = radio_hub["WiresPowerContribution"].as<double>();
-
-  for (size_t i = 0; i < radio_hub["PowerMap"].size(); i++)
-  {
-      pair<int,int> key(radio_hub["PowerMap"][i]["TXHubID"].as<int>(), radio_hub["PowerMap"][i]["RXHubID"].as<int>());
-      rh_power_map[key] =radio_hub["PowerMap"][i]["Energy"].as<double>();
-  }
-
-  return true;
+    total_power_d+=link_pwr_d;
 }
+
+void Power::networkInterface()
+{
+    total_power_d+=ni_pwr_d;
+}
+
+
+void Power::wirelessTx(int src,int dst,int length)
+{
+    pair<int,int> key = pair<int,int>(src,dst);
+
+    assert(bit_wireless_tx_pwr.find(key)!=bit_wireless_tx_pwr.end());
+
+    total_power_d += bit_wireless_tx_pwr[key] * length;
+
+}
+
+void Power::wirelessRx()
+{
+    total_power_d+= flit_wireless_rx_pwr;
+}
+
+
+void Power::leakage()
+{
+    total_power_s+= buffer_pwr_s+
+	            antenna_buffer_pwr_s+
+		    routing_pwr_s+
+		    selection_pwr_s+
+		    crossbar_pwr_s+
+		    link_pwr_s+
+		    transceiver_pwr_s+
+		    ni_pwr_s;
+}
+
+
+
