@@ -73,10 +73,10 @@ class Power {
     void bufferPush();
     void bufferPop();
     void bufferFront();
-    void aBufferPush();
-    void aBufferPop();
-    void aBufferFront();
-    void wirelessTx(int src,int dst);
+    void antennaBufferPush();
+    void antennaBufferPop();
+    void antennaBufferFront();
+    void wirelessTx(int src,int dst,int length);
     void wirelessRx();
 
     void routing();
@@ -88,8 +88,11 @@ class Power {
     void leakage();
 
 
-    double getPower() {
-	return pwr;
+    double getDynamicPower() {
+	return total_power_d;
+    } 
+    double getStaticPower() {
+	return total_power_s;
     } 
 
 
@@ -108,7 +111,7 @@ class Power {
     double antenna_buffer_front_pwr_d;
     double antenna_buffer_pwr_s;
 
-    double bit_wireless_tx_pwr;
+    map< pair<int, int> , double>  bit_wireless_tx_pwr;
     double flit_wireless_rx_pwr;
     double transceiver_pwr_s;
 
