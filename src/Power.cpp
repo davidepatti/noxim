@@ -45,24 +45,84 @@ void Power::configureRouter(int link_width,
 	string selection_function)
 {
 
+// (s)tatic, (d)ynamic power
+
+// Buffer //////////////////////////////////
     pair<int,int> key = pair<int,int>(buffer_depth,buffer_size);
 
     assert(buffer_push_pm.find(key)!=buffer_push_pm.end());
     assert(buffer_pop_pm.find(key)!=buffer_pop_pm.end());
     assert(buffer_front_pm.find(key)!=buffer_front_pm.end());
+    assert(buffer_leakage_pm.find(key)!=buffer_leakage_pm.end());
 
-    buffer_push_pwr = buffer_push_pm[key];
-    buffer_pop_pwr = buffer_pop_pm[key];
-    buffer_front_pwr = buffer_front_pm[key];
+    buffer_push_pwr_d = buffer_push_pm[key];
+    buffer_pop_pwr_d = buffer_pop_pm[key];
+    buffer_front_pwr_d = buffer_front_pm[key];
+    buffer_pwr_s = buffer_leakage_pm[key];
 
-    assert(routing_pm.find(routing_function)!=routing_pm.end());
-    routing_pwr = routing_pm[routing_function];
 
-    assert(selection_pm.find(selection_function)!=selection_pm.end());
-    selection_pwr = selection_pm[selection_function];
+// Routing //////////////////////////////////
 
-    link_pwr = link_width * bit_line_pwr;
+    assert(routing_pm_s.find(routing_function)!=routing_pm_s.end());
+    assert(routing_pm_d.find(routing_function)!=routing_pm_d.end());
 
+    routing_pwr_d = routing_pm_d[routing_function];
+    routing_pwr_s = routing_pm_s[routing_function];
+
+// Selection //////////////////////////////////
+    assert(selection_pm_s.find(selection_function)!=selection_pm_s.end());
+    assert(selection_pm_d.find(selection_function)!=selection_pm_d.end());
+
+    selection_pwr_d = selection_pm_d[selection_function];
+    selection_pwr_s = selection_pm_s[selection_function];
+
+// Link 
+    link_pwr_s = link_width * bit_line_pwr_s;
+    link_pwr_d = link_width * bit_line_pwr_d;
+
+
+}
+
+void Power::configureHub(int link_width,
+	int buffer_depth,
+	int buffer_size,
+	int antenna_buffer_depth,
+	int antenna_buffer_size)
+{
+// (s)tatic, (d)ynamic power
+
+// Buffer //////////////////////////////////
+    pair<int,int> key = pair<int,int>(buffer_depth,buffer_size);
+
+    assert(buffer_push_pm.find(key)!=buffer_push_pm.end());
+    assert(buffer_pop_pm.find(key)!=buffer_pop_pm.end());
+    assert(buffer_front_pm.find(key)!=buffer_front_pm.end());
+    assert(buffer_leakage_pm.find(key)!=buffer_leakage_pm.end());
+
+    buffer_push_pwr_d = buffer_push_pm[key];
+    buffer_pop_pwr_d = buffer_pop_pm[key];
+    buffer_front_pwr_d = buffer_front_pm[key];
+    buffer_pwr_s = buffer_leakage_pm[key];
+// Buffer Antenna//////////////////////////////////
+    pair<int,int> akey = pair<int,int>(antenna_buffer_depth,antenna_buffer_size);
+
+    assert(antenna_buffer_push_pm.find(akey)!=buffer_push_pm.end());
+    assert(antenna_buffer_pop_pm.find(akey)!=buffer_pop_pm.end());
+    assert(antenna_buffer_front_pm.find(akey)!=buffer_front_pm.end());
+    assert(antenna_buffer_leakage_pm.find(akey)!=buffer_leakage_pm.end());
+
+    antenna_buffer_push_pwr_d = buffer_push_pm[akey];
+    antenna_buffer_pop_pwr_d = buffer_pop_pm[akey];
+    antenna_buffer_front_pwr_d = buffer_front_pm[akey];
+    antenna_buffer_pwr_s = buffer_leakage_pm[akey];
+
+    // mappa (id_src,id_dst) -> bit pwr tx
+    bit_wireless_tx_pwr = bit_wireless_tx_pm;
+
+    // non e' una mappa, e' indipendente da sorgente e destinazione
+    flit_wireless_rx_pwr = antenna_buffer_size * bit_wireless_rx;
+
+    transceiver_pwr_s = transceiver_pwd_s_TURI_SCEGLI_NOME;
 
 }
 
