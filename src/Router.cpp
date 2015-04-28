@@ -42,19 +42,19 @@ void Router::rxProcess()
 		// Store the incoming flit in the circular buffer
 		buffer[i].Push(received_flit);
 
+		power.bufferPush();
+
 		// Negate the old value for Alternating Bit Protocol (ABP)
 		current_level_rx[i] = 1 - current_level_rx[i];
 
-		// Incoming flit
-		stats.power.Buffering();
 
+		// if a new flit is injected from local PE
 		if (received_flit.src_id == local_id)
-		  stats.power.EndToEnd();
+		  power.networkInterface();
 	    }
 	    ack_rx[i].write(current_level_rx[i]);
 	}
     }
-    stats.power.Leakage();
 }
 
 
@@ -86,6 +86,7 @@ void Router::txProcess()
 	    {
 
 	      Flit flit = buffer[i].Front();
+	      power.bufferFront();
 
 	      if (flit.flit_type == FLIT_TYPE_HEAD) 
 		{
@@ -98,6 +99,7 @@ void Router::txProcess()
 
 		  int o = route(route_data);
 
+
 		  if ( o==DIRECTION_HUB)
 		  {
 		      LOG << "Ready to reserve HUB direction ..." << endl;
@@ -106,7 +108,6 @@ void Router::txProcess()
 
 		  if (reservation_table.isAvailable(o)) 
 		  {
-		      stats.power.Crossbar();
 		      reservation_table.reserve(i, o);
 		      if (GlobalParams::verbose_mode > VERBOSE_OFF) 
 		      {
@@ -120,11 +121,14 @@ void Router::txProcess()
 	}
       start_from_port++;
 
+      int crossbar_traversed = 0;
+
       // 2nd phase: Forwarding
       for (int i = 0; i < DIRECTIONS + 2; i++) 
-	{
+      {
 	  if (!buffer[i].IsEmpty()) 
-	    {
+	  {
+	      // power contribution already computed in 1st phase
 	      Flit flit = buffer[i].Front();
 
 	      int o = reservation_table.getOutputPort(i);
@@ -132,90 +136,66 @@ void Router::txProcess()
 	      {
 		  if (current_level_tx[o] == ack_tx[o].read()) 
 		  {
-		    if (o == DIRECTION_HUB)
-		    {
+		      if (o == DIRECTION_HUB)
+		      {
 			  LOG << "Forwarding to HUB " << endl;
-		  /* TODO: adapt code to new model
-			// Forward flit to WiNoC
-			if (winoc->CanTransmit(local_id))
-			{
-			    if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-			    {
-				    LOG << "Input[" << i <<
-				    "] forward to Output[" << o << "], flit: "
-				    << flit << endl;
-			    }
-			    // LOG << "Inject to RH: Router ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
+		      }
+		      if (GlobalParams::verbose_mode > VERBOSE_OFF) 
+		      {
+			  LOG << "Input[" << i <<
+			      "] forward to Output[" << o << "], flit: "
+			      << flit << endl;
+		      }
 
-			    winoc->InjectToRadioHub(local_id, flit);
-			    buffer[i].Pop();
+		      flit_tx[o].write(flit);
+		      power.link();
+		      crossbar_traversed++;
 
-			    if (flit.flit_type == FLIT_TYPE_TAIL)
-				reservation_table.release(o);
-			}
-		    */
-		    }
-		    if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-		    {
-			    LOG << "Input[" << i <<
-			    "] forward to Output[" << o << "], flit: "
-			    << flit << endl;
-		    }
+		      current_level_tx[o] = 1 - current_level_tx[o];
+		      req_tx[o].write(current_level_tx[o]);
+		      buffer[i].Pop();
 
-		    flit_tx[o].write(flit);
-		    current_level_tx[o] = 1 - current_level_tx[o];
-		    req_tx[o].write(current_level_tx[o]);
-		    buffer[i].Pop();
+		      power.bufferPop();
 
-		    stats.power.Link();
+		      // if flit has been consumed
+		      if (flit.dst_id == local_id)
+			  power.networkInterface();
 
-		    if (flit.dst_id == local_id)
-			stats.power.EndToEnd();
+		      if (flit.flit_type == FLIT_TYPE_TAIL)
+			  reservation_table.release(o);
 
-		    if (flit.flit_type == FLIT_TYPE_TAIL)
-			reservation_table.release(o);
-
-		    // Update stats
-		    if (o == DIRECTION_LOCAL) 
-		    {
-			LOG << "Consumed flit src " << flit.src_id << " dst = " << flit.dst_id << endl;
-			stats.receivedFlit(sc_time_stamp().
-				to_double() / 1000, flit);
-			if (GlobalParams::
-				max_volume_to_be_drained) 
-			{
-			    if (drained_volume >=
-				    GlobalParams::
-				    max_volume_to_be_drained)
-				sc_stop();
-			    else 
-			    {
-				drained_volume++;
-				local_drained++;
-			    }
-			}
-		    } 
-		    else if (i != DIRECTION_LOCAL) 
-		    {
-			// Increment routed flits counter
-			routed_flits++;
-		    }
+		      // Update stats
+		      if (o == DIRECTION_LOCAL) 
+		      {
+			  LOG << "Consumed flit src " << flit.src_id << " dst = " << flit.dst_id << endl;
+			  stats.receivedFlit(sc_time_stamp().
+				  to_double() / 1000, flit);
+			  if (GlobalParams::
+				  max_volume_to_be_drained) 
+			  {
+			      if (drained_volume >=
+				      GlobalParams::
+				      max_volume_to_be_drained)
+				  sc_stop();
+			      else 
+			      {
+				  drained_volume++;
+				  local_drained++;
+			      }
+			  }
+		      } 
+		      else if (i != DIRECTION_LOCAL) 
+		      {
+			  // Increment routed flits counter
+			  routed_flits++;
+		      }
 		  }
 	      }
-	    }
-	}
-      /* TODO: move this code as a normal direction
-      // 3rd phase: Consume incoming flits from WiNoC
-      if (GlobalParams::use_winoc &&
-      winoc->FlitAvailable(local_id))
-      {
-      Flit flit = winoc->GetFlit(local_id);
-      stats.receivedFlit(sc_time_stamp().
-      to_double() / 1000, flit);
+	  }
       }
-       */
+      if (crossbar_traversed)
+	  power.crossBar();
     }				// else reset read
-  stats.power.Leakage();
 }
 
 NoP_data Router::getCurrentNoPData()
@@ -234,7 +214,7 @@ NoP_data Router::getCurrentNoPData()
     return NoP_data;
 }
 
-void Router::bufferMonitor()
+void Router::perCycleUpdate()
 {
     if (reset.read()) {
 	for (int i = 0; i < DIRECTIONS + 1; i++)
@@ -254,6 +234,8 @@ void Router::bufferMonitor()
 	    for (int i = 0; i < DIRECTIONS; i++)
 		NoP_data_out[i].write(current_NoP_data);
 	}
+
+	power.leakage();
     }
 }
 
@@ -282,13 +264,14 @@ vector < int > Router::routingFunction(const RouteData & route_data)
 
 int Router::route(const RouteData & route_data)
 {
-    stats.power.Routing();
 
     if (route_data.dst_id == local_id)
 	return DIRECTION_LOCAL;
 
+    power.routing();
     vector < int >candidate_channels = routingFunction(route_data);
 
+    power.selection();
     return selectionFunction(candidate_channels, route_data);
 }
 
@@ -456,7 +439,6 @@ int Router::selectionFunction(const vector < int >&directions,
     if (directions.size() == 1)
 	return directions[0];
 
-    stats.power.Selection();
 
     switch (GlobalParams::selection_strategy) {
     case SEL_RANDOM:
@@ -516,10 +498,6 @@ unsigned int Router::getFlitsCount()
     return count;
 }
 
-double Router::getPower()
-{
-    return stats.power.getPower();
-}
 
 int Router::reflexDirection(int direction) const
 {

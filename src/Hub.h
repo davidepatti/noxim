@@ -20,6 +20,7 @@
 #include "Initiator.h"
 #include "Target.h"
 #include "TokenRing.h"
+#include "Power.h"
 
 using namespace std;
 
@@ -70,6 +71,8 @@ SC_MODULE(Hub)
 
     int route(Flit&);
     int tile2Port(int);
+
+    Power power;
 
     // Constructor
 

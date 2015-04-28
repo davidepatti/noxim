@@ -217,7 +217,7 @@ double GlobalStats::getPower()
 
     for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
 	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
-	    power += noc->t[x][y]->r->getPower();
+	    power += noc->t[x][y]->r->power.getTotalPower();
 
     return power;
 }

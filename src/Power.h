@@ -70,20 +70,20 @@ class Power {
 	              int buffer_depth,
 		      int buffer_size);
 
-    void bufferPush();
-    void bufferPop();
-    void bufferFront();
+    void bufferPush(); // x
+    void bufferPop(); // x
+    void bufferFront(); // x
     void antennaBufferPush();
     void antennaBufferPop();
     void antennaBufferFront();
     void wirelessTx(int src,int dst,int length);
     void wirelessRx();
 
-    void routing();
-    void selection();
-    void crossBar();
-    void link();
-    void networkInterface();
+    void routing(); //x 
+    void selection(); // x
+    void crossBar(); //x
+    void link(); // x 
+    void networkInterface(); //x
 
     void leakage();
 
@@ -93,6 +93,9 @@ class Power {
     } 
     double getStaticPower() {
 	return total_power_s;
+    } 
+    double getTotalPower() {
+	return (total_power_d + total_power_s);
     } 
 
 

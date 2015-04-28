@@ -78,9 +78,6 @@ class Stats {
     void showStats(int curr_node, std::ostream & out =
 		   std::cout, bool header = false);
 
-  public:
-
-    Power power;
 
   private:
 

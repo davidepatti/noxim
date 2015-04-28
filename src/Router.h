@@ -61,6 +61,7 @@ SC_MODULE(Router)
     bool current_level_rx[DIRECTIONS + 2];	// Current level for Alternating Bit Protocol (ABP)
     bool current_level_tx[DIRECTIONS + 2];	// Current level for Alternating Bit Protocol (ABP)
     Stats stats;		                // Statistics
+    Power power;
     LocalRoutingTable routing_table;	// Routing table
     ReservationTable reservation_table;	// Switch reservation table
     int start_from_port;	                // Port from which to start the reservation cycle
@@ -71,14 +72,13 @@ SC_MODULE(Router)
 
     void rxProcess();		// The receiving process
     void txProcess();		// The transmitting process
-    void bufferMonitor();
+    void perCycleUpdate();
     void configure(const int _id, const double _warm_up_time,
 		   const unsigned int _max_buffer_size,
 		   GlobalRoutingTable & grt);
 
     unsigned long getRoutedFlits();	// Returns the number of routed flits 
     unsigned int getFlitsCount();	// Returns the number of flits into the router
-    double getPower();		        // Returns the total power dissipated by the router
 
     // Constructor
 
@@ -91,7 +91,7 @@ SC_MODULE(Router)
 	sensitive << reset;
 	sensitive << clock.pos();
 
-	SC_METHOD(bufferMonitor);
+	SC_METHOD(perCycleUpdate);
 	sensitive << reset;
 	sensitive << clock.pos();
 	
