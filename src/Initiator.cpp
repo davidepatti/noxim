@@ -1,3 +1,4 @@
+#include "Hub.h"
 #include "Initiator.h"
 
   void Initiator::thread_process()
@@ -20,6 +21,8 @@
 	  tlm::tlm_command cmd = tlm::TLM_WRITE_COMMAND;
 	  flit_payload = buffer_tx.Front();
 
+	  hub->power.antennaBufferFront();
+
 	  int destHub = tile2Hub(flit_payload.dst_id);
 	  LOG << "Forwarding to wireless to reach Hub_" << destHub <<  endl;
 
@@ -40,11 +43,13 @@
 	  // Call b_transport to demonstrate the b/nb conversion by the simple_target_socket
 	  socket->b_transport( *trans, delay);
 
+	  hub->power.wirelessTx(hub->local_id,destHub,GlobalParams::flit_size);
 
 	  // Initiator obliged to check response status and delay
 	  if ( !trans->is_response_error() )
 	  {
 	      buffer_tx.Pop();
+	      hub->power.antennaBufferPop();
 	  }
 	  else
 	  {

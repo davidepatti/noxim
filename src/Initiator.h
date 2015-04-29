@@ -7,8 +7,12 @@
 #include "DataStructs.h"
 #include "Buffer.h"
 
+
+
 using namespace sc_core;
 using namespace std;
+
+struct Hub;
 
 // **************************************************************************************
 // Initiator module generating multiple pipelined generic payload transactions
@@ -16,11 +20,15 @@ using namespace std;
 
 struct Initiator: sc_module
 {
+  Hub * hub;
   // TLM-2 socket, defaults to 32-bits wide, base protocol
   tlm_utils::simple_initiator_socket<Initiator> socket;
 
-  SC_CTOR(Initiator)
-  : socket("socket")  // Construct and name socket
+  SC_HAS_PROCESS(Initiator);
+
+  //SC_CTOR(Initiator)
+  //: socket("socket")  // Construct and name socket
+  Initiator(sc_module_name nm,Hub* h): sc_module(nm),hub(h), socket("socket")
   {
 
     SC_THREAD(thread_process);

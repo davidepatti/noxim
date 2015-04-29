@@ -131,7 +131,7 @@ SC_MODULE(Hub)
         for (unsigned int i = 0; i < txChannels.size(); i++) {
             char txt[20];
             sprintf(txt, "init_%d", txChannels[i]);
-            init[txChannels[i]] = new Initiator(txt);
+            init[txChannels[i]] = new Initiator(txt,this);
             init[txChannels[i]]->buffer_tx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].txBufferSize);
             LOG << "Size of buffer_tx = " << init[txChannels[i]]->buffer_tx.GetMaxBufferSize() << " for Channel_"<< txChannels[i] << endl;
             token_ring->attachHub(txChannels[i],local_id);

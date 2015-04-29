@@ -73,11 +73,12 @@ class Power {
     void bufferPush(); // x
     void bufferPop(); // x
     void bufferFront(); // x
-    void antennaBufferPush();
-    void antennaBufferPop();
-    void antennaBufferFront();
+    void antennaBufferPush(); // x
+    void antennaBufferPop(); // x
+    void antennaBufferFront(); // x
     void wirelessTx(int src,int dst,int length);
-    void wirelessRx();
+    void wirelessTotalRx(int no_receivers);
+    void wirelessSnooping();
 
     void routing(); //x 
     void selection(); // x
@@ -114,9 +115,9 @@ class Power {
     double antenna_buffer_front_pwr_d;
     double antenna_buffer_pwr_s;
 
-    map< pair<int, int> , double>  bit_wireless_tx_pwr;
     double flit_wireless_rx_pwr;
     double transceiver_pwr_s;
+    double wireless_snooping;
 
     double routing_pwr_d;
     double routing_pwr_s;
@@ -133,6 +134,7 @@ class Power {
     double ni_pwr_d;
     double ni_pwr_s;
    
+    map< pair<int, int> , double>  bit_wireless_tx_pwr;
     
 };
 

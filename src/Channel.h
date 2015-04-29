@@ -2,6 +2,7 @@
 #define __BUS_H__
 
 #include "Utils.h"
+#include "Power.h"
 #include "tlm_utils/simple_initiator_socket.h"
 #include "tlm_utils/simple_target_socket.h"
 #include "tlm_utils/multi_passthrough_initiator_socket.h"
@@ -54,6 +55,7 @@ struct Channel: sc_module
     LOG << "data rate " << GlobalParams::channel_configuration[local_id].dataRate << " Gbps, transmission delay " << delay << " ps " << endl; 
   }
 
+  Power power;
 
   // Tagged TLM-2 blocking transport method
   virtual void b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& delay );

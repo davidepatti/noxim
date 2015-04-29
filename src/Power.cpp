@@ -15,17 +15,37 @@ using namespace std;
 
 Power::Power()
 {
-   total_power_d = 0.0;
-   total_power_s = 0.0;
+    total_power_d = 0.0;
+    total_power_s = 0.0;
 
-   buffer_pwr_s = 0.0;
-   antenna_buffer_pwr_s = 0.0;
-   routing_pwr_s = 0.0;
-   selection_pwr_s = 0.0;
-   crossbar_pwr_s = 0.0;
-   link_pwr_s = 0.0;
-   transceiver_pwr_s = 0.0;
-   ni_pwr_s = 0.0;
+    buffer_push_pwr_d = 0.0;
+    buffer_pop_pwr_d = 0.0;
+    buffer_front_pwr_d = 0.0;
+    buffer_pwr_s = 0.0;
+    
+    antenna_buffer_push_pwr_d = 0.0;
+    antenna_buffer_pop_pwr_d = 0.0;
+    antenna_buffer_front_pwr_d = 0.0;
+    antenna_buffer_pwr_s = 0.0;
+
+    flit_wireless_rx_pwr = 0.0;
+    transceiver_pwr_s = 0.0;
+    wireless_snooping = 0.0;
+
+    routing_pwr_d = 0.0;
+    routing_pwr_s = 0.0;
+
+    selection_pwr_d = 0.0;
+    selection_pwr_s = 0.0;
+
+    crossbar_pwr_d = 0.0;
+    crossbar_pwr_s = 0.0;
+
+    link_pwr_d = 0.0;
+    link_pwr_s = 0.0;
+
+    ni_pwr_d = 0.0;
+    ni_pwr_s = 0.0;
 
 }
 
@@ -209,9 +229,14 @@ void Power::wirelessTx(int src,int dst,int length)
 
 }
 
-void Power::wirelessRx()
+void Power::wirelessTotalRx(int no_receivers)
 {
-    total_power_d+= flit_wireless_rx_pwr;
+    total_power_d+= flit_wireless_rx_pwr*no_receivers;
+}
+
+void Power::wirelessSnooping()
+{
+    total_power_d += wireless_snooping;
 }
 
 

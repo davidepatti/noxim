@@ -13,6 +13,10 @@ void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& del
     sc_dt::uint64 masked_address;
     unsigned int target_nr = decode_address( address, masked_address);
 
+    // due the rx power consumption of all the Hubs belonging to the
+    // channel, regardless the actual recipients of the current tx
+    power.wirelessTotalRx((int)targ_socket.size());
+
     if (target_nr < init_socket.size())
     {
 	// Modify address within transaction

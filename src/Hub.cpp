@@ -8,9 +8,6 @@ int Hub::tile2Port(int id)
     return tile2port_mapping[id];
 }
 
-
-
-
 int Hub::route(Flit& f)
 {
     for (vector<int>::size_type i=0; i< GlobalParams::hub_configuration[local_id].attachedNodes.size();i++)
@@ -58,6 +55,9 @@ void Hub::rxRadioProcess()
     } 
     else 
     {
+	power.wirelessSnooping();
+	power.leakage();
+
 	// stores routing decision
 	// need a vector to use this info to choose between the two
 	// tables
@@ -71,6 +71,7 @@ void Hub::rxRadioProcess()
 	    {
 		LOG << "Buffer_rx is not empty for channel " << channel << endl;
 		Flit received_flit = target[channel]->buffer_rx.Front();
+		power.antennaBufferFront();
 		r[i] = tile2Port(received_flit.dst_id);
 	    }
 	}
@@ -82,13 +83,16 @@ void Hub::rxRadioProcess()
 	    if (!(target[channel]->buffer_rx.IsEmpty()))
 	    {
 		Flit received_flit = target[channel]->buffer_rx.Front();
+		power.antennaBufferFront();
 
 		if ( !buffer_to_tile[r[i]].IsFull() ) 
 		{
 		    target[channel]->buffer_rx.Pop();
+		    power.antennaBufferPop();
 		    LOG << "Moving flit from buffer_rx to buffer port " << r[i] << endl;
 
 		    buffer_to_tile[r[i]].Push(received_flit);
+		    power.bufferPush();
 		}
 		else 
 		    LOG << "WARNING, buffer full for port " << r[i] << endl;
@@ -122,6 +126,7 @@ void Hub::rxProcess()
 		Flit received_flit = flit_rx[i]->read();
 
 		buffer_from_tile[i].Push(received_flit);
+		power.bufferPush();
 
 		current_level_rx[i] = 1 - current_level_rx[i];
 
@@ -171,6 +176,7 @@ void Hub::txProcess()
 		LOG << "Reservation: buffer_from_tile not empty on port " << i << endl;
 
 		Flit flit = buffer_from_tile[i].Front();
+		power.bufferFront();
 		r_from_tile[i] = route(flit);
 
 		if (flit.flit_type == FLIT_TYPE_HEAD) 
@@ -195,6 +201,7 @@ void Hub::txProcess()
 		LOG << "Reservation: buffer_to_tile not empty on port " << i << endl;
 
 		Flit flit = buffer_to_tile[i].Front();
+		power.bufferFront();
 		r_to_tile[i] = route(flit);
 
 		if (flit.flit_type == FLIT_TYPE_HEAD) 
@@ -220,6 +227,7 @@ void Hub::txProcess()
 	    if (!buffer_from_tile[i].IsEmpty()) 
 	    {     
 		Flit flit = buffer_from_tile[i].Front();
+		// powerFront already accounted in 1st phase
 
 		assert(r_from_tile[i] == DIRECTION_WIRELESS);
 
@@ -231,7 +239,9 @@ void Hub::txProcess()
 		    {
 			LOG << "Flit moved from buffer["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
 			buffer_from_tile[i].Pop();
+			power.bufferPop();
 			init[channel]->buffer_tx.Push(flit);
+			power.antennaBufferPush();
 			if (flit.flit_type == FLIT_TYPE_TAIL) wireless_reservation_table.release(channel);
 		    }
 
@@ -247,6 +257,7 @@ void Hub::txProcess()
 	    if (!buffer_to_tile[i].IsEmpty()) 
 	    {     
 		Flit flit = buffer_to_tile[i].Front();
+		// powerFront already accounted in 1st phase
 
 		assert(r_to_tile[i] != DIRECTION_WIRELESS);
 
@@ -265,6 +276,7 @@ void Hub::txProcess()
 		    current_level_tx[d] = 1 - current_level_tx[d];
 		    req_tx[d].write(current_level_tx[d]);
 		    buffer_to_tile[i].Pop();
+		    power.bufferPop();
 
 		    if (flit.flit_type == FLIT_TYPE_TAIL) reservation_table.release(d);
 
