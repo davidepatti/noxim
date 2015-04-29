@@ -15,6 +15,7 @@
 #include <map>
 #include <utility>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -63,15 +64,15 @@ using namespace std;
 #define VERBOSE_MEDIUM         2
 #define VERBOSE_HIGH           3
 
-typedef struct {
-    int maxHoldCycles;
-} TxChannelConfig;
-
 // TODO check the list of attributes for ChannelConfig 
 typedef struct {
     pair<int, int> ber;
     int dataRate;
 } ChannelConfig;
+
+typedef struct {
+    int maxHoldCycles;
+} TxChannelConfig;
 
 typedef struct {
     vector<int> attachedNodes;
@@ -83,6 +84,34 @@ typedef struct {
     int rxBufferSize;
 } HubConfig;
 
+typedef struct {
+    map<pair <int, int>, double> front_pm;
+    map<pair <int, int>, double> pop_pm;
+    map<pair <int, int>, double> push_pm;
+    map<pair <int, int>, double> leakage_pm;
+} BufferPowerConfig;
+
+typedef struct {
+    pair<double, double> link_bit_line_pm;
+    pair<double, double> crossbar_pm;
+    pair<double, double> network_interface_pm;
+    map<string, pair<double, double> > routing_algorithm_pm;
+    map<string, pair<double, double> > selection_strategy_pm;
+} RouterPowerConfig;
+
+typedef struct {
+    pair<double, double> link_bit_line_pm;
+    double transceiver_leakage_pm;
+    double receiver_pm;
+    double default_transmitter_pm;
+    map<pair <int, int>, double> transmitter_pm;
+} HubPowerConfig;
+
+typedef struct {
+    BufferPowerConfig bufferPowerConfig;
+    RouterPowerConfig routerPowerConfig;
+    HubPowerConfig hubPowerConfig;
+} PowerConfig;
 
 struct GlobalParams {
     static int verbose_mode;
@@ -118,6 +147,7 @@ struct GlobalParams {
     static HubConfig default_hub_configuration;
     static map<int, HubConfig> hub_configuration;
     static map<int, int> hub_for_tile;
+    static PowerConfig power_configuration;
 };
 
 #endif

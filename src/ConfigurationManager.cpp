@@ -82,6 +82,8 @@ void loadConfiguration() {
         node[channel_id] = GlobalParams::channel_configuration[channel_id];
         cout << node[channel_id] << endl;
     }
+
+    GlobalParams::power_configuration = config["Power"].as<PowerConfig>();
 }
 
 void showHelp(char selfname[])

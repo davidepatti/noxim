@@ -43,3 +43,4 @@ map<int, ChannelConfig> GlobalParams::channel_configuration;
 HubConfig GlobalParams::default_hub_configuration;
 map<int, HubConfig> GlobalParams::hub_configuration;
 map<int, int> GlobalParams::hub_for_tile;
+PowerConfig GlobalParams::power_configuration;
