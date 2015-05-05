@@ -43,6 +43,8 @@ double GlobalStats::getAverageDelay()
     return avg_delay;
 }
 
+
+
 double GlobalStats::getAverageDelay(const int src_id,
 					 const int dst_id)
 {
@@ -211,13 +213,24 @@ vector < vector < unsigned long > > GlobalStats::getRoutedFlitsMtx()
     return mtx;
 }
 
-double GlobalStats::getPower()
+double GlobalStats::getDynamicPower()
 {
     double power = 0.0;
 
     for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
 	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
-	    power += noc->t[x][y]->r->power.getTotalPower();
+	    power += noc->t[x][y]->r->power.getDynamicPower();
+
+    return power;
+}
+
+double GlobalStats::getStaticPower()
+{
+    double power = 0.0;
+
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+	    power += noc->t[x][y]->r->power.getStaticPower();
 
     return power;
 }
@@ -232,7 +245,9 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 	getAverageThroughput() << endl;
     out << "% Throughput (flits/cycle/IP): " << getThroughput() << endl;
     out << "% Max delay (cycles): " << getMaxDelay() << endl;
-    out << "% Total energy (J): " << getPower() << endl;
+    out << "% Total energy (J): " << getTotalPower() << endl;
+    out << "% \tDynamic energy (J): " << getDynamicPower() << endl;
+    out << "% \tStatic energy (J): " << getStaticPower() << endl;
 
     if (GlobalParams::show_buffer_stats)
       showBufferStats(out);

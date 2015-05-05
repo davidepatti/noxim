@@ -63,8 +63,13 @@ class GlobalStats {
     // Returns the number of routed flits for each router
      vector < vector < unsigned long > > getRoutedFlitsMtx();
 
+    // Returns the total dyamic power
+    double getDynamicPower();
+    // Returns the total static power
+    double getStaticPower();
+
     // Returns the total power
-    double getPower();
+    double getTotalPower() { return getDynamicPower()+getStaticPower(); }
 
     // Shows global statistics
     void showStats(std::ostream & out = std::cout, bool detailed = false);

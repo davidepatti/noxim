@@ -42,6 +42,13 @@ void NoC::buildMesh()
         hub[hub_id]->clock(clock);
         hub[hub_id]->reset(reset);
 
+	// TODO: use values from config.yaml
+	hub[hub_id]->power.configureHub(GlobalParams::flit_size,
+		                        GlobalParams::buffer_depth,
+					GlobalParams::flit_size,
+					GlobalParams::buffer_depth,
+					GlobalParams::flit_size);
+
         // Determine, from configuration file, which Hub is connected to which Tile
         for(vector<int>::iterator iit = hub_config.attachedNodes.begin(); 
                 iit != hub_config.attachedNodes.end(); 
@@ -69,6 +76,8 @@ void NoC::buildMesh()
             channel[channel_id]->init_socket.bind(hub[hub_id]->target[channel_id]->socket);
 	    channel[channel_id]->addHub(hub_id);
         }
+
+
     }
 
     // DEBUG Print Tile / Hub connections 
@@ -140,6 +149,12 @@ void NoC::buildMesh()
 				  GlobalParams::stats_warm_up_time,
 				  GlobalParams::buffer_depth,
 				  grtable);
+	    t[i][j]->r->power.configureRouter(GlobalParams::flit_size,
+		      			      GlobalParams::buffer_depth,
+					      GlobalParams::flit_size,
+					      string(GlobalParams::routing_algorithm),
+					      "default");
+					      
 
 
 	    // Tell to the PE its coordinates

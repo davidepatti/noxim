@@ -103,8 +103,14 @@ void Power::configureRouter(int link_width,
     // Router has both type of links
     double length_r2h = 1.0; // TODO TURI GlobalParams::power_configuration.r2h_link_length;
     double length_r2r = 1.0; // TODO TURI GlobalParams::power_configuration.r2r_link_length;
+    
+    for (map<double,pair<double,double> > ::iterator i = GlobalParams::power_configuration.linkBitLinePowerConfig.begin();
+	    i!=GlobalParams::power_configuration.linkBitLinePowerConfig.end(); i++)
+	cout << i->first << " " << i->second.first << " " << i->second.second << endl;
+
     assert(GlobalParams::power_configuration.linkBitLinePowerConfig.find(length_r2r)!=GlobalParams::power_configuration.linkBitLinePowerConfig.end());
     assert(GlobalParams::power_configuration.linkBitLinePowerConfig.find(length_r2h)!=GlobalParams::power_configuration.linkBitLinePowerConfig.end());
+
 
     link_r2r_pwr_s= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2r].first;
     link_r2r_pwr_d= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2r].second;
