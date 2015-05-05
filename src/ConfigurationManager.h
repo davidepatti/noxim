@@ -97,7 +97,7 @@ namespace YAML {
             return true;
         }
     };
-    
+     
     template<>
     struct convert<BufferPowerConfig> {
         static bool decode(const Node& node, BufferPowerConfig& bufferPowerConfig) {
@@ -114,28 +114,39 @@ namespace YAML {
             }
             return true;
         }
+    };   
+
+    template<>
+    struct convert<LinkBitLinePowerConfig> {
+        static bool decode(const Node& node, LinkBitLinePowerConfig& linkBitLinePowerConfig) {
+            for(YAML::const_iterator link_bit_line_pc_it= node.begin();
+                link_bit_line_pc_it != node.end();
+                ++link_bit_line_pc_it)
+            {    
+                vector<double> v = link_bit_line_pc_it->as<vector<double> >();
+                cout << v[0] << " " << v[1] << " " << v[2] << endl;
+                linkBitLinePowerConfig[v[0]] = make_pair(v[1], v[2]);
+            }
+            return true;
+        }
     };
 
 
     template<>
     struct convert<RouterPowerConfig> {
         static bool decode(const Node& node, RouterPowerConfig& routerPowerConfig) {
-            routerPowerConfig.link_bit_line_pm = node["link_bit_line"].as<pair<double, double> >();
-            routerPowerConfig.crossbar_pm = node["crossbar"].as<pair<double, double> >();
-            routerPowerConfig.network_interface_pm = node["network_interface"].as<pair<double, double> >();
-/*            
-            for(YAML::const_iterator buffering_it= node["buffering"].begin(); 
-                buffering_it != node["buffering"].end();
-                ++buffering_it)
+
+            for(YAML::const_iterator crossbar_it = node["crossbar"].begin();
+                crossbar_it != node["crossbar"].end();
+                ++crossbar_it)
             {    
-                vector<double> v = buffering_it->as<vector<double> >();
-                //cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << " " << v[4] << " " << v[5] << endl;
-                routerPowerConfig.buffer_leakage_pm[make_pair(v[0],v[1])] = v[2];
-                routerPowerConfig.buffer_push_pm[make_pair(v[0],v[1])] = v[3];
-                routerPowerConfig.buffer_front_pm[make_pair(v[0],v[1])] = v[4];
-                routerPowerConfig.buffer_pop_pm[make_pair(v[0],v[1])] = v[5];
+                vector<double> v = crossbar_it->as<vector<double> >();
+                cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << endl;
+                routerPowerConfig.crossbar_pm[make_pair(v[0], v[1])] = make_pair(v[2], v[3]);
             }
-*/
+
+            routerPowerConfig.network_interface_pm = node["network_interface"].as<pair<double, double> >();
+            
             for(YAML::const_iterator routing_it = node["routing"].begin(); 
                 routing_it != node["routing"].end();
                 ++routing_it)
@@ -157,18 +168,19 @@ namespace YAML {
     template<>
     struct convert<HubPowerConfig> {
         static bool decode(const Node& node, HubPowerConfig& hubPowerConfig) {
-            hubPowerConfig.link_bit_line_pm = node["link_bit_line"].as<pair<double, double> >();
-            hubPowerConfig.transceiver_leakage_pm = node["transceiver_leakage"].as<double>();
-            hubPowerConfig.receiver_pm = node["rx_power"].as<double>();
-            hubPowerConfig.default_transmitter_pm = node["default_tx_power"].as<double>();
+            hubPowerConfig.transceiver_leakage_pm = node["transceiver_leakage"].as<pair<double, double> >();
+            hubPowerConfig.transceiver_biasing_pm = node["transceiver_biasing"].as<pair<double, double> >();
+            hubPowerConfig.receiver_dynamic_pm = node["rx_dynamic"].as<double>();
+            hubPowerConfig.receiver_snooping_pm = node["rx_snooping"].as<double>();
+            hubPowerConfig.default_transmitter_pm = node["default_tx_energy"].as<double>();
 
-            for(YAML::const_iterator tx_power_map_it= node["tx_power_map"].begin(); 
-                tx_power_map_it != node["tx_power_map"].end();
-                ++tx_power_map_it)
+            for(YAML::const_iterator tx_attenuation_map_it= node["tx_attenuation_map"].begin(); 
+                tx_attenuation_map_it != node["tx_attenuation_map"].end();
+                ++tx_attenuation_map_it)
             {    
-                vector<double> v = tx_power_map_it->as<vector<double> >();
-                //cout << v[0] << " " << v[1] << " " << v[2] << endl;
-                hubPowerConfig.transmitter_pm[make_pair(v[0],v[1])] = v[2];
+                vector<double> v = tx_attenuation_map_it->as<vector<double> >();
+                cout << v[0] << " " << v[1] << " " << v[2] << endl;
+                hubPowerConfig.transmitter_attenuation_map[make_pair(v[0],v[1])] = v[2];
             }
 
             return true;
@@ -179,6 +191,7 @@ namespace YAML {
     struct convert<PowerConfig> {
         static bool decode(const Node& node, PowerConfig& powerConfig) {
             powerConfig.bufferPowerConfig = node["Buffer"].as<BufferPowerConfig>();
+            powerConfig.linkBitLinePowerConfig = node["LinkBitLine"].as<LinkBitLinePowerConfig>();
             powerConfig.routerPowerConfig = node["Router"].as<RouterPowerConfig>();
             powerConfig.hubPowerConfig = node["Hub"].as<HubPowerConfig>();
             return true;

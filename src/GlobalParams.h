@@ -91,24 +91,27 @@ typedef struct {
     map<pair <int, int>, double> leakage_pm;
 } BufferPowerConfig;
 
+typedef map<double, pair <double, double> > LinkBitLinePowerConfig;
+
 typedef struct {
-    pair<double, double> link_bit_line_pm;
-    pair<double, double> crossbar_pm;
+    map<pair<double, double>, pair<double, double> > crossbar_pm;
     pair<double, double> network_interface_pm;
     map<string, pair<double, double> > routing_algorithm_pm;
     map<string, pair<double, double> > selection_strategy_pm;
 } RouterPowerConfig;
 
 typedef struct {
-    pair<double, double> link_bit_line_pm;
-    double transceiver_leakage_pm;
-    double receiver_pm;
+    pair<double, double> transceiver_leakage_pm;
+    pair<double, double> transceiver_biasing_pm;
+    double receiver_dynamic_pm;
+    double receiver_snooping_pm;
     double default_transmitter_pm;
-    map<pair <int, int>, double> transmitter_pm;
+    map<pair <int, int>, double> transmitter_attenuation_map;
 } HubPowerConfig;
 
 typedef struct {
     BufferPowerConfig bufferPowerConfig;
+    LinkBitLinePowerConfig linkBitLinePowerConfig;
     RouterPowerConfig routerPowerConfig;
     HubPowerConfig hubPowerConfig;
 } PowerConfig;
@@ -139,7 +142,6 @@ struct GlobalParams {
     static vector <pair <int, double> > hotspots;
     static float dyad_threshold;
     static unsigned int max_volume_to_be_drained;
-    static char router_power_filename[128];
     static bool show_buffer_stats;
     static bool use_winoc;
     static ChannelConfig default_channel_configuration;

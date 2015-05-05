@@ -83,12 +83,13 @@ void Power::configureRouter(int link_width,
     selection_pwr_d = GlobalParams::power_configuration.routerPowerConfig.selection_strategy_pm[selection_function].second;
 
     // CrossBar
-    crossbar_pwr_s = GlobalParams::power_configuration.routerPowerConfig.crossbar_pm.first;
-    crossbar_pwr_d = GlobalParams::power_configuration.routerPowerConfig.crossbar_pm.second;
+    crossbar_pwr_s = 0.0;// TODO: CHECK // GlobalParams::power_configuration.routerPowerConfig.crossbar_pm.first;
+    crossbar_pwr_d = 0.0;// TODO: CHECK // GlobalParams::power_configuration.routerPowerConfig.crossbar_pm.second;
     
     // Link 
-    link_pwr_s= link_width * GlobalParams::power_configuration.routerPowerConfig.link_bit_line_pm.first;
-    link_pwr_d= link_width * GlobalParams::power_configuration.routerPowerConfig.link_bit_line_pm.second;
+    double length = 1.0;
+    link_pwr_s= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length].first;
+    link_pwr_d= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length].second;
 
     // NetworkInterface
     ni_pwr_s = GlobalParams::power_configuration.routerPowerConfig.network_interface_pm.first;
@@ -129,12 +130,15 @@ void Power::configureHub(int link_width,
     antenna_buffer_front_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.front_pm[akey];
     antenna_buffer_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop_pm[akey];
 
-    bit_wireless_tx_pwr = GlobalParams::power_configuration.hubPowerConfig.transmitter_pm;
-    //TODO: add default power values for SRC/DST couples not defined in the transmission power map
+    bit_wireless_tx_pwr = GlobalParams::power_configuration.hubPowerConfig.transmitter_attenuation_map;
 
-    flit_wireless_rx_pwr = antenna_buffer_size * GlobalParams::power_configuration.hubPowerConfig.receiver_pm;
+    flit_wireless_rx_pwr = antenna_buffer_size * GlobalParams::power_configuration.hubPowerConfig.receiver_dynamic_pm;
+    wireless_snooping = GlobalParams::power_configuration.hubPowerConfig.receiver_snooping_pm;
 
-    transceiver_pwr_s = GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage_pm;
+    transceiver_pwr_s = GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage_pm.first +
+        GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage_pm.second +
+        GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing_pm.first +
+        GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing_pm.second;
 }
 
 

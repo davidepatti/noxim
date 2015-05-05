@@ -41,7 +41,6 @@ void loadConfiguration() {
     GlobalParams::dyad_threshold = config["dyad_threshold"].as<float>();
     GlobalParams::max_volume_to_be_drained = config["max_volume_to_be_drained"].as<unsigned int>();
     //GlobalParams::hotspots;
-    strcpy(GlobalParams::router_power_filename, config["router_power_filename"].as<string>().c_str()); 
     GlobalParams::show_buffer_stats = config["show_buffer_stats"].as<bool>();
     GlobalParams::use_winoc = config["use_winoc"].as<bool>();
     
@@ -83,7 +82,7 @@ void loadConfiguration() {
         cout << node[channel_id] << endl;
     }
 
-    GlobalParams::power_configuration = config["Power"].as<PowerConfig>();
+    GlobalParams::power_configuration = config["Energy"].as<PowerConfig>();
 }
 
 void showHelp(char selfname[])
@@ -127,7 +126,6 @@ void showHelp(char selfname[])
          << "\t\tshuffle\t\tShuffle traffic distribution" << endl
          <<	"\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file" << endl
          << "\t-hs ID P\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)" << endl
-         << "\t-pwr FILENAME\tRouter and link power data (default " << GlobalParams::router_power_filename << ")" << endl
          << "\t-warmup N\tStart to collect statistics after N cycles (default " << GlobalParams::stats_warm_up_time << ")" << endl
          << "\t-seed N\t\tSet the seed of the random generator (default time())" << endl
          << "\t-detailed\tShow detailed statistics" << endl
@@ -366,8 +364,6 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		    atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-sim"))
 		GlobalParams::simulation_time = atoi(arg_vet[++i]);
-	    else if (!strcmp(arg_vet[i], "-pwr"))
-	      strcpy(GlobalParams::router_power_filename, arg_vet[++i]);
 	    else {
 		cerr << "Error: Invalid option: " << arg_vet[i] << endl;
 		exit(1);
