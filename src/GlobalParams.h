@@ -85,27 +85,27 @@ typedef struct {
 } HubConfig;
 
 typedef struct {
-    map<pair <int, int>, double> front_pm;
-    map<pair <int, int>, double> pop_pm;
-    map<pair <int, int>, double> push_pm;
-    map<pair <int, int>, double> leakage_pm;
+    map<pair <int, int>, double> front;
+    map<pair <int, int>, double> pop;
+    map<pair <int, int>, double> push;
+    map<pair <int, int>, double> leakage;
 } BufferPowerConfig;
 
 typedef map<double, pair <double, double> > LinkBitLinePowerConfig;
 
 typedef struct {
     map<pair<double, double>, pair<double, double> > crossbar_pm;
-    pair<double, double> network_interface_pm;
+    pair<double, double> network_interface;
     map<string, pair<double, double> > routing_algorithm_pm;
     map<string, pair<double, double> > selection_strategy_pm;
 } RouterPowerConfig;
 
 typedef struct {
-    pair<double, double> transceiver_leakage_pm;
-    pair<double, double> transceiver_biasing_pm;
-    double receiver_dynamic_pm;
-    double receiver_snooping_pm;
-    double default_transmitter_pm;
+    pair<double, double> transceiver_leakage;
+    pair<double, double> transceiver_biasing;
+    double receiver_dynamic;
+    double receiver_snooping;
+    double default_transmitter;
     map<pair <int, int>, double> transmitter_attenuation_map;
 } HubPowerConfig;
 

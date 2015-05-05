@@ -121,7 +121,6 @@ void Router::txProcess()
 	}
       start_from_port++;
 
-      int crossbar_traversed = 0;
 
       // 2nd phase: Forwarding
       for (int i = 0; i < DIRECTIONS + 2; i++) 
@@ -136,20 +135,21 @@ void Router::txProcess()
 	      {
 		  if (current_level_tx[o] == ack_tx[o].read()) 
 		  {
-		      if (o == DIRECTION_HUB)
-		      {
-			  LOG << "Forwarding to HUB " << endl;
-		      }
 		      if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-		      {
-			  LOG << "Input[" << i <<
-			      "] forward to Output[" << o << "], flit: "
-			      << flit << endl;
-		      }
+			  LOG << "Input[" << i << "] forward to Output[" << o << "], flit: " << flit << endl;
 
 		      flit_tx[o].write(flit);
-		      power.link();
-		      crossbar_traversed++;
+		      if (o == DIRECTION_HUB)
+		      {
+			  power.r2hLink();
+			  LOG << "Forwarding to HUB " << endl;
+		      }
+		      else
+		      {
+			  power.r2rLink();
+		      }
+
+		      power.crossBar();
 
 		      current_level_tx[o] = 1 - current_level_tx[o];
 		      req_tx[o].write(current_level_tx[o]);
@@ -193,8 +193,6 @@ void Router::txProcess()
 	      }
 	  }
       }
-      if (crossbar_traversed)
-	  power.crossBar();
     }				// else reset read
 }
 

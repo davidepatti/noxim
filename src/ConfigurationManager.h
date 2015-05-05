@@ -107,10 +107,10 @@ namespace YAML {
             {    
                 vector<double> v = buffering_it->as<vector<double> >();
                 cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << " " << v[4] << " " << v[5] << endl;
-                bufferPowerConfig.leakage_pm[make_pair(v[0],v[1])] = v[2];
-                bufferPowerConfig.push_pm[make_pair(v[0],v[1])] = v[3];
-                bufferPowerConfig.front_pm[make_pair(v[0],v[1])] = v[4];
-                bufferPowerConfig.pop_pm[make_pair(v[0],v[1])] = v[5];
+                bufferPowerConfig.leakage[make_pair(v[0],v[1])] = v[2];
+                bufferPowerConfig.push[make_pair(v[0],v[1])] = v[3];
+                bufferPowerConfig.front[make_pair(v[0],v[1])] = v[4];
+                bufferPowerConfig.pop[make_pair(v[0],v[1])] = v[5];
             }
             return true;
         }
@@ -145,7 +145,7 @@ namespace YAML {
                 routerPowerConfig.crossbar_pm[make_pair(v[0], v[1])] = make_pair(v[2], v[3]);
             }
 
-            routerPowerConfig.network_interface_pm = node["network_interface"].as<pair<double, double> >();
+            routerPowerConfig.network_interface = node["network_interface"].as<pair<double, double> >();
             
             for(YAML::const_iterator routing_it = node["routing"].begin(); 
                 routing_it != node["routing"].end();
@@ -168,11 +168,11 @@ namespace YAML {
     template<>
     struct convert<HubPowerConfig> {
         static bool decode(const Node& node, HubPowerConfig& hubPowerConfig) {
-            hubPowerConfig.transceiver_leakage_pm = node["transceiver_leakage"].as<pair<double, double> >();
-            hubPowerConfig.transceiver_biasing_pm = node["transceiver_biasing"].as<pair<double, double> >();
-            hubPowerConfig.receiver_dynamic_pm = node["rx_dynamic"].as<double>();
-            hubPowerConfig.receiver_snooping_pm = node["rx_snooping"].as<double>();
-            hubPowerConfig.default_transmitter_pm = node["default_tx_energy"].as<double>();
+            hubPowerConfig.transceiver_leakage = node["transceiver_leakage"].as<pair<double, double> >();
+            hubPowerConfig.transceiver_biasing = node["transceiver_biasing"].as<pair<double, double> >();
+            hubPowerConfig.receiver_dynamic = node["rx_dynamic"].as<double>();
+            hubPowerConfig.receiver_snooping = node["rx_snooping"].as<double>();
+            hubPowerConfig.default_transmitter = node["default_tx_energy"].as<double>();
 
             for(YAML::const_iterator tx_attenuation_map_it= node["tx_attenuation_map"].begin(); 
                 tx_attenuation_map_it != node["tx_attenuation_map"].end();

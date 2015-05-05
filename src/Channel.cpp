@@ -15,7 +15,7 @@ void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& del
 
     // due the rx power consumption of all the Hubs belonging to the
     // channel, regardless the actual recipients of the current tx
-    power.wirelessTotalRx((int)targ_socket.size());
+    power.wirelessDynamicRx((int)targ_socket.size());
 
     if (target_nr < init_socket.size())
     {

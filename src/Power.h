@@ -77,16 +77,18 @@ class Power {
     void antennaBufferPop(); // x
     void antennaBufferFront(); // x
     void wirelessTx(int src,int dst,int length);
-    void wirelessTotalRx(int no_receivers);
+    void wirelessDynamicRx(int no_receivers);
     void wirelessSnooping();
 
     void routing(); //x 
     void selection(); // x
     void crossBar(); //x
-    void link(); // x 
+    void r2hLink(); // x 
+    void r2rLink(); // x 
     void networkInterface(); //x
 
     void leakage();
+    void biasing();
 
 
     double getDynamicPower() {
@@ -98,6 +100,7 @@ class Power {
     double getTotalPower() {
 	return (total_power_d + total_power_s);
     } 
+
 
 
   private:
@@ -115,8 +118,9 @@ class Power {
     double antenna_buffer_front_pwr_d;
     double antenna_buffer_pwr_s;
 
-    double flit_wireless_rx_pwr;
+    double wireless_rx_pwr;
     double transceiver_pwr_s;
+    double transceiver_pwr_biasing;
     double wireless_snooping;
 
     double routing_pwr_d;
@@ -128,13 +132,16 @@ class Power {
     double crossbar_pwr_d;
     double crossbar_pwr_s;
 
-    double link_pwr_d;
-    double link_pwr_s;
+    double link_r2r_pwr_d;
+    double link_r2r_pwr_s;
+    double link_r2h_pwr_s;
+    double link_r2h_pwr_d;
 
     double ni_pwr_d;
     double ni_pwr_s;
    
-    map< pair<int, int> , double>  bit_wireless_tx_pwr;
+    map< pair<int, int> , double>  attenuation_map;
+    double attenuation2power(double);
     
 };
 

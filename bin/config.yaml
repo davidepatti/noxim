@@ -129,9 +129,9 @@ Energy:
         # [Static, Dynamic]
         crossbar:
         # - [I/O Port number, FlitSize, Leakage, Dynamic]
-        - [1, 16, 0.0, 0.0] 
-        - [1, 32, 0.0, 0.0] 
-        - [1, 64, 0.0, 0.0] 
+        - [5, 16, 0.0, 0.0] 
+        - [5, 32, 0.0, 0.0] 
+        - [5, 64, 0.0, 0.0] 
  
         # [Static, Dynamic]
         network_interface: [0.0, 0.0]
@@ -161,20 +161,16 @@ Energy:
         default_tx_energy: 0.0
         
         tx_attenuation_map:
-        # - [TX_Zone_ID, RX_Zone_ID, Attenuation]
-        - [0, 0, 0.0]
+        # - [Hub ID TX, Hub ID RX, Attenuation]
         - [0, 1, 1.1]
         - [0, 2, 2.2]
         - [0, 3, 3.3]
         - [1, 0, 0.0]
-        - [1, 1, 1.1]
         - [1, 2, 2.2]
         - [1, 3, 3.3]
         - [2, 0, 0.0]
         - [2, 1, 1.1]
-        - [2, 2, 2.2]
         - [2, 3, 3.3]
         - [3, 0, 0.0]
         - [3, 1, 1.1]
         - [3, 2, 2.2]
-        - [3, 3, 3.3]

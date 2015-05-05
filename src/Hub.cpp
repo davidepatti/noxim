@@ -24,6 +24,13 @@ int Hub::route(Flit& f)
 
 }
 
+
+void Hub::perCycleUpdate()
+{
+	power.leakage();
+	power.biasing();
+}
+
 void Hub::txRadioProcess()
 {
     if (reset.read()) 
@@ -56,7 +63,6 @@ void Hub::rxRadioProcess()
     else 
     {
 	power.wirelessSnooping();
-	power.leakage();
 
 	// stores routing decision
 	// need a vector to use this info to choose between the two
@@ -130,18 +136,9 @@ void Hub::rxProcess()
 
 		current_level_rx[i] = 1 - current_level_rx[i];
 
-		/* TODO: re-enable
-		// Incoming flit
-		//stats.power.Buffering();
-
-		if (received_flit.src_id == local_id)
-		stats.power.EndToEnd();
-		 */
 	    }
 	    ack_rx[i]->write(current_level_rx[i]);
 	}
-	// TODO: re-enable
-	//stats.power.Leakage();
     }
 }
 
@@ -273,6 +270,7 @@ void Hub::txProcess()
 		    LOG << "Forwarding to port " << d << endl;
 
 		    flit_tx[d].write(flit);
+		    power.r2hLink();
 		    current_level_tx[d] = 1 - current_level_tx[d];
 		    req_tx[d].write(current_level_tx[d]);
 		    buffer_to_tile[i].Pop();
