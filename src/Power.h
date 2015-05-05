@@ -90,22 +90,19 @@ class Power {
     void leakage();
     void biasing();
 
+    double getDynamicPower();
 
-    double getDynamicPower() {
-	return total_power_d;
-    } 
     double getStaticPower() {
 	return total_power_s;
     } 
     double getTotalPower() {
-	return (total_power_d + total_power_s);
+	return (getDynamicPower() + total_power_s);
     } 
 
 
 
   private:
 
-    double total_power_d;
     double total_power_s;
 
     double buffer_push_pwr_d;
@@ -139,9 +136,11 @@ class Power {
 
     double ni_pwr_d;
     double ni_pwr_s;
-   
+
     map< pair<int, int> , double>  attenuation_map;
     double attenuation2power(double);
+
+    map<string,double> power_breakdown;
     
 };
 

@@ -15,7 +15,6 @@ using namespace std;
 
 Power::Power()
 {
-    total_power_d = 0.0;
     total_power_s = 0.0;
 
     buffer_push_pwr_d = 0.0;
@@ -179,62 +178,72 @@ void Power::configureHub(int link_width,
 
 void Power::bufferPush()
 {
-    total_power_d+= buffer_push_pwr_d;
+    power_breakdown["buffer_push_pwr_d"] += buffer_push_pwr_d;
 }
 
 void Power::bufferPop()
 {
-    total_power_d+= buffer_pop_pwr_d;
+    power_breakdown["buffer_pop_pwr_d"]+= buffer_pop_pwr_d;
 }
 
 void Power::bufferFront()
 {
-    total_power_d+= buffer_front_pwr_d;
+    power_breakdown["buffer_front_pwr_d"]+= buffer_front_pwr_d;
 }
 
 void Power::antennaBufferPush()
 {
-    total_power_d+= antenna_buffer_push_pwr_d;
+    power_breakdown["antenna_buffer_push_pwr_d"]+= antenna_buffer_push_pwr_d;
 }
 
 void Power::antennaBufferPop()
 {
-    total_power_d+= antenna_buffer_pop_pwr_d;
+    power_breakdown["antenna_buffer_pop_pwr_d"]+= antenna_buffer_pop_pwr_d;
 }
 
 void Power::antennaBufferFront()
 {
-    total_power_d+= antenna_buffer_front_pwr_d;
+    power_breakdown["antenna_buffer_front_pwr_d"]+= antenna_buffer_front_pwr_d;
 }
 
 void Power::routing()
 {
-    total_power_d+= routing_pwr_d;
+    power_breakdown["routing_pwr_d"]+= routing_pwr_d;
 }
 
 void Power::selection()
 {
-    total_power_d+= selection_pwr_d;
+    power_breakdown["selection_pwr_d"]+=selection_pwr_d ;
 }
 
 void Power::crossBar()
 {
-    total_power_d+=crossbar_pwr_d;
+    power_breakdown["crossbar_pwr_d"]+=crossbar_pwr_d;
 }
 
 void Power::r2rLink()
 {
-    total_power_d+=link_r2r_pwr_d;
+    power_breakdown["link_r2r_pwr_d"]+=link_r2r_pwr_d;
 }
 
 void Power::r2hLink()
 {
-    total_power_d+=link_r2h_pwr_d;
+    power_breakdown["link_r2h_pwr_d"]+=link_r2h_pwr_d;
 }
 
 void Power::networkInterface()
 {
-    total_power_d+=ni_pwr_d;
+    power_breakdown["ni_pwr_d"]+=ni_pwr_d;
+}
+
+
+double Power::getDynamicPower()
+{
+    double power = 0.0;
+    for (map<string,double>::iterator i = power_breakdown.begin(); i!=power_breakdown.end(); i++)
+	power+= i->second;
+
+    return power;
 }
 
 
@@ -251,17 +260,17 @@ void Power::wirelessTx(int src,int dst,int length)
     pair<int,int> key = pair<int,int>(src,dst);
     assert(attenuation_map.find(key)!=attenuation_map.end());
 
-    total_power_d += attenuation2power(attenuation_map[key]) * length;
+    power_breakdown["wireless_tx"] += attenuation2power(attenuation_map[key]) * length;
 }
 
 void Power::wirelessDynamicRx(int no_receivers)
 {
-    total_power_d+= wireless_rx_pwr*no_receivers;
+    power_breakdown["wireless_dynamic_rx_pwr"]+= wireless_rx_pwr*no_receivers;
 }
 
 void Power::wirelessSnooping()
 {
-    total_power_d += wireless_snooping;
+    power_breakdown["wireless_snooping"] += wireless_snooping;
 }
 
 void Power::biasing()
