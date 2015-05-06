@@ -91,15 +91,16 @@ class Power {
     void biasing();
 
     double getDynamicPower();
+    double getStaticPower();
 
-    double getStaticPower() {
-	return total_power_s;
-    } 
     double getTotalPower() {
-	return (getDynamicPower() + total_power_s);
+	return (getDynamicPower() + getStaticPower());
     } 
 
 
+    void printBreakDown(std::ostream & out);
+    map<string,double> getDynamicPowerBreakDown(){ return power_breakdown_d;}
+    map<string,double> getStaticPowerBreakDown(){ return power_breakdown_s;}
 
   private:
 
@@ -140,7 +141,12 @@ class Power {
     map< pair<int, int> , double>  attenuation_map;
     double attenuation2power(double);
 
-    map<string,double> power_breakdown;
+
+    void printBreakDown(string label, const map<string,double> & m,std::ostream & out) const;
+
+    map<string,double> power_breakdown_d;
+    map<string,double> power_breakdown_s;
+
     
 };
 

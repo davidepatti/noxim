@@ -76,12 +76,18 @@ class GlobalStats {
 
     void showBufferStats(std::ostream & out);
 
+
+    void showPowerBreakDown(std::ostream & out);
+
+
+
 #ifdef TESTING
     unsigned int drained_total;
 #endif
 
   private:
     const NoC *noc;
+    void updatePowerBreakDown(map<string,double> &dst,const map<string,double>& src);
 };
 
 #endif

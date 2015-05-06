@@ -285,8 +285,56 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 	    out << endl;
 	}
 	out << "];" << endl;
+
+	showPowerBreakDown(out);
     }
 }
+
+void GlobalStats::updatePowerBreakDown(map<string,double> &dst,const map<string,double>& src)
+{
+    for (map<string,double>::const_iterator i=src.begin();i!=src.end();i++)
+    {
+	dst[i->first]+=i->second;
+    }
+}
+
+
+void GlobalStats::showPowerBreakDown(std::ostream & out)
+{
+    map<string,double> power_breakdown_d;
+    map<string,double> power_breakdown_s;
+
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+	{
+	    updatePowerBreakDown(power_breakdown_d, 
+		noc->t[x][y]->r->power.getDynamicPowerBreakDown());
+
+	    updatePowerBreakDown(power_breakdown_s, 
+		noc->t[x][y]->r->power.getStaticPowerBreakDown());
+	}
+
+    for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();
+            it != GlobalParams::hub_configuration.end();
+            ++it)
+    {
+	int hub_id = it->first;
+
+	map<int,Hub*>::const_iterator i = noc->hub.find(hub_id);
+	Hub * h = i->second;
+
+	    updatePowerBreakDown(power_breakdown_d, 
+		h->power.getDynamicPowerBreakDown());
+
+	    updatePowerBreakDown(power_breakdown_s, 
+		h->power.getStaticPowerBreakDown());
+    }
+
+    printMap("power_breakdown_d",power_breakdown_d,out);
+    printMap("power_breakdown_s",power_breakdown_s,out);
+
+}
+
 
 
 void GlobalStats::showBufferStats(std::ostream & out)

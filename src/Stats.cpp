@@ -176,7 +176,6 @@ double Stats::getCommunicationEnergy(int src_id, int dst_id)
 
     return energy;
   */
-  assert(false);
   return -1.0;
 }
 

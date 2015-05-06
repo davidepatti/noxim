@@ -10,6 +10,8 @@
 
 #include <iostream>
 #include "Power.h"
+#include "Utils.h"
+
 using namespace std;
 
 
@@ -178,69 +180,78 @@ void Power::configureHub(int link_width,
 
 void Power::bufferPush()
 {
-    power_breakdown["buffer_push_pwr_d"] += buffer_push_pwr_d;
+    power_breakdown_d["buffer_push_pwr_d"] += buffer_push_pwr_d;
 }
 
 void Power::bufferPop()
 {
-    power_breakdown["buffer_pop_pwr_d"]+= buffer_pop_pwr_d;
+    power_breakdown_d["buffer_pop_pwr_d"]+= buffer_pop_pwr_d;
 }
 
 void Power::bufferFront()
 {
-    power_breakdown["buffer_front_pwr_d"]+= buffer_front_pwr_d;
+    power_breakdown_d["buffer_front_pwr_d"]+= buffer_front_pwr_d;
 }
 
 void Power::antennaBufferPush()
 {
-    power_breakdown["antenna_buffer_push_pwr_d"]+= antenna_buffer_push_pwr_d;
+    power_breakdown_d["antenna_buffer_push_pwr_d"]+= antenna_buffer_push_pwr_d;
 }
 
 void Power::antennaBufferPop()
 {
-    power_breakdown["antenna_buffer_pop_pwr_d"]+= antenna_buffer_pop_pwr_d;
+    power_breakdown_d["antenna_buffer_pop_pwr_d"]+= antenna_buffer_pop_pwr_d;
 }
 
 void Power::antennaBufferFront()
 {
-    power_breakdown["antenna_buffer_front_pwr_d"]+= antenna_buffer_front_pwr_d;
+    power_breakdown_d["antenna_buffer_front_pwr_d"]+= antenna_buffer_front_pwr_d;
 }
 
 void Power::routing()
 {
-    power_breakdown["routing_pwr_d"]+= routing_pwr_d;
+    power_breakdown_d["routing_pwr_d"]+= routing_pwr_d;
 }
 
 void Power::selection()
 {
-    power_breakdown["selection_pwr_d"]+=selection_pwr_d ;
+    power_breakdown_d["selection_pwr_d"]+=selection_pwr_d ;
 }
 
 void Power::crossBar()
 {
-    power_breakdown["crossbar_pwr_d"]+=crossbar_pwr_d;
+    power_breakdown_d["crossbar_pwr_d"]+=crossbar_pwr_d;
 }
 
 void Power::r2rLink()
 {
-    power_breakdown["link_r2r_pwr_d"]+=link_r2r_pwr_d;
+    power_breakdown_d["link_r2r_pwr_d"]+=link_r2r_pwr_d;
 }
 
 void Power::r2hLink()
 {
-    power_breakdown["link_r2h_pwr_d"]+=link_r2h_pwr_d;
+    power_breakdown_d["link_r2h_pwr_d"]+=link_r2h_pwr_d;
 }
 
 void Power::networkInterface()
 {
-    power_breakdown["ni_pwr_d"]+=ni_pwr_d;
+    power_breakdown_d["ni_pwr_d"]+=ni_pwr_d;
 }
 
 
 double Power::getDynamicPower()
 {
     double power = 0.0;
-    for (map<string,double>::iterator i = power_breakdown.begin(); i!=power_breakdown.end(); i++)
+    for (map<string,double>::iterator i = power_breakdown_d.begin(); i!=power_breakdown_d.end(); i++)
+	power+= i->second;
+
+    return power;
+}
+
+double Power::getStaticPower()
+{
+    double power = 0.0;
+    for (map<string,double>::iterator i = power_breakdown_s.begin(); i!=power_breakdown_s.end(); i++)
 	power+= i->second;
 
     return power;
@@ -260,33 +271,45 @@ void Power::wirelessTx(int src,int dst,int length)
     pair<int,int> key = pair<int,int>(src,dst);
     assert(attenuation_map.find(key)!=attenuation_map.end());
 
-    power_breakdown["wireless_tx"] += attenuation2power(attenuation_map[key]) * length;
+    power_breakdown_d["wireless_tx"] += attenuation2power(attenuation_map[key]) * length;
 }
 
 void Power::wirelessDynamicRx(int no_receivers)
 {
-    power_breakdown["wireless_dynamic_rx_pwr"]+= wireless_rx_pwr*no_receivers;
+    power_breakdown_d["wireless_dynamic_rx_pwr"]+= wireless_rx_pwr*no_receivers;
 }
 
 void Power::wirelessSnooping()
 {
-    power_breakdown["wireless_snooping"] += wireless_snooping;
+    power_breakdown_d["wireless_snooping"] += wireless_snooping;
 }
 
 void Power::biasing()
 {
-    total_power_s+= transceiver_pwr_biasing;
+    power_breakdown_s["transceiver_pwr_biasing"] += transceiver_pwr_biasing;
 }
 
 void Power::leakage()
 {
-    total_power_s+= buffer_pwr_s+
-	            antenna_buffer_pwr_s+
-		    routing_pwr_s+
-		    selection_pwr_s+
-		    crossbar_pwr_s+
-		    link_r2r_pwr_s+
-		    link_r2h_pwr_s+
-		    transceiver_pwr_s+
-		    ni_pwr_s;
+    power_breakdown_s["buffer_pwr_s"]+=buffer_pwr_s;
+    power_breakdown_s["antenna_buffer_pwr_s"]+=antenna_buffer_pwr_s;
+    power_breakdown_s["routing_pwr_s"]+=routing_pwr_s;
+    power_breakdown_s["selection_pwr_s"]+=selection_pwr_s;
+    power_breakdown_s["crossbar_pwr_s"]+=crossbar_pwr_s;
+    power_breakdown_s["link_r2r_pwr_s"]+=link_r2r_pwr_s;
+    power_breakdown_s["link_r2h_pwr_s"]+=link_r2h_pwr_s;
+    power_breakdown_s["transceiver_pwr_s"]+=transceiver_pwr_s;
+    power_breakdown_s["ni_pwr_s"]+=ni_pwr_s;
 }
+
+
+
+void Power::printBreakDown(std::ostream & out)
+{
+    printMap("power_breakdown_d",power_breakdown_d,cout);
+    printMap("power_breakdown_s",power_breakdown_s,cout);
+}
+    
+
+
+

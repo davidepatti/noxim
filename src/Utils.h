@@ -9,8 +9,6 @@
 
 #define LOG (std::cout << std::setw(7) << left << sc_time_stamp().to_double() / 1000 << " " << name() << "::" << __func__<< "() => ")
 
-int rand_ps();
-
 // Output overloading
 
 inline ostream & operator <<(ostream & os, const Flit & flit)
@@ -181,6 +179,15 @@ inline int selectChannel(int src_hub, int dst_hub)
 
     return intersection[0];
 
+}
+
+inline void printMap(string label, const map<string,double> & m,std::ostream & out)
+{
+    out << label << " = [" << endl;
+    for (map<string,double>::const_iterator i = m.begin();i!=m.end();i++)
+	out << "\t" << i->second << "\t % " << i->first << endl;
+
+    out << "];" << endl;
 }
 
 #endif
