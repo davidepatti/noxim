@@ -28,9 +28,11 @@ SC_MODULE(TokenRing)
     sc_in_clk clock;	
     sc_in < bool > reset;
 
-    int currentTokenHolder(int channel);
+    map<int, sc_out<int>* > current_token_holder;
+    //map<int, map<int, sc_signal<int>* > > tr_hub_signals;
+    map<int, sc_signal<int>* > tr_hub_signals;
 
-    void attachHub(int channel, int hub);
+    void attachHub(int channel, int hub, sc_in<int>* hub_port);
 
     void updateTokens();
 

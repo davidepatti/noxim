@@ -52,6 +52,9 @@ SC_MODULE(Hub)
     bool* current_level_rx;	// Current level for ABP
     bool* current_level_tx;	// Current level for ABP
 
+
+    map<int, sc_in<int>* > current_token_holder;
+
     map<int, Initiator*> init;
     map<int, Target*> target;
 
@@ -139,7 +142,8 @@ SC_MODULE(Hub)
             init[txChannels[i]] = new Initiator(txt,this);
             init[txChannels[i]]->buffer_tx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].txBufferSize);
             LOG << "Size of buffer_tx = " << init[txChannels[i]]->buffer_tx.GetMaxBufferSize() << " for Channel_"<< txChannels[i] << endl;
-            token_ring->attachHub(txChannels[i],local_id);
+	    current_token_holder[txChannels[i]] = new sc_in<int>();
+            token_ring->attachHub(txChannels[i],local_id, current_token_holder[txChannels[i]]);
         }
 
         for (unsigned int i = 0; i < rxChannels.size(); i++) {

@@ -41,8 +41,9 @@ void Hub::txRadioProcess()
 	for (unsigned int i =0 ;i<txChannels.size();i++)
 	{
 	    int channel = txChannels[i];
-
-	    if (token_ring->currentTokenHolder(channel) == local_id)
+//TODO: replace with current_token_holder mechanism
+	    //if (token_ring->currentTokenHolder(channel) == local_id)
+	    if (current_token_holder[channel]->read() == local_id)
 	    {
 		if (!init[channel]->buffer_tx.IsEmpty())
 		{
