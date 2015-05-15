@@ -29,7 +29,6 @@ struct Channel: sc_module
 
     void addHub(int);
 
-    int delay; // in ps
 
   SC_HAS_PROCESS(Channel);
   // ***********************************************************
@@ -51,8 +50,11 @@ struct Channel: sc_module
     targ_socket.register_transport_dbg(     this, &Channel::transport_dbg);
 
     init_socket.register_invalidate_direct_mem_ptr(this, &Channel::invalidate_direct_mem_ptr);
-    delay = 1000*GlobalParams::flit_size/GlobalParams::channel_configuration[local_id].dataRate;
-    LOG << "data rate " << GlobalParams::channel_configuration[local_id].dataRate << " Gbps, transmission delay " << delay << " ps " << endl; 
+    flit_transmission_delay_ps = 1000*GlobalParams::flit_size/GlobalParams::channel_configuration[local_id].dataRate;
+    flit_transmission_cycles = ceil(((double)flit_transmission_delay_ps/1000)/CLOCK_PERIOD);
+    LOG << "data rate " << GlobalParams::channel_configuration[local_id].dataRate 
+	<< " Gbps, transmission delay " << flit_transmission_delay_ps << " ps, " << flit_transmission_cycles << " cycles " << endl; 
+
   }
 
   Power power;
@@ -100,7 +102,16 @@ struct Channel: sc_module
     return address;
   }
 
+
+  int getFlitTransmissionCycles() { return flit_transmission_cycles;}
+
+    private:
+      int flit_transmission_delay_ps;
+      int flit_transmission_cycles;
+
   std::map <tlm::tlm_generic_payload*, unsigned int> m_id_map;
+
+
 };
 
 #endif

@@ -4,7 +4,7 @@ void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& del
 
     // the total transmission delay is due to TLM Initiator delay +
     // channel delay
-    delay += sc_time(this->delay, SC_PS);
+    delay += sc_time(this->flit_transmission_delay_ps, SC_PS);
 
     assert (id < (int)targ_socket.size());
 
