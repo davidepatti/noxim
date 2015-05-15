@@ -35,20 +35,35 @@ void Hub::txRadioProcess()
 {
     if (reset.read()) 
     {
+	for (unsigned int i =0 ;i<txChannels.size();i++)
+	{
+	    int channel = txChannels[i];
+	    flag[channel]->write(HOLD_CHANNEL);
+	}
+	
     } 
     else 
     {
 	for (unsigned int i =0 ;i<txChannels.size();i++)
 	{
 	    int channel = txChannels[i];
-//TODO: replace with current_token_holder mechanism
-	    //if (token_ring->currentTokenHolder(channel) == local_id)
+
+	    if (flag[channel]->read()==RELEASE_CHANNEL)
+		flag[channel]->write(HOLD_CHANNEL);
+
+
 	    if (current_token_holder[channel]->read() == local_id)
 	    {
 		if (!init[channel]->buffer_tx.IsEmpty())
 		{
+		    flag[channel]->write(HOLD_CHANNEL);
 		    LOG << "Buffer_tx is not empty for channel " << channel << endl;
 		    init[channel]->start_request_event.notify();
+		}
+		else
+		{
+		    LOG << "Buffer_tx empty: releasing token for channel " << channel << endl;
+		    flag[channel]->write(RELEASE_CHANNEL);
 		}
 	    }
 	}
