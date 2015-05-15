@@ -21,6 +21,9 @@ using namespace std;
 
 #define CONFIG_FILENAME        "config.yaml"
 
+// nanoseconds
+#define CLOCK_PERIOD 1
+
 // Define the directions as numbers
 #define DIRECTIONS             4
 #define DIRECTION_NORTH        0
@@ -63,6 +66,11 @@ using namespace std;
 #define VERBOSE_LOW            1
 #define VERBOSE_MEDIUM         2
 #define VERBOSE_HIGH           3
+
+
+// Wireless MAC constants
+#define RELEASE_CHANNEL 1
+#define HOLD_CHANNEL 	2
 
 // TODO check the list of attributes for ChannelConfig 
 typedef struct {

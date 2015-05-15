@@ -12,6 +12,7 @@
 #include "NoC.h"
 #include "GlobalStats.h"
 #include "DataStructs.h"
+#include "GlobalParams.h"
 
 using namespace std;
 
@@ -32,7 +33,7 @@ int sc_main(int arg_num, char *arg_vet[])
     //cout << "\n ROUTING = " <<  GlobalParams::routing_algorithm << endl;
 
     // Signals
-    sc_clock clock("clock", 1, SC_NS);
+    sc_clock clock("clock", CLOCK_PERIOD, SC_NS);
     sc_signal <bool> reset;
 
     // NoC instance
