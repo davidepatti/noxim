@@ -29,10 +29,16 @@ SC_MODULE(TokenRing)
     sc_in < bool > reset;
 
     map<int, sc_out<int>* > current_token_holder;
-    //map<int, map<int, sc_signal<int>* > > tr_hub_signals;
-    map<int, sc_signal<int>* > tr_hub_signals;
+    map<int, sc_out<int>* > current_token_expiration;
+    map<int, map<int,sc_in<int>* > > flag;
 
-    void attachHub(int channel, int hub, sc_in<int>* hub_port);
+    map<int, sc_signal<int>* > token_holder_signals;
+    map<int, sc_signal<int>* > token_expiration_signals;
+    map<int, map<int, sc_signal<int>* > > flag_signals;
+
+
+
+    void attachHub(int channel, int hub, sc_in<int>* hub_token_holder_port, sc_in<int>* hub_token_expiration_port, sc_out<int>* hub_flag_port);
 
     void updateTokens();
 
@@ -40,6 +46,7 @@ SC_MODULE(TokenRing)
         SC_METHOD(updateTokens);
         sensitive << reset;
         sensitive << clock.pos();
+
     }
 
     private:
@@ -48,7 +55,7 @@ SC_MODULE(TokenRing)
     map<int,vector<pair<int,int> > > rings_mapping;
 
     // ring of a channel -> token position in the ring
-    map<int,int> ch_token_position;
+    map<int,int> token_position;
 
 };
 

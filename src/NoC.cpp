@@ -65,6 +65,9 @@ void NoC::buildMesh()
             int channel_id = iit->first;
             LOG << "Binding " << hub[hub_id]->name() << " to txChannel " << channel_id << endl;
             hub[hub_id]->init[channel_id]->socket.bind(channel[channel_id]->targ_socket);
+
+	    hub[hub_id]->setFlitTransmissionCycles(channel[channel_id]->getFlitTransmissionCycles(),channel_id);
+
         }
 
         for(vector<int>::iterator iit = hub_config.rxChannels.begin(); 
@@ -129,6 +132,7 @@ void NoC::buildMesh()
     for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
     	t[i] = new Tile*[GlobalParams::mesh_dim_y];
     }
+
 
     // Create the mesh as a matrix of tiles
     for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {

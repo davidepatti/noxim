@@ -56,9 +56,19 @@ void Hub::txRadioProcess()
 	    {
 		if (!init[channel]->buffer_tx.IsEmpty())
 		{
-		    flag[channel]->write(HOLD_CHANNEL);
-		    LOG << "Buffer_tx is not empty for channel " << channel << endl;
-		    init[channel]->start_request_event.notify();
+		    LOG << "Token holder for channel " << channel << " with not empty buffer_tx" << endl;
+
+		    if (current_token_expiration[channel]->read() < flit_transmission_cycles[channel])
+		    {
+			LOG << "Not enough token expiration time: releasing token for channel " << channel << endl;
+			flag[channel]->write(RELEASE_CHANNEL);
+		    }
+		    else
+		    {
+			flag[channel]->write(HOLD_CHANNEL);
+			LOG << "Starting transmission on channel " << channel << endl;
+			init[channel]->start_request_event.notify();
+		    }
 		}
 		else
 		{

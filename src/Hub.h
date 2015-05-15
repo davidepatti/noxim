@@ -54,7 +54,9 @@ SC_MODULE(Hub)
 
 
     map<int, sc_in<int>* > current_token_holder;
+    map<int, sc_in<int>* > current_token_expiration;
     map<int, sc_out<int>* > flag;
+
 
     map<int, Initiator*> init;
     map<int, Target*> target;
@@ -76,6 +78,8 @@ SC_MODULE(Hub)
 
     int route(Flit&);
     int tile2Port(int);
+
+    void setFlitTransmissionCycles(int cycles,int ch_id) {flit_transmission_cycles[ch_id]=cycles;}
 
     Power power;
 
@@ -110,6 +114,8 @@ SC_MODULE(Hub)
         for(map<int, TxChannelConfig>::iterator it = GlobalParams::hub_configuration[local_id].txChannels.begin();
                 it != GlobalParams::hub_configuration[local_id].txChannels.end(); ++it) {
             txChannels.push_back(it->first);
+
+
         }
         rxChannels = GlobalParams::hub_configuration[local_id].rxChannels;
 
@@ -144,8 +150,9 @@ SC_MODULE(Hub)
             init[txChannels[i]]->buffer_tx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].txBufferSize);
             LOG << "Size of buffer_tx = " << init[txChannels[i]]->buffer_tx.GetMaxBufferSize() << " for Channel_"<< txChannels[i] << endl;
 	    current_token_holder[txChannels[i]] = new sc_in<int>();
+	    current_token_expiration[txChannels[i]] = new sc_in<int>();
 	    flag[txChannels[i]] = new sc_out<int>();
-            token_ring->attachHub(txChannels[i],local_id, current_token_holder[txChannels[i]],flag[txChannels[i]]);
+            token_ring->attachHub(txChannels[i],local_id, current_token_holder[txChannels[i]],current_token_expiration[txChannels[i]],flag[txChannels[i]]);
         }
 
         for (unsigned int i = 0; i < rxChannels.size(); i++) {
@@ -158,6 +165,9 @@ SC_MODULE(Hub)
 
         start_from_port = 0;
     }
+
+    private:
+    map<int,int> flit_transmission_cycles;
 };
 
 #endif
