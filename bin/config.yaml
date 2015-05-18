@@ -5,7 +5,7 @@
 mesh_dim_x: 4
 mesh_dim_y: 4
 buffer_depth: 4
-flit_size: 64
+flit_size: 32
 
 # Routing algorithms:
 #   XY
@@ -37,7 +37,7 @@ Hubs:
         rxChannels: [0]
         txChannels:
             0:
-                max_hold_cycles: 7
+                max_hold_cycles: 8
         attachedNodes: []
         toTileBufferSize: 4
         fromTileBufferSize: 4

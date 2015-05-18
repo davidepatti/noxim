@@ -31,6 +31,99 @@ void Hub::perCycleUpdate()
 	power.biasing();
 }
 
+
+void Hub::txRadioProcessTokenPacket(int channel)
+{
+    if (flag[channel]->read()==RELEASE_CHANNEL)
+	flag[channel]->write(HOLD_CHANNEL);
+
+    if (current_token_holder[channel]->read() == local_id)
+    {
+	if (!init[channel]->buffer_tx.IsEmpty())
+	{
+	    LOG << "Token holder for channel " << channel << " with not empty buffer_tx" << endl;
+
+	    bool is_tail = init[channel]->buffer_tx.Front().flit_type == FLIT_TYPE_TAIL;
+
+	    flag[channel]->write(HOLD_CHANNEL);
+	    LOG << "Starting transmission on channel " << channel << endl;
+	    init[channel]->start_request_event.notify();
+
+	    if (is_tail)
+	    {
+		LOG << "TOKEN_PACKET: tail sent, releasing token for channel " << channel << endl;
+		flag[channel]->write(RELEASE_CHANNEL);
+	    }
+
+	}
+	else
+	{
+	    LOG << "TOKEN_PACKET: Buffer_tx empty, releasing token for channel " << channel << endl;
+	    flag[channel]->write(RELEASE_CHANNEL);
+	}
+    }
+}
+    
+void Hub::txRadioProcessTokenHold(int channel)
+{
+    if (flag[channel]->read()==RELEASE_CHANNEL)
+	flag[channel]->write(HOLD_CHANNEL);
+
+    if (current_token_holder[channel]->read() == local_id)
+    {
+	if (!init[channel]->buffer_tx.IsEmpty())
+	{
+	    LOG << "Token holder for channel " << channel << " with not empty buffer_tx" << endl;
+
+	    if (current_token_expiration[channel]->read() < flit_transmission_cycles[channel])
+	    {
+		LOG << "TOKEN_HOLD policy: Not enough token expiration time for sending channel " << channel << endl;
+	    }
+	    else
+	    {
+		flag[channel]->write(HOLD_CHANNEL);
+		LOG << "Starting transmission on channel " << channel << endl;
+		init[channel]->start_request_event.notify();
+	    }
+	}
+	else
+	{
+		LOG << "TOKEN_HOLD policy: nothing to transmit, holding token for channel " << channel << endl;
+	}
+    }
+}
+
+void Hub::txRadioProcessTokenMaxHold(int channel)
+{
+    if (flag[channel]->read()==RELEASE_CHANNEL)
+	flag[channel]->write(HOLD_CHANNEL);
+
+    if (current_token_holder[channel]->read() == local_id)
+    {
+	if (!init[channel]->buffer_tx.IsEmpty())
+	{
+	    LOG << "Token holder for channel " << channel << " with not empty buffer_tx" << endl;
+
+	    if (current_token_expiration[channel]->read() < flit_transmission_cycles[channel])
+	    {
+		LOG << "TOKEN_MAX_HOLD: Not enough token expiration time, releasing token for channel " << channel << endl;
+		flag[channel]->write(RELEASE_CHANNEL);
+	    }
+	    else
+	    {
+		flag[channel]->write(HOLD_CHANNEL);
+		LOG << "Starting transmission on channel " << channel << endl;
+		init[channel]->start_request_event.notify();
+	    }
+	}
+	else
+	{
+	    LOG << "TOKEN_MAX_HOLD: Buffer_tx empty, releasing token for channel " << channel << endl;
+	    flag[channel]->write(RELEASE_CHANNEL);
+	}
+    }
+}
+
 void Hub::txRadioProcess()
 {
     if (reset.read()) 
@@ -48,34 +141,21 @@ void Hub::txRadioProcess()
 	{
 	    int channel = txChannels[i];
 
-	    if (flag[channel]->read()==RELEASE_CHANNEL)
-		flag[channel]->write(HOLD_CHANNEL);
-
-
-	    if (current_token_holder[channel]->read() == local_id)
+	    switch (token_ring->getPolicy(channel))
 	    {
-		if (!init[channel]->buffer_tx.IsEmpty())
-		{
-		    LOG << "Token holder for channel " << channel << " with not empty buffer_tx" << endl;
-
-		    if (current_token_expiration[channel]->read() < flit_transmission_cycles[channel])
-		    {
-			LOG << "Not enough token expiration time: releasing token for channel " << channel << endl;
-			flag[channel]->write(RELEASE_CHANNEL);
-		    }
-		    else
-		    {
-			flag[channel]->write(HOLD_CHANNEL);
-			LOG << "Starting transmission on channel " << channel << endl;
-			init[channel]->start_request_event.notify();
-		    }
-		}
-		else
-		{
-		    LOG << "Buffer_tx empty: releasing token for channel " << channel << endl;
-		    flag[channel]->write(RELEASE_CHANNEL);
-		}
+		case TOKEN_PACKET:
+		    txRadioProcessTokenPacket(channel);
+		    break;
+		case TOKEN_HOLD:
+		    txRadioProcessTokenHold(channel);
+		    break;
+		case TOKEN_MAX_HOLD:
+		    txRadioProcessTokenMaxHold(channel);
+		    break;
+		default: assert(false);
 	    }
+
+
 	}
 
     }

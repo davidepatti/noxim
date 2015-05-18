@@ -168,6 +168,10 @@ SC_MODULE(Hub)
 
     private:
     map<int,int> flit_transmission_cycles;
+
+    void txRadioProcessTokenPacket(int channel);
+    void txRadioProcessTokenHold(int channel);
+    void txRadioProcessTokenMaxHold(int channel);
 };
 
 #endif

@@ -21,8 +21,6 @@ SC_MODULE(TokenRing)
 {
     SC_HAS_PROCESS(TokenRing);
 
-    int max_hold_cycles;
-    int hold_count;
 
     // I/O Ports
     sc_in_clk clock;	
@@ -46,16 +44,28 @@ SC_MODULE(TokenRing)
         SC_METHOD(updateTokens);
         sensitive << reset;
         sensitive << clock.pos();
+	// TODO TURI: policy hardwired
+	//token_policy[0] = TOKEN_MAX_HOLD;
+	//token_policy[0] = TOKEN_HOLD;
+	token_policy[0] = TOKEN_PACKET;
 
     }
 
+    int getPolicy(int channel) { return token_policy[channel];}
+
     private:
+
+    void updateTokenMaxHold(int channel);
+    void updateTokenHold(int channel);
+    void updateTokenPacket(int channel);
 
     // ring of a channel -> list of pairs < hubs , hold counts >
     map<int,vector<pair<int,int> > > rings_mapping;
 
     // ring of a channel -> token position in the ring
     map<int,int> token_position;
+
+    map<int,int> token_policy;
 
 };
 

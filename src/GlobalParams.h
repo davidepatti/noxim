@@ -24,6 +24,7 @@ using namespace std;
 // nanoseconds
 #define CLOCK_PERIOD 1
 
+
 // Define the directions as numbers
 #define DIRECTIONS             4
 #define DIRECTION_NORTH        0
@@ -71,6 +72,10 @@ using namespace std;
 // Wireless MAC constants
 #define RELEASE_CHANNEL 1
 #define HOLD_CHANNEL 	2
+
+#define TOKEN_HOLD 	0
+#define TOKEN_MAX_HOLD 	1
+#define TOKEN_PACKET 	2
 
 // TODO check the list of attributes for ChannelConfig 
 typedef struct {
