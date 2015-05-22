@@ -3,6 +3,7 @@
 
 #include "Utils.h"
 #include "Power.h"
+#include "Hub.h"
 #include "tlm_utils/simple_initiator_socket.h"
 #include "tlm_utils/simple_target_socket.h"
 #include "tlm_utils/multi_passthrough_initiator_socket.h"
@@ -25,9 +26,10 @@ using namespace std;
 struct Channel: sc_module
 {
 
-    vector<int> hubs;
+    vector<int> hubs_id;
+    vector<Hub*> hubs;
 
-    void addHub(int);
+    void addHub(Hub*);
 
 
   SC_HAS_PROCESS(Channel);
@@ -84,9 +86,9 @@ struct Channel: sc_module
 
       masked_address = address;
 
-      for (unsigned int i=0;i<hubs.size();i++)
+      for (unsigned int i=0;i<hubs_id.size();i++)
       {
-	  if (hubs[i]==static_cast<int>(masked_address))
+	  if (hubs_id[i]==static_cast<int>(masked_address))
 	  {
 	      target_nr = i;
 	      break;

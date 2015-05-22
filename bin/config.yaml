@@ -89,7 +89,7 @@ trace_mode: false
 trace_filename: ""
 
 min_packet_size: 2
-max_packet_size: 10
+max_packet_size: 2
 packet_injection_rate: 0.01
 probability_of_retransmission: 0.01
 
@@ -102,7 +102,7 @@ probability_of_retransmission: 0.01
 #   TRAFFIC_BIT_REVERSAL   5
 #   TRAFFIC_SHUFFLE        6
 #   TRAFFIC_BUTTERFLY      7
-traffic_distribution: 4
+traffic_distribution: 0
 traffic_table_filename: "t.txt"
 
 

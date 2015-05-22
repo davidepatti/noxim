@@ -166,6 +166,9 @@ SC_MODULE(Hub)
         start_from_port = 0;
     }
 
+
+    int getID() { return local_id;}
+
     private:
     map<int,int> flit_transmission_cycles;
 

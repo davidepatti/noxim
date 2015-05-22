@@ -17,6 +17,7 @@ void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& del
     // channel, regardless the actual recipients of the current tx
     power.wirelessDynamicRx((int)targ_socket.size());
 
+
     if (target_nr < init_socket.size())
     {
 	// Modify address within transaction
@@ -32,6 +33,16 @@ void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& del
 	trans.set_address( address );
     }
 }
+
+
+/*
+void Channel::powerManager()
+{
+
+
+}
+*/
+
 
   bool Channel::get_direct_mem_ptr(int id,
                                   tlm::tlm_generic_payload& trans,
@@ -79,9 +90,11 @@ void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& del
   }
 
 
-void Channel::addHub(int h)
+void Channel::addHub(Hub* h)
 {
+
     hubs.push_back(h);
+    hubs_id.push_back(h->getID());
 
     LOG << "Adding hub " << h << " to Channel " <<  local_id << endl;
 }
