@@ -217,10 +217,23 @@ double GlobalStats::getDynamicPower()
 {
     double power = 0.0;
 
+    // Electric noc
     for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
 	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
 	    power += noc->t[x][y]->r->power.getDynamicPower();
 
+    // Wireless noc
+    for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();
+            it != GlobalParams::hub_configuration.end();
+            ++it)
+    {
+	int hub_id = it->first;
+
+	map<int,Hub*>::const_iterator i = noc->hub.find(hub_id);
+	Hub * h = i->second;
+
+	power+= h->power.getDynamicPower();
+    }
     return power;
 }
 
@@ -232,6 +245,18 @@ double GlobalStats::getStaticPower()
 	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
 	    power += noc->t[x][y]->r->power.getStaticPower();
 
+    // Wireless noc
+    for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();
+            it != GlobalParams::hub_configuration.end();
+            ++it)
+    {
+	int hub_id = it->first;
+
+	map<int,Hub*>::const_iterator i = noc->hub.find(hub_id);
+	Hub * h = i->second;
+
+	power+= h->power.getStaticPower();
+    }
     return power;
 }
 

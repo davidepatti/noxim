@@ -13,7 +13,7 @@
 #include "Utils.h"
 #include "systemc.h"
 
-#define W2J(watt) (watt*CLOCK_PERIOD_PS*1.0e-12)
+#define W2J(watt) ((watt)*CLOCK_PERIOD_PS*1.0e-12)
 
 using namespace std;
 
@@ -51,6 +51,8 @@ Power::Power()
     link_r2h_pwr_s = 0.0;
     link_r2h_pwr_d = 0.0;
 
+    default_tx_energy = 0.0;
+
     ni_pwr_d = 0.0;
     ni_pwr_s = 0.0;
 
@@ -58,14 +60,14 @@ Power::Power()
 
 void Power::configureRouter(int link_width,
 	int buffer_depth,
-	int buffer_size,
+	int buffer_item_size,
 	string routing_function,
 	string selection_function)
 {
 // (s)tatic, (d)ynamic power
 
     // Buffer 
-    pair<int,int> key = pair<int,int>(buffer_depth, buffer_size);
+    pair<int,int> key = pair<int,int>(buffer_depth, buffer_item_size);
     
     assert(GlobalParams::power_configuration.bufferPowerConfig.leakage.find(key) != GlobalParams::power_configuration.bufferPowerConfig.leakage.end());
     assert(GlobalParams::power_configuration.bufferPowerConfig.push.find(key) != GlobalParams::power_configuration.bufferPowerConfig.push.end());
@@ -127,14 +129,15 @@ void Power::configureRouter(int link_width,
 
 void Power::configureHub(int link_width,
 	int buffer_depth,
-	int buffer_size,
+	int buffer_item_size,
 	int antenna_buffer_depth,
-	int antenna_buffer_size)
+	int antenna_buffer_item_size,
+	int data_rate_gbs)
 {
 // (s)tatic, (d)ynamic power
 
     // Buffer 
-    pair<int,int> key = pair<int,int>(buffer_depth, buffer_size);
+    pair<int,int> key = pair<int,int>(buffer_depth, buffer_item_size);
     
     assert(GlobalParams::power_configuration.bufferPowerConfig.leakage.find(key) != GlobalParams::power_configuration.bufferPowerConfig.leakage.end());
     assert(GlobalParams::power_configuration.bufferPowerConfig.push.find(key) != GlobalParams::power_configuration.bufferPowerConfig.push.end());
@@ -147,7 +150,7 @@ void Power::configureHub(int link_width,
     buffer_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop[key];
 
     // Buffer Antenna
-    pair<int,int> akey = pair<int,int>(antenna_buffer_depth,antenna_buffer_size);
+    pair<int,int> akey = pair<int,int>(antenna_buffer_depth,antenna_buffer_item_size);
     
     assert(GlobalParams::power_configuration.bufferPowerConfig.leakage.find(akey) != GlobalParams::power_configuration.bufferPowerConfig.leakage.end());
     assert(GlobalParams::power_configuration.bufferPowerConfig.push.find(akey) != GlobalParams::power_configuration.bufferPowerConfig.push.end());
@@ -162,16 +165,21 @@ void Power::configureHub(int link_width,
     attenuation_map = GlobalParams::power_configuration.hubPowerConfig.transmitter_attenuation_map;
 
 
-    // POSTERI:
-    // Non sappiamo se questi due valori vengono caricati dal file
+    // TX
+    // Joule
+    default_tx_energy = (GlobalParams::power_configuration.hubPowerConfig.default_tx_energy / (10e9*data_rate_gbs) )* antenna_buffer_item_size;
 
-    wireless_rx_pwr = 7e-13; // TODO TURI antenna_buffer_size * GlobalParams::power_configuration.hubPowerConfig.rx_dynamic;
-    wireless_snooping = 7e-14; // TODO TURIGlobalParams::power_configuration.hubPowerConfig.rx_snooping;
+    // RX Dynamic
+    wireless_rx_pwr = antenna_buffer_item_size * GlobalParams::power_configuration.hubPowerConfig.rx_dynamic;
+    
+    // RX snooping
+    wireless_snooping = W2J(GlobalParams::power_configuration.hubPowerConfig.rx_snooping);
 
+    // RX TX leakage
     transceiver_pwr_s = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.first +
         GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.second);
-
-
+   
+    // RX TX biasing
     transceiver_pwr_biasing = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.first +
         GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.second);
     // Link 
@@ -253,7 +261,10 @@ double Power::getDynamicPower()
 {
     double power = 0.0;
     for (map<string,double>::iterator i = power_breakdown_d.begin(); i!=power_breakdown_d.end(); i++)
+    {
+	//cout << " ABBIANDO " << i->first << " = " << i->second << endl;
 	power+= i->second;
+    }
 
     return power;
 }
@@ -278,6 +289,11 @@ double Power::attenuation2power(double attenuation)
 
 void Power::wirelessTx(int src,int dst,int length)
 {
+    power_breakdown_d["wireless_tx"] += default_tx_energy;
+    return;
+
+    // TODO enable attenuation_map
+
     pair<int,int> key = pair<int,int>(src,dst);
     assert(attenuation_map.find(key)!=attenuation_map.end());
 
@@ -323,14 +339,14 @@ void Power::printBreakDown(std::ostream & out)
 void Power::rxSleep(int cycles)
 {
 
-    int sleep_start_cycle = (int)(sc_time_stamp().to_double()/CLOCK_PERIOD);
+    int sleep_start_cycle = (int)(sc_time_stamp().to_double()/CLOCK_PERIOD_PS);
     sleep_end_cycle = sleep_start_cycle + cycles;
 }
 
 
 bool Power::isSleeping()
 {
-    int now = (int)(sc_time_stamp().to_double()/CLOCK_PERIOD);
+    int now = (int)(sc_time_stamp().to_double()/CLOCK_PERIOD_PS);
 
     return (now<sleep_end_cycle);
 

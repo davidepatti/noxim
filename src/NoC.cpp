@@ -42,12 +42,6 @@ void NoC::buildMesh()
         hub[hub_id]->clock(clock);
         hub[hub_id]->reset(reset);
 
-	// TODO: use values from config.yaml
-	hub[hub_id]->power.configureHub(GlobalParams::flit_size,
-		                        GlobalParams::buffer_depth,
-					GlobalParams::flit_size,
-					GlobalParams::buffer_depth,
-					GlobalParams::flit_size);
 
         // Determine, from configuration file, which Hub is connected to which Tile
         for(vector<int>::iterator iit = hub_config.attachedNodes.begin(); 
@@ -56,6 +50,7 @@ void NoC::buildMesh()
         {
             GlobalParams::hub_for_tile[*iit] = hub_id;
         }
+
 
         // Determine, from configuration file, which Hub is connected to which Channel
         for(map<int, TxChannelConfig>::iterator iit = hub_config.txChannels.begin(); 
@@ -80,6 +75,39 @@ void NoC::buildMesh()
 	    channel[channel_id]->addHub(hub[hub_id]);
         }
 
+	// TODO FIX
+	// Hub Power model does not currently support different data rates for single hub
+	// If multiple channels are connected to an Hub, the data rate
+	// of the first channel will be used as default
+	
+	int no_channels = hub_config.txChannels.size();
+
+	if (no_channels > 1)
+	{
+	    cerr << " WARNING, currently multi-channel per hub are unsupported, using default_tx_energy" << endl;
+	}
+
+	map<int,TxChannelConfig>::iterator first_channel_config = hub_config.txChannels.begin();
+
+	int data_rate_gbs;
+	
+	if (first_channel_config!= hub_config.txChannels.end())
+	{
+	    int first_channel_id = first_channel_config->first;
+	    data_rate_gbs = GlobalParams::channel_configuration[first_channel_id].dataRate;
+	}
+	else
+	    data_rate_gbs = NOT_VALID;
+
+	cout << "XXXXXX HUB " << hub_id << " attached to " << no_channels << " tx channels " << endl;
+	cout << "XXXXXX HUB " << hub_id << " using data rate " << data_rate_gbs << endl;
+
+	hub[hub_id]->power.configureHub(GlobalParams::flit_size,
+		                        GlobalParams::buffer_depth,
+					GlobalParams::flit_size,
+					GlobalParams::buffer_depth,
+					GlobalParams::flit_size,
+					data_rate_gbs);
 
     }
 

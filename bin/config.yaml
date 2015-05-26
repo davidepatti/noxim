@@ -76,6 +76,7 @@ show_buffer_stats: false
 
 # Winoc
 use_winoc: false
+use_wirxsleep: false
 
 # Verbosity level:
 #   VERBOSE_OFF    0
@@ -88,8 +89,8 @@ verbose_mode: 0
 trace_mode: false
 trace_filename: ""
 
-min_packet_size: 2
-max_packet_size: 2
+min_packet_size: 8
+max_packet_size: 8
 packet_injection_rate: 0.01
 probability_of_retransmission: 0.01
 
@@ -138,20 +139,21 @@ Energy:
             - [5, 32, 7.49e-4, 2.21e-13]
             - [5, 64, 1.49e-3, 4.00e-13]
             # [FlitSize Static, Dynamic]
-        network_interface: 
-            - [16, 4.43e-4, 2.50e-13]
-            - [32, 8.64e-4, 4.22e-13]
-            - [64, 1.72e-3, 8.35e-13]
+        network_interface:  [8.64e-4, 4.22e-13]
+	    # TODO TURI: fallo cosi':
+            #- [16, 4.43e-4, 2.50e-13]
+            #- [32, 8.64e-4, 4.22e-13]
+            #- [64, 1.72e-3, 8.35e-13]
         routing:
             # [Static, Dynamic]
             default:     [1.20e-4, 6.00e-14]
-            XY:        [1.20e-4, 6.00e-14]
+            XY:          [1.20e-4, 6.00e-14]
             DYAD:        [1.25e-4, 6.23e-14]
         selection:
                     # [Static, Dynamic]
             default:     [1.10e-4, 5.00e-14]
             XY:          [1.10e-4, 5.00e-14]
-            DYAD:          [1.23e-4, 5.89e-14]
+            DYAD:        [1.23e-4, 5.89e-14]
 
     Hub:
             # [RX, TX] Contribution (W)
@@ -160,11 +162,13 @@ Energy:
             # [RX, TX] Contribution (W)
             transceiver_biasing: [0, 7e-3]
 
-            # RX Dynamic Contribution in J (RX Digital Interfaces)
+            # RX Dynamic Contribution in J/bit (RX Digital Interfaces)
             rx_dynamic: 7e-13
+
+            # in W
             rx_snooping: 1.5e-2
 
-            # RX Dynamic Contribution in W (To be divided for Datarate)
+            # TX Dynamic Contribution in W (To be divided for Datarate)
             default_tx_energy: 1e-2
         
             tx_attenuation_map:

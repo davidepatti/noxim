@@ -40,19 +40,13 @@ void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& del
 
 void Channel::powerManager(int hub_dst_index, tlm::tlm_generic_payload& trans)
 {
-    /*
-    int mem[MEM_SIZE];
-    unsigned char*   ptr = trans.get_data_ptr();
-    memcpy(ptr, &mem[adr], len);
-    */
+    if (!GlobalParams::use_wirxsleep) return;
 
     struct Flit* f = (struct Flit*)trans.get_data_ptr();
 
     if (f->flit_type==FLIT_TYPE_HEAD)
     {
 	int sleep_cycles = flit_transmission_cycles * f->sequence_length;
-
-	LOG << "*xixixixixixixi***************** src " << f->src_id << " dst " << f->dst_id << " length " << f->sequence_length << endl;
 
 	for (unsigned int i = 0; i<hubs.size();i++)
 	{

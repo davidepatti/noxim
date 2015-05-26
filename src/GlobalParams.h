@@ -116,9 +116,9 @@ typedef struct {
 typedef struct {
     pair<double, double> transceiver_leakage;
     pair<double, double> transceiver_biasing;
-    double receiver_dynamic;
-    double receiver_snooping;
-    double default_transmitter;
+    double rx_dynamic;
+    double rx_snooping;
+    double default_tx_energy;
     map<pair <int, int>, double> transmitter_attenuation_map;
 } HubPowerConfig;
 
@@ -157,6 +157,7 @@ struct GlobalParams {
     static unsigned int max_volume_to_be_drained;
     static bool show_buffer_stats;
     static bool use_winoc;
+    static bool use_wirxsleep;
     static ChannelConfig default_channel_configuration;
     static map<int, ChannelConfig> channel_configuration;
     static HubConfig default_hub_configuration;

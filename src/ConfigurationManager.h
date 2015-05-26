@@ -170,9 +170,9 @@ namespace YAML {
         static bool decode(const Node& node, HubPowerConfig& hubPowerConfig) {
             hubPowerConfig.transceiver_leakage = node["transceiver_leakage"].as<pair<double, double> >();
             hubPowerConfig.transceiver_biasing = node["transceiver_biasing"].as<pair<double, double> >();
-            hubPowerConfig.receiver_dynamic = node["rx_dynamic"].as<double>();
-            hubPowerConfig.receiver_snooping = node["rx_snooping"].as<double>();
-            hubPowerConfig.default_transmitter = node["default_tx_energy"].as<double>();
+            hubPowerConfig.rx_dynamic = node["rx_dynamic"].as<double>();
+            hubPowerConfig.rx_snooping = node["rx_snooping"].as<double>();
+            hubPowerConfig.default_tx_energy = node["default_tx_energy"].as<double>();
 
             for(YAML::const_iterator tx_attenuation_map_it= node["tx_attenuation_map"].begin(); 
                 tx_attenuation_map_it != node["tx_attenuation_map"].end();

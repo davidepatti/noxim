@@ -43,6 +43,7 @@ void loadConfiguration() {
     //GlobalParams::hotspots;
     GlobalParams::show_buffer_stats = config["show_buffer_stats"].as<bool>();
     GlobalParams::use_winoc = config["use_winoc"].as<bool>();
+    GlobalParams::use_wirxsleep = config["use_wirxsleep"].as<bool>();
     
     GlobalParams::default_hub_configuration = config["Hubs"]["defaults"].as<HubConfig>();
 
@@ -97,6 +98,7 @@ void showHelp(char selfname[])
          << "\t-dimy N\t\tSet the mesh Y dimension to the specified integer value (default " << GlobalParams::mesh_dim_y << ")" << endl
          << "\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value [flits] (default "<< GlobalParams::buffer_depth << ")" << endl
          << "\t-winoc enable radio hub wireless transmission" << endl
+         << "\t-wirxsleep enable radio hub wireless receiver auto sleep" << endl
          << "\t-size Nmin Nmax\tSet the minimum and maximum packet size to the specified integer values [flits] (default min=" << GlobalParams::min_packet_size << ", max=" << GlobalParams::max_packet_size << ")" << endl
          << "\t-routing TYPE\tSet the routing algorithm to TYPE where TYPE is one of the following (default " << GlobalParams::routing_algorithm << "):" << endl
          << "\t\tXY\t\tXY routing algorithm" << endl
@@ -269,9 +271,10 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::mesh_dim_y = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-buffer"))
 		GlobalParams::buffer_depth = atoi(arg_vet[++i]);
-	    else if (!strcmp(arg_vet[i], "-winoc")) {
+	    else if (!strcmp(arg_vet[i], "-winoc")) 
 		GlobalParams::use_winoc = true;
-	    }
+	    else if (!strcmp(arg_vet[i], "-wirxsleep")) 
+		GlobalParams::use_wirxsleep = true;
 	    else if (!strcmp(arg_vet[i], "-size")) {
 		GlobalParams::min_packet_size = atoi(arg_vet[++i]);
 		GlobalParams::max_packet_size = atoi(arg_vet[++i]);

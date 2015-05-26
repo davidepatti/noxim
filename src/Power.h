@@ -19,37 +19,6 @@
 
 using namespace std;
 
-/*
-
-The average energy dissipated by a flit for a hop switch was estimated
-as being 0.151nJ, 0.178nJ, 0.182nJ and 0.189nJ for XY, Odd-Even, DyAD,
-and NoP-OE respectively
-
-We assumed the tile size to be 2mm x 2mm and that the tiles were
-arranged in a regular fashion on the floorplan. The load wire
-capacitance was set to 0.50fF per micron, so considering an average of
-25% switching activity the amount of energy consumed by a flit for a
-hop interconnect is 0.384nJ.
-
-
-
-#define PWR_ROUTING_XY             0.151e-9
-#define PWR_ROUTING_WEST_FIRST     0.155e-9
-#define PWR_ROUTING_NORTH_LAST     0.155e-9
-#define PWR_ROUTING_NEGATIVE_FIRST 0.155e-9
-#define PWR_ROUTING_ODD_EVEN       0.178e-9
-#define PWR_ROUTING_DYAD           0.182e-9
-#define PWR_ROUTING_FULLY_ADAPTIVE 0.0
-#define PWR_ROUTING_TABLE_BASED    0.185e-9
-
-#define PWR_SEL_RANDOM             0.002e-9
-#define PWR_SEL_BUFFER_LEVEL       0.006e-9
-#define PWR_SEL_NOP                0.012e-9
-
-#define PWR_FORWARD_FLIT           0.384e-9
-#define PWR_INCOMING               0.002e-9
-#define PWR_STANDBY                0.0001e-9/2.0
-*/
 
 class Power {
 
@@ -60,32 +29,33 @@ class Power {
 
     void configureRouter(int link_width,
 	                 int buffer_depth,
-			 int buffer_size,
+			 int buffer_item_size,
 			 string routing_function,
 			 string selection_function);
 
-    void configureHub(int link_width,
-	              int txrx_buffer_depth,
-	              int txrx_buffer_size,
-	              int buffer_depth,
-		      int buffer_size);
+    void configureHub(int link_width, 
+	              int buffer_depth, 
+		      int buffer_item_size, 
+		      int antenna_buffer_depth, 
+		      int antenna_buffer_item_size, 
+		      int data_rate_gbs);
 
-    void bufferPush(); // x
-    void bufferPop(); // x
-    void bufferFront(); // x
-    void antennaBufferPush(); // x
-    void antennaBufferPop(); // x
-    void antennaBufferFront(); // x
+    void bufferPush(); 
+    void bufferPop(); 
+    void bufferFront(); 
+    void antennaBufferPush();
+    void antennaBufferPop();
+    void antennaBufferFront(); 
     void wirelessTx(int src,int dst,int length);
     void wirelessDynamicRx(int no_receivers);
     void wirelessSnooping();
 
-    void routing(); //x 
-    void selection(); // x
-    void crossBar(); //x
-    void r2hLink(); // x 
-    void r2rLink(); // x 
-    void networkInterface(); //x
+    void routing();
+    void selection(); 
+    void crossBar(); 
+    void r2hLink(); 
+    void r2rLink(); 
+    void networkInterface();
 
     void leakage();
     void biasing();
@@ -122,6 +92,8 @@ class Power {
     double transceiver_pwr_s;
     double transceiver_pwr_biasing;
     double wireless_snooping;
+
+    double default_tx_energy;
 
     double routing_pwr_d;
     double routing_pwr_s;
