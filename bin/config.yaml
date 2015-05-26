@@ -107,80 +107,77 @@ traffic_table_filename: "t.txt"
 
 
 Energy:
-	Buffer: #Energy consumed by a single flit in Joule
+    Buffer: #Energy consumed by a single flit in Joule
     # - [Depth ItemSize Leakage Push Front Pop]
-	- [2, 16, 2.05e-4, 3.13e-13, 0,  1.86e-13]
-	- [2, 32, 1.35e-3, 6.12e-13, 0,  3.65e-13]
-	- [2, 64, 2.68e-3, 1.21e-12, 0,  7.23e-13]
-	- [4, 16, 1.16e-3, 3.93e-13, 0,  2.82e-13]
-	- [4, 32, 2.27e-3, 7.62e-13, 0,  5.34e-13]
-	- [4, 64, 4.48e-3, 1.50e-12, 0,  1.03e-12]
-	- [8, 16, 2.08e-3, 5.36e-13, 0,  4.47e-13]
-	- [8, 32, 2.30e-3, 1.03e-12, 0,  8.26e-13]
-	- [8, 64, 7.91e-3, 2.08e-12, 0,  1.58e-12]
+        - [2, 16, 2.05e-4, 3.13e-13, 0,  1.86e-13]
+        - [2, 32, 1.35e-3, 6.12e-13, 0,  3.65e-13]
+        - [2, 64, 2.68e-3, 1.21e-12, 0,  7.23e-13]
+        - [4, 16, 1.16e-3, 3.93e-13, 0,  2.82e-13]
+        - [4, 32, 2.27e-3, 7.62e-13, 0,  5.34e-13]
+        - [4, 64, 4.48e-3, 1.50e-12, 0,  1.03e-12]
+        - [8, 16, 2.08e-3, 5.36e-13, 0,  4.47e-13]
+        - [8, 32, 2.30e-3, 1.03e-12, 0,  8.26e-13]
+        - [8, 64, 7.91e-3, 2.08e-12, 0,  1.58e-12]
 
     # LinkBitLine energy in the form [ Length (mm) Leakage Dynamic ] 
     # Energy(J) for a single bitline. Total flit energy will 
     # be obtained  as flit_size x reported Energy.
     LinkBitLine:
-	- [0.5, 4.76e-7, 2.50e-14]
-	- [1.0, 4.80e-7, 4.88e-14]
-	- [1.5, 4.92e-7, 7.25e-14]
-	- [2.0, 5.10e-7, 9.63e-14]
-	- [2.5, 5.50e-7, 1.20e-13]
-	- [3.0, 5.53e-7, 1.43e-13]
+        - [0.5, 4.76e-7, 2.50e-14]
+        - [1.0, 4.80e-7, 4.88e-14]
+        - [1.5, 4.92e-7, 7.25e-14]
+        - [2.0, 5.10e-7, 9.63e-14]
+        - [2.5, 5.50e-7, 1.20e-13]
+        - [3.0, 5.53e-7, 1.43e-13]
 
     Router:
         # [Static, Dynamic]
         crossbar:
-        # - [I/O Port number, FlitSize, Leakage, Dynamic]
-        - [5, 16, 3.78e-4, 1.20e-13]
-        - [5, 32, 7.49e-4, 2.21e-13]
-        - [5, 64, 1.49e-3, 4.00e-13]
-
-        # [FlitSize Static, Dynamic]
+            # - [I/O Port number, FlitSize, Leakage, Dynamic]
+            - [5, 16, 3.78e-4, 1.20e-13]
+            - [5, 32, 7.49e-4, 2.21e-13]
+            - [5, 64, 1.49e-3, 4.00e-13]
+            # [FlitSize Static, Dynamic]
         network_interface: 
-		-[16, 4.43e-4, 2.50e-13]
-		-[32, 8.64e-4, 4.22e-13]
-		-[64, 1.72e-3, 8.35e-13]
-
+            - [16, 4.43e-4, 2.50e-13]
+            - [32, 8.64e-4, 4.22e-13]
+            - [64, 1.72e-3, 8.35e-13]
         routing:
             # [Static, Dynamic]
-            default: 	[1.20e-4, 6.00e-14]
-            XY: 	[1.20e-4, 6.00e-14]
-            DYAD: 	[1.25e-4, 6.23e-14]
-
+            default:     [1.20e-4, 6.00e-14]
+            XY:        [1.20e-4, 6.00e-14]
+            DYAD:        [1.25e-4, 6.23e-14]
         selection:
-            # [Static, Dynamic]
-            default: [1.10e-4, 5.00e-14]
-            XY: 	 [1.10e-4, 5.00e-14]
-            DYAD: 	 [1.23e-4, 5.89e-14]
+                    # [Static, Dynamic]
+            default:     [1.10e-4, 5.00e-14]
+            XY:          [1.10e-4, 5.00e-14]
+            DYAD:          [1.23e-4, 5.89e-14]
 
     Hub:
-        # [RX, TX] Contribution (W)
-        transceiver_leakage: [4.43e-4, 1.10e-4]
+            # [RX, TX] Contribution (W)
+            transceiver_leakage: [4.43e-4, 1.10e-4]
 
-        # [RX, TX] Contribution (W)
-        transceiver_biasing: [0, 7e-3]
+            # [RX, TX] Contribution (W)
+            transceiver_biasing: [0, 7e-3]
 
-        # RX Dynamic Contribution in J (RX Digital Interfaces)
-        rx_dynamic: 7e-13
-        rx_snooping: 1.5e-2
+            # RX Dynamic Contribution in J (RX Digital Interfaces)
+            rx_dynamic: 7e-13
+            rx_snooping: 1.5e-2
 
-        # RX Dynamic Contribution in W (To be divided for Datarate)
-        default_tx_energy: 1e-2
+            # RX Dynamic Contribution in W (To be divided for Datarate)
+            default_tx_energy: 1e-2
         
-        tx_attenuation_map:
-        # - [Hub ID TX, Hub ID RX, Attenuation]
-        - [0, 1, 1.1]
-        - [0, 2, 2.2]
-        - [0, 3, 3.3]
-        - [1, 0, 1.0]
-        - [1, 2, 2.2]
-        - [1, 3, 3.3]
-        - [2, 0, 1.0]
-        - [2, 1, 1.1]
-        - [2, 3, 3.3]
-        - [3, 0, 1.0]
-        - [3, 1, 1.1]
-        - [3, 2, 2.2]
+            tx_attenuation_map:
+            # - [Hub ID TX, Hub ID RX, Attenuation]
+            - [0, 1, 1.1]
+            - [0, 2, 2.2]
+            - [0, 3, 3.3]
+            - [1, 0, 1.0]
+            - [1, 2, 2.2]
+            - [1, 3, 3.3]
+            - [2, 0, 1.0]
+            - [2, 1, 1.1]
+            - [2, 3, 3.3]
+            - [3, 0, 1.0]
+            - [3, 1, 1.1]
+            - [3, 2, 2.2]
