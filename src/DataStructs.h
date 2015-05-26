@@ -103,6 +103,7 @@ struct Flit {
     int dst_id;
     FlitType flit_type;	// The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
     int sequence_no;		// The sequence number of the flit inside the packet
+    int sequence_length;
     Payload payload;	// Optional payload
     double timestamp;		// Unix timestamp at packet generation
     int hop_no;			// Current number of hops from source to destination
@@ -112,6 +113,7 @@ struct Flit {
 	return (flit.src_id == src_id && flit.dst_id == dst_id
 		&& flit.flit_type == flit_type
 		&& flit.sequence_no == sequence_no
+		&& flit.sequence_length == sequence_length
 		&& flit.payload == payload && flit.timestamp == timestamp
 		&& flit.hop_no == hop_no
 		&& flit.use_low_voltage_path == use_low_voltage_path);

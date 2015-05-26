@@ -52,8 +52,9 @@ struct Channel: sc_module
     targ_socket.register_transport_dbg(     this, &Channel::transport_dbg);
 
     init_socket.register_invalidate_direct_mem_ptr(this, &Channel::invalidate_direct_mem_ptr);
+    // bit rate is Gb/s
     flit_transmission_delay_ps = 1000*GlobalParams::flit_size/GlobalParams::channel_configuration[local_id].dataRate;
-    flit_transmission_cycles = ceil(((double)flit_transmission_delay_ps/1000)/CLOCK_PERIOD);
+    flit_transmission_cycles = ceil(((double)flit_transmission_delay_ps/CLOCK_PERIOD));
     LOG << "data rate " << GlobalParams::channel_configuration[local_id].dataRate 
 	<< " Gbps, transmission delay " << flit_transmission_delay_ps << " ps, " << flit_transmission_cycles << " cycles " << endl; 
 
@@ -113,6 +114,7 @@ struct Channel: sc_module
 
   std::map <tlm::tlm_generic_payload*, unsigned int> m_id_map;
 
+   void powerManager(int hub_dst_index, tlm::tlm_generic_payload& trans);
 
 };
 

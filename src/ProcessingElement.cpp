@@ -72,6 +72,7 @@ Flit ProcessingElement::nextFlit()
     flit.dst_id = packet.dst_id;
     flit.timestamp = packet.timestamp;
     flit.sequence_no = packet.size - packet.flit_left;
+    flit.sequence_length = packet.size;
     flit.hop_no = 0;
     //  flit.payload     = DEFAULT_PAYLOAD;
 

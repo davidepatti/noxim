@@ -23,11 +23,14 @@ void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& del
 	// Modify address within transaction
 	trans.set_address( masked_address );
 
+	powerManager(target_nr,trans);
+
 	// Realize the delay annotated onto the transport call
 	wait(delay);
 
 	// Forward transaction to appropriate target
 	init_socket[target_nr]->b_transport(trans, delay);
+
 
 	// Replace original address
 	trans.set_address( address );
@@ -35,13 +38,34 @@ void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& del
 }
 
 
-/*
-void Channel::powerManager()
+void Channel::powerManager(int hub_dst_index, tlm::tlm_generic_payload& trans)
 {
+    /*
+    int mem[MEM_SIZE];
+    unsigned char*   ptr = trans.get_data_ptr();
+    memcpy(ptr, &mem[adr], len);
+    */
 
+    struct Flit* f = (struct Flit*)trans.get_data_ptr();
+
+    if (f->flit_type==FLIT_TYPE_HEAD)
+    {
+	int sleep_cycles = flit_transmission_cycles * f->sequence_length;
+
+	LOG << "*xixixixixixixi***************** src " << f->src_id << " dst " << f->dst_id << " length " << f->sequence_length << endl;
+
+	for (unsigned int i = 0; i<hubs.size();i++)
+	{
+
+	    if (i!=hub_dst_index) 
+	    {
+		hubs[i]->power.rxSleep(sleep_cycles);
+		LOG << " HUB_"<<hubs_id[i]<<" rxSleep() invoked with " << sleep_cycles << " cycles " << endl;
+	    }
+	}
+    }
 
 }
-*/
 
 
   bool Channel::get_direct_mem_ptr(int id,

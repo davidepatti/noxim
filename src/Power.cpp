@@ -11,6 +11,9 @@
 #include <iostream>
 #include "Power.h"
 #include "Utils.h"
+#include "systemc.h"
+
+#define W2J(watt) (watt*CLOCK_PERIOD_PS*1.0e-12)
 
 using namespace std;
 
@@ -69,7 +72,10 @@ void Power::configureRouter(int link_width,
     assert(GlobalParams::power_configuration.bufferPowerConfig.front.find(key) != GlobalParams::power_configuration.bufferPowerConfig.front.end());
     assert(GlobalParams::power_configuration.bufferPowerConfig.pop.find(key) != GlobalParams::power_configuration.bufferPowerConfig.pop.end());
 
-    buffer_pwr_s = GlobalParams::power_configuration.bufferPowerConfig.leakage[key];
+    // Dynamic values are expressed in Joule
+    // Static/Leakage values must be converted from Watt to Joule
+
+    buffer_pwr_s = W2J(GlobalParams::power_configuration.bufferPowerConfig.leakage[key]);
     buffer_push_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.push[key];
     buffer_front_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.front[key];
     buffer_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop[key];
@@ -77,23 +83,23 @@ void Power::configureRouter(int link_width,
     // Routing 
     assert(GlobalParams::power_configuration.routerPowerConfig.routing_algorithm_pm.find(routing_function) != GlobalParams::power_configuration.routerPowerConfig.routing_algorithm_pm.end());
 
-    routing_pwr_s = GlobalParams::power_configuration.routerPowerConfig.routing_algorithm_pm[routing_function].first;
+    routing_pwr_s = W2J(GlobalParams::power_configuration.routerPowerConfig.routing_algorithm_pm[routing_function].first);
     routing_pwr_d = GlobalParams::power_configuration.routerPowerConfig.routing_algorithm_pm[routing_function].second;
 
     // Selection 
     assert(GlobalParams::power_configuration.routerPowerConfig.selection_strategy_pm.find(selection_function) != GlobalParams::power_configuration.routerPowerConfig.selection_strategy_pm.end());
 
-    selection_pwr_s = GlobalParams::power_configuration.routerPowerConfig.selection_strategy_pm[selection_function].first;
+    selection_pwr_s = W2J(GlobalParams::power_configuration.routerPowerConfig.selection_strategy_pm[selection_function].first);
     selection_pwr_d = GlobalParams::power_configuration.routerPowerConfig.selection_strategy_pm[selection_function].second;
 
     // CrossBar
     // TODO future work: tuning of crossbar radix
     pair<int,int> xbar_k = pair<int,int>(5,GlobalParams::flit_size);
-    crossbar_pwr_s = GlobalParams::power_configuration.routerPowerConfig.crossbar_pm[xbar_k].first;
+    crossbar_pwr_s = W2J(GlobalParams::power_configuration.routerPowerConfig.crossbar_pm[xbar_k].first);
     crossbar_pwr_d = GlobalParams::power_configuration.routerPowerConfig.crossbar_pm[xbar_k].second;
     
     // NetworkInterface
-    ni_pwr_s = GlobalParams::power_configuration.routerPowerConfig.network_interface.first;
+    ni_pwr_s = W2J(GlobalParams::power_configuration.routerPowerConfig.network_interface.first);
     ni_pwr_d = GlobalParams::power_configuration.routerPowerConfig.network_interface.second;
 
     // Link 
@@ -113,9 +119,9 @@ void Power::configureRouter(int link_width,
     assert(GlobalParams::power_configuration.linkBitLinePowerConfig.find(length_r2h)!=GlobalParams::power_configuration.linkBitLinePowerConfig.end());
 
 
-    link_r2r_pwr_s= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2r].first;
+    link_r2r_pwr_s= W2J(link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2r].first);
     link_r2r_pwr_d= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2r].second;
-    link_r2h_pwr_s= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2h].first;
+    link_r2h_pwr_s= W2J(link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2h].first);
     link_r2h_pwr_d= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2h].second;
 }
 
@@ -135,7 +141,7 @@ void Power::configureHub(int link_width,
     assert(GlobalParams::power_configuration.bufferPowerConfig.front.find(key) != GlobalParams::power_configuration.bufferPowerConfig.front.end());
     assert(GlobalParams::power_configuration.bufferPowerConfig.pop.find(key) != GlobalParams::power_configuration.bufferPowerConfig.pop.end());
 
-    buffer_pwr_s = GlobalParams::power_configuration.bufferPowerConfig.leakage[key];
+    buffer_pwr_s = W2J(GlobalParams::power_configuration.bufferPowerConfig.leakage[key]);
     buffer_push_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.push[key];
     buffer_front_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.front[key];
     buffer_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop[key];
@@ -148,22 +154,26 @@ void Power::configureHub(int link_width,
     assert(GlobalParams::power_configuration.bufferPowerConfig.front.find(akey) != GlobalParams::power_configuration.bufferPowerConfig.front.end());
     assert(GlobalParams::power_configuration.bufferPowerConfig.pop.find(akey) != GlobalParams::power_configuration.bufferPowerConfig.pop.end());
 
-    antenna_buffer_pwr_s = GlobalParams::power_configuration.bufferPowerConfig.leakage[akey];
+    antenna_buffer_pwr_s = W2J(GlobalParams::power_configuration.bufferPowerConfig.leakage[akey]);
     antenna_buffer_push_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.push[akey];
     antenna_buffer_front_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.front[akey];
     antenna_buffer_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop[akey];
 
     attenuation_map = GlobalParams::power_configuration.hubPowerConfig.transmitter_attenuation_map;
 
-    wireless_rx_pwr = 1.0; // TODO TURI antenna_buffer_size * GlobalParams::power_configuration.hubPowerConfig.rx_dynamic;
-    wireless_snooping =  1.0; // TODO TURIGlobalParams::power_configuration.hubPowerConfig.rx_snooping;
 
-    transceiver_pwr_s = GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.first +
-        GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.second;
+    // POSTERI:
+    // Non sappiamo se questi due valori vengono caricati dal file
+
+    wireless_rx_pwr = 7e-13; // TODO TURI antenna_buffer_size * GlobalParams::power_configuration.hubPowerConfig.rx_dynamic;
+    wireless_snooping = 7e-14; // TODO TURIGlobalParams::power_configuration.hubPowerConfig.rx_snooping;
+
+    transceiver_pwr_s = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.first +
+        GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.second);
 
 
-    transceiver_pwr_biasing = GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.first +
-        GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.second;
+    transceiver_pwr_biasing = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.first +
+        GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.second);
     // Link 
     // TODO TURI: aggiungere nel file di configurazione la
     // possibilita' di specificare le lunghezze di connessione
@@ -173,7 +183,7 @@ void Power::configureHub(int link_width,
     double length_r2h = 1.0; // TODO TURI GlobalParams::power_configuration.r2h_link_length;
     assert(GlobalParams::power_configuration.linkBitLinePowerConfig.find(length_r2h)!=GlobalParams::power_configuration.linkBitLinePowerConfig.end());
 
-    link_r2h_pwr_s= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2h].first;
+    link_r2h_pwr_s= W2J(link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2h].first);
     link_r2h_pwr_d= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2h].second;
 }
 
@@ -281,7 +291,8 @@ void Power::wirelessDynamicRx(int no_receivers)
 
 void Power::wirelessSnooping()
 {
-    power_breakdown_d["wireless_snooping"] += wireless_snooping;
+    if (!isSleeping())
+	power_breakdown_d["wireless_snooping"] += wireless_snooping;
 }
 
 void Power::biasing()
@@ -302,13 +313,29 @@ void Power::leakage()
     power_breakdown_s["ni_pwr_s"]+=ni_pwr_s;
 }
 
-
-
 void Power::printBreakDown(std::ostream & out)
 {
     printMap("power_breakdown_d",power_breakdown_d,cout);
     printMap("power_breakdown_s",power_breakdown_s,cout);
 }
+
+
+void Power::rxSleep(int cycles)
+{
+
+    int sleep_start_cycle = (int)(sc_time_stamp().to_double()/CLOCK_PERIOD);
+    sleep_end_cycle = sleep_start_cycle + cycles;
+}
+
+
+bool Power::isSleeping()
+{
+    int now = (int)(sc_time_stamp().to_double()/CLOCK_PERIOD);
+
+    return (now<sleep_end_cycle);
+
+}
+
     
 
 

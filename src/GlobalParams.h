@@ -21,8 +21,8 @@ using namespace std;
 
 #define CONFIG_FILENAME        "config.yaml"
 
-// nanoseconds
-#define CLOCK_PERIOD 1
+// picoseconds
+#define CLOCK_PERIOD_PS 1000
 
 
 // Define the directions as numbers

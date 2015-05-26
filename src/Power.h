@@ -102,6 +102,8 @@ class Power {
     map<string,double> getDynamicPowerBreakDown(){ return power_breakdown_d;}
     map<string,double> getStaticPowerBreakDown(){ return power_breakdown_s;}
 
+    void rxSleep(int cycles);
+
   private:
 
     double total_power_s;
@@ -146,6 +148,10 @@ class Power {
 
     map<string,double> power_breakdown_d;
     map<string,double> power_breakdown_s;
+
+    int sleep_end_cycle;
+
+    bool isSleeping();
 
     
 };
