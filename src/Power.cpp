@@ -33,8 +33,10 @@ Power::Power()
     antenna_buffer_pwr_s = 0.0;
 
     wireless_rx_pwr = 0.0;
-    transceiver_pwr_s = 0.0;
-    transceiver_pwr_biasing = 0.0;
+    transceiver_tx_pwr_s = 0.0;
+    transceiver_rx_pwr_s = 0.0;
+    transceiver_tx_pwr_biasing = 0.0;
+    transceiver_rx_pwr_biasing = 0.0;
     wireless_snooping = 0.0;
 
     routing_pwr_d = 0.0;
@@ -55,6 +57,9 @@ Power::Power()
 
     ni_pwr_d = 0.0;
     ni_pwr_s = 0.0;
+
+
+    sleep_end_cycle = NOT_VALID;
 
 }
 
@@ -173,15 +178,17 @@ void Power::configureHub(int link_width,
     wireless_rx_pwr = antenna_buffer_item_size * GlobalParams::power_configuration.hubPowerConfig.rx_dynamic;
     
     // RX snooping
-    wireless_snooping = W2J(GlobalParams::power_configuration.hubPowerConfig.rx_snooping);
+    wireless_snooping = GlobalParams::power_configuration.hubPowerConfig.rx_snooping;
 
+    // TX leakage
+    transceiver_tx_pwr_s = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.first);
     // RX TX leakage
-    transceiver_pwr_s = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.first +
-        GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.second);
+    transceiver_rx_pwr_s = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.second);
    
-    // RX TX biasing
-    transceiver_pwr_biasing = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.first +
-        GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.second);
+    // TX biasing
+    transceiver_tx_pwr_biasing = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.first);
+    // RX biasing
+    transceiver_rx_pwr_biasing = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.second);
     // Link 
     // TODO TURI: aggiungere nel file di configurazione la
     // possibilita' di specificare le lunghezze di connessione
@@ -300,9 +307,10 @@ void Power::wirelessTx(int src,int dst,int length)
     power_breakdown_d["wireless_tx"] += attenuation2power(attenuation_map[key]) * length;
 }
 
-void Power::wirelessDynamicRx(int no_receivers)
+void Power::wirelessDynamicRx()
 {
-    power_breakdown_d["wireless_dynamic_rx_pwr"]+= wireless_rx_pwr*no_receivers;
+    if (!isSleeping())
+	power_breakdown_d["wireless_dynamic_rx_pwr"]+= wireless_rx_pwr;
 }
 
 void Power::wirelessSnooping()
@@ -313,7 +321,10 @@ void Power::wirelessSnooping()
 
 void Power::biasing()
 {
-    power_breakdown_s["transceiver_pwr_biasing"] += transceiver_pwr_biasing;
+    power_breakdown_s["transceiver_pwr_biasing"] += transceiver_tx_pwr_biasing;
+
+    if (!isSleeping())
+	power_breakdown_s["transceiver_pwr_biasing"] += transceiver_rx_pwr_biasing;
 }
 
 void Power::leakage()
@@ -325,7 +336,9 @@ void Power::leakage()
     power_breakdown_s["crossbar_pwr_s"]+=crossbar_pwr_s;
     power_breakdown_s["link_r2r_pwr_s"]+=link_r2r_pwr_s;
     power_breakdown_s["link_r2h_pwr_s"]+=link_r2h_pwr_s;
-    power_breakdown_s["transceiver_pwr_s"]+=transceiver_pwr_s;
+    power_breakdown_s["transceiver_pwr_s"]+=transceiver_tx_pwr_s;
+    if (!isSleeping())
+	power_breakdown_s["transceiver_pwr_s"]+=transceiver_rx_pwr_s;
     power_breakdown_s["ni_pwr_s"]+=ni_pwr_s;
 }
 

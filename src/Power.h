@@ -47,7 +47,7 @@ class Power {
     void antennaBufferPop();
     void antennaBufferFront(); 
     void wirelessTx(int src,int dst,int length);
-    void wirelessDynamicRx(int no_receivers);
+    void wirelessDynamicRx();
     void wirelessSnooping();
 
     void routing();
@@ -89,8 +89,10 @@ class Power {
     double antenna_buffer_pwr_s;
 
     double wireless_rx_pwr;
-    double transceiver_pwr_s;
-    double transceiver_pwr_biasing;
+    double transceiver_tx_pwr_s;
+    double transceiver_rx_pwr_s;
+    double transceiver_tx_pwr_biasing;
+    double transceiver_rx_pwr_biasing;
     double wireless_snooping;
 
     double default_tx_energy;
