@@ -69,33 +69,11 @@ SC_MODULE(NoC)
     GlobalRoutingTable grtable;
     GlobalTrafficTable gttable;
 
-    //---------- Mau experiment <start>
-    void flitsMonitor() {
-
-	if (!reset.read()) {
-	    //      if ((int)sc_simulation_time() % 5)
-	    //        return;
-
-	    unsigned int count = 0;
-	    for (int i = 0; i < GlobalParams::mesh_dim_x; i++)
-		for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
-		    count += t[i][j]->r->getFlitsCount();
-	    LOG << count << endl;
-	}
-    }
-    //---------- Mau experiment <stop>
 
     // Constructor
 
     SC_CTOR(NoC) {
 
-	//---------- Mau experiment <start>
-	/*
-	   SC_METHOD(flitsMonitor);
-	   sensitive(reset);
-	   sensitive_pos(clock);
-	 */
-	//---------- Mau experiment <stop>
 
 	// Build the Mesh
 	buildMesh();

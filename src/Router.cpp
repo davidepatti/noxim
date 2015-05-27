@@ -36,9 +36,6 @@ void Router::rxProcess()
 		&& !buffer[i].IsFull()) {
 		Flit received_flit = flit_rx[i].read();
 
-		if (GlobalParams::verbose_mode > VERBOSE_OFF) {
-			LOG << "Input[" << i << "], Received flit: " << received_flit << endl;
-		}
 		// Store the incoming flit in the circular buffer
 		buffer[i].Push(received_flit);
 
@@ -100,21 +97,9 @@ void Router::txProcess()
 		  int o = route(route_data);
 
 
-		  if ( o==DIRECTION_HUB)
-		  {
-		      LOG << "Ready to reserve HUB direction ..." << endl;
-
-		  }
-
 		  if (reservation_table.isAvailable(o)) 
 		  {
 		      reservation_table.reserve(i, o);
-		      if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-		      {
-			      LOG << "Input[" << i << "] (" << buffer[i].
-			      Size() << " flits)" << ", reserved Output["
-			      << o << "], flit: " << flit << endl;
-		      }
 		  }
 		}
 	    }

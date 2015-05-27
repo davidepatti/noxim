@@ -95,7 +95,7 @@ struct Channel: sc_module
 	      break;
 	  }	  
       }
-      LOG << "Address " << masked_address << "(Hub_"<<masked_address<<") in this channel corresponds to target_nr " << target_nr << endl;
+      //LOG << "Address " << masked_address << "(Hub_"<<masked_address<<") in this channel corresponds to target_nr " << target_nr << endl;
       assert(target_nr!=NOT_VALID);
       return target_nr;
   }

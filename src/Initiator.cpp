@@ -13,14 +13,13 @@
 
 	  LOG << " ****** Initiator - waiting for transmissions" << endl;
 
-	  // TODO: check
 	  wait(start_request_event);
 
 	  LOG << " ****** Initiator - starting blocking transmissions" << endl;
 
 	  tlm::tlm_command cmd = tlm::TLM_WRITE_COMMAND;
 	  flit_payload = buffer_tx.Front();
-
+	  
 	  hub->power.antennaBufferFront();
 
 	  int destHub = tile2Hub(flit_payload.dst_id);
@@ -38,7 +37,7 @@
 
 	  delay = sc_time(0, SC_PS);
 
-	  LOG << "Calling blocking transport with target address = " << destHub << endl;
+	  //LOG << "Calling blocking transport with target address = " << destHub << endl;
 
 	  // Call b_transport to demonstrate the b/nb conversion by the simple_target_socket
 	  socket->b_transport( *trans, delay);
@@ -55,11 +54,6 @@
 	  {
 		LOG << " WARNING: incomplete transaction " << endl;
 	  }
-
-
-	  LOG << "trans = { " << (cmd ? 'W' : 'R') << ", " << destHub
-	      << " } , " <<  " at time " << sc_time_stamp()
-	      << " delay = " << delay << endl;
 
 	  //check_transaction( *trans );
 

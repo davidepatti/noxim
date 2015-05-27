@@ -18,7 +18,7 @@ void TokenRing::updateTokenPacket(int channel)
 	    int num_hubs = rings_mapping[channel].size();
 
 	    token_position[channel] = (token_position[channel]+1)%num_hubs;
-	    LOG << "Token of channel " << channel << " has been assigned to hub " <<  rings_mapping[channel][token_position[channel]].first << endl;
+	    LOG << "Token of channel " << channel << " assigned to hub " <<  rings_mapping[channel][token_position[channel]].first << endl;
 
 	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]].first);
 	}
@@ -38,7 +38,7 @@ void TokenRing::updateTokenMaxHold(int channel)
 	    int num_hubs = rings_mapping[channel].size();
 
 	    token_position[channel] = (token_position[channel]+1)%num_hubs;
-	    LOG << "Token of channel " << channel << " has been assigned to hub " <<  rings_mapping[channel][token_position[channel]].first << endl;
+	    LOG << "Token of channel " << channel << " assigned to hub " <<  rings_mapping[channel][token_position[channel]].first << endl;
 
 	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]].first);
 	}
@@ -56,7 +56,7 @@ void TokenRing::updateTokenHold(int channel)
 	    int num_hubs = rings_mapping[channel].size();
 
 	    token_position[channel] = (token_position[channel]+1)%num_hubs;
-	    LOG << "Token of channel " << channel << " has been assigned to hub " <<  rings_mapping[channel][token_position[channel]].first << endl;
+	    LOG << "Token of channel " << channel << " assigned to hub " <<  rings_mapping[channel][token_position[channel]].first << endl;
 
 	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]].first);
 	}
@@ -132,7 +132,7 @@ void TokenRing::attachHub(int channel, int hub, sc_in<int>* hub_token_holder_por
     hub_token_holder_port->bind(*(token_holder_signals[channel]));
     hub_token_expiration_port->bind(*(token_expiration_signals[channel]));
 
-    LOG << "Attaching Hub " << hub << " to the token ring for channel " << channel << endl;
+    //LOG << "Attaching Hub " << hub << " to the token ring for channel " << channel << endl;
     rings_mapping[channel].push_back(pair<int, int>(hub, GlobalParams::hub_configuration[hub].txChannels[channel].maxHoldCycles));
 }
 

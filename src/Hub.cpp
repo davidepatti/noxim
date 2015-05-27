@@ -4,7 +4,6 @@
 
 int Hub::tile2Port(int id)
 {
-    LOG << " tileID = " << id << " => portID = " << tile2port_mapping[id] << endl;
     return tile2port_mapping[id];
 }
 
@@ -41,8 +40,6 @@ void Hub::txRadioProcessTokenPacket(int channel)
     {
 	if (!init[channel]->buffer_tx.IsEmpty())
 	{
-	    LOG << "Token holder for channel " << channel << " with not empty buffer_tx" << endl;
-
 	    bool is_tail = init[channel]->buffer_tx.Front().flit_type == FLIT_TYPE_TAIL;
 
 	    flag[channel]->write(HOLD_CHANNEL);
@@ -51,14 +48,14 @@ void Hub::txRadioProcessTokenPacket(int channel)
 
 	    if (is_tail)
 	    {
-		LOG << "TOKEN_PACKET: tail sent, releasing token for channel " << channel << endl;
+		//LOG << "TOKEN_PACKET: tail sent, releasing token for channel " << channel << endl;
 		flag[channel]->write(RELEASE_CHANNEL);
 	    }
 
 	}
 	else
 	{
-	    LOG << "TOKEN_PACKET: Buffer_tx empty, releasing token for channel " << channel << endl;
+	    //LOG << "TOKEN_PACKET: Buffer_tx empty, releasing token for channel " << channel << endl;
 	    flag[channel]->write(RELEASE_CHANNEL);
 	}
     }
@@ -73,11 +70,11 @@ void Hub::txRadioProcessTokenHold(int channel)
     {
 	if (!init[channel]->buffer_tx.IsEmpty())
 	{
-	    LOG << "Token holder for channel " << channel << " with not empty buffer_tx" << endl;
+	    //LOG << "Token holder for channel " << channel << " with not empty buffer_tx" << endl;
 
 	    if (current_token_expiration[channel]->read() < flit_transmission_cycles[channel])
 	    {
-		LOG << "TOKEN_HOLD policy: Not enough token expiration time for sending channel " << channel << endl;
+		//LOG << "TOKEN_HOLD policy: Not enough token expiration time for sending channel " << channel << endl;
 	    }
 	    else
 	    {
@@ -88,7 +85,7 @@ void Hub::txRadioProcessTokenHold(int channel)
 	}
 	else
 	{
-		LOG << "TOKEN_HOLD policy: nothing to transmit, holding token for channel " << channel << endl;
+		//LOG << "TOKEN_HOLD policy: nothing to transmit, holding token for channel " << channel << endl;
 	}
     }
 }
@@ -102,11 +99,11 @@ void Hub::txRadioProcessTokenMaxHold(int channel)
     {
 	if (!init[channel]->buffer_tx.IsEmpty())
 	{
-	    LOG << "Token holder for channel " << channel << " with not empty buffer_tx" << endl;
+	    //LOG << "Token holder for channel " << channel << " with not empty buffer_tx" << endl;
 
 	    if (current_token_expiration[channel]->read() < flit_transmission_cycles[channel])
 	    {
-		LOG << "TOKEN_MAX_HOLD: Not enough token expiration time, releasing token for channel " << channel << endl;
+		//LOG << "TOKEN_MAX_HOLD: Not enough token expiration time, releasing token for channel " << channel << endl;
 		flag[channel]->write(RELEASE_CHANNEL);
 	    }
 	    else
@@ -118,7 +115,7 @@ void Hub::txRadioProcessTokenMaxHold(int channel)
 	}
 	else
 	{
-	    LOG << "TOKEN_MAX_HOLD: Buffer_tx empty, releasing token for channel " << channel << endl;
+	    //LOG << "TOKEN_MAX_HOLD: Buffer_tx empty, releasing token for channel " << channel << endl;
 	    flag[channel]->write(RELEASE_CHANNEL);
 	}
     }
@@ -201,7 +198,7 @@ void Hub::rxRadioProcess()
 		{
 		    target[channel]->buffer_rx.Pop();
 		    power.antennaBufferPop();
-		    LOG << "Moving flit from buffer_rx to buffer port " << r[i] << endl;
+		    //LOG << "Moving flit from buffer_rx to buffer port " << r[i] << endl;
 
 		    buffer_to_tile[r[i]].Push(received_flit);
 		    power.bufferPush();
@@ -234,7 +231,7 @@ void Hub::rxProcess()
 
 	    if ((req_rx[i]->read() == 1 - current_level_rx[i]) && !buffer_from_tile[i].IsFull()) 
 	    {
-		LOG << "Reading flit on port " << i << endl;
+		//LOG << "Reading flit on port " << i << endl;
 		Flit received_flit = flit_rx[i]->read();
 
 		buffer_from_tile[i].Push(received_flit);
@@ -276,7 +273,7 @@ void Hub::txProcess()
 
 	    if (!buffer_from_tile[i].IsEmpty()) 
 	    {
-		LOG << "Reservation: buffer_from_tile not empty on port " << i << endl;
+		//LOG << "Reservation: buffer_from_tile not empty on port " << i << endl;
 
 		Flit flit = buffer_from_tile[i].Front();
 		power.bufferFront();
@@ -294,14 +291,16 @@ void Hub::txProcess()
 			wireless_reservation_table.reserve(i, channel);
 		    }
 		    else
+		    {
 			LOG << "Reservation:  wireless channel " << channel << " not available ..." << endl;
+		    }
 
 		}
 	    }
 
 	    if (!buffer_to_tile[i].IsEmpty()) 
 	    {
-		LOG << "Reservation: buffer_to_tile not empty on port " << i << endl;
+		//LOG << "Reservation: buffer_to_tile not empty on port " << i << endl;
 
 		Flit flit = buffer_to_tile[i].Front();
 		power.bufferFront();
@@ -340,7 +339,7 @@ void Hub::txProcess()
 		{
 		    if (!(init[channel]->buffer_tx.IsFull()) )
 		    {
-			LOG << "Flit moved from buffer["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
+			LOG << "Flit moved from buffer_from_tile["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
 			buffer_from_tile[i].Pop();
 			power.bufferPop();
 			init[channel]->buffer_tx.Push(flit);
@@ -368,12 +367,6 @@ void Hub::txProcess()
 
 		if (d != NOT_RESERVED) 
 		{
-		    LOG << "Inject to RH: Hub ID " << local_id << ", Type " << flit.flit_type << ", " << flit.src_id << "-->" << flit.dst_id << endl;
-		    LOG << "port[" << i << "] forward to direction [" << d << "], flit: " << flit << endl;
-
-		    // TODO: put code that writes signals to the
-		    // tile
-		    LOG << "Forwarding to port " << d << endl;
 
 		    flit_tx[d].write(flit);
 		    power.r2hLink();

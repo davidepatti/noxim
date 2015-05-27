@@ -13,7 +13,6 @@ void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& del
     sc_dt::uint64 masked_address;
     unsigned int target_nr = decode_address( address, masked_address);
 
-
     if (target_nr < init_socket.size())
     {
 	// Modify address within transaction
@@ -120,5 +119,4 @@ void Channel::addHub(Hub* h)
     hubs.push_back(h);
     hubs_id.push_back(h->getID());
 
-    LOG << "Adding hub " << h << " to Channel " <<  local_id << endl;
 }
