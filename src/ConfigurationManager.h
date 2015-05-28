@@ -77,7 +77,7 @@ namespace YAML {
                 ++buffering_it)
             {    
                 vector<double> v = buffering_it->as<vector<double> >();
-                cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << " " << v[4] << " " << v[5] << endl;
+                //cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << " " << v[4] << " " << v[5] << endl;
                 bufferPowerConfig.leakage[make_pair(v[0],v[1])] = v[2];
                 bufferPowerConfig.push[make_pair(v[0],v[1])] = v[3];
                 bufferPowerConfig.front[make_pair(v[0],v[1])] = v[4];
@@ -95,7 +95,7 @@ namespace YAML {
                 ++link_bit_line_pc_it)
             {    
                 vector<double> v = link_bit_line_pc_it->as<vector<double> >();
-                cout << v[0] << " " << v[1] << " " << v[2] << endl;
+                //cout << v[0] << " " << v[1] << " " << v[2] << endl;
                 linkBitLinePowerConfig[v[0]] = make_pair(v[1], v[2]);
             }
             return true;
@@ -112,7 +112,7 @@ namespace YAML {
                 ++crossbar_it)
             {    
                 vector<double> v = crossbar_it->as<vector<double> >();
-                cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << endl;
+                //cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << endl;
                 routerPowerConfig.crossbar_pm[make_pair(v[0], v[1])] = make_pair(v[2], v[3]);
             }
 
@@ -157,7 +157,7 @@ namespace YAML {
                 ++tx_attenuation_map_it)
             {    
                 vector<double> v = tx_attenuation_map_it->as<vector<double> >();
-                cout << v[0] << " " << v[1] << " " << v[2] << endl;
+                //cout << v[0] << " " << v[1] << " " << v[2] << endl;
                 hubPowerConfig.transmitter_attenuation_map[make_pair(v[0],v[1])] = v[2];
             }
 

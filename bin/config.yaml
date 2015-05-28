@@ -172,7 +172,7 @@ Energy:
         transceiver_leakage: [4.43e-4, 1.10e-4]
 
         # [RX, TX] Contribution (W)
-        transceiver_biasing: [0, 7e-3]
+        transceiver_biasing: [1.5e-2, 7e-3]
 
         # RX Dynamic Contribution in J/bit (RX Digital Interfaces)
         rx_dynamic: 7e-13

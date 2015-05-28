@@ -24,9 +24,6 @@ void ProcessingElement::rxProcess()
     } else {
 	if (req_rx.read() == 1 - current_level_rx) {
 	    Flit flit_tmp = flit_rx.read();
-	    if (GlobalParams::verbose_mode > VERBOSE_OFF) {
-		LOG << "RECEIVING " << flit_tmp << endl;
-	    }
 	    current_level_rx = 1 - current_level_rx;	// Negate the old value for Alternating Bit Protocol (ABP)
 	}
 	ack_rx.write(current_level_rx);
@@ -52,9 +49,6 @@ void ProcessingElement::txProcess()
 	if (ack_tx.read() == current_level_tx) {
 	    if (!packet_queue.empty()) {
 		Flit flit = nextFlit();	// Generate a new flit
-		if (GlobalParams::verbose_mode > VERBOSE_OFF) {
-		    LOG << "SENDING " << flit << endl;
-		}
 		flit_tx->write(flit);	// Send the generated flit
 		current_level_tx = 1 - current_level_tx;	// Negate the old value for Alternating Bit Protocol (ABP)
 		req_tx.write(current_level_tx);
@@ -169,8 +163,6 @@ Packet ProcessingElement::trafficRandom()
     double rnd = rand() / (double) RAND_MAX;
     double range_start = 0.0;
 
-    //LOG << "rnd = " << rnd << endl;
-
     int max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) - 1;
 
     // Random destination distribution
@@ -179,13 +171,11 @@ Packet ProcessingElement::trafficRandom()
 
 	// check for hotspot destination
 	for (size_t i = 0; i < GlobalParams::hotspots.size(); i++) {
-	    //LOG << "Checking node " << GlobalParams::hotspots[i].first << " with P = " << GlobalParams::hotspots[i].second << endl;
 
 	    if (rnd >= range_start
 		&& rnd <
 		range_start + GlobalParams::hotspots[i].second) {
 		if (local_id != GlobalParams::hotspots[i].first) {
-		    //LOG << "That is ! " << endl;
 		    p.dst_id = GlobalParams::hotspots[i].first;
 		}
 		break;

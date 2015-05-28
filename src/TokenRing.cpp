@@ -132,7 +132,7 @@ void TokenRing::attachHub(int channel, int hub, sc_in<int>* hub_token_holder_por
     hub_token_holder_port->bind(*(token_holder_signals[channel]));
     hub_token_expiration_port->bind(*(token_expiration_signals[channel]));
 
-    LOG << "Attaching Hub " << hub << " to the token ring for channel " << channel << endl;
+    //LOG << "Attaching Hub " << hub << " to the token ring for channel " << channel << endl;
     rings_mapping[channel].push_back(hub); 
     token_hold_count[channel]= 8; // TODO TURI GlobalParams::hub_configuration[hub].txChannels[channel].maxHoldCycles));
 }

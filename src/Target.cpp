@@ -5,14 +5,15 @@
 
 void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 {
+    /*
     tlm::tlm_command cmd = trans.get_command();
     sc_dt::uint64    adr = trans.get_address() / 4;
     unsigned char*   ptr = trans.get_data_ptr();
     unsigned int     len = trans.get_data_length();
+    */
     //unsigned char*   byt = trans.get_byte_enable_ptr();
     //unsigned int     wid = trans.get_streaming_width();
 
-    LOG << "Received data with size " << len << endl;
     // Obliged to check address range and check for unsupported features,
     //   i.e. byte enables, streaming, and bursts
     // Can ignore DMI hint and extensions
@@ -25,13 +26,8 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 	*/
 
     // Obliged to implement read and write commands
-    if ( cmd == tlm::TLM_READ_COMMAND )
-	memcpy(ptr, &mem[adr], len);
-    else if ( cmd == tlm::TLM_WRITE_COMMAND )
-	memcpy(&mem[adr], ptr, len);
+    struct Flit* my_flit = (struct Flit*)trans.get_data_ptr();
 
-    Flit * my_flit;
-    my_flit = (Flit*)(&mem[0]);
 
     LOG << ">>>> Target received flit: Type " << my_flit->flit_type << ", " << my_flit->src_id << "-->" << my_flit->dst_id << " flit: " << *my_flit << endl;
 
@@ -44,7 +40,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 	{
 	    if (hub->in_reservation_table.isAvailable(dst_port))
 	    {
-		LOG << "Reserving output port " << dst_port << " for channel " << local_id << endl;
+		//LOG << "Reserving output port " << dst_port << " for channel " << local_id << endl;
 		hub->in_reservation_table.reserve(local_id, dst_port);
 	    }
 	    else
@@ -57,12 +53,12 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 
 	if (my_flit->flit_type == FLIT_TYPE_TAIL) 
 	{
-	    LOG << "Releasing reservation for output port " << dst_port << endl;
+	    //LOG << "Releasing reservation for output port " << dst_port << endl;
 	    hub->in_reservation_table.release(dst_port);
 	}
 	
 
-	LOG << "Flit moved to rx_buffer " << endl;
+	//LOG << "Flit moved to rx_buffer " << endl;
 	buffer_rx.Push(*my_flit);
 	hub->power.antennaBufferPush();
 	// Obliged to set response status to indicate successful completion

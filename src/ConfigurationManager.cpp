@@ -64,7 +64,6 @@ void loadConfiguration() {
 
         YAML::Node node;
         node[hub_id] = GlobalParams::hub_configuration[hub_id];
-        cout << node[hub_id] << endl;
     }
 
     GlobalParams::default_channel_configuration = config["Channels"]["defaults"].as<ChannelConfig>();
@@ -83,7 +82,6 @@ void loadConfiguration() {
 
         YAML::Node node;
         node[channel_id] = GlobalParams::channel_configuration[channel_id];
-        cout << node[channel_id] << endl;
     }
 
     GlobalParams::power_configuration = config["Energy"].as<PowerConfig>();

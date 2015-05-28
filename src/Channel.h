@@ -95,7 +95,7 @@ struct Channel: sc_module
 	      break;
 	  }	  
       }
-      LOG << "Address " << masked_address << "(Hub_"<<masked_address<<") in this channel corresponds to target_nr " << target_nr << endl;
+      //LOG << "Address " << masked_address << "(Hub_"<<masked_address<<") in this channel corresponds to target_nr " << target_nr << endl;
       assert(target_nr!=NOT_VALID);
       return target_nr;
   }
@@ -115,6 +115,7 @@ struct Channel: sc_module
   std::map <tlm::tlm_generic_payload*, unsigned int> m_id_map;
 
    void powerManager(int hub_dst_index, tlm::tlm_generic_payload& trans);
+   void accountWirelessRxPower();
 
 };
 

@@ -82,7 +82,6 @@ double Stats::getMaxDelay(const int src_id)
 
     for (unsigned int j = 0; j < chist[i].delays.size(); j++)
 	if (chist[i].delays[j] > maxd) {
-	    //      cout << src_id << " -> " << id << ": " << chist[i].delays[j] << endl;
 	    maxd = chist[i].delays[j];
 	}
     return maxd;

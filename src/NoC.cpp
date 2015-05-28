@@ -24,7 +24,6 @@ void NoC::buildMesh()
     {
         int channel_id = it->first;
         sprintf(channel_name, "Channel_%d", channel_id);
-        LOG << "Creating " << channel_name << endl;
         channel[channel_id] = new Channel(channel_name, channel_id);
     }
 
@@ -37,7 +36,6 @@ void NoC::buildMesh()
         HubConfig hub_config = it->second;
 
         sprintf(hub_name, "Hub_%d", hub_id);
-        LOG << "Creating " << hub_name << endl;
         hub[hub_id] = new Hub(hub_name, hub_id,token_ring);
         hub[hub_id]->clock(clock);
         hub[hub_id]->reset(reset);
@@ -58,7 +56,7 @@ void NoC::buildMesh()
                 ++iit) 
         {
             int channel_id = *iit;
-            LOG << "Binding " << hub[hub_id]->name() << " to txChannel " << channel_id << endl;
+            //LOG << "Binding " << hub[hub_id]->name() << " to txChannel " << channel_id << endl;
             hub[hub_id]->init[channel_id]->socket.bind(channel[channel_id]->targ_socket);
             LOG << "Binding " << hub[hub_id]->name() << " to txChannel " << channel_id << endl;
             hub[hub_id]->setFlitTransmissionCycles(channel[channel_id]->getFlitTransmissionCycles(),channel_id);
@@ -69,7 +67,7 @@ void NoC::buildMesh()
                 ++iit) 
         {
             int channel_id = *iit;
-            LOG << "Binding " << hub[hub_id]->name() << " to rxChannel " << channel_id << endl;
+            //LOG << "Binding " << hub[hub_id]->name() << " to rxChannel " << channel_id << endl;
             channel[channel_id]->init_socket.bind(hub[hub_id]->target[channel_id]->socket);
             channel[channel_id]->addHub(hub[hub_id]);
         }
@@ -94,9 +92,6 @@ void NoC::buildMesh()
 	else
 	    data_rate_gbs = NOT_VALID;
 
-	cout << "XXXXXX HUB " << hub_id << " attached to " << no_channels << " tx channels " << endl;
-	cout << "XXXXXX HUB " << hub_id << " using data rate " << data_rate_gbs << endl;
-
 	hub[hub_id]->power.configureHub(GlobalParams::flit_size,
 		                        GlobalParams::buffer_depth,
 					GlobalParams::flit_size,
@@ -106,19 +101,6 @@ void NoC::buildMesh()
 
     }
 
-    // DEBUG Print Tile / Hub connections 
-    for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
-	    for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
-            Coord c;
-            c.x = i;
-            c.y = j;
-            map<int, int>::iterator it = GlobalParams::hub_for_tile.find(coord2Id(c));
-            if (it != GlobalParams::hub_for_tile.end())
-                LOG << "Tile [" << i << "][" << j << "] will be connected to " << hub[it->second]->name() << endl;
-            else
-                LOG << "Tile [" << i << "][" << j << "] will not be connected to any Hub" << endl;
-        }
-    }
 
     // Check for routing table availability
     if (!strcmp(GlobalParams::routing_algorithm, ROUTING_TABLE_BASED))
@@ -168,8 +150,6 @@ void NoC::buildMesh()
 	    int tile_id = coord2Id(tile_coord);
 	    sprintf(tile_name, "Tile[%02d][%02d]_(#%d)", i, j, tile_id);
 	    t[i][j] = new Tile(tile_name, tile_id);
-
-	    LOG << "Setting " << tile_name << endl;
 
 	    // Tell to the router its coordinates
 	    t[i][j]->r->configure(j * GlobalParams::mesh_dim_x + i,

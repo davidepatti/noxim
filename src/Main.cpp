@@ -30,7 +30,6 @@ int sc_main(int arg_num, char *arg_vet[])
 
     configure(arg_num, arg_vet);
 
-    //cout << "\n ROUTING = " <<  GlobalParams::routing_algorithm << endl;
 
     // Signals
     sc_clock clock("clock", GlobalParams::clock_period, SC_PS);

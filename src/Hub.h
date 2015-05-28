@@ -129,8 +129,6 @@ SC_MODULE(Hub)
             buffer_from_tile[i].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].fromTileBufferSize);
             buffer_to_tile[i].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].toTileBufferSize);
         }
-        LOG << "Size of buffers for data from tiles = " << buffer_from_tile[0].GetMaxBufferSize() << endl; 
-        LOG << "size of buffer for data to tiles = " << buffer_to_tile[0].GetMaxBufferSize() << endl; 
 
         current_level_rx = new bool[num_ports];
         current_level_tx = new bool[num_ports];
@@ -143,7 +141,6 @@ SC_MODULE(Hub)
             LOG << "Creating " << txt << endl;
             init[txChannels[i]] = new Initiator(txt,this);
             init[txChannels[i]]->buffer_tx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].txBufferSize);
-            LOG << "Size of buffer_tx = " << init[txChannels[i]]->buffer_tx.GetMaxBufferSize() << " for Channel_"<< txChannels[i] << endl;
 	    current_token_holder[txChannels[i]] = new sc_in<int>();
 	    current_token_expiration[txChannels[i]] = new sc_in<int>();
 	    flag[txChannels[i]] = new sc_out<int>();
@@ -155,7 +152,6 @@ SC_MODULE(Hub)
             sprintf(txt, "target_%d", rxChannels[i]);
             target[rxChannels[i]] = new Target(txt, rxChannels[i], this);
             target[rxChannels[i]]->buffer_rx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].rxBufferSize);
-            LOG << "Size of buffer_rx = " << target[rxChannels[i]]->buffer_rx.GetMaxBufferSize() << " for Channel_"<< rxChannels[i] << endl;
         }
 
         start_from_port = 0;

@@ -16,28 +16,9 @@ ReservationTable::ReservationTable()
 }
 
 
-/* DEPRECATED 
-void ReservationTable::init(int size)
-{
-    LOG << "Initializing reservation table with size " << size << endl;
-    assert(size>0);
-    assert(size()==0);
-
-    for (int i=0;i<size;i++)
-	rtable.push_back(NOT_RESERVED); 
-
-}
-
-int ReservationTable::size() const
-{
-    return rtable.size();
-}
-*/
 
 bool ReservationTable::isAvailable(const int port_out)
 {
-
-    LOG << "Checking availability of out port " << port_out << endl;
 
     if (rtable.find(port_out)==rtable.end())
 	rtable[port_out] = NOT_RESERVED;
@@ -70,7 +51,6 @@ void ReservationTable::release(const int port_out)
 
 int ReservationTable::getOutputPort(const int port_in)
 {
-//    LOG << "GetOutputPort invoked with port_in = " << port_in << endl;
 
     for (map<int,int>::iterator i=rtable.begin(); i!=rtable.end(); i++)
     {
