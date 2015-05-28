@@ -18,9 +18,9 @@ void TokenRing::updateTokenPacket(int channel)
 	    int num_hubs = rings_mapping[channel].size();
 
 	    token_position[channel] = (token_position[channel]+1)%num_hubs;
-	    LOG << "Token of channel " << channel << " has been assigned to hub " <<  rings_mapping[channel][token_position[channel]].first << endl;
+	    LOG << "Token of channel " << channel << " has been assigned to hub " <<  rings_mapping[channel][token_position[channel]] << endl;
 
-	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]].first);
+	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]]);
 	}
 }
 
@@ -29,39 +29,39 @@ void TokenRing::updateTokenMaxHold(int channel)
     // TODO TURI: controllare struttura dati per hold count, troppo
     // complessa, per esempio il contatore dipende solo dal canale,
     // non pure dalla posizione del token
-	if (--rings_mapping[channel][token_position[channel]].second == 0 ||
+	if (--token_hold_count[channel] == 0 ||
 		flag[channel][token_position[channel]]->read() == RELEASE_CHANNEL)
 	{
-	    rings_mapping[channel][token_position[channel]].second =
-	    GlobalParams::hub_configuration[rings_mapping[channel][token_position[channel]].first].txChannels[channel].maxHoldCycles;
+	    token_hold_count[channel] = 8;
+	    //TODO: TURI GlobalParams::hub_configuration[rings_mapping[channel][token_position[channel]].first].txChannels[channel].maxHoldCycles;
 	    // number of hubs of the ring
 	    int num_hubs = rings_mapping[channel].size();
 
 	    token_position[channel] = (token_position[channel]+1)%num_hubs;
-	    LOG << "Token of channel " << channel << " has been assigned to hub " <<  rings_mapping[channel][token_position[channel]].first << endl;
+	    LOG << "Token of channel " << channel << " has been assigned to hub " <<  rings_mapping[channel][token_position[channel]] << endl;
 
-	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]].first);
+	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]]);
 	}
 
-	current_token_expiration[channel]->write(rings_mapping[channel][token_position[channel]].second);
+	current_token_expiration[channel]->write(token_hold_count[channel]);
 }
 
 void TokenRing::updateTokenHold(int channel)
 {
-	if (--rings_mapping[channel][token_position[channel]].second == 0)
+	if (--token_hold_count[channel] == 0)
 	{
-	    rings_mapping[channel][token_position[channel]].second =
-	    GlobalParams::hub_configuration[rings_mapping[channel][token_position[channel]].first].txChannels[channel].maxHoldCycles;
+	    token_hold_count[channel] = 8;
+	    //TODO TURI GlobalParams::hub_configuration[rings_mapping[channel][token_position[channel]].first].txChannels[channel].maxHoldCycles;
 	    // number of hubs of the ring
 	    int num_hubs = rings_mapping[channel].size();
 
 	    token_position[channel] = (token_position[channel]+1)%num_hubs;
-	    LOG << "Token of channel " << channel << " has been assigned to hub " <<  rings_mapping[channel][token_position[channel]].first << endl;
+	    LOG << "Token of channel " << channel << " has been assigned to hub " <<  rings_mapping[channel][token_position[channel]] << endl;
 
-	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]].first);
+	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]]);
 	}
 
-	current_token_expiration[channel]->write(rings_mapping[channel][token_position[channel]].second);
+	current_token_expiration[channel]->write(token_hold_count[channel]);
 }
 
 void TokenRing::updateTokens()
@@ -117,8 +117,8 @@ void TokenRing::attachHub(int channel, int hub, sc_in<int>* hub_token_holder_por
 	// checking max hold cycles vs wireless transmission latency
 	// consistency
         double delay_ps = 1000*GlobalParams::flit_size/GlobalParams::channel_configuration[channel].dataRate;
-	int cycles = ceil(delay_ps/CLOCK_PERIOD_PS);
-	int max_hold_cycles = GlobalParams::hub_configuration[hub].txChannels[channel].maxHoldCycles;
+	int cycles = ceil(delay_ps/GlobalParams::clock_period);
+	int max_hold_cycles = 8; // TODO TURI GlobalParams::hub_configuration[hub].txChannels[channel].maxHoldCycles;
 	assert(cycles< max_hold_cycles);
 
     }	
@@ -133,7 +133,8 @@ void TokenRing::attachHub(int channel, int hub, sc_in<int>* hub_token_holder_por
     hub_token_expiration_port->bind(*(token_expiration_signals[channel]));
 
     LOG << "Attaching Hub " << hub << " to the token ring for channel " << channel << endl;
-    rings_mapping[channel].push_back(pair<int, int>(hub, GlobalParams::hub_configuration[hub].txChannels[channel].maxHoldCycles));
+    rings_mapping[channel].push_back(hub); 
+    token_hold_count[channel]= 8; // TODO TURI GlobalParams::hub_configuration[hub].txChannels[channel].maxHoldCycles));
 }
 
 

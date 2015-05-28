@@ -110,14 +110,8 @@ SC_MODULE(Hub)
 	token_ring = tr;
         num_ports = GlobalParams::hub_configuration[local_id].attachedNodes.size();
         attachedNodes = GlobalParams::hub_configuration[local_id].attachedNodes;
-
-        for(map<int, TxChannelConfig>::iterator it = GlobalParams::hub_configuration[local_id].txChannels.begin();
-                it != GlobalParams::hub_configuration[local_id].txChannels.end(); ++it) {
-            txChannels.push_back(it->first);
-
-
-        }
         rxChannels = GlobalParams::hub_configuration[local_id].rxChannels;
+        txChannels = GlobalParams::hub_configuration[local_id].txChannels;
 
         flit_rx = new sc_in<Flit>[num_ports];
         req_rx = new sc_in<bool>[num_ports];
@@ -146,6 +140,7 @@ SC_MODULE(Hub)
         for (unsigned int i = 0; i < txChannels.size(); i++) {
             char txt[20];
             sprintf(txt, "init_%d", txChannels[i]);
+            LOG << "Creating " << txt << endl;
             init[txChannels[i]] = new Initiator(txt,this);
             init[txChannels[i]]->buffer_tx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].txBufferSize);
             LOG << "Size of buffer_tx = " << init[txChannels[i]]->buffer_tx.GetMaxBufferSize() << " for Channel_"<< txChannels[i] << endl;

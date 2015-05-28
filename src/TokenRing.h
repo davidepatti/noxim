@@ -60,10 +60,12 @@ SC_MODULE(TokenRing)
     void updateTokenPacket(int channel);
 
     // ring of a channel -> list of pairs < hubs , hold counts >
-    map<int,vector<pair<int,int> > > rings_mapping;
+    map<int,vector<int> > rings_mapping;
 
     // ring of a channel -> token position in the ring
     map<int,int> token_position;
+    
+    map<int,int> token_hold_count;
 
     map<int,int> token_policy;
 

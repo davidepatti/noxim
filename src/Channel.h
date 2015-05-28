@@ -54,7 +54,7 @@ struct Channel: sc_module
     init_socket.register_invalidate_direct_mem_ptr(this, &Channel::invalidate_direct_mem_ptr);
     // bit rate is Gb/s
     flit_transmission_delay_ps = 1000*GlobalParams::flit_size/GlobalParams::channel_configuration[local_id].dataRate;
-    flit_transmission_cycles = ceil(((double)flit_transmission_delay_ps/CLOCK_PERIOD_PS));
+    flit_transmission_cycles = ceil(((double)flit_transmission_delay_ps/GlobalParams::clock_period));
     LOG << "data rate " << GlobalParams::channel_configuration[local_id].dataRate 
 	<< " Gbps, transmission delay " << flit_transmission_delay_ps << " ps, " << flit_transmission_cycles << " cycles " << endl; 
 

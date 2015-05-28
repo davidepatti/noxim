@@ -7,7 +7,7 @@
 #include "DataStructs.h"
 #include <iomanip>
 
-#define LOG (std::cout << std::setw(7) << left << sc_time_stamp().to_double() / CLOCK_PERIOD_PS << " " << name() << "::" << __func__<< "() => ")
+#define LOG (std::cout << std::setw(7) << left << sc_time_stamp().to_double() / GlobalParams::clock_period << " " << name() << "::" << __func__<< "() => ")
 
 // Output overloading
 
@@ -161,17 +161,17 @@ inline int tile2Hub(int id)
 inline int selectChannel(int src_hub, int dst_hub)
 {  
     
-    map<int, TxChannelConfig> & first = GlobalParams::hub_configuration[src_hub].txChannels;
+    vector<int> & first = GlobalParams::hub_configuration[src_hub].txChannels;
     vector<int> & second = GlobalParams::hub_configuration[dst_hub].rxChannels;
 
     vector<int> intersection;
 
-    for (map<int, TxChannelConfig>::iterator i = first.begin(); i != first.end(); i++)
+	for (unsigned int i=0;i<first.size();i++)
     {
 	for (unsigned int j=0;j<second.size();j++)
 	{
-	    if (i->first ==second[j])
-		intersection.push_back(i->first);
+	    if (first[i] ==second[j])
+		intersection.push_back(first[i]);
 	}
     }
 

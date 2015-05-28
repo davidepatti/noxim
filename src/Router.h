@@ -21,6 +21,8 @@
 #include "Utils.h"
 #include "routingAlgorithms/RoutingAlgorithm.h"
 #include "routingAlgorithms/RoutingAlgorithms.h"
+#include "selectionStrategies/SelectionStrategy.h"
+#include "selectionStrategies/SelectionStrategies.h"
 
 using namespace std;
 
@@ -67,6 +69,7 @@ SC_MODULE(Router)
     int start_from_port;	                // Port from which to start the reservation cycle
     unsigned long routed_flits;
     RoutingAlgorithm * routingAlgorithm; 
+    SelectionStrategy * selectionStrategy; 
     
     // Functions
 
@@ -100,6 +103,10 @@ SC_MODULE(Router)
     if (routingAlgorithm == 0)
         assert(false);
 
+    selectionStrategy = SelectionStrategies::get(GlobalParams::selection_strategy);
+
+    if (selectionStrategy == 0)
+        assert(false);
     }
 
   private:
@@ -111,13 +118,7 @@ SC_MODULE(Router)
     int selectionFunction(const vector <int> &directions,
 			  const RouteData & route_data);
     vector < int >routingFunction(const RouteData & route_data);
-
-    // selection strategies
-    int selectionRandom(const vector <int> & directions);
-    int selectionBufferLevel(const vector <int> & directions);
-    int selectionNoP(const vector <int> & directions,
-		     const RouteData & route_data);
-
+ 
     NoP_data getCurrentNoPData();
     void NoP_report() const;
     int NoPScore(const NoP_data & nop_data, const vector <int> & nop_channels) const;
@@ -125,7 +126,6 @@ SC_MODULE(Router)
     int getNeighborId(int _id, int direction) const;
 
   public:
-
     unsigned int local_drained;
 
     bool inCongestion();

@@ -218,22 +218,8 @@ void Router::perCycleUpdate()
 	for (int i = 0; i < DIRECTIONS + 1; i++)
 	    free_slots[i].write(buffer[i].GetMaxBufferSize());
     } else {
-
-	if (GlobalParams::selection_strategy == SEL_BUFFER_LEVEL ||
-	    GlobalParams::selection_strategy == SEL_NOP) {
-
-	    // update current input buffers level to neighbors
-	    for (int i = 0; i < DIRECTIONS + 1; i++)
-		free_slots[i].write(buffer[i].getCurrentFreeSlots());
-
-	    // NoP selection: send neighbor info to each direction 'i'
-	    NoP_data current_NoP_data = getCurrentNoPData();
-
-	    for (int i = 0; i < DIRECTIONS; i++)
-		NoP_data_out[i].write(current_NoP_data);
-	}
-
-	power.leakage();
+        selectionStrategy->perCycleUpdate(this);
+	    power.leakage();
     }
 }
 
@@ -309,127 +295,6 @@ int Router::NoPScore(const NoP_data & nop_data,
     return score;
 }
 
-int Router::selectionNoP(const vector < int >&directions,
-			      const RouteData & route_data)
-{
-    vector < int >neighbors_on_path;
-    vector < int >score;
-    int direction_selected = NOT_VALID;
-
-    int current_id = route_data.current_id;
-
-    for (size_t i = 0; i < directions.size(); i++) {
-	// get id of adjacent candidate
-	int candidate_id = getNeighborId(current_id, directions[i]);
-
-	// apply routing function to the adjacent candidate node
-	RouteData tmp_route_data;
-	tmp_route_data.current_id = candidate_id;
-	tmp_route_data.src_id = route_data.src_id;
-	tmp_route_data.dst_id = route_data.dst_id;
-	tmp_route_data.dir_in = reflexDirection(directions[i]);
-
-
-	vector < int >next_candidate_channels =
-	    routingFunction(tmp_route_data);
-
-	// select useful data from Neighbor-on-Path input 
-	NoP_data nop_tmp = NoP_data_in[directions[i]].read();
-
-	// store the score of node in the direction[i]
-	score.push_back(NoPScore(nop_tmp, next_candidate_channels));
-    }
-
-    // check for direction with higher score
-    //int max_direction = directions[0];
-    int max = score[0];
-    for (unsigned int i = 0; i < directions.size(); i++) {
-	if (score[i] > max) {
-	//    max_direction = directions[i];
-	    max = score[i];
-	}
-    }
-
-    // if multiple direction have the same score = max, choose randomly.
-
-    vector < int >equivalent_directions;
-
-    for (unsigned int i = 0; i < directions.size(); i++)
-	if (score[i] == max)
-	    equivalent_directions.push_back(directions[i]);
-
-    direction_selected =
-	equivalent_directions[rand() % equivalent_directions.size()];
-
-    return direction_selected;
-}
-
-int Router::selectionBufferLevel(const vector < int >&directions)
-{
-    vector < int >best_dirs;
-    int max_free_slots = 0;
-    for (unsigned int i = 0; i < directions.size(); i++) {
-	int free_slots = free_slots_neighbor[directions[i]].read();
-	bool available = reservation_table.isAvailable(directions[i]);
-	if (available) {
-	    if (free_slots > max_free_slots) {
-		max_free_slots = free_slots;
-		best_dirs.clear();
-		best_dirs.push_back(directions[i]);
-	    } else if (free_slots == max_free_slots)
-		best_dirs.push_back(directions[i]);
-	}
-    }
-
-    if (best_dirs.size())
-	return (best_dirs[rand() % best_dirs.size()]);
-    else
-	return (directions[rand() % directions.size()]);
-
-    //-------------------------
-    // TODO: unfair if multiple directions have same buffer level
-    // TODO: to check when both available
-//   unsigned int max_free_slots = 0;
-//   int direction_choosen = NOT_VALID;
-
-//   for (unsigned int i=0;i<directions.size();i++)
-//     {
-//       int free_slots = free_slots_neighbor[directions[i]].read();
-//       if ((free_slots >= max_free_slots) &&
-//        (reservation_table.isAvailable(directions[i])))
-//      {
-//        direction_choosen = directions[i];
-//        max_free_slots = free_slots;
-//      }
-//     }
-
-//   // No available channel 
-//   if (direction_choosen==NOT_VALID)
-//     direction_choosen = directions[rand() % directions.size()]; 
-
-//   if(GlobalParams::verbose_mode>VERBOSE_OFF)
-//     {
-//       ChannelStatus tmp;
-
-//       LOG << "SELECTION between: " << endl;
-//       for (unsigned int i=0;i<directions.size();i++)
-//      {
-//        tmp.free_slots = free_slots_neighbor[directions[i]].read();
-//        tmp.available = (reservation_table.isAvailable(directions[i]));
-//        cout << "    -> direction " << directions[i] << ", channel status: " << tmp << endl;
-//      }
-//       cout << " direction choosen: " << direction_choosen << endl;
-//     }
-
-//   assert(direction_choosen>=0);
-//   return direction_choosen;
-}
-
-int Router::selectionRandom(const vector < int >&directions)
-{
-    return directions[rand() % directions.size()];
-}
-
 int Router::selectionFunction(const vector < int >&directions,
 				   const RouteData & route_data)
 {
@@ -437,17 +302,7 @@ int Router::selectionFunction(const vector < int >&directions,
     if (directions.size() == 1)
 	return directions[0];
 
-
-    switch (GlobalParams::selection_strategy) {
-    case SEL_RANDOM:
-	return selectionRandom(directions);
-    case SEL_BUFFER_LEVEL:
-	return selectionBufferLevel(directions);
-    case SEL_NOP:
-	return selectionNoP(directions, route_data);
-    default:
-	assert(false);
-    }
+    selectionStrategy->apply(this, directions, route_data);
 
     return 0;
 }

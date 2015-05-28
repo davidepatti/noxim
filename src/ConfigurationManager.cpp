@@ -22,17 +22,20 @@ void loadConfiguration() {
     strcpy(GlobalParams::trace_filename, config["trace_filename"].as<string>().c_str());
     GlobalParams::mesh_dim_x = config["mesh_dim_x"].as<int>();
     GlobalParams::mesh_dim_y = config["mesh_dim_y"].as<int>();
+    GlobalParams::r2r_link_length = config["r2r_link_length"].as<float>();
+    GlobalParams::r2h_link_length = config["r2h_link_length"].as<float>();
     GlobalParams::buffer_depth = config["buffer_depth"].as<int>();
     GlobalParams::flit_size = config["flit_size"].as<int>();
     GlobalParams::min_packet_size = config["min_packet_size"].as<int>();
     GlobalParams::max_packet_size = config["max_packet_size"].as<int>();
     strcpy(GlobalParams::routing_algorithm, config["routing_algorithm"].as<string>().c_str());
     strcpy(GlobalParams::routing_table_filename, config["routing_table_filename"].as<string>().c_str()); 
-    GlobalParams::selection_strategy = config["selection_strategy"].as<int>();
+    GlobalParams::selection_strategy = config["selection_strategy"].as<string>();
     GlobalParams::packet_injection_rate = config["packet_injection_rate"].as<float>();
     GlobalParams::probability_of_retransmission = config["probability_of_retransmission"].as<float>();
     GlobalParams::traffic_distribution = config["traffic_distribution"].as<int>();
     strcpy(GlobalParams::traffic_table_filename, config["traffic_table_filename"].as<string>().c_str());
+    GlobalParams::clock_period = config["clock_period"].as<int>();
     GlobalParams::simulation_time = config["simulation_time"].as<int>();
     GlobalParams::reset_time = config["reset_time"].as<int>();
     GlobalParams::stats_warm_up_time = config["stats_warm_up_time"].as<int>();
@@ -157,6 +160,7 @@ void showConfig()
          << "- packet_injection_rate = " << GlobalParams::packet_injection_rate << endl
          << "- probability_of_retransmission = " << GlobalParams::probability_of_retransmission << endl
          << "- traffic_distribution = " << GlobalParams::traffic_distribution << endl
+         << "- clock_period = " << GlobalParams::clock_period << "ps" << endl
          << "- simulation_time = " << GlobalParams::simulation_time << endl
          << "- stats_warm_up_time = " << GlobalParams::stats_warm_up_time << endl
          << "- rnd_generator_seed = " << GlobalParams::rnd_generator_seed << endl;
@@ -192,7 +196,7 @@ void checkConfiguration()
 	exit(1);
     }
 
-    if (GlobalParams::selection_strategy == INVALID_SELECTION) {
+    if (GlobalParams::selection_strategy.compare("INVALID_SELECTION") == 0) {
 	cerr << "Error: invalid selection policy" << endl;
 	exit(1);
     }
@@ -289,16 +293,16 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		} 
 	    } else if (!strcmp(arg_vet[i], "-sel")) {
 		char *selection = arg_vet[++i];
-		if (!strcmp(selection, "random"))
-		    GlobalParams::selection_strategy = SEL_RANDOM;
-		else if (!strcmp(selection, "bufferlevel"))
+		if (!strcmp(selection, "RANDOM"))
+		    GlobalParams::selection_strategy = "RANDOM";
+		else if (!strcmp(selection, "BUFFER_LEVEL"))
 		    GlobalParams::selection_strategy =
-			SEL_BUFFER_LEVEL;
-		else if (!strcmp(selection, "nop"))
-		    GlobalParams::selection_strategy = SEL_NOP;
+			"BUFFER_LEVEL";
+		else if (!strcmp(selection, "NOP"))
+		    GlobalParams::selection_strategy = "NOP";
 		else
 		    GlobalParams::selection_strategy =
-			INVALID_SELECTION;
+			"INVALID_SELECTION";
 	    } else if (!strcmp(arg_vet[i], "-pir")) {
 		GlobalParams::packet_injection_rate =
 		    atof(arg_vet[++i]);

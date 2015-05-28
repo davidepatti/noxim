@@ -16,6 +16,8 @@
 #include "GlobalParams.h"
 
 #include <iostream>
+#include <vector>
+#include <string>
 #include <utility>
 
 using namespace std;
@@ -28,8 +30,8 @@ namespace YAML {
         static Node encode(const HubConfig& hubConfig) {
             Node node;
             node["attachedNodes"] = hubConfig.attachedNodes;
-            node["txChannels"] = hubConfig.txChannels;
             node["rxChannels"] = hubConfig.rxChannels;
+            node["txChannels"] = hubConfig.txChannels;
             node["toTileBufferSize"] = hubConfig.toTileBufferSize;
             node["fromTileBufferSize"] = hubConfig.fromTileBufferSize;
             node["txBufferSize"] = hubConfig.txBufferSize;
@@ -38,27 +40,9 @@ namespace YAML {
         }
 
         static bool decode(const Node& node, HubConfig& hubConfig) {
-            hubConfig.attachedNodes = node["attachedNodes"].as<std::vector<int> >(GlobalParams::default_hub_configuration.attachedNodes);
-            hubConfig.txChannels = GlobalParams::default_hub_configuration.txChannels;
-            
-            for(YAML::const_iterator it = node["txChannels"].begin(); 
-                    it != node["txChannels"].end();
-                    ++it)
-            { 
-                if (it == node["txChannels"].begin())
-                    hubConfig.txChannels.clear();
-
-                int txChannel_id = it->first.as<int>(-1);
-                if (txChannel_id < 0)
-                    continue;
-                
-                YAML::Node txChannel_config_node = it->second;
-
-                hubConfig.txChannels[txChannel_id] = txChannel_config_node.as<TxChannelConfig>
-                    (GlobalParams::default_hub_configuration.txChannels[txChannel_id]);
-            }
-
-            hubConfig.rxChannels = node["rxChannels"].as<std::vector<int> >(GlobalParams::default_hub_configuration.rxChannels);
+            hubConfig.attachedNodes = node["attachedNodes"].as<vector<int> >(GlobalParams::default_hub_configuration.attachedNodes);
+            hubConfig.rxChannels = node["rxChannels"].as<vector<int> >(GlobalParams::default_hub_configuration.rxChannels);
+            hubConfig.txChannels = node["txChannels"].as<vector<int> >(GlobalParams::default_hub_configuration.txChannels);
             hubConfig.toTileBufferSize = node["toTileBufferSize"].as<int>(GlobalParams::default_hub_configuration.toTileBufferSize);
             hubConfig.fromTileBufferSize = node["fromTileBufferSize"].as<int>(GlobalParams::default_hub_configuration.fromTileBufferSize);
             hubConfig.txBufferSize = node["txBufferSize"].as<int>(GlobalParams::default_hub_configuration.txBufferSize);
@@ -73,31 +57,18 @@ namespace YAML {
             Node node;
             node["ber"] = channelConfig.ber;
             node["dataRate"] = channelConfig.dataRate;
+            node["mac_policy"] = channelConfig.macPolicy;
             return node;
         }
 
         static bool decode(const Node& node, ChannelConfig& channelConfig) {
             channelConfig.ber = node["ber"].as<pair<int, int> >(GlobalParams::default_channel_configuration.ber);
             channelConfig.dataRate = node["dataRate"].as<int>(GlobalParams::default_channel_configuration.dataRate);
+            channelConfig.macPolicy = node["mac_policy"].as<vector<string> >(GlobalParams::default_channel_configuration.macPolicy);
             return true;
         }
     };
 
-    template<>
-    struct convert<TxChannelConfig> {
-        static Node encode(const TxChannelConfig& txChannelConfig) {
-            Node node;
-            node["max_hold_cycles"] = txChannelConfig.maxHoldCycles;
-
-            return node;
-        }
-
-        static bool decode(const Node& node, TxChannelConfig& txChannelConfig) {
-            txChannelConfig.maxHoldCycles = node["max_hold_cycles"].as<int>();
-            return true;
-        }
-    };
-     
     template<>
     struct convert<BufferPowerConfig> {
         static bool decode(const Node& node, BufferPowerConfig& bufferPowerConfig) {
@@ -145,7 +116,14 @@ namespace YAML {
                 routerPowerConfig.crossbar_pm[make_pair(v[0], v[1])] = make_pair(v[2], v[3]);
             }
 
-            routerPowerConfig.network_interface = node["network_interface"].as<pair<double, double> >();
+            for(YAML::const_iterator network_interface_it = node["network_interface"].begin(); 
+                network_interface_it != node["network_interface"].end();
+                ++network_interface_it)
+            {    
+                vector<double> v = network_interface_it->as<vector<double> >();
+                cout << v[0] << " " << v[1] << " " << v[2] << endl;
+                routerPowerConfig.network_interface[v[0]] = make_pair(v[1],v[2]);
+            }
             
             for(YAML::const_iterator routing_it = node["routing"].begin(); 
                 routing_it != node["routing"].end();

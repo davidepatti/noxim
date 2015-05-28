@@ -53,16 +53,15 @@ void NoC::buildMesh()
 
 
         // Determine, from configuration file, which Hub is connected to which Channel
-        for(map<int, TxChannelConfig>::iterator iit = hub_config.txChannels.begin(); 
+        for(vector<int>::iterator iit = hub_config.txChannels.begin(); 
                 iit != hub_config.txChannels.end(); 
                 ++iit) 
         {
-            int channel_id = iit->first;
+            int channel_id = *iit;
             LOG << "Binding " << hub[hub_id]->name() << " to txChannel " << channel_id << endl;
             hub[hub_id]->init[channel_id]->socket.bind(channel[channel_id]->targ_socket);
-
-	    hub[hub_id]->setFlitTransmissionCycles(channel[channel_id]->getFlitTransmissionCycles(),channel_id);
-
+            LOG << "Binding " << hub[hub_id]->name() << " to txChannel " << channel_id << endl;
+            hub[hub_id]->setFlitTransmissionCycles(channel[channel_id]->getFlitTransmissionCycles(),channel_id);
         }
 
         for(vector<int>::iterator iit = hub_config.rxChannels.begin(); 
@@ -72,7 +71,7 @@ void NoC::buildMesh()
             int channel_id = *iit;
             LOG << "Binding " << hub[hub_id]->name() << " to rxChannel " << channel_id << endl;
             channel[channel_id]->init_socket.bind(hub[hub_id]->target[channel_id]->socket);
-	    channel[channel_id]->addHub(hub[hub_id]);
+            channel[channel_id]->addHub(hub[hub_id]);
         }
 
 	// TODO FIX
@@ -87,14 +86,10 @@ void NoC::buildMesh()
 	    cerr << " WARNING, currently multi-channel per hub are unsupported, using default_tx_energy" << endl;
 	}
 
-	map<int,TxChannelConfig>::iterator first_channel_config = hub_config.txChannels.begin();
-
 	int data_rate_gbs;
 	
-	if (first_channel_config!= hub_config.txChannels.end())
-	{
-	    int first_channel_id = first_channel_config->first;
-	    data_rate_gbs = GlobalParams::channel_configuration[first_channel_id].dataRate;
+	if (no_channels > 0) {
+	    data_rate_gbs = GlobalParams::channel_configuration[hub_config.txChannels[0]].dataRate;
 	}
 	else
 	    data_rate_gbs = NOT_VALID;
