@@ -13,7 +13,7 @@
 #include "Utils.h"
 #include "systemc.h"
 
-#define W2J(watt) ((watt)*CLOCK_PERIOD_PS*1.0e-12)
+#define W2J(watt) ((watt)*GlobalParams::clock_period*1.0e-12)
 
 using namespace std;
 
@@ -106,17 +106,13 @@ void Power::configureRouter(int link_width,
     crossbar_pwr_d = GlobalParams::power_configuration.routerPowerConfig.crossbar_pm[xbar_k].second;
     
     // NetworkInterface
-    ni_pwr_s = W2J(GlobalParams::power_configuration.routerPowerConfig.network_interface.first);
-    ni_pwr_d = GlobalParams::power_configuration.routerPowerConfig.network_interface.second;
+    ni_pwr_s = W2J(GlobalParams::power_configuration.routerPowerConfig.network_interface[GlobalParams::flit_size].first);
+    ni_pwr_d = GlobalParams::power_configuration.routerPowerConfig.network_interface[GlobalParams::flit_size].second;
 
     // Link 
-    // TODO TURI: aggiungere nel file di configurazione la
-    // possibilita' di specificare le lunghezze di connessione
-    // Router/Router Router/Hub:
-
     // Router has both type of links
-    double length_r2h = 1.0; // TODO TURI GlobalParams::power_configuration.r2h_link_length;
-    double length_r2r = 1.0; // TODO TURI GlobalParams::power_configuration.r2r_link_length;
+    double length_r2h = GlobalParams::r2h_link_length;
+    double length_r2r = GlobalParams::r2r_link_length;
     
     assert(GlobalParams::power_configuration.linkBitLinePowerConfig.find(length_r2r)!=GlobalParams::power_configuration.linkBitLinePowerConfig.end());
     assert(GlobalParams::power_configuration.linkBitLinePowerConfig.find(length_r2h)!=GlobalParams::power_configuration.linkBitLinePowerConfig.end());
@@ -186,12 +182,8 @@ void Power::configureHub(int link_width,
     // RX biasing
     transceiver_rx_pwr_biasing = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.second);
     // Link 
-    // TODO TURI: aggiungere nel file di configurazione la
-    // possibilita' di specificare le lunghezze di connessione
-    // Hub/Router
-
     // Hub has only Router/Hub link connections
-    double length_r2h = 1.0; // TODO TURI GlobalParams::power_configuration.r2h_link_length;
+    double length_r2h = GlobalParams::r2h_link_length;
     assert(GlobalParams::power_configuration.linkBitLinePowerConfig.find(length_r2h)!=GlobalParams::power_configuration.linkBitLinePowerConfig.end());
 
     link_r2h_pwr_s= W2J(link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2h].first);
@@ -348,14 +340,14 @@ void Power::printBreakDown(std::ostream & out)
 void Power::rxSleep(int cycles)
 {
 
-    int sleep_start_cycle = (int)(sc_time_stamp().to_double()/CLOCK_PERIOD_PS);
+    int sleep_start_cycle = (int)(sc_time_stamp().to_double()/GlobalParams::clock_period);
     sleep_end_cycle = sleep_start_cycle + cycles;
 }
 
 
 bool Power::isSleeping()
 {
-    int now = (int)(sc_time_stamp().to_double()/CLOCK_PERIOD_PS);
+    int now = (int)(sc_time_stamp().to_double()/GlobalParams::clock_period);
 
     return (now<sleep_end_cycle);
 
