@@ -317,8 +317,8 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 			GlobalParams::packet_injection_rate *
 			pow((1 - r), (1 / Aoff - 1 / Aon));
 		} else if (!strcmp(distribution, "custom"))
-		    GlobalParams::probability_of_retransmission =
-			atof(arg_vet[++i]);
+		    GlobalParams::probability_of_retransmission = atof(arg_vet[++i]);
+		  else assert("Invalid pir format" && false);
 	    } else if (!strcmp(arg_vet[i], "-traffic")) {
 		char *traffic = arg_vet[++i];
 		if (!strcmp(traffic, "random"))
@@ -371,7 +371,6 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 	    }
 	}
     }
-
 
 }
 
