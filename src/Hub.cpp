@@ -13,12 +13,10 @@ int Hub::route(Flit& f)
     {
 	if (GlobalParams::hub_configuration[local_id].attachedNodes[i]==f.dst_id)
 	{
-	    LOG << "Destination tile " << f.dst_id << " is connected to this hub " << endl;
 	    return tile2Port(f.dst_id);
 	}
     }
 
-    LOG << "Destination tile " << f.dst_id << " is not connected to this hub " << endl;
     return DIRECTION_WIRELESS;
 
 }
@@ -228,6 +226,13 @@ void Hub::rxProcess()
 
 	for (int i = 0; i < num_ports; i++) 
 	{
+	    /*
+	    if (!buffer_from_tile[i].deadlockFree())
+	    {
+		LOG << " deadlock on buffer " << i << endl;
+		buffer_from_tile[i].Print("deadlock");
+	    }
+	    */
 
 	    if ((req_rx[i]->read() == 1 - current_level_rx[i]) && !buffer_from_tile[i].IsFull()) 
 	    {
@@ -292,7 +297,7 @@ void Hub::txProcess()
 		    }
 		    else
 		    {
-			LOG << "Reservation:  wireless channel " << channel << " not available ..." << endl;
+			//LOG << "Reservation:  wireless channel " << channel << " not available ..." << endl;
 		    }
 
 		}
@@ -351,7 +356,7 @@ void Hub::txProcess()
 		}
 		else
 		{
-		    LOG << "Forwarding: No channel reserved for port direction " << i  << endl;
+		    //LOG << "Forwarding: No channel reserved for port direction " << i  << endl;
 		}
 	    }
 

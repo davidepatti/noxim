@@ -18,7 +18,7 @@ void TokenRing::updateTokenPacket(int channel)
 	    int num_hubs = rings_mapping[channel].size();
 
 	    token_position[channel] = (token_position[channel]+1)%num_hubs;
-	    LOG << "Token of channel " << channel << " assigned to hub " <<  rings_mapping[channel][token_position[channel]].first << endl;
+	    LOG << "**Token** of channel " << channel << " assigned to Hub_" <<  rings_mapping[channel][token_position[channel]].first << endl;
 
 	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]].first);
 	}
@@ -38,7 +38,7 @@ void TokenRing::updateTokenMaxHold(int channel)
 	    int num_hubs = rings_mapping[channel].size();
 
 	    token_position[channel] = (token_position[channel]+1)%num_hubs;
-	    LOG << "Token of channel " << channel << " assigned to hub " <<  rings_mapping[channel][token_position[channel]].first << endl;
+	    LOG << "**Token** of channel " << channel << " assigned to Hub_" <<  rings_mapping[channel][token_position[channel]].first << endl;
 
 	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]].first);
 	}
@@ -56,7 +56,7 @@ void TokenRing::updateTokenHold(int channel)
 	    int num_hubs = rings_mapping[channel].size();
 
 	    token_position[channel] = (token_position[channel]+1)%num_hubs;
-	    LOG << "Token of channel " << channel << " assigned to hub " <<  rings_mapping[channel][token_position[channel]].first << endl;
+	    LOG << "**Token** of channel " << channel << " assigned to Hub_" <<  rings_mapping[channel][token_position[channel]].first << endl;
 
 	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]].first);
 	}

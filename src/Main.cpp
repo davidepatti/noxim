@@ -76,6 +76,7 @@ int sc_main(int arg_num, char *arg_vet[])
     reset.write(1);
     cout << "Reset..." << endl;
     srand(GlobalParams::rnd_generator_seed);	// time(NULL));
+
     sc_start(GlobalParams::reset_time, SC_NS);
     reset.write(0);
     cout << " done! Now running for " << GlobalParams::

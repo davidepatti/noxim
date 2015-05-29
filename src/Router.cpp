@@ -74,10 +74,14 @@ void Router::txProcess()
 	{
 	  int i = (start_from_port + j) % (DIRECTIONS + 2);
 	 
-	  if (!buffer[i].checkDeadlock())
+	  /*
+	  if (!buffer[i].deadlockFree())
 	  {
 	      LOG << " deadlock on buffer " << i << endl;
+	      buffer[i].Print(" deadlock ");
+
 	  }
+	  */
 
 	  if (!buffer[i].IsEmpty()) 
 	    {
