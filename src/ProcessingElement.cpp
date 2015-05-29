@@ -101,7 +101,6 @@ bool ProcessingElement::canShot(Packet & packet)
 	if (shot) {
 	    switch (GlobalParams::traffic_distribution) {
 	    case TRAFFIC_RANDOM:
-		if (local_id!=0 && local_id!=1 && local_id!=2) return false;
 		packet = trafficRandom();
 		break;
 
