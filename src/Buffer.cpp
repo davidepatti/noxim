@@ -25,10 +25,9 @@ Buffer::Buffer()
   last_front_flit_seq = NOT_VALID;
 }
 
-void Buffer::Print(char *prefix)
+void Buffer::Print(const char *prefix)
 {
     queue<Flit> m = buffer;
-
 
     string bstr = "";
 
@@ -39,12 +38,12 @@ void Buffer::Print(char *prefix)
     {
 	Flit f = m.front();
 	m.pop();
-	cout << bstr << t[f.flit_type] << f.sequence_no <<  " | ";
+	cout << bstr << t[f.flit_type] << f.sequence_no <<  "(" << f.dst_id << ") | ";
     }
     cout << endl;
 }
 
-bool Buffer::checkDeadlock()
+bool Buffer::deadlockFree()
 {
     if (IsEmpty()) return true;
 
@@ -63,7 +62,7 @@ bool Buffer::checkDeadlock()
 	full_cycles_counter=0;
     }
 
-    if (full_cycles_counter>2000) 
+    if (full_cycles_counter>10000) 
 	return false;
 
     return true;

@@ -50,9 +50,9 @@ class Buffer {
     void Disable();
 
 
-    void Print(char*);
+    void Print(const char*);
     
-    bool checkDeadlock();
+    bool deadlockFree();
 
 
     inline string name() { return "Buffer";};
