@@ -164,13 +164,13 @@ unsigned int Buffer::getCurrentFreeSlots() const
 void Buffer::SaveOccupancyAndTime()
 {
   previous_occupancy = buffer.size();
-  hold_time = (sc_time_stamp().to_double() / 1000) - last_event;
-  last_event = sc_time_stamp().to_double() / 1000;
+  hold_time = (sc_time_stamp().to_double() / GlobalParams::clock_period_ps) - last_event;
+  last_event = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
 }
 
 void Buffer::UpdateMeanOccupancy()
 {
-  double current_time = sc_time_stamp().to_double() / 1000;
+  double current_time = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
   if (current_time - GlobalParams::reset_time < GlobalParams::stats_warm_up_time)
     return;
 

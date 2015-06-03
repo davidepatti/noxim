@@ -26,6 +26,7 @@ char GlobalParams::routing_table_filename[128];
 string GlobalParams::selection_strategy;
 float GlobalParams::packet_injection_rate;
 float GlobalParams::probability_of_retransmission;
+float GlobalParams::locality;
 int GlobalParams::traffic_distribution;
 char GlobalParams::traffic_table_filename[128];
 char GlobalParams::config_filename[128];

@@ -41,9 +41,14 @@ SC_MODULE(TokenRing)
     void updateTokens();
 
     TokenRing(sc_module_name nm): sc_module(nm) {
-        SC_METHOD(updateTokens);
-        sensitive << reset;
-        sensitive << clock.pos();
+
+
+	if (GlobalParams::use_winoc)
+	{
+	    SC_METHOD(updateTokens);
+	    sensitive << reset;
+	    sensitive << clock.pos();
+	}
 	// TODO TURI: policy hardwired
 	//token_policy[0] = TOKEN_MAX_HOLD;
 	//token_policy[0] = TOKEN_HOLD;

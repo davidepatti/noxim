@@ -74,6 +74,7 @@ using namespace std;
 #define TOKEN_PACKET 	2
 
 // TODO check the list of attributes for ChannelConfig 
+// TODO TURI: perche' si usano float ?, mettere double
 typedef struct {
     pair<int, int> ber;
     int dataRate;
@@ -139,6 +140,7 @@ struct GlobalParams {
     static string selection_strategy;
     static float packet_injection_rate;
     static float probability_of_retransmission;
+    static float locality;
     static int traffic_distribution;
     static char traffic_table_filename[128];
     static char config_filename[128];

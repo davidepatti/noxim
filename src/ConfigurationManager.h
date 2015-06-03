@@ -121,7 +121,7 @@ namespace YAML {
                 ++network_interface_it)
             {    
                 vector<double> v = network_interface_it->as<vector<double> >();
-                cout << v[0] << " " << v[1] << " " << v[2] << endl;
+                //cout << v[0] << " " << v[1] << " " << v[2] << endl;
                 routerPowerConfig.network_interface[v[0]] = make_pair(v[1],v[2]);
             }
             

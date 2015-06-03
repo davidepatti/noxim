@@ -31,7 +31,7 @@ struct Initiator: sc_module
   Initiator(sc_module_name nm,Hub* h): sc_module(nm),hub(h), socket("socket")
   {
 
-    SC_THREAD(thread_process);
+      if (GlobalParams::use_winoc) SC_THREAD(thread_process);
   }
 
   void thread_process();

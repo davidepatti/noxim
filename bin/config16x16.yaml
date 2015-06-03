@@ -6,6 +6,8 @@ mesh_dim_x: 16
 mesh_dim_y: 16
 buffer_depth: 4
 flit_size: 64
+r2h_link_length: 2.0
+r2r_link_length: 1.0
 
 # Routing algorithms:
 #   XY
@@ -16,18 +18,18 @@ flit_size: 64
 #   DYAD
 #   FULLY_ADAPTIVE
 #   TABLE_BASED
-routing_algorithm: "XY"
+routing_algorithm: XY
 routing_table_filename: ""
 
 # Routing specific parameters
 #   dyad_threshold: double
 dyad_threshold: 0.6
 
-# Selection Strategies
-#   SEL_RANDOM             0
-#   SEL_BUFFER_LEVEL       1
-#   SEL_NOP                2
-selection_strategy: 0
+# Selection Strategies:
+#   RANDOM
+#   BUFFER_LEVEL
+#   NOP
+selection_strategy: RANDOM
 
 #
 # WIRELESS CONFIGURATION
@@ -35,9 +37,7 @@ selection_strategy: 0
 Hubs:
     defaults:
         rxChannels: [0]
-        txChannels:
-            0:
-                max_hold_cycles: 8
+        txChannels: [0]
         attachedNodes: []
         toTileBufferSize: 4
         fromTileBufferSize: 4
@@ -82,6 +82,10 @@ Channels:
     defaults:
         dataRate: 16
         ber: [0, 0]
+        #[TOKEN_PACKET]
+        #[TOKEN_HOLD_CYCLES, num_hold_cycles]
+        #[TOKEN_MAX_HOLD_CYCLES, max_hold_cycles]
+        mac_policy: [TOKEN_PACKET]
 
     0:
         ber: [0, 0]
@@ -89,6 +93,7 @@ Channels:
 #
 # SIMULATION PARAMETERS
 #
+clock_period: 1000
 reset_time: 1000
 simulation_time: 10000
 stats_warm_up_time: 1000
@@ -116,7 +121,7 @@ max_packet_size: 12
 packet_injection_rate: 0.01
 probability_of_retransmission: 0.01
 
-# Traffic distribution
+# Traffic distribution:
 #   TRAFFIC_RANDOM         0
 #   TRAFFIC_TRANSPOSE1     1
 #   TRAFFIC_TRANSPOSE2     2
@@ -131,7 +136,7 @@ traffic_table_filename: "t.txt"
 
 Energy:
     Buffer: #Energy consumed by a single flit in Joule
-    # - [Depth ItemSize Leakage Push Front Pop]
+    #   - [Depth ItemSize Leakage Push Front Pop]
         - [2, 16, 2.05e-4, 3.13e-13, 0,  1.86e-13]
         - [2, 32, 1.35e-3, 6.12e-13, 0,  3.65e-13]
         - [2, 64, 2.68e-3, 1.21e-12, 0,  7.23e-13]
@@ -146,6 +151,7 @@ Energy:
     # Energy(J) for a single bitline. Total flit energy will 
     # be obtained  as flit_size x reported Energy.
     LinkBitLine:
+    #   - [ Length (mm), Leakage, Dynamic ] 
         - [0.5, 4.76e-7, 2.50e-14]
         - [1.0, 4.80e-7, 4.88e-14]
         - [1.5, 4.92e-7, 7.25e-14]
@@ -156,45 +162,47 @@ Energy:
     Router:
         # [Static, Dynamic]
         crossbar:
-            # - [I/O Port number, FlitSize, Leakage, Dynamic]
+        #   - [I/O Port number, FlitSize, Leakage, Dynamic]
             - [5, 16, 3.78e-4, 1.20e-13]
             - [5, 32, 7.49e-4, 2.21e-13]
             - [5, 64, 1.49e-3, 4.00e-13]
-            # [FlitSize Static, Dynamic]
-        network_interface:  [8.64e-4, 4.22e-13]
-	    # TODO TURI: fallo cosi':
-            #- [16, 4.43e-4, 2.50e-13]
-            #- [32, 8.64e-4, 4.22e-13]
-            #- [64, 1.72e-3, 8.35e-13]
+
+        network_interface:
+        #   - [FlitSize, Static, Dynamic]
+            - [16, 4.43e-4, 2.50e-13]
+            - [32, 8.64e-4, 4.22e-13]
+            - [64, 1.72e-3, 8.35e-13]
+
         routing:
-            # [Static, Dynamic]
+        #   Algorithm:   [Static, Dynamic]
             default:     [1.20e-4, 6.00e-14]
             XY:          [1.20e-4, 6.00e-14]
             DYAD:        [1.25e-4, 6.23e-14]
+
         selection:
-                    # [Static, Dynamic]
+        #   Strategy:    [Static, Dynamic]
             default:     [1.10e-4, 5.00e-14]
             XY:          [1.10e-4, 5.00e-14]
             DYAD:        [1.23e-4, 5.89e-14]
 
     Hub:
-            # [RX, TX] Contribution (W)
-            transceiver_leakage: [4.43e-4, 1.10e-4]
+        # [RX, TX] Contribution (W)
+        transceiver_leakage: [4.43e-4, 1.10e-4]
 
-            # [RX, TX] Contribution (W)
-            transceiver_biasing: [1.5e-2, 7.0e-3]
+        # [RX, TX] Contribution (W)
+        transceiver_biasing: [1.5e-2, 7e-3]
 
-            # RX Dynamic Contribution in J/bit (RX Digital Interfaces)
-            rx_dynamic: 7.0e-13
+        # RX Dynamic Contribution in J/bit (RX Digital Interfaces)
+        rx_dynamic: 7e-13
 
-            # J
-            rx_snooping: 1.0e-15
+        # in W
+        rx_snooping: 1.0e-15
 
-            # TX Dynamic Contribution in W (To be divided for Datarate)
-            default_tx_energy: 1.0e-2
-        
-            tx_attenuation_map:
-            # - [Hub ID TX, Hub ID RX, Attenuation]
+        # TX Dynamic Contribution in W (To be divided for Datarate)
+        default_tx_energy: 1e-2
+
+        tx_attenuation_map:
+        #   - [TX Hub ID, RX Hub ID, Attenuation]
             - [0, 1, 1.1]
             - [0, 2, 2.2]
             - [0, 3, 3.3]

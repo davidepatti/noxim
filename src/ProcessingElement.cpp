@@ -89,7 +89,7 @@ bool ProcessingElement::canShot(Packet & packet)
     bool shot;
     double threshold;
 
-    double now = sc_time_stamp().to_double() / 1000;
+    double now = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
 
     if (GlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED) {
 	if (!transmittedAtPreviousCycle)
@@ -217,7 +217,7 @@ Packet ProcessingElement::trafficRandom()
 	}
     } while (p.dst_id == p.src_id);
 
-    p.timestamp = sc_time_stamp().to_double() / 1000;
+    p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
     return p;
@@ -229,7 +229,7 @@ Packet ProcessingElement::trafficTest()
     p.src_id = local_id;
     p.dst_id = 10;
 
-    p.timestamp = sc_time_stamp().to_double() / 1000;
+    p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
     return p;
@@ -249,7 +249,7 @@ Packet ProcessingElement::trafficTranspose1()
     fixRanges(src, dst);
     p.dst_id = coord2Id(dst);
 
-    p.timestamp = sc_time_stamp().to_double() / 1000;
+    p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
     return p;
@@ -269,7 +269,7 @@ Packet ProcessingElement::trafficTranspose2()
     fixRanges(src, dst);
     p.dst_id = coord2Id(dst);
 
-    p.timestamp = sc_time_stamp().to_double() / 1000;
+    p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
     return p;
@@ -313,7 +313,7 @@ Packet ProcessingElement::trafficBitReversal()
     p.src_id = local_id;
     p.dst_id = dnode;
 
-    p.timestamp = sc_time_stamp().to_double() / 1000;
+    p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
     return p;
@@ -336,7 +336,7 @@ Packet ProcessingElement::trafficShuffle()
     p.src_id = local_id;
     p.dst_id = dnode;
 
-    p.timestamp = sc_time_stamp().to_double() / 1000;
+    p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
     return p;
@@ -360,7 +360,7 @@ Packet ProcessingElement::trafficButterfly()
     p.src_id = local_id;
     p.dst_id = dnode;
 
-    p.timestamp = sc_time_stamp().to_double() / 1000;
+    p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
     return p;

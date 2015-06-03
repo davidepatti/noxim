@@ -77,6 +77,7 @@ int sc_main(int arg_num, char *arg_vet[])
     cout << "Reset..." << endl;
     srand(GlobalParams::rnd_generator_seed);	// time(NULL));
 
+
     sc_start(GlobalParams::reset_time, SC_NS);
     reset.write(0);
     cout << " done! Now running for " << GlobalParams::
@@ -87,15 +88,14 @@ int sc_main(int arg_num, char *arg_vet[])
     if (GlobalParams::trace_mode)
 	sc_close_vcd_trace_file(tf);
     cout << "Noxim simulation completed." << endl;
-    cout << " ( " << sc_time_stamp().to_double() /
-	1000 << " cycles executed)" << endl;
+    cout << " ( " << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " cycles executed)" << endl;
 
     // Show statistics
     GlobalStats gs(n);
     gs.showStats(std::cout, GlobalParams::detailed);
 
     if ((GlobalParams::max_volume_to_be_drained > 0) &&
-	(sc_time_stamp().to_double() / 1000 >=
+	(sc_time_stamp().to_double() / GlobalParams::clock_period_ps >=
 	 GlobalParams::simulation_time)) {
 	cout << endl
          << "WARNING! the number of flits specified with -volume option" << endl

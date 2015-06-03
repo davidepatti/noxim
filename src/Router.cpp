@@ -156,9 +156,8 @@ void Router::txProcess()
 		      // Update stats
 		      if (o == DIRECTION_LOCAL) 
 		      {
-			  LOG << "Consumed flit src " << flit.src_id << " dst = " << flit.dst_id << endl;
-			  stats.receivedFlit(sc_time_stamp().
-				  to_double() / 1000, flit);
+			  //LOG << "Consumed flit src " << flit.src_id << " dst = " << flit.dst_id << endl;
+			  stats.receivedFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, flit);
 			  if (GlobalParams::
 				  max_volume_to_be_drained) 
 			  {
@@ -214,8 +213,6 @@ void Router::perCycleUpdate()
 
 vector < int > Router::routingFunction(const RouteData & route_data)
 {
-    // TODO: check 
-    // If WiNoC available, check for intercluster communication
     if (GlobalParams::use_winoc)
     {
         if (hasRadioHub(local_id) &&
@@ -230,7 +227,7 @@ vector < int > Router::routingFunction(const RouteData & route_data)
             return dirv;
         }
     }
-    LOG << "Wired routing for dst = " << route_data.dst_id << endl;
+    //LOG << "Wired routing for dst = " << route_data.dst_id << endl;
 
     return routingAlgorithm->route(this, route_data);
 }

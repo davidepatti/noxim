@@ -58,7 +58,7 @@ void NoC::buildMesh()
             int channel_id = *iit;
             //LOG << "Binding " << hub[hub_id]->name() << " to txChannel " << channel_id << endl;
             hub[hub_id]->init[channel_id]->socket.bind(channel[channel_id]->targ_socket);
-            LOG << "Binding " << hub[hub_id]->name() << " to txChannel " << channel_id << endl;
+            //LOG << "Binding " << hub[hub_id]->name() << " to txChannel " << channel_id << endl;
             hub[hub_id]->setFlitTransmissionCycles(channel[channel_id]->getFlitTransmissionCycles(),channel_id);
         }
 

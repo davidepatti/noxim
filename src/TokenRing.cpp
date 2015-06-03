@@ -117,7 +117,7 @@ void TokenRing::attachHub(int channel, int hub, sc_in<int>* hub_token_holder_por
 	// checking max hold cycles vs wireless transmission latency
 	// consistency
         double delay_ps = 1000*GlobalParams::flit_size/GlobalParams::channel_configuration[channel].dataRate;
-	int cycles = ceil(delay_ps/GlobalParams::clock_period);
+	int cycles = ceil(delay_ps/GlobalParams::clock_period_ps);
 	int max_hold_cycles = 8; // TODO TURI GlobalParams::hub_configuration[hub].txChannels[channel].maxHoldCycles;
 	assert(cycles< max_hold_cycles);
 

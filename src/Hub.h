@@ -86,25 +86,28 @@ SC_MODULE(Hub)
     // Constructor
 
     Hub(sc_module_name nm, int id, TokenRing * tr): sc_module(nm) {
-        SC_METHOD(rxProcess);
-        sensitive << reset;
-        sensitive << clock.pos();
+	if (GlobalParams::use_winoc)
+	{
+	    SC_METHOD(rxProcess);
+	    sensitive << reset;
+	    sensitive << clock.pos();
 
-        SC_METHOD(txProcess);
-        sensitive << reset;
-        sensitive << clock.pos();
+	    SC_METHOD(txProcess);
+	    sensitive << reset;
+	    sensitive << clock.pos();
 
-        SC_METHOD(rxRadioProcess);
-        sensitive << reset;
-        sensitive << clock.pos();
+	    SC_METHOD(rxRadioProcess);
+	    sensitive << reset;
+	    sensitive << clock.pos();
 
-        SC_METHOD(txRadioProcess);
-        sensitive << reset;
-        sensitive << clock.pos();
+	    SC_METHOD(txRadioProcess);
+	    sensitive << reset;
+	    sensitive << clock.pos();
 
-        SC_METHOD(perCycleUpdate);
-        sensitive << reset;
-        sensitive << clock.pos();
+	    SC_METHOD(perCycleUpdate);
+	    sensitive << reset;
+	    sensitive << clock.pos();
+	}
 
         local_id = id;
 	token_ring = tr;
@@ -138,7 +141,6 @@ SC_MODULE(Hub)
         for (unsigned int i = 0; i < txChannels.size(); i++) {
             char txt[20];
             sprintf(txt, "init_%d", txChannels[i]);
-            LOG << "Creating " << txt << endl;
             init[txChannels[i]] = new Initiator(txt,this);
             init[txChannels[i]]->buffer_tx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].txBufferSize);
 	    current_token_holder[txChannels[i]] = new sc_in<int>();
