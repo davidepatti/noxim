@@ -124,6 +124,10 @@ bool ProcessingElement::canShot(Packet & packet)
 		packet = trafficButterfly();
 		break;
 
+	    case TRAFFIC_LOCAL:
+		packet = trafficLocal();
+		break;
+
 	    default:
 		assert(false);
 	    }
@@ -169,7 +173,7 @@ Packet ProcessingElement::trafficLocal()
     {
 	if (rnd<=GlobalParams::locality)
 	{
-	    if (sameRadioHub(local_id,i))
+	    if (local_id!=i && sameRadioHub(local_id,i))
 		dst_set.push_back(i);
 	}
 	else

@@ -242,6 +242,12 @@ void checkConfiguration()
 	exit(1);
     }
 
+    if (GlobalParams::locality<0 || GlobalParams::locality>1)
+    {
+	cerr << "Error: traffic locality must be in the range 0..1" << endl;
+	exit(1);
+    }
+
 
 }
 
@@ -344,7 +350,11 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 			TRAFFIC_TABLE_BASED;
 		    strcpy(GlobalParams::traffic_table_filename,
 			   arg_vet[++i]);
-		} else assert(false);
+		} else if (!strcmp(traffic, "local")) {
+		    GlobalParams::traffic_distribution = TRAFFIC_LOCAL;
+		    GlobalParams::locality=atof(arg_vet[++i]);
+		}
+		else assert(false);
 	    } else if (!strcmp(arg_vet[i], "-hs")) {
 		int node = atoi(arg_vet[++i]);
 		double percentage = atof(arg_vet[++i]);

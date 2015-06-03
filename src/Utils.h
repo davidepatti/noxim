@@ -9,6 +9,7 @@
 
 #define LOG (std::cout << std::setw(7) << left << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " " << name() << "::" << __func__<< "() => ")
 
+
 // Output overloading
 
 inline ostream & operator <<(ostream & os, const Flit & flit)
