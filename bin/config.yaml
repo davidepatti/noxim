@@ -45,13 +45,9 @@ Hubs:
         txBufferSize: 4
 
     0:
-        rxChannels: [0,1]
-        txChannels: [0,1]
         attachedNodes: [0,1,4,5]
 
     1:
-        rxChannels: [0,1]
-        txChannels: [0,1]
         attachedNodes: [2,3,6,7]
 
     2:
@@ -71,13 +67,11 @@ Channels:
 
     0:
         dataRate: 8
-    1:
-        dataRate: 8
 
 #
 # SIMULATION PARAMETERS
 #
-clock_period: 1000
+clock_period_ps: 1000
 reset_time: 1000
 simulation_time: 10000
 stats_warm_up_time: 1000
@@ -143,6 +137,7 @@ Energy:
         - [3.0, 5.53e-7, 1.43e-13]
 
     Router:
+        # [Static, Dynamic]
         crossbar:
         #   - [I/O Port number, FlitSize, Leakage, Dynamic]
             - [5, 16, 3.78e-4, 1.20e-13]
@@ -178,7 +173,7 @@ Energy:
         rx_dynamic: 7e-13
 
         # in W
-        rx_snooping: 1.5e-2
+        rx_snooping: 1.0e-15
 
         # TX Dynamic Contribution in W (To be divided for Datarate)
         default_tx_energy: 1e-2
