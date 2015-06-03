@@ -155,6 +155,40 @@ bool ProcessingElement::canShot(Packet & packet)
 }
 
 
+Packet ProcessingElement::trafficLocal()
+{
+    Packet p;
+    p.src_id = local_id;
+    double rnd = rand() / (double) RAND_MAX;
+
+    vector<int> dst_set;
+
+    int max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) - 1;
+
+    for (int i=0;i<max_id;i++)
+    {
+	if (rnd<=GlobalParams::locality)
+	{
+	    if (sameRadioHub(local_id,i))
+		dst_set.push_back(i);
+	}
+	else
+	    if (!sameRadioHub(local_id,i))
+		dst_set.push_back(i);
+    }
+
+
+    int i_rnd = rand()%dst_set.size();
+
+    p.dst_id = dst_set[i_rnd];
+    p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+    p.size = p.flit_left = getRandomSize();
+
+    return p;
+
+}
+
+
 Packet ProcessingElement::trafficRandom()
 {
     Packet p;
