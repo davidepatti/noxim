@@ -7,7 +7,7 @@
 #include "DataStructs.h"
 #include <iomanip>
 
-#define LOG (std::cout << std::setw(7) << left << sc_time_stamp().to_double() / GlobalParams::clock_period << " " << name() << "::" << __func__<< "() => ")
+#define LOG (std::cout << std::setw(7) << left << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " " << name() << "::" << __func__<< "() => ")
 
 // Output overloading
 

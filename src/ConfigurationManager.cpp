@@ -35,7 +35,7 @@ void loadConfiguration() {
     GlobalParams::probability_of_retransmission = config["probability_of_retransmission"].as<float>();
     GlobalParams::traffic_distribution = config["traffic_distribution"].as<int>();
     strcpy(GlobalParams::traffic_table_filename, config["traffic_table_filename"].as<string>().c_str());
-    GlobalParams::clock_period = config["clock_period"].as<int>();
+    GlobalParams::clock_period_ps = config["clock_period_ps"].as<int>();
     GlobalParams::simulation_time = config["simulation_time"].as<int>();
     GlobalParams::reset_time = config["reset_time"].as<int>();
     GlobalParams::stats_warm_up_time = config["stats_warm_up_time"].as<int>();
@@ -158,7 +158,7 @@ void showConfig()
          << "- packet_injection_rate = " << GlobalParams::packet_injection_rate << endl
          << "- probability_of_retransmission = " << GlobalParams::probability_of_retransmission << endl
          << "- traffic_distribution = " << GlobalParams::traffic_distribution << endl
-         << "- clock_period = " << GlobalParams::clock_period << "ps" << endl
+         << "- clock_period = " << GlobalParams::clock_period_ps << "ps" << endl
          << "- simulation_time = " << GlobalParams::simulation_time << endl
          << "- stats_warm_up_time = " << GlobalParams::stats_warm_up_time << endl
          << "- rnd_generator_seed = " << GlobalParams::rnd_generator_seed << endl;
@@ -207,10 +207,6 @@ void checkConfiguration()
 	exit(1);
     }
 
-    if (GlobalParams::traffic_distribution == INVALID_TRAFFIC) {
-	cerr << "Error: invalid traffic" << endl;
-	exit(1);
-    }
 
     for (unsigned int i = 0; i < GlobalParams::hotspots.size(); i++) {
 	if (GlobalParams::hotspots[i].first >=
@@ -348,9 +344,7 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 			TRAFFIC_TABLE_BASED;
 		    strcpy(GlobalParams::traffic_table_filename,
 			   arg_vet[++i]);
-		} else
-		    GlobalParams::traffic_distribution =
-			INVALID_TRAFFIC;
+		} else assert(false);
 	    } else if (!strcmp(arg_vet[i], "-hs")) {
 		int node = atoi(arg_vet[++i]);
 		double percentage = atof(arg_vet[++i]);

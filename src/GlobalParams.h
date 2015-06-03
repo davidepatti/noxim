@@ -142,7 +142,7 @@ struct GlobalParams {
     static int traffic_distribution;
     static char traffic_table_filename[128];
     static char config_filename[128];
-    static int clock_period;
+    static int clock_period_ps;
     static int simulation_time;
     static int reset_time;
     static int stats_warm_up_time;

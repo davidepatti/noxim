@@ -13,7 +13,7 @@
 #include "Utils.h"
 #include "systemc.h"
 
-#define W2J(watt) ((watt)*GlobalParams::clock_period*1.0e-12)
+#define W2J(watt) ((watt)*GlobalParams::clock_period_ps*1.0e-12)
 
 using namespace std;
 
@@ -340,14 +340,14 @@ void Power::printBreakDown(std::ostream & out)
 void Power::rxSleep(int cycles)
 {
 
-    int sleep_start_cycle = (int)(sc_time_stamp().to_double()/GlobalParams::clock_period);
+    int sleep_start_cycle = (int)(sc_time_stamp().to_double()/GlobalParams::clock_period_ps);
     sleep_end_cycle = sleep_start_cycle + cycles;
 }
 
 
 bool Power::isSleeping()
 {
-    int now = (int)(sc_time_stamp().to_double()/GlobalParams::clock_period);
+    int now = (int)(sc_time_stamp().to_double()/GlobalParams::clock_period_ps);
 
     return (now<sleep_end_cycle);
 
