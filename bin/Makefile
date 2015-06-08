@@ -21,9 +21,9 @@ MODULE := noxim
 
 CXX      := g++
 OPT      := -O3
-DEBUG    := -g
+DEBUG    := # -g -DDEBUG
 OTHER    := -Wall# -Wno-deprecated
-CXXFLAGS := $(OPT) $(OTHER)# $(DEBUG)
+CXXFLAGS := $(OPT) $(OTHER) $(DEBUG)
 
 INCDIR := -I$(SRCDIR) -isystem $(SYSTEMC)/include -I$(YAML)/include
 LIBDIR := -L$(SRCDIR) -L$(SYSTEMC)/lib-$(TARGET_ARCH) -L$(YAML)/lib

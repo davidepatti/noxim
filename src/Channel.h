@@ -14,8 +14,6 @@
 using namespace sc_core;
 using namespace std;
 
-#define DEBUG
-
 // ************************************************************************************
 // Channel model supports multiple initiators and multiple targets
 // Supports b_ and nb_ transport interfaces, DMI and debug
