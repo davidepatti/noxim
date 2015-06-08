@@ -24,8 +24,34 @@ int Hub::route(Flit& f)
 
 void Hub::perCycleUpdate()
 {
-	power.leakage();
-	power.biasing();
+        for (int i = 0; i < num_ports; i++) 
+	{
+	    // TX
+	    power.leakageBuffer();
+	    // RX
+	    power.leakageBuffer();
+
+	    power.leakageLinkRouter2Hub();
+	}
+
+	for (int i=0;i<txChannels.size();i++)
+	{
+	    power.leakageAntennaBuffer();
+	}
+
+	for (int i=0;i<rxChannels.size();i++)
+	{
+	    power.leakageAntennaBuffer();
+	}
+	
+	if (!(power.isSleeping()))
+	{
+	    power.leakageTransceiverRx();
+	    power.biasingRx();
+	}
+
+	power.leakageTransceiverTx();
+	power.biasingTx();
 }
 
 
@@ -163,7 +189,8 @@ void Hub::rxRadioProcess()
     } 
     else 
     {
-	power.wirelessSnooping();
+	if (!power.isSleeping())
+	    power.wirelessSnooping();
 
 	// stores routing decision
 	// need a vector to use this info to choose between the two

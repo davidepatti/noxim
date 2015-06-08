@@ -207,7 +207,14 @@ void Router::perCycleUpdate()
 	    free_slots[i].write(buffer[i].GetMaxBufferSize());
     } else {
         selectionStrategy->perCycleUpdate(this);
-	    power.leakage();
+	power.leakageRouter();
+	for (int i = 0; i < DIRECTIONS + 1; i++)
+	{
+	    power.leakageBuffer();
+	    power.leakageLinkRouter2Router();
+	}
+
+	power.leakageLinkRouter2Hub();
     }
 }
 

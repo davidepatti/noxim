@@ -39,7 +39,10 @@ void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& del
 void Channel::accountWirelessRxPower()
 {
     for (unsigned int i = 0; i<hubs.size();i++)
+    {
+	if (!(hubs[i]->power.isSleeping()))
 	    hubs[i]->power.wirelessDynamicRx();
+    }
 }
 
 

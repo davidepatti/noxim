@@ -57,8 +57,15 @@ class Power {
     void r2rLink(); 
     void networkInterface();
 
-    void leakage();
-    void biasing();
+    void leakageBuffer();
+    void leakageAntennaBuffer();
+    void leakageLinkRouter2Router();
+    void leakageLinkRouter2Hub();
+    void leakageRouter();
+    void leakageTransceiverRx();
+    void leakageTransceiverTx();
+    void biasingRx();
+    void biasingTx();
 
     double getDynamicPower();
     double getStaticPower();
@@ -73,6 +80,7 @@ class Power {
     map<string,double> getStaticPowerBreakDown(){ return power_breakdown_s;}
 
     void rxSleep(int cycles);
+    bool isSleeping();
 
   private:
 
@@ -125,7 +133,6 @@ class Power {
 
     int sleep_end_cycle;
 
-    bool isSleeping();
 
     
 };

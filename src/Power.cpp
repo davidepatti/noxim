@@ -188,6 +188,7 @@ void Power::configureHub(int link_width,
 
     link_r2h_pwr_s= W2J(link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2h].first);
     link_r2h_pwr_d= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2h].second;
+
 }
 
 
@@ -220,6 +221,7 @@ void Power::antennaBufferFront()
 {
     power_breakdown_d["antenna_buffer_front_pwr_d"]+= antenna_buffer_front_pwr_d;
 }
+
 
 void Power::routing()
 {
@@ -297,37 +299,68 @@ void Power::wirelessTx(int src,int dst,int length)
 
 void Power::wirelessDynamicRx()
 {
-    if (!isSleeping())
-	power_breakdown_d["wireless_dynamic_rx_pwr"]+= wireless_rx_pwr;
+    power_breakdown_d["wireless_dynamic_rx_pwr"]+= wireless_rx_pwr;
 }
 
 void Power::wirelessSnooping()
 {
-    if (!isSleeping())
-	power_breakdown_d["wireless_snooping"] += wireless_snooping;
+    power_breakdown_d["wireless_snooping"] += wireless_snooping;
 }
 
-void Power::biasing()
+
+void Power::biasingRx()
 {
-    power_breakdown_s["transceiver_pwr_biasing"] += transceiver_tx_pwr_biasing;
-
-    if (!isSleeping())
-	power_breakdown_s["transceiver_pwr_biasing"] += transceiver_rx_pwr_biasing;
+    power_breakdown_s["transceiver_rx_pwr_biasing"] += transceiver_rx_pwr_biasing;
 }
 
-void Power::leakage()
+void Power::biasingTx()
+{
+    power_breakdown_s["transceiver_tx_pwr_biasing"] += transceiver_tx_pwr_biasing;
+
+}
+
+void Power::leakageBuffer()
 {
     power_breakdown_s["buffer_pwr_s"]+=buffer_pwr_s;
-    power_breakdown_s["antenna_buffer_pwr_s"]+=antenna_buffer_pwr_s;
+}
+
+
+void Power::leakageLinkRouter2Router()
+{
+    power_breakdown_s["link_r2r_pwr_s"]+=link_r2r_pwr_s;
+}
+
+void Power::leakageLinkRouter2Hub()
+{
+    power_breakdown_s["link_r2h_pwr_s"]+=link_r2h_pwr_s;
+}
+
+void Power::leakageRouter()
+{
+    // note: leakage contributions depending on instance number are 
+    // accounted in specific separate leakage functions
     power_breakdown_s["routing_pwr_s"]+=routing_pwr_s;
     power_breakdown_s["selection_pwr_s"]+=selection_pwr_s;
     power_breakdown_s["crossbar_pwr_s"]+=crossbar_pwr_s;
-    power_breakdown_s["link_r2r_pwr_s"]+=link_r2r_pwr_s;
-    power_breakdown_s["link_r2h_pwr_s"]+=link_r2h_pwr_s;
-    power_breakdown_s["transceiver_pwr_s"]+=transceiver_tx_pwr_s;
-    if (!isSleeping())
-	power_breakdown_s["transceiver_pwr_s"]+=transceiver_rx_pwr_s;
     power_breakdown_s["ni_pwr_s"]+=ni_pwr_s;
+}
+
+
+void Power::leakageAntennaBuffer()
+{
+    power_breakdown_s["antenna_buffer_pwr_s"]+=(antenna_buffer_pwr_s);
+}
+
+void Power::leakageTransceiverRx()
+{
+
+    power_breakdown_s["transceiver_rx_pwr_s"]+=transceiver_rx_pwr_s;
+}
+
+void Power::leakageTransceiverTx()
+{
+
+    power_breakdown_s["transceiver_tx_pwr_s"]+=transceiver_tx_pwr_s;
 }
 
 void Power::printBreakDown(std::ostream & out)
