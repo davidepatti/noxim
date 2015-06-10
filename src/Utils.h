@@ -70,7 +70,7 @@ inline ostream & operator <<(ostream & os, const Flit & flit)
 	os << "Total number of hops from source to destination is " <<
 	    flit.hop_no << endl;
     } else {
-	os << "[type: ";
+	os << "[";
 	switch (flit.flit_type) {
 	case FLIT_TYPE_HEAD:
 	    os << "H";
@@ -83,7 +83,7 @@ inline ostream & operator <<(ostream & os, const Flit & flit)
 	    break;
 	}
 
-	os << ", seq: " << flit.sequence_no << ", " << flit.src_id << "-->" << flit.dst_id << "]";
+	os << " seq: " << flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << "]";
     }
 
     return os;
