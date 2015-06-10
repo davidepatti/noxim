@@ -79,6 +79,8 @@ SC_MODULE(Hub)
     int route(Flit&);
     int tile2Port(int);
 
+    int tot,brutto;
+
     void setFlitTransmissionCycles(int cycles,int ch_id) {flit_transmission_cycles[ch_id]=cycles;}
 
     Power power;
@@ -108,6 +110,9 @@ SC_MODULE(Hub)
 	    sensitive << reset;
 	    sensitive << clock.pos();
 	}
+
+	tot = 0;
+	brutto = 0;
 
         local_id = id;
 	token_ring = tr;
@@ -147,6 +152,9 @@ SC_MODULE(Hub)
 	    current_token_expiration[txChannels[i]] = new sc_in<int>();
 	    flag[txChannels[i]] = new sc_out<int>();
             token_ring->attachHub(txChannels[i],local_id, current_token_holder[txChannels[i]],current_token_expiration[txChannels[i]],flag[txChannels[i]]);
+	    // wirxsleep currently assumes TOKEN_PACKET mac policy
+	    if (GlobalParams::use_wirxsleep)
+		assert(token_ring->getPolicy(txChannels[i])==TOKEN_PACKET);
         }
 
         for (unsigned int i = 0; i < rxChannels.size(); i++) {

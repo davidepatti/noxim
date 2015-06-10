@@ -24,34 +24,83 @@ int Hub::route(Flit& f)
 
 void Hub::perCycleUpdate()
 {
-        for (int i = 0; i < num_ports; i++) 
-	{
-	    // TX
-	    power.leakageBuffer();
-	    // RX
-	    power.leakageBuffer();
-
-	    power.leakageLinkRouter2Hub();
-	}
-
+	// Mandatory leakage contributions **************************
+	//
+	// Initiators buffer_tx
 	for (int i=0;i<txChannels.size();i++)
 	{
 	    power.leakageAntennaBuffer();
 	}
 
-	for (int i=0;i<rxChannels.size();i++)
+	// buffer from tile connections
+        for (int i = 0; i < num_ports; i++) 
 	{
-	    power.leakageAntennaBuffer();
+	    power.leakageBufferFromTile();
+	    power.leakageLinkRouter2Hub();
 	}
-	
+
+	power.leakageTransceiverTx();
+	power.biasingTx();
+	//***********************************************************
+
+
+	// if true, the entire power save management must be skipped
+	bool skip_power_saving;
+
+	if (power.isSleeping())
+	{
+	    skip_power_saving = false;
+	}
+	else
+	    skip_power_saving = true;
+
+
+	// check if there is at least one not empty antenna RX buffer
+	for (int i=0;i<rxChannels.size() && !skip_power_saving ;i++)
+	{
+	    int ch_id = rxChannels[i];
+
+	    if (!target[ch_id]->buffer_rx.IsEmpty())
+	    {
+		skip_power_saving = true;
+	    }
+	}
+
+
+	// account all power contributions
+	if (skip_power_saving)
+	{
+	    // Targets buffer rx
+	    for (int i=0;i<rxChannels.size();i++)
+	    {
+		power.leakageAntennaBuffer();
+	    }
+
+	    for (int i = 0; i < num_ports; i++) 
+	    {
+		power.leakageBufferToTile();
+	    }
+
+	}
+	// If power saving is active and all antenna rx buffers are empty
+	// we can also disable power accounting of buffers to tile that are empty
+	else
+	{
+	    for (int i = 0; i < num_ports; i++) 
+	    {
+		if (!buffer_to_tile[i].IsEmpty())
+		{
+		    power.leakageBufferToTile();
+		}
+	    }
+	};
+
 	if (!(power.isSleeping()))
 	{
 	    power.leakageTransceiverRx();
 	    power.biasingRx();
 	}
 
-	power.leakageTransceiverTx();
-	power.biasingTx();
 }
 
 
@@ -72,14 +121,14 @@ void Hub::txRadioProcessTokenPacket(int channel)
 
 	    if (is_tail)
 	    {
-		//LOG << "TOKEN_PACKET: tail sent, releasing token for channel " << channel << endl;
+		LOG << "TOKEN_PACKET: tail sent, releasing token for channel " << channel << endl;
 		flag[channel]->write(RELEASE_CHANNEL);
 	    }
 
 	}
 	else
 	{
-	    //LOG << "TOKEN_PACKET: Buffer_tx empty, releasing token for channel " << channel << endl;
+	    LOG << "TOKEN_PACKET: Buffer_tx empty, releasing token for channel " << channel << endl;
 	    flag[channel]->write(RELEASE_CHANNEL);
 	}
     }
