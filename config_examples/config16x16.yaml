@@ -93,7 +93,7 @@ Channels:
 #
 # SIMULATION PARAMETERS
 #
-clock_period: 1000
+clock_period_ps: 1000
 reset_time: 1000
 simulation_time: 10000
 stats_warm_up_time: 1000
@@ -116,8 +116,8 @@ verbose_mode: 0
 trace_mode: false
 trace_filename: ""
 
-min_packet_size: 12
-max_packet_size: 12
+min_packet_size: 2
+max_packet_size: 2
 packet_injection_rate: 0.01
 probability_of_retransmission: 0.01
 
