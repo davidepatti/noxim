@@ -52,7 +52,7 @@ SC_MODULE(TokenRing)
 	// TODO TURI: policy hardwired
 	//token_policy[0] = TOKEN_MAX_HOLD;
 	//token_policy[0] = TOKEN_HOLD;
-	//token_policy[0] = TOKEN_PACKET;
+	token_policy[0] = TOKEN_PACKET;
 
     }
 

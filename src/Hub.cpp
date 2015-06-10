@@ -116,7 +116,7 @@ void Hub::txRadioProcessTokenPacket(int channel)
 	    bool is_tail = init[channel]->buffer_tx.Front().flit_type == FLIT_TYPE_TAIL;
 
 	    flag[channel]->write(HOLD_CHANNEL);
-	    LOG << "Starting transmission on channel " << channel << endl;
+	    //LOG << "Starting transmission on channel " << channel << endl;
 	    init[channel]->start_request_event.notify();
 
 	    if (is_tail)
@@ -128,7 +128,7 @@ void Hub::txRadioProcessTokenPacket(int channel)
 	}
 	else
 	{
-	    LOG << "TOKEN_PACKET: Buffer_tx empty, releasing token for channel " << channel << endl;
+	    //LOG << "TOKEN_PACKET: Buffer_tx empty, releasing token for channel " << channel << endl;
 	    flag[channel]->write(RELEASE_CHANNEL);
 	}
     }

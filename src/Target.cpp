@@ -29,7 +29,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
     struct Flit* my_flit = (struct Flit*)trans.get_data_ptr();
 
 
-    LOG << ">>>> Target received flit: Type " << my_flit->flit_type << ", " << my_flit->src_id << "-->" << my_flit->dst_id << " flit: " << *my_flit << endl;
+    LOG << "*** Received: " << *my_flit << endl;
 
     if (!buffer_rx.IsFull())
     {
@@ -58,7 +58,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 	}
 	
 
-	//LOG << "Flit moved to rx_buffer " << endl;
+	LOG << "Flit " << *my_flit << " moved to rx_buffer " << endl;
 	buffer_rx.Push(*my_flit);
 	hub->power.antennaBufferPush();
 	// Obliged to set response status to indicate successful completion

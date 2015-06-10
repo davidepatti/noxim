@@ -131,7 +131,7 @@ void Router::txProcess()
 		      if (o == DIRECTION_HUB)
 		      {
 			  power.r2hLink();
-			  LOG << "Forwarding to HUB " << endl;
+			  LOG << "Forwarding to HUB " << flit << endl;
 		      }
 		      else
 		      {
@@ -210,7 +210,7 @@ void Router::perCycleUpdate()
 	power.leakageRouter();
 	for (int i = 0; i < DIRECTIONS + 1; i++)
 	{
-	    power.leakageBuffer();
+	    power.leakageBufferRouter();
 	    power.leakageLinkRouter2Router();
 	}
 
@@ -227,7 +227,7 @@ vector < int > Router::routingFunction(const RouteData & route_data)
                 !sameRadioHub(local_id,route_data.dst_id)
            )
         {
-            LOG << "Setting direction hub to reach destination node " << route_data.dst_id << endl;
+            LOG << "Setting direction HUB to reach destination node " << route_data.dst_id << endl;
 
             vector<int> dirv;
             dirv.push_back(DIRECTION_HUB);
