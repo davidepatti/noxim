@@ -14,7 +14,7 @@ What's New ?
   * YAML configuration file for all features/parameters
   * Totally rewritten power model to support fine-grained estimation
   * Modular plugin-like addition of Routing/Selection strategies
-  * Optional accurate logs for deep debugging
+  * Optional accurate logs for deep debugging (see DEBUG in Makefile)
 
 Quick Start
 -----------
