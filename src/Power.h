@@ -57,7 +57,9 @@ class Power {
     void r2rLink(); 
     void networkInterface();
 
-    void leakageBuffer();
+    void leakageBufferRouter();
+    void leakageBufferToTile();
+    void leakageBufferFromTile();
     void leakageAntennaBuffer();
     void leakageLinkRouter2Router();
     void leakageLinkRouter2Hub();

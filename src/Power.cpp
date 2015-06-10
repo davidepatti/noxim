@@ -319,11 +319,30 @@ void Power::biasingTx()
 
 }
 
-void Power::leakageBuffer()
+// Note: In the following 3 functions buffer_pwr_s 
+// is assumed as loaded with the proper values from configuration file:
+// - Router: takes the value of input buffers leakage
+// - Hub: takes the leakage value of buffer_from_tile/to_tile
+void Power::leakageBufferRouter()
 {
-    power_breakdown_s["buffer_pwr_s"]+=buffer_pwr_s;
+    power_breakdown_s["buffer_router_pwr_s"]+=buffer_pwr_s;
 }
 
+void Power::leakageBufferToTile()
+{
+    power_breakdown_s["buffer_to_tile_pwr_s"]+=buffer_pwr_s;
+}
+
+void Power::leakageBufferFromTile()
+{
+    power_breakdown_s["buffer_from_tile_pwr_s"]+=buffer_pwr_s;
+}
+
+// Account for each buffer_rx (Targets) or buffer_tx (Initiators)
+void Power::leakageAntennaBuffer()
+{
+    power_breakdown_s["antenna_buffer_pwr_s"]+=(antenna_buffer_pwr_s);
+}
 
 void Power::leakageLinkRouter2Router()
 {
@@ -346,10 +365,6 @@ void Power::leakageRouter()
 }
 
 
-void Power::leakageAntennaBuffer()
-{
-    power_breakdown_s["antenna_buffer_pwr_s"]+=(antenna_buffer_pwr_s);
-}
 
 void Power::leakageTransceiverRx()
 {
