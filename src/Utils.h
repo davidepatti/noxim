@@ -9,7 +9,7 @@
 
 #ifdef DEBUG
 
-#define LOG (std::cout << std::setw(7) << left << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " " << name() << "::" << __func__<< "() => ")
+#define LOG (std::cout << std::setw(7) << left << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " " << name() << "::" << __func__<< "() --> ")
 
 #else
 template <class cT, class traits = std::char_traits<cT> >
@@ -70,7 +70,7 @@ inline ostream & operator <<(ostream & os, const Flit & flit)
 	os << "Total number of hops from source to destination is " <<
 	    flit.hop_no << endl;
     } else {
-	os << "[";
+	os << "(";
 	switch (flit.flit_type) {
 	case FLIT_TYPE_HEAD:
 	    os << "H";
@@ -83,7 +83,7 @@ inline ostream & operator <<(ostream & os, const Flit & flit)
 	    break;
 	}
 
-	os << " seq: " << flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << "]";
+	os <<  flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << ")";
     }
 
     return os;
@@ -218,7 +218,7 @@ inline void printMap(string label, const map<string,double> & m,std::ostream & o
 {
     out << label << " = [" << endl;
     for (map<string,double>::const_iterator i = m.begin();i!=m.end();i++)
-	out << "\t" << i->second << "\t % " << i->first << endl;
+	out << "\t" << setprecision(5) << i->second << "\t % " << i->first << endl;
 
     out << "];" << endl;
 }
