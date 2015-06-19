@@ -262,29 +262,11 @@ double GlobalStats::getStaticPower()
 
 void GlobalStats::showStats(std::ostream & out, bool detailed)
 {
-    out << "% Total received packets: " << getReceivedPackets() << endl;
-    out << "% Total received flits: " << getReceivedFlits() << endl;
-    out << "% Global average delay (cycles): " << getAverageDelay() <<
-	endl;
-    out << "% Global average throughput (flits/cycle): " <<
-	getAverageThroughput() << endl;
-    out << "% Throughput (flits/cycle/IP): " << getThroughput() << endl;
-    out << "% Max delay (cycles): " << getMaxDelay() << endl;
-    out << "% Total energy (J): " << getTotalPower() << endl;
-    out << "% \tDynamic energy (J): " << getDynamicPower() << endl;
-    out << "% \tStatic energy (J): " << getStaticPower() << endl;
-
-    if (GlobalParams::show_buffer_stats)
-      showBufferStats(out);
-
     if (detailed) {
 	out << endl << "detailed = [" << endl;
 	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
 	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
-		noc->t[x][y]->r->stats.showStats(y *
-						 GlobalParams::
-						 mesh_dim_x + x, out,
-						 true);
+		noc->t[x][y]->r->stats.showStats(y * GlobalParams:: mesh_dim_x + x, out, true);
 	out << "];" << endl;
 
 	// show MaxDelay matrix
@@ -313,6 +295,22 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 
 	showPowerBreakDown(out);
     }
+
+    out << "% Total received packets: " << getReceivedPackets() << endl;
+    out << "% Total received flits: " << getReceivedFlits() << endl;
+    out << "% Global average delay (cycles): " << getAverageDelay() <<
+	endl;
+    out << "% Global average throughput (flits/cycle): " <<
+	getAverageThroughput() << endl;
+    out << "% Throughput (flits/cycle/IP): " << getThroughput() << endl;
+    out << "% Max delay (cycles): " << getMaxDelay() << endl;
+    out << "% Total energy (J): " << getTotalPower() << endl;
+    out << "% \tDynamic energy (J): " << getDynamicPower() << endl;
+    out << "% \tStatic energy (J): " << getStaticPower() << endl;
+
+    if (GlobalParams::show_buffer_stats)
+      showBufferStats(out);
+
 }
 
 void GlobalStats::updatePowerBreakDown(map<string,double> &dst,const map<string,double>& src)
