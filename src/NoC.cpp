@@ -92,10 +92,16 @@ void NoC::buildMesh()
 	else
 	    data_rate_gbs = NOT_VALID;
 
+
+	// TODO: update power model (configureHub to support different
+	// tx/tx buffer depth
+	assert(GlobalParams::hub_configuration[hub_id].rxBufferSize==GlobalParams::hub_configuration[hub_id].txBufferSize);
+	
 	hub[hub_id]->power.configureHub(GlobalParams::flit_size,
-		                        GlobalParams::buffer_depth,
+		                        GlobalParams::hub_configuration[hub_id].toTileBufferSize,
+		                        GlobalParams::hub_configuration[hub_id].fromTileBufferSize,
 					GlobalParams::flit_size,
-					GlobalParams::buffer_depth,
+					GlobalParams::hub_configuration[hub_id].rxBufferSize,
 					GlobalParams::flit_size,
 					data_rate_gbs);
 

@@ -39,7 +39,7 @@ void Router::rxProcess()
 		// Store the incoming flit in the circular buffer
 		buffer[i].Push(received_flit);
 
-		power.bufferPush();
+		power.bufferRouterPush();
 
 		// Negate the old value for Alternating Bit Protocol (ABP)
 		current_level_rx[i] = 1 - current_level_rx[i];
@@ -87,7 +87,7 @@ void Router::txProcess()
 	    {
 
 	      Flit flit = buffer[i].Front();
-	      power.bufferFront();
+	      power.bufferRouterFront();
 
 	      if (flit.flit_type == FLIT_TYPE_HEAD) 
 		{
@@ -144,7 +144,7 @@ void Router::txProcess()
 		      req_tx[o].write(current_level_tx[o]);
 		      buffer[i].Pop();
 
-		      power.bufferPop();
+		      power.bufferRouterPop();
 
 		      // if flit has been consumed
 		      if (flit.dst_id == local_id)

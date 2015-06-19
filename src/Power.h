@@ -34,15 +34,22 @@ class Power {
 			 string selection_function);
 
     void configureHub(int link_width, 
-	              int buffer_depth, 
+	              int buffer_to_tile_depth, 
+	              int buffer_from_tile_depth, 
 		      int buffer_item_size, 
 		      int antenna_buffer_depth, 
 		      int antenna_buffer_item_size, 
 		      int data_rate_gbs);
 
-    void bufferPush(); 
-    void bufferPop(); 
-    void bufferFront(); 
+    void bufferRouterPush(); 
+    void bufferRouterPop(); 
+    void bufferRouterFront(); 
+    void bufferToTilePush(); 
+    void bufferToTilePop(); 
+    void bufferToTileFront(); 
+    void bufferFromTilePush(); 
+    void bufferFromTilePop(); 
+    void bufferFromTileFront(); 
     void antennaBufferPush();
     void antennaBufferPop();
     void antennaBufferFront(); 
@@ -88,11 +95,21 @@ class Power {
 
     double total_power_s;
 
-    double buffer_push_pwr_d;
-    double buffer_pop_pwr_d;
-    double buffer_front_pwr_d;
-    double buffer_pwr_s;
+    double buffer_router_push_pwr_d;
+    double buffer_router_pop_pwr_d;
+    double buffer_router_front_pwr_d;
+    double buffer_router_pwr_s;
     
+    double buffer_to_tile_push_pwr_d;
+    double buffer_to_tile_pop_pwr_d;
+    double buffer_to_tile_front_pwr_d;
+    double buffer_to_tile_pwr_s;
+
+    double buffer_from_tile_push_pwr_d;
+    double buffer_from_tile_pop_pwr_d;
+    double buffer_from_tile_front_pwr_d;
+    double buffer_from_tile_pwr_s;
+
     double antenna_buffer_push_pwr_d;
     double antenna_buffer_pop_pwr_d;
     double antenna_buffer_front_pwr_d;

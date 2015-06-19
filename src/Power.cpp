@@ -22,11 +22,21 @@ Power::Power()
 {
     total_power_s = 0.0;
 
-    buffer_push_pwr_d = 0.0;
-    buffer_pop_pwr_d = 0.0;
-    buffer_front_pwr_d = 0.0;
-    buffer_pwr_s = 0.0;
+    buffer_router_push_pwr_d = 0.0;
+    buffer_router_pop_pwr_d = 0.0;
+    buffer_router_front_pwr_d = 0.0;
+    buffer_router_pwr_s = 0.0;
     
+    buffer_to_tile_push_pwr_d = 0.0;
+    buffer_to_tile_pop_pwr_d = 0.0;
+    buffer_to_tile_front_pwr_d = 0.0;
+    buffer_to_tile_pwr_s = 0.0;
+
+    buffer_from_tile_push_pwr_d = 0.0;
+    buffer_from_tile_pop_pwr_d = 0.0;
+    buffer_from_tile_front_pwr_d = 0.0;
+    buffer_from_tile_pwr_s = 0.0;
+
     antenna_buffer_push_pwr_d = 0.0;
     antenna_buffer_pop_pwr_d = 0.0;
     antenna_buffer_front_pwr_d = 0.0;
@@ -82,10 +92,10 @@ void Power::configureRouter(int link_width,
     // Dynamic values are expressed in Joule
     // Static/Leakage values must be converted from Watt to Joule
 
-    buffer_pwr_s = W2J(GlobalParams::power_configuration.bufferPowerConfig.leakage[key]);
-    buffer_push_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.push[key];
-    buffer_front_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.front[key];
-    buffer_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop[key];
+    buffer_router_pwr_s = W2J(GlobalParams::power_configuration.bufferPowerConfig.leakage[key]);
+    buffer_router_push_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.push[key];
+    buffer_router_front_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.front[key];
+    buffer_router_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop[key];
 
     // Routing 
     assert(GlobalParams::power_configuration.routerPowerConfig.routing_algorithm_pm.find(routing_function) != GlobalParams::power_configuration.routerPowerConfig.routing_algorithm_pm.end());
@@ -125,27 +135,39 @@ void Power::configureRouter(int link_width,
 }
 
 void Power::configureHub(int link_width,
-	int buffer_depth,
+	int buffer_to_tile_depth, // buffer to tile
+	int buffer_from_tile_depth, // buffer from tile
 	int buffer_item_size,
-	int antenna_buffer_depth,
+	int antenna_buffer_depth, // rx/tx antenna buffers
 	int antenna_buffer_item_size,
 	int data_rate_gbs)
 {
 // (s)tatic, (d)ynamic power
 
     // Buffer 
-    pair<int,int> key = pair<int,int>(buffer_depth, buffer_item_size);
+    pair<int,int> key_to_tile = pair<int,int>(buffer_to_tile_depth, buffer_item_size);
+    pair<int,int> key_from_tile = pair<int,int>(buffer_from_tile_depth, buffer_item_size);
     
-    assert(GlobalParams::power_configuration.bufferPowerConfig.leakage.find(key) != GlobalParams::power_configuration.bufferPowerConfig.leakage.end());
-    assert(GlobalParams::power_configuration.bufferPowerConfig.push.find(key) != GlobalParams::power_configuration.bufferPowerConfig.push.end());
-    assert(GlobalParams::power_configuration.bufferPowerConfig.front.find(key) != GlobalParams::power_configuration.bufferPowerConfig.front.end());
-    assert(GlobalParams::power_configuration.bufferPowerConfig.pop.find(key) != GlobalParams::power_configuration.bufferPowerConfig.pop.end());
+    assert(GlobalParams::power_configuration.bufferPowerConfig.leakage.find(key_to_tile) != GlobalParams::power_configuration.bufferPowerConfig.leakage.end());
+    assert(GlobalParams::power_configuration.bufferPowerConfig.push.find(key_to_tile) != GlobalParams::power_configuration.bufferPowerConfig.push.end());
+    assert(GlobalParams::power_configuration.bufferPowerConfig.front.find(key_to_tile) != GlobalParams::power_configuration.bufferPowerConfig.front.end());
+    assert(GlobalParams::power_configuration.bufferPowerConfig.pop.find(key_to_tile) != GlobalParams::power_configuration.bufferPowerConfig.pop.end());
 
-    buffer_pwr_s = W2J(GlobalParams::power_configuration.bufferPowerConfig.leakage[key]);
-    buffer_push_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.push[key];
-    buffer_front_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.front[key];
-    buffer_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop[key];
+    assert(GlobalParams::power_configuration.bufferPowerConfig.leakage.find(key_from_tile) != GlobalParams::power_configuration.bufferPowerConfig.leakage.end());
+    assert(GlobalParams::power_configuration.bufferPowerConfig.push.find(key_from_tile) != GlobalParams::power_configuration.bufferPowerConfig.push.end());
+    assert(GlobalParams::power_configuration.bufferPowerConfig.front.find(key_from_tile) != GlobalParams::power_configuration.bufferPowerConfig.front.end());
+    assert(GlobalParams::power_configuration.bufferPowerConfig.pop.find(key_from_tile) != GlobalParams::power_configuration.bufferPowerConfig.pop.end());
 
+    buffer_to_tile_pwr_s = W2J(GlobalParams::power_configuration.bufferPowerConfig.leakage[key_to_tile]);
+    buffer_to_tile_push_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.push[key_to_tile];
+    buffer_to_tile_front_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.front[key_to_tile];
+    buffer_to_tile_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop[key_to_tile];
+
+    buffer_from_tile_pwr_s = W2J(GlobalParams::power_configuration.bufferPowerConfig.leakage[key_from_tile]);
+    buffer_from_tile_push_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.push[key_from_tile];
+    buffer_from_tile_front_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.front[key_from_tile];
+    buffer_from_tile_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop[key_from_tile];
+   
     // Buffer Antenna
     pair<int,int> akey = pair<int,int>(antenna_buffer_depth,antenna_buffer_item_size);
     
@@ -192,21 +214,58 @@ void Power::configureHub(int link_width,
 }
 
 
-void Power::bufferPush()
+// Router buffer
+void Power::bufferRouterPush()
 {
-    power_breakdown_d["buffer_push_pwr_d"] += buffer_push_pwr_d;
+    power_breakdown_d["buffer_push_pwr_d"] += buffer_router_push_pwr_d;
 }
 
-void Power::bufferPop()
+void Power::bufferRouterPop()
 {
-    power_breakdown_d["buffer_pop_pwr_d"]+= buffer_pop_pwr_d;
+    power_breakdown_d["buffer_pop_pwr_d"]+= buffer_router_pop_pwr_d;
 }
 
-void Power::bufferFront()
+void Power::bufferRouterFront()
 {
-    power_breakdown_d["buffer_front_pwr_d"]+= buffer_front_pwr_d;
+    power_breakdown_d["buffer_front_pwr_d"]+= buffer_router_front_pwr_d;
 }
 
+// Hub to tile
+void Power::bufferToTilePush()
+{
+    power_breakdown_d["buffer_to_tile_push_pwr_d"] += buffer_to_tile_push_pwr_d;
+}
+
+void Power::bufferToTilePop()
+{
+    power_breakdown_d["buffer_to_tile_pop_pwr_d"]+= buffer_to_tile_pop_pwr_d;
+}
+
+void Power::bufferToTileFront()
+{
+
+    power_breakdown_d["buffer_to_tile_front_pwr_d"]+= buffer_to_tile_front_pwr_d;
+}
+
+// Hub from tile
+void Power::bufferFromTilePush()
+{
+    power_breakdown_d["buffer_from_tile_push_pwr_d"] += buffer_from_tile_push_pwr_d;
+}
+
+void Power::bufferFromTilePop()
+{
+    power_breakdown_d["buffer_from_tile_pop_pwr_d"]+= buffer_from_tile_pop_pwr_d;
+}
+
+void Power::bufferFromTileFront()
+{
+
+    power_breakdown_d["buffer_from_tile_front_pwr_d"]+= buffer_from_tile_front_pwr_d;
+}
+
+
+// Antenna buffers (RX/TX)
 void Power::antennaBufferPush()
 {
     power_breakdown_d["antenna_buffer_push_pwr_d"]+= antenna_buffer_push_pwr_d;
@@ -325,17 +384,17 @@ void Power::biasingTx()
 // - Hub: takes the leakage value of buffer_from_tile/to_tile
 void Power::leakageBufferRouter()
 {
-    power_breakdown_s["buffer_router_pwr_s"]+=buffer_pwr_s;
+    power_breakdown_s["buffer_router_pwr_s"]+=buffer_router_pwr_s;
 }
 
 void Power::leakageBufferToTile()
 {
-    power_breakdown_s["buffer_to_tile_pwr_s"]+=buffer_pwr_s;
+    power_breakdown_s["buffer_to_tile_pwr_s"]+=buffer_to_tile_pwr_s;
 }
 
 void Power::leakageBufferFromTile()
 {
-    power_breakdown_s["buffer_from_tile_pwr_s"]+=buffer_pwr_s;
+    power_breakdown_s["buffer_from_tile_pwr_s"]+=buffer_from_tile_pwr_s;
 }
 
 // Account for each buffer_rx (Targets) or buffer_tx (Initiators)
@@ -395,6 +454,7 @@ void Power::rxSleep(int cycles)
 
 bool Power::isSleeping()
 {
+    assert(GlobalParams::use_wirxsleep);
     int now = (int)(sc_time_stamp().to_double()/GlobalParams::clock_period_ps);
 
     return (now<sleep_end_cycle);

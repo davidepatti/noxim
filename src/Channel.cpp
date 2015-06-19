@@ -40,6 +40,9 @@ void Channel::accountWirelessRxPower()
 {
     for (unsigned int i = 0; i<hubs.size();i++)
     {
+	if (!GlobalParams::use_wirxsleep) 
+	    hubs[i]->power.wirelessDynamicRx();
+	else
 	if (!(hubs[i]->power.isSleeping()))
 	    hubs[i]->power.wirelessDynamicRx();
     }

@@ -22,84 +22,88 @@ int Hub::route(Flit& f)
 }
 
 
-void Hub::perCycleUpdate()
+void Hub::wirxPowerManager()
 {
-	// Mandatory leakage contributions **************************
-	//
-	// Initiators buffer_tx
-	for (int i=0;i<txChannels.size();i++)
-	{
-	    power.leakageAntennaBuffer();
-	}
 
-	// buffer from tile connections
-        for (int i = 0; i < num_ports; i++) 
-	{
-	    power.leakageBufferFromTile();
-	    power.leakageLinkRouter2Hub();
-	}
-
-	power.leakageTransceiverTx();
-	power.biasingTx();
-	//***********************************************************
-
-
-	// if true, the entire power save management must be skipped
-	bool skip_power_saving;
-
-	if (power.isSleeping())
-	{
-	    skip_power_saving = false;
-	}
-	else
-	    skip_power_saving = true;
-
-
+    if (power.isSleeping())
+    {
+	bool account_buffer_to_tile_leakage = false;
 	// check if there is at least one not empty antenna RX buffer
-	for (int i=0;i<rxChannels.size() && !skip_power_saving ;i++)
+	for (int i=0;i<rxChannels.size();i++)
 	{
 	    int ch_id = rxChannels[i];
 
 	    if (!target[ch_id]->buffer_rx.IsEmpty())
 	    {
-		skip_power_saving = true;
-	    }
-	}
-
-
-	// account all power contributions
-	if (skip_power_saving)
-	{
-	    // Targets buffer rx
-	    for (int i=0;i<rxChannels.size();i++)
-	    {
+		account_buffer_to_tile_leakage = true;
 		power.leakageAntennaBuffer();
 	    }
+	}
 
-	    for (int i = 0; i < num_ports; i++) 
-	    {
+	for (int i = 0; i < num_ports; i++) 
+	{
+
+	    if (account_buffer_to_tile_leakage || !buffer_to_tile[i].IsEmpty())
 		power.leakageBufferToTile();
-	    }
-
 	}
-	// If power saving is active and all antenna rx buffers are empty
-	// we can also disable power accounting of buffers to tile that are empty
-	else
-	{
-	    for (int i = 0; i < num_ports; i++) 
-	    {
-		if (!buffer_to_tile[i].IsEmpty())
-		{
-		    power.leakageBufferToTile();
-		}
-	    }
-	};
+	
+    }
+    else
+    {
+	for (int i=0;i<rxChannels.size();i++)
+	    power.leakageAntennaBuffer();
 
-	if (!(power.isSleeping()))
+	for (int i = 0; i < num_ports; i++) 
 	{
-	    power.leakageTransceiverRx();
-	    power.biasingRx();
+		power.leakageBufferToTile();
 	}
+    }
+
+}
+
+
+void Hub::perCycleUpdate()
+{
+    // Mandatory leakage contributions **************************
+    //
+    // Initiators buffer_tx
+    for (int i=0;i<txChannels.size();i++)
+    {
+	power.leakageAntennaBuffer();
+    }
+
+    // buffer from tile connections
+    for (int i = 0; i < num_ports; i++) 
+    {
+	power.leakageBufferFromTile();
+	power.leakageLinkRouter2Hub();
+    }
+
+    power.leakageTransceiverTx();
+    power.biasingTx();
+    //***********************************************************
+
+
+
+    if (GlobalParams::use_wirxsleep)
+	wirxPowerManager();
+    else
+    {
+	for (int i=0;i<rxChannels.size();i++)
+	{
+	    power.leakageAntennaBuffer();
+	}
+
+	for (int i = 0; i < num_ports; i++) 
+	{
+	    power.leakageBufferToTile();
+	}
+	power.leakageTransceiverRx();
+	power.biasingRx();
+    }
+	
+
+
 
 }
 
@@ -238,6 +242,9 @@ void Hub::rxRadioProcess()
     } 
     else 
     {
+	if (!GlobalParams::use_wirxsleep)
+	    power.wirelessSnooping();
+	else
 	if (!power.isSleeping())
 	    power.wirelessSnooping();
 
@@ -275,7 +282,7 @@ void Hub::rxRadioProcess()
 		    //LOG << "Moving flit from buffer_rx to buffer port " << r[i] << endl;
 
 		    buffer_to_tile[r[i]].Push(received_flit);
-		    power.bufferPush();
+		    power.bufferToTilePush();
 		}
 		else 
 		    LOG << "WARNING, buffer full for port " << r[i] << endl;
@@ -316,7 +323,7 @@ void Hub::rxProcess()
 		Flit received_flit = flit_rx[i]->read();
 
 		buffer_from_tile[i].Push(received_flit);
-		power.bufferPush();
+		power.bufferFromTilePush();
 
 		current_level_rx[i] = 1 - current_level_rx[i];
 
@@ -357,7 +364,7 @@ void Hub::txProcess()
 		//LOG << "Reservation: buffer_from_tile not empty on port " << i << endl;
 
 		Flit flit = buffer_from_tile[i].Front();
-		power.bufferFront();
+		power.bufferFromTileFront();
 		r_from_tile[i] = route(flit);
 
 		if (flit.flit_type == FLIT_TYPE_HEAD) 
@@ -384,7 +391,7 @@ void Hub::txProcess()
 		//LOG << "Reservation: buffer_to_tile not empty on port " << i << endl;
 
 		Flit flit = buffer_to_tile[i].Front();
-		power.bufferFront();
+		power.bufferToTileFront();
 		r_to_tile[i] = route(flit);
 
 		if (flit.flit_type == FLIT_TYPE_HEAD) 
@@ -422,7 +429,7 @@ void Hub::txProcess()
 		    {
 			LOG << "Flit moved from buffer_from_tile["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
 			buffer_from_tile[i].Pop();
-			power.bufferPop();
+			power.bufferFromTilePop();
 			init[channel]->buffer_tx.Push(flit);
 			power.antennaBufferPush();
 			if (flit.flit_type == FLIT_TYPE_TAIL) wireless_reservation_table.release(channel);
@@ -454,7 +461,7 @@ void Hub::txProcess()
 		    current_level_tx[d] = 1 - current_level_tx[d];
 		    req_tx[d].write(current_level_tx[d]);
 		    buffer_to_tile[i].Pop();
-		    power.bufferPop();
+		    power.bufferToTilePop();
 
 		    if (flit.flit_type == FLIT_TYPE_TAIL) reservation_table.release(d);
 
