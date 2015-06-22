@@ -218,7 +218,7 @@ inline void printMap(string label, const map<string,double> & m,std::ostream & o
 {
     out << label << " = [" << endl;
     for (map<string,double>::const_iterator i = m.begin();i!=m.end();i++)
-	out << "\t" << setprecision(5) << i->second << "\t % " << i->first << endl;
+	out << "\t" << std::scientific << i->second << "\t % " << i->first << endl;
 
     out << "];" << endl;
 }
