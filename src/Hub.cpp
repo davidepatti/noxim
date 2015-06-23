@@ -24,6 +24,14 @@ int Hub::route(Flit& f)
 
 void Hub::wirxPowerManager()
 {
+    LOG << " buffer_to_tile STATUS: " << endl;
+    for (int i = 0; i < num_ports; i++) 
+    {
+	if (!buffer_to_tile[i].IsEmpty()) cout << "*"; else cout << ".";
+	if (!buffer_to_tile[i].IsEmpty()) assert(false);
+
+    }
+    cout << endl;
 
     if (power.isSleeping())
     {
@@ -40,9 +48,9 @@ void Hub::wirxPowerManager()
 	    }
 	}
 
+
 	for (int i = 0; i < num_ports; i++) 
 	{
-
 	    if (account_buffer_to_tile_leakage || !buffer_to_tile[i].IsEmpty())
 		power.leakageBufferToTile();
 	}
@@ -279,7 +287,7 @@ void Hub::rxRadioProcess()
 		{
 		    target[channel]->buffer_rx.Pop();
 		    power.antennaBufferPop();
-		    //LOG << "Moving flit from buffer_rx to buffer port " << r[i] << endl;
+		    LOG << "Moving flit from buffer_rx to buffer_to_tile, port " << r[i] << endl;
 
 		    buffer_to_tile[r[i]].Push(received_flit);
 		    power.bufferToTilePush();
@@ -291,6 +299,7 @@ void Hub::rxRadioProcess()
 	}
     }
 }
+
 
 void Hub::rxProcess()
 {
@@ -386,27 +395,6 @@ void Hub::txProcess()
 		}
 	    }
 
-	    if (!buffer_to_tile[i].IsEmpty()) 
-	    {
-		//LOG << "Reservation: buffer_to_tile not empty on port " << i << endl;
-
-		Flit flit = buffer_to_tile[i].Front();
-		power.bufferToTileFront();
-		r_to_tile[i] = route(flit);
-
-		if (flit.flit_type == FLIT_TYPE_HEAD) 
-		{
-		    assert(r_to_tile[i]!=DIRECTION_WIRELESS);
-
-		    if (reservation_table.isAvailable(r_to_tile[i])) 
-		    {
-			reservation_table.reserve(i, r_to_tile[i]);
-		    }
-		    else
-			LOG << "Reservation: no available port to route dir " << r_to_tile[i] << endl;
-		}
-
-	    }
 	}
 
 	start_from_port++;
@@ -451,26 +439,14 @@ void Hub::txProcess()
 
 		assert(r_to_tile[i] != DIRECTION_WIRELESS);
 
-		int d = reservation_table.getOutputPort(i);
 
-		if (d != NOT_RESERVED) 
-		{
-
-		    flit_tx[d].write(flit);
-		    power.r2hLink();
-		    current_level_tx[d] = 1 - current_level_tx[d];
-		    req_tx[d].write(current_level_tx[d]);
-		    buffer_to_tile[i].Pop();
-		    power.bufferToTilePop();
-
-		    if (flit.flit_type == FLIT_TYPE_TAIL) reservation_table.release(d);
-
-		}
-		else
-		{
-		    LOG << "Forwarding: No output port reserved for input port " << i  <<  endl;
-		}
-
+		flit_tx[i].write(flit);
+		power.r2hLink();
+		current_level_tx[i] = 1 - current_level_tx[i];
+		req_tx[i].write(current_level_tx[i]);
+		LOG << "Flit moved from buffer_to_tile[" << i <<"] to signal flit_tx["<<i<<"] " << endl;
+		buffer_to_tile[i].Pop();
+		power.bufferToTilePop();
 	    } //if buffer not empty
 	}// for all the ports
     } 
