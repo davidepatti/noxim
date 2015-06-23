@@ -70,16 +70,13 @@ SC_MODULE(Hub)
     ReservationTable in_reservation_table;	// Switch reservation table
     ReservationTable wireless_reservation_table;// Wireless reservation table
 
-    void rxProcess(); // The receiving process
-    void txProcess(); // The transmitting process
-    void rxRadioProcess(); // The radio transceiver process
-    void txRadioProcess(); // The radio transceiver process
     void perCycleUpdate();
+    void updateRxPower();
+    void antennaToTile();
+    void tileToAntenna();
 
     int route(Flit&);
     int tile2Port(int);
-
-    int tot,brutto;
 
     void setFlitTransmissionCycles(int cycles,int ch_id) {flit_transmission_cycles[ch_id]=cycles;}
 
@@ -90,19 +87,11 @@ SC_MODULE(Hub)
     Hub(sc_module_name nm, int id, TokenRing * tr): sc_module(nm) {
 	if (GlobalParams::use_winoc)
 	{
-	    SC_METHOD(rxProcess);
+	    SC_METHOD(tileToAntenna);
 	    sensitive << reset;
 	    sensitive << clock.pos();
 
-	    SC_METHOD(txProcess);
-	    sensitive << reset;
-	    sensitive << clock.pos();
-
-	    SC_METHOD(rxRadioProcess);
-	    sensitive << reset;
-	    sensitive << clock.pos();
-
-	    SC_METHOD(txRadioProcess);
+	    SC_METHOD(antennaToTile);
 	    sensitive << reset;
 	    sensitive << clock.pos();
 
@@ -111,8 +100,6 @@ SC_MODULE(Hub)
 	    sensitive << clock.pos();
 	}
 
-	tot = 0;
-	brutto = 0;
 
         local_id = id;
 	token_ring = tr;

@@ -28,7 +28,6 @@ void Hub::wirxPowerManager()
     for (int i = 0; i < num_ports; i++) 
     {
 	if (!buffer_to_tile[i].IsEmpty()) cout << "*"; else cout << ".";
-	if (!buffer_to_tile[i].IsEmpty()) assert(false);
 
     }
     cout << endl;
@@ -92,11 +91,18 @@ void Hub::perCycleUpdate()
     //***********************************************************
 
 
+}
+
+void Hub::updateRxPower()
+{
+    if (!power.isSleeping())
+	power.wirelessSnooping();
 
     if (GlobalParams::use_wirxsleep)
 	wirxPowerManager();
     else
     {
+	power.wirelessSnooping();
 	for (int i=0;i<rxChannels.size();i++)
 	{
 	    power.leakageAntennaBuffer();
@@ -108,13 +114,8 @@ void Hub::perCycleUpdate()
 	}
 	power.leakageTransceiverRx();
 	power.biasingRx();
-    }
-	
-
-
-
+    }    
 }
-
 
 void Hub::txRadioProcessTokenPacket(int channel)
 {
@@ -206,55 +207,37 @@ void Hub::txRadioProcessTokenMaxHold(int channel)
     }
 }
 
-void Hub::txRadioProcess()
+
+
+void Hub::antennaToTile()
 {
     if (reset.read()) 
     {
-	for (unsigned int i =0 ;i<txChannels.size();i++)
-	{
-	    int channel = txChannels[i];
-	    flag[channel]->write(HOLD_CHANNEL);
-	}
+        for (int i = 0; i < num_ports; i++) 
+        {
+	    req_tx[i]->write(0);
+	    current_level_tx[i] = 0;
+        }
+    } 
+    else
+    {
+	updateRxPower();
 	
-    } 
-    else 
-    {
-	for (unsigned int i =0 ;i<txChannels.size();i++)
+	for (int i = 0; i < num_ports; i++) 
 	{
-	    int channel = txChannels[i];
+	    if (!buffer_to_tile[i].IsEmpty()) 
+	    {     
+		Flit flit = buffer_to_tile[i].Front();
 
-	    switch (token_ring->getPolicy(channel))
-	    {
-		case TOKEN_PACKET:
-		    txRadioProcessTokenPacket(channel);
-		    break;
-		case TOKEN_HOLD:
-		    txRadioProcessTokenHold(channel);
-		    break;
-		case TOKEN_MAX_HOLD:
-		    txRadioProcessTokenMaxHold(channel);
-		    break;
-		default: assert(false);
-	    }
-
-
+		flit_tx[i].write(flit);
+		power.r2hLink();
+		current_level_tx[i] = 1 - current_level_tx[i];
+		req_tx[i].write(current_level_tx[i]);
+		LOG << "Flit moved from buffer_to_tile[" << i <<"] to signal flit_tx["<<i<<"] " << endl;
+		buffer_to_tile[i].Pop();
+		power.bufferToTilePop();
+	    } //if buffer not empty
 	}
-
-    }
-}
-
-void Hub::rxRadioProcess()
-{
-    if (reset.read()) 
-    {
-    } 
-    else 
-    {
-	if (!GlobalParams::use_wirxsleep)
-	    power.wirelessSnooping();
-	else
-	if (!power.isSleeping())
-	    power.wirelessSnooping();
 
 	// stores routing decision
 	// need a vector to use this info to choose between the two
@@ -301,156 +284,140 @@ void Hub::rxRadioProcess()
 }
 
 
-void Hub::rxProcess()
+void Hub::tileToAntenna()
 {
     if (reset.read()) 
     {
-        for (int i = 0; i < num_ports; i++) 
-        {
+	for (unsigned int i =0 ;i<txChannels.size();i++)
+	{
+	    int channel = txChannels[i];
+	    flag[channel]->write(HOLD_CHANNEL);
+	}
+	
+	for (int i = 0; i < num_ports; i++) 
+	{
             ack_rx[i]->write(0);
             current_level_rx[i] = 0;
-        }
+	}
     } 
     else 
     {
-	////////////////////////////////////////////////////////////////
-	// For each port decide if a new flit can be accepted
-
-	for (int i = 0; i < num_ports; i++) 
+	for (unsigned int i =0 ;i<txChannels.size();i++)
 	{
-	    /*
-	    if (!buffer_from_tile[i].deadlockFree())
+	    int channel = txChannels[i];
+
+	    switch (token_ring->getPolicy(channel))
 	    {
-		LOG << " deadlock on buffer " << i << endl;
-		buffer_from_tile[i].Print("deadlock");
+		case TOKEN_PACKET:
+		    txRadioProcessTokenPacket(channel);
+		    break;
+		case TOKEN_HOLD:
+		    txRadioProcessTokenHold(channel);
+		    break;
+		case TOKEN_MAX_HOLD:
+		    txRadioProcessTokenMaxHold(channel);
+		    break;
+		default: assert(false);
 	    }
-	    */
 
-	    if ((req_rx[i]->read() == 1 - current_level_rx[i]) && !buffer_from_tile[i].IsFull()) 
-	    {
-		//LOG << "Reading flit on port " << i << endl;
-		Flit received_flit = flit_rx[i]->read();
 
-		buffer_from_tile[i].Push(received_flit);
-		power.bufferFromTilePush();
-
-		current_level_rx[i] = 1 - current_level_rx[i];
-
-	    }
-	    ack_rx[i]->write(current_level_rx[i]);
 	}
+
     }
-}
 
+    int * r_from_tile = new int[num_ports];
 
-
-void Hub::txProcess()
-{
-    if (reset.read()) 
+    // 1st phase: Reservation
+    for (int j = 0; j < num_ports; j++) 
     {
+	int i = (start_from_port + j) % (num_ports);
 
-	for (int i = 0; i < num_ports; i++) 
+	if (!buffer_from_tile[i].IsEmpty()) 
 	{
-	    req_tx[i]->write(0);
-	    current_level_tx[i] = 0;
-	}
-    } 
-    else 
-    {
-	// stores routing decision
-	// need a vector to use this info to choose between the two
-	// tables
-	int * r_from_tile = new int[num_ports];
-	int * r_to_tile = new int[num_ports];
+	    //LOG << "Reservation: buffer_from_tile not empty on port " << i << endl;
 
-	// 1st phase: Reservation
-	for (int j = 0; j < num_ports; j++) 
-	{
-	    int i = (start_from_port + j) % (num_ports);
+	    Flit flit = buffer_from_tile[i].Front();
+	    power.bufferFromTileFront();
+	    r_from_tile[i] = route(flit);
 
-	    if (!buffer_from_tile[i].IsEmpty()) 
+	    if (flit.flit_type == FLIT_TYPE_HEAD) 
 	    {
-		//LOG << "Reservation: buffer_from_tile not empty on port " << i << endl;
+		assert(r_from_tile[i]==DIRECTION_WIRELESS);
+		int channel = selectChannel(local_id,tile2Hub(flit.dst_id));
 
-		Flit flit = buffer_from_tile[i].Front();
-		power.bufferFromTileFront();
-		r_from_tile[i] = route(flit);
+		assert(channel!=NOT_VALID && "hubs are connected by any channel");
 
-		if (flit.flit_type == FLIT_TYPE_HEAD) 
+		if (wireless_reservation_table.isAvailable(channel)) 
 		{
-		    assert(r_from_tile[i]==DIRECTION_WIRELESS);
-		    int channel = selectChannel(local_id,tile2Hub(flit.dst_id));
-
-		    assert(channel!=NOT_VALID && "hubs are connected by any channel");
-
-		    if (wireless_reservation_table.isAvailable(channel)) 
-		    {
-			wireless_reservation_table.reserve(i, channel);
-		    }
-		    else
-		    {
-			//LOG << "Reservation:  wireless channel " << channel << " not available ..." << endl;
-		    }
-
-		}
-	    }
-
-	}
-
-	start_from_port++;
-
-	// 2nd phase: Forwarding
-	for (int i = 0; i < num_ports; i++) 
-	{
-	    if (!buffer_from_tile[i].IsEmpty()) 
-	    {     
-		Flit flit = buffer_from_tile[i].Front();
-		// powerFront already accounted in 1st phase
-
-		assert(r_from_tile[i] == DIRECTION_WIRELESS);
-
-		int channel = wireless_reservation_table.getOutputPort(i);
-
-		if (channel != NOT_RESERVED) 
-		{
-		    if (!(init[channel]->buffer_tx.IsFull()) )
-		    {
-			LOG << "Flit moved from buffer_from_tile["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
-			buffer_from_tile[i].Pop();
-			power.bufferFromTilePop();
-			init[channel]->buffer_tx.Push(flit);
-			power.antennaBufferPush();
-			if (flit.flit_type == FLIT_TYPE_TAIL) wireless_reservation_table.release(channel);
-		    }
-
-
+		    wireless_reservation_table.reserve(i, channel);
 		}
 		else
 		{
-		    //LOG << "Forwarding: No channel reserved for port direction " << i  << endl;
+		    //LOG << "Reservation:  wireless channel " << channel << " not available ..." << endl;
 		}
+
 	    }
+	}
+
+    }
+
+    start_from_port++;
+
+    // 2nd phase: Forwarding
+    for (int i = 0; i < num_ports; i++) 
+    {
+	if (!buffer_from_tile[i].IsEmpty()) 
+	{     
+	    Flit flit = buffer_from_tile[i].Front();
+	    // powerFront already accounted in 1st phase
+
+	    assert(r_from_tile[i] == DIRECTION_WIRELESS);
+
+	    int channel = wireless_reservation_table.getOutputPort(i);
+
+	    if (channel != NOT_RESERVED) 
+	    {
+		if (!(init[channel]->buffer_tx.IsFull()) )
+		{
+		    LOG << "Flit moved from buffer_from_tile["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
+		    buffer_from_tile[i].Pop();
+		    power.bufferFromTilePop();
+		    init[channel]->buffer_tx.Push(flit);
+		    power.antennaBufferPush();
+		    if (flit.flit_type == FLIT_TYPE_TAIL) wireless_reservation_table.release(channel);
+		}
 
 
-	    if (!buffer_to_tile[i].IsEmpty()) 
-	    {     
-		Flit flit = buffer_to_tile[i].Front();
-		// powerFront already accounted in 1st phase
+	    }
+	    else
+	    {
+		//LOG << "Forwarding: No channel reserved for port direction " << i  << endl;
+	    }
+	}
 
-		assert(r_to_tile[i] != DIRECTION_WIRELESS);
+    }// for all the ports
 
+    for (int i = 0; i < num_ports; i++) 
+    {
+	/*
+	if (!buffer_from_tile[i].deadlockFree())
+	{
+	    LOG << " deadlock on buffer " << i << endl;
+	    buffer_from_tile[i].Print("deadlock");
+	}
+	*/
 
-		flit_tx[i].write(flit);
-		power.r2hLink();
-		current_level_tx[i] = 1 - current_level_tx[i];
-		req_tx[i].write(current_level_tx[i]);
-		LOG << "Flit moved from buffer_to_tile[" << i <<"] to signal flit_tx["<<i<<"] " << endl;
-		buffer_to_tile[i].Pop();
-		power.bufferToTilePop();
-	    } //if buffer not empty
-	}// for all the ports
-    } 
+	if ((req_rx[i]->read() == 1 - current_level_rx[i]) && !buffer_from_tile[i].IsFull()) 
+	{
+	    //LOG << "Reading flit on port " << i << endl;
+	    Flit received_flit = flit_rx[i]->read();
+
+	    buffer_from_tile[i].Push(received_flit);
+	    power.bufferFromTilePush();
+
+	    current_level_rx[i] = 1 - current_level_rx[i];
+
+	}
+	ack_rx[i]->write(current_level_rx[i]);
+    }
 }
-
-
-
