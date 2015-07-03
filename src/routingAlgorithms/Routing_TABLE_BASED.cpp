@@ -1,4 +1,4 @@
-#include "routing_TABLE_BASED.h"
+#include "Routing_TABLE_BASED.h"
 
 RoutingAlgorithmsRegister Routing_TABLE_BASED::routingAlgorithmsRegister("TABLE_BASED", getInstance());
 

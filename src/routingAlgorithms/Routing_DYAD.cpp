@@ -1,4 +1,4 @@
-#include "routing_DYAD.h"
+#include "Routing_DYAD.h"
 
 RoutingAlgorithmsRegister Routing_DYAD::routingAlgorithmsRegister("DYAD", getInstance());
 

@@ -1,4 +1,4 @@
-#include "selection_BUFFER_LEVEL.h"
+#include "Selection_BUFFER_LEVEL.h"
 
 SelectionStrategiesRegister Selection_BUFFER_LEVEL::selectionStrategiesRegister("BUFFER_LEVEL", getInstance());
 

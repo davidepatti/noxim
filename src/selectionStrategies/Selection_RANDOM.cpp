@@ -1,4 +1,4 @@
-#include "selection_RANDOM.h"
+#include "Selection_RANDOM.h"
 
 SelectionStrategiesRegister Selection_RANDOM::selectionStrategiesRegister("RANDOM", getInstance());
 
