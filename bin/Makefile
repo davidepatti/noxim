@@ -2,7 +2,7 @@
 
 SYSTEMC     := /usr/local/systemc-2.3.1
 TARGET_ARCH := linux64
-YAML        := /usr/lib
+YAML        := /usr
 
 #SYSTEMC     := systemc-2.3.1
 #TARGET_ARCH := macosx64
