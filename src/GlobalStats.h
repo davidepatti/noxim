@@ -79,6 +79,8 @@ class GlobalStats {
 
     void showPowerBreakDown(std::ostream & out);
 
+    void showWirxStats(std::ostream & out);
+
 
 
 #ifdef TESTING

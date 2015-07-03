@@ -294,6 +294,7 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 	out << "];" << endl;
 
 	showPowerBreakDown(out);
+	showWirxStats(out);
     }
 
     out << "% Total received packets: " << getReceivedPackets() << endl;
@@ -321,6 +322,52 @@ void GlobalStats::updatePowerBreakDown(map<string,double> &dst,const map<string,
     }
 }
 
+void GlobalStats::showWirxStats(std::ostream & out)
+{
+    out << "wirxsleep_stats = [" << endl;
+    out << "%\tTotal Sleep Cycles (T), antenna BufferRX sleep cycles (ARX), BufferToTile sleep cycles (TTRX) " << endl;
+    out << "%\tHUB\tT\tARX\tTTRX\t" << endl;
+
+    std::streamsize p = out.precision();
+
+    int total_cycles = sc_time_stamp().to_double() / GlobalParams::clock_period_ps-GlobalParams::reset_time;
+
+    for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();
+            it != GlobalParams::hub_configuration.end();
+            ++it)
+    {
+
+	out.precision(2);
+
+
+	
+	int hub_id = it->first;
+
+	map<int,Hub*>::const_iterator i = noc->hub.find(hub_id);
+	Hub * h = i->second;
+
+	out << "\t" << hub_id << "\t" << std::fixed << (double)h->total_sleep_cycles/total_cycles << "\t";
+
+	int s = 0;
+	for (map<int,int>::iterator i = h->buffer_rx_sleep_cycles.begin();
+		i!=h->buffer_rx_sleep_cycles.end();i++)
+	    s+=i->second;
+	out << (double)s/h->buffer_rx_sleep_cycles.size()/h->total_sleep_cycles << "\t";
+
+	s = 0;
+	for (map<int,int>::iterator i = h->buffer_to_tile_sleep_cycles.begin();
+		i!=h->buffer_to_tile_sleep_cycles.end();i++)
+	    s+=i->second;
+	out << (double)s/h->buffer_to_tile_sleep_cycles.size()/h->total_sleep_cycles << endl;
+    }
+
+    out << "];" << endl;
+
+    out.unsetf(std::ios::fixed);
+
+    out.precision(p);
+
+}
 
 void GlobalStats::showPowerBreakDown(std::ostream & out)
 {

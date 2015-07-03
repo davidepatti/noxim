@@ -194,15 +194,15 @@ void Power::configureHub(int link_width,
     // RX snooping
     wireless_snooping = GlobalParams::power_configuration.hubPowerConfig.rx_snooping;
 
+    // RX leakage
+    transceiver_rx_pwr_s = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.first);
     // TX leakage
-    transceiver_tx_pwr_s = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.first);
-    // RX TX leakage
-    transceiver_rx_pwr_s = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.second);
+    transceiver_tx_pwr_s = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_leakage.second);
    
-    // TX biasing
-    transceiver_tx_pwr_biasing = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.first);
     // RX biasing
-    transceiver_rx_pwr_biasing = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.second);
+    transceiver_rx_pwr_biasing = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.first);
+    // TX biasing
+    transceiver_tx_pwr_biasing = W2J(GlobalParams::power_configuration.hubPowerConfig.transceiver_biasing.second);
     // Link 
     // Hub has only Router/Hub link connections
     double length_r2h = GlobalParams::r2h_link_length;

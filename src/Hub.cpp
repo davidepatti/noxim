@@ -24,6 +24,7 @@ int Hub::route(Flit& f)
 
 void Hub::wirxPowerManager()
 {
+    /*
     //LOG << " buffer_to_tile STATUS: " << endl;
     for (int i = 0; i < num_ports; i++) 
     {
@@ -31,9 +32,12 @@ void Hub::wirxPowerManager()
 
     }
     //cout << endl;
+    */
 
     if (power.isSleeping())
     {
+	total_sleep_cycles++;
+
 	bool account_buffer_to_tile_leakage = false;
 	// check if there is at least one not empty antenna RX buffer
 	for (int i=0;i<rxChannels.size();i++)
@@ -45,6 +49,8 @@ void Hub::wirxPowerManager()
 		account_buffer_to_tile_leakage = true;
 		power.leakageAntennaBuffer();
 	    }
+	    else
+		buffer_rx_sleep_cycles[ch_id]++;
 	}
 
 
@@ -52,6 +58,8 @@ void Hub::wirxPowerManager()
 	{
 	    if (account_buffer_to_tile_leakage || !buffer_to_tile[i].IsEmpty())
 		power.leakageBufferToTile();
+	    else
+		buffer_to_tile_sleep_cycles[i]++;
 	}
 	
     }
@@ -66,6 +74,8 @@ void Hub::wirxPowerManager()
 	{
 		power.leakageBufferToTile();
 	}
+	power.leakageTransceiverRx();
+	power.biasingRx();
     }
 
 }

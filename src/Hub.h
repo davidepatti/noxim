@@ -82,9 +82,14 @@ SC_MODULE(Hub)
 
     Power power;
 
+    int total_sleep_cycles;
+    map<int,int> buffer_rx_sleep_cycles;
+    map<int,int> buffer_to_tile_sleep_cycles;
+
     // Constructor
 
     Hub(sc_module_name nm, int id, TokenRing * tr): sc_module(nm) {
+
 	if (GlobalParams::use_winoc)
 	{
 	    SC_METHOD(tileToAntenna);
@@ -152,6 +157,8 @@ SC_MODULE(Hub)
         }
 
         start_from_port = 0;
+
+	total_sleep_cycles = 0;
     }
 
 
