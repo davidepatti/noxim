@@ -1,9 +1,12 @@
-##### SYSTEMC CONFIGURATION #####
+##### LIBRARIES CONFIGURATION #####
 
-SYSTEMC     := /usr/local/systemc-2.3.1 # systemc-2.3.1
-TARGET_ARCH := linux64 # macosx64
-YAML        := /usr/lib # /opt/local
+SYSTEMC     := /usr/local/systemc-2.3.1
+TARGET_ARCH := linux64
+YAML        := /usr/lib
 
+#SYSTEMC     := systemc-2.3.1
+#TARGET_ARCH := macosx64
+#YAML        := /opt/local
 
 ##### DIRECTORIES #####
 
