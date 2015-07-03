@@ -24,13 +24,13 @@ int Hub::route(Flit& f)
 
 void Hub::wirxPowerManager()
 {
-    LOG << " buffer_to_tile STATUS: " << endl;
+    //LOG << " buffer_to_tile STATUS: " << endl;
     for (int i = 0; i < num_ports; i++) 
     {
-	if (!buffer_to_tile[i].IsEmpty()) cout << "*"; else cout << ".";
+	//if (!buffer_to_tile[i].IsEmpty()) cout << "*"; else cout << ".";
 
     }
-    cout << endl;
+    //cout << endl;
 
     if (power.isSleeping())
     {
@@ -57,6 +57,8 @@ void Hub::wirxPowerManager()
     }
     else
     {
+	power.wirelessSnooping();
+	
 	for (int i=0;i<rxChannels.size();i++)
 	    power.leakageAntennaBuffer();
 
@@ -95,8 +97,6 @@ void Hub::perCycleUpdate()
 
 void Hub::updateRxPower()
 {
-    if (!power.isSleeping())
-	power.wirelessSnooping();
 
     if (GlobalParams::use_wirxsleep)
 	wirxPowerManager();
