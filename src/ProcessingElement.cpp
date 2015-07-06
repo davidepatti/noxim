@@ -167,7 +167,7 @@ Packet ProcessingElement::trafficLocal()
 
     vector<int> dst_set;
 
-    int max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) - 1;
+    int max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y);
 
     for (int i=0;i<max_id;i++)
     {
