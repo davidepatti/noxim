@@ -18,11 +18,16 @@ What's New ?
 
 Quick Start
 -----------
-Get the latest master version:
+
+If you are working on Ubuntu, you can install noxim and all the dependencies with the following command:
+
+    bash <(wget -qO- --no-check-certificate https://raw.githubusercontent.com/davidepatti/noxim/master/other/setup/ubuntu.sh)
+
+Or, to get just the latest master sources, you can run:
 
     git clone https://github.com/davidepatti/noxim.git
 
-For further informations please refer to the following files contained in the "doc" directory:
+For further information please refer to the following files contained in the "doc" directory:
 
   * INSTALL.txt: instructions to install the tool
   * MANUAL.txt: explanation of the arguments that can be passed to the simulator
