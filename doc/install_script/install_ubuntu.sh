@@ -1,14 +1,14 @@
 #!/bin/bash
 sudo apt-get update
-sudo apt-get install build-essential linux-headers-$(uname -r) wget tar 
-sudo apt-get install git || \
-    sudo apt-get install python-software-properties && \
+sudo apt-get -y install build-essential linux-headers-$(uname -r) wget tar 
+sudo apt-get -y install git || \
+    sudo apt-get -y install python-software-properties && \
     sudo add-apt-repository ppa:git-core/ppa && \
     sudo apt-get update && \
-    sudo apt-get install git
-sudo apt-get install libboost-dev
-sudo apt-get install libyaml-cpp-dev || \
-    sudo apt-get install cmake && \
+    sudo apt-get -y install git
+sudo apt-get -y install libboost-dev
+sudo apt-get -y install libyaml-cpp-dev || \
+    sudo apt-get -y install cmake && \
     git clone https://github.com/jbeder/yaml-cpp && \
     cd yaml-cpp/ && \
     mkdir lib && \
