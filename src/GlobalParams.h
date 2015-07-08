@@ -73,10 +73,8 @@ using namespace std;
 #define TOKEN_MAX_HOLD 	1
 #define TOKEN_PACKET 	2
 
-// TODO check the list of attributes for ChannelConfig 
-// TODO TURI: perche' si usano float ?, mettere double
 typedef struct {
-    pair<int, int> ber;
+    pair<double, double> ber;
     int dataRate;
     vector<string> macPolicy;
 } ChannelConfig;
@@ -129,8 +127,8 @@ struct GlobalParams {
     static char trace_filename[128];
     static int mesh_dim_x;
     static int mesh_dim_y;
-    static float r2r_link_length;
-    static float r2h_link_length;
+    static double r2r_link_length;
+    static double r2h_link_length;
     static int buffer_depth;
     static int flit_size;
     static int min_packet_size;
@@ -138,9 +136,9 @@ struct GlobalParams {
     static char routing_algorithm[128];
     static char routing_table_filename[128];
     static string selection_strategy;
-    static float packet_injection_rate;
-    static float probability_of_retransmission;
-    static float locality;
+    static double packet_injection_rate;
+    static double probability_of_retransmission;
+    static double locality;
     static int traffic_distribution;
     static char traffic_table_filename[128];
     static char config_filename[128];
@@ -151,7 +149,7 @@ struct GlobalParams {
     static int rnd_generator_seed;
     static bool detailed;
     static vector <pair <int, double> > hotspots;
-    static float dyad_threshold;
+    static double dyad_threshold;
     static unsigned int max_volume_to_be_drained;
     static bool show_buffer_stats;
     static bool use_winoc;

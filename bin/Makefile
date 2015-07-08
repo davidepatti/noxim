@@ -1,15 +1,16 @@
-##### SYSTEMC CONFIGURATION #####
+##### LIBRARIES CONFIGURATION #####
 
-SYSTEMC     := systemc-2.3.1
-TARGET_ARCH := macosx64
-YAML		:= /opt/local
+SYSTEMC := /usr/local/systemc-2.3.1
+YAML    := /usr
 
 
 ##### DIRECTORIES #####
 
-SRCDIR := ../src
+SYSTEMC_LIBS := $(wildcard $(SYSTEMC)/lib-*)
+
+SRCDIR  := ../src
 SUBDIRS := $(filter %/,$(wildcard $(SRCDIR)/*/))
-OBJDIR := ./build
+OBJDIR  := ./build
 
 SRCS := $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(addsuffix *.cpp,$(SUBDIRS)))
 OBJS := $(subst $(SRCDIR),$(OBJDIR),$(SRCS:.cpp=.o))
@@ -26,7 +27,7 @@ OTHER    := -Wall# -Wno-deprecated
 CXXFLAGS := $(OPT) $(OTHER) $(DEBUG)
 
 INCDIR := -I$(SRCDIR) -isystem $(SYSTEMC)/include -I$(YAML)/include
-LIBDIR := -L$(SRCDIR) -L$(SYSTEMC)/lib-$(TARGET_ARCH) -L$(YAML)/lib
+LIBDIR := -L$(SRCDIR) -L$(SYSTEMC_LIBS) -L$(YAML)/lib
 
 LIBS := -lsystemc -lm -lyaml-cpp 
 

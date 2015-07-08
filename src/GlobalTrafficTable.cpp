@@ -32,11 +32,11 @@ bool GlobalTrafficTable::load(const char *fname)
     if (line[0] != '\0') {
       if (line[0] != '%') {
 	int src, dst;	// Mandatory
-	float pir, por;
+	double pir, por;
 	int t_on, t_off, t_period;
 
 	int params =
-	  sscanf(line, "%d %d %f %f %d %d %d", &src, &dst, &pir,
+	  sscanf(line, "%d %d %lf %lf %d %d %d", &src, &dst, &pir,
 		 &por, &t_on, &t_off, &t_period);
 	if (params >= 2) {
 	  // Create a communication from the parameters read on the line
