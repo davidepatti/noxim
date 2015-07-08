@@ -62,7 +62,7 @@ namespace YAML {
         }
 
         static bool decode(const Node& node, ChannelConfig& channelConfig) {
-            channelConfig.ber = node["ber"].as<pair<int, int> >(GlobalParams::default_channel_configuration.ber);
+            channelConfig.ber = node["ber"].as<pair<double, double> >(GlobalParams::default_channel_configuration.ber);
             channelConfig.dataRate = node["dataRate"].as<int>(GlobalParams::default_channel_configuration.dataRate);
             channelConfig.macPolicy = node["mac_policy"].as<vector<string> >(GlobalParams::default_channel_configuration.macPolicy);
             return true;
