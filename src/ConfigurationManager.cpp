@@ -22,8 +22,8 @@ void loadConfiguration() {
     strcpy(GlobalParams::trace_filename, config["trace_filename"].as<string>().c_str());
     GlobalParams::mesh_dim_x = config["mesh_dim_x"].as<int>();
     GlobalParams::mesh_dim_y = config["mesh_dim_y"].as<int>();
-    GlobalParams::r2r_link_length = config["r2r_link_length"].as<float>();
-    GlobalParams::r2h_link_length = config["r2h_link_length"].as<float>();
+    GlobalParams::r2r_link_length = config["r2r_link_length"].as<double>();
+    GlobalParams::r2h_link_length = config["r2h_link_length"].as<double>();
     GlobalParams::buffer_depth = config["buffer_depth"].as<int>();
     GlobalParams::flit_size = config["flit_size"].as<int>();
     GlobalParams::min_packet_size = config["min_packet_size"].as<int>();
@@ -31,8 +31,8 @@ void loadConfiguration() {
     strcpy(GlobalParams::routing_algorithm, config["routing_algorithm"].as<string>().c_str());
     strcpy(GlobalParams::routing_table_filename, config["routing_table_filename"].as<string>().c_str()); 
     GlobalParams::selection_strategy = config["selection_strategy"].as<string>();
-    GlobalParams::packet_injection_rate = config["packet_injection_rate"].as<float>();
-    GlobalParams::probability_of_retransmission = config["probability_of_retransmission"].as<float>();
+    GlobalParams::packet_injection_rate = config["packet_injection_rate"].as<double>();
+    GlobalParams::probability_of_retransmission = config["probability_of_retransmission"].as<double>();
     GlobalParams::traffic_distribution = config["traffic_distribution"].as<int>();
     strcpy(GlobalParams::traffic_table_filename, config["traffic_table_filename"].as<string>().c_str());
     GlobalParams::clock_period_ps = config["clock_period_ps"].as<int>();
@@ -41,7 +41,7 @@ void loadConfiguration() {
     GlobalParams::stats_warm_up_time = config["stats_warm_up_time"].as<int>();
     GlobalParams::rnd_generator_seed = time(NULL);
     GlobalParams::detailed = config["detailed"].as<bool>();
-    GlobalParams::dyad_threshold = config["dyad_threshold"].as<float>();
+    GlobalParams::dyad_threshold = config["dyad_threshold"].as<double>();
     GlobalParams::max_volume_to_be_drained = config["max_volume_to_be_drained"].as<unsigned int>();
     //GlobalParams::hotspots;
     GlobalParams::show_buffer_stats = config["show_buffer_stats"].as<bool>();
@@ -311,14 +311,14 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		    GlobalParams::probability_of_retransmission =
 			GlobalParams::packet_injection_rate;
 		else if (!strcmp(distribution, "burst")) {
-		    float burstness = atof(arg_vet[++i]);
+		    double burstness = atof(arg_vet[++i]);
 		    GlobalParams::probability_of_retransmission =
 			GlobalParams::packet_injection_rate / (1 -
 								    burstness);
 		} else if (!strcmp(distribution, "pareto")) {
-		    float Aon = atof(arg_vet[++i]);
-		    float Aoff = atof(arg_vet[++i]);
-		    float r = atof(arg_vet[++i]);
+		    double Aon = atof(arg_vet[++i]);
+		    double Aoff = atof(arg_vet[++i]);
+		    double r = atof(arg_vet[++i]);
 		    GlobalParams::probability_of_retransmission =
 			GlobalParams::packet_injection_rate *
 			pow((1 - r), (1 / Aoff - 1 / Aon));
