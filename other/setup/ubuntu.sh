@@ -1,4 +1,6 @@
 #!/bin/bash
+export GIT_SSL_NO_VERIFY=1
+
 sudo apt-get update
 sudo apt-get -y install build-essential linux-headers-$(uname -r) wget tar 
 sudo apt-get -y install git || \
