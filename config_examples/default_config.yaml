@@ -94,11 +94,11 @@ Channels:
 
 	# who has the token, release only after a fixed number of
 	# cycles, even no transmission is occurring
-        #[TOKEN_HOLD_CYCLES, num_hold_cycles]
+        #[TOKEN_HOLD, num_hold_cycles]
 
-	#w who has the token, holds the packet until needed for
+	# who has the token, holds the packet until needed for
 	# transmissions, until a max number of cycles is reached
-        #[TOKEN_MAX_HOLD_CYCLES, max_hold_cycles]
+        #[TOKEN_MAX_HOLD, max_hold_cycles]
 
         mac_policy: [TOKEN_PACKET]
 

@@ -146,7 +146,7 @@ SC_MODULE(Hub)
             token_ring->attachHub(txChannels[i],local_id, current_token_holder[txChannels[i]],current_token_expiration[txChannels[i]],flag[txChannels[i]]);
 	    // wirxsleep currently assumes TOKEN_PACKET mac policy
 	    if (GlobalParams::use_wirxsleep)
-		assert(token_ring->getPolicy(txChannels[i])==TOKEN_PACKET);
+		assert(token_ring->getPolicy(txChannels[i]).first==TOKEN_PACKET);
         }
 
         for (unsigned int i = 0; i < rxChannels.size(); i++) {

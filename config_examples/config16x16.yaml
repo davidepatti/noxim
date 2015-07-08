@@ -83,8 +83,8 @@ Channels:
         dataRate: 16
         ber: [0, 0]
         #[TOKEN_PACKET]
-        #[TOKEN_HOLD_CYCLES, num_hold_cycles]
-        #[TOKEN_MAX_HOLD_CYCLES, max_hold_cycles]
+        #[TOKEN_HOLD, num_hold_cycles]
+        #[TOKEN_MAX_HOLD, max_hold_cycles]
         mac_policy: [TOKEN_PACKET]
 
     0:

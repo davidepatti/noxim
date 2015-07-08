@@ -69,9 +69,9 @@ using namespace std;
 #define RELEASE_CHANNEL 1
 #define HOLD_CHANNEL 	2
 
-#define TOKEN_HOLD 	0
-#define TOKEN_MAX_HOLD 	1
-#define TOKEN_PACKET 	2
+#define TOKEN_HOLD 	"TOKEN_HOLD"
+#define TOKEN_MAX_HOLD 	"TOKEN_MAX_HOLD"
+#define TOKEN_PACKET 	"TOKEN_PACKET"
 
 typedef struct {
     pair<double, double> ber;
