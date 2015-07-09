@@ -106,11 +106,11 @@ use_winoc: false
 use_wirxsleep: false
 
 # Verbosity level:
-#   VERBOSE_OFF    0
-#   VERBOSE_LOW    1
-#   VERBOSE_MEDIUM 2
-#   VERBOSE_HIGH   3
-verbose_mode: 0
+#   VERBOSE_OFF
+#   VERBOSE_LOW
+#   VERBOSE_MEDIUM
+#   VERBOSE_HIGH
+verbose_mode: VERBOSE_OFF
 
 # Trace
 trace_mode: false
@@ -122,15 +122,15 @@ packet_injection_rate: 0.01
 probability_of_retransmission: 0.01
 
 # Traffic distribution:
-#   TRAFFIC_RANDOM         0
-#   TRAFFIC_TRANSPOSE1     1
-#   TRAFFIC_TRANSPOSE2     2
-#   TRAFFIC_HOTSPOT        3
-#   TRAFFIC_TABLE_BASED    4
-#   TRAFFIC_BIT_REVERSAL   5
-#   TRAFFIC_SHUFFLE        6
-#   TRAFFIC_BUTTERFLY      7
-traffic_distribution: 0
+#   TRAFFIC_RANDOM
+#   TRAFFIC_TRANSPOSE1
+#   TRAFFIC_TRANSPOSE2
+#   TRAFFIC_HOTSPOT
+#   TRAFFIC_TABLE_BASED
+#   TRAFFIC_BIT_REVERSAL
+#   TRAFFIC_SHUFFLE
+#   TRAFFIC_BUTTERFLY
+traffic_distribution: TRAFFIC_RANDOM
 traffic_table_filename: "t.txt"
 
 

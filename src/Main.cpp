@@ -44,7 +44,7 @@ int sc_main(int arg_num, char *arg_vet[])
     // Trace signals
     sc_trace_file *tf = NULL;
     if (GlobalParams::trace_mode) {
-	tf = sc_create_vcd_trace_file(GlobalParams::trace_filename);
+	tf = sc_create_vcd_trace_file(GlobalParams::trace_filename.c_str());
 	sc_trace(tf, reset, "reset");
 	sc_trace(tf, clock, "clock");
 

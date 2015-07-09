@@ -17,9 +17,9 @@ void loadConfiguration() {
     YAML::Node config = YAML::LoadFile(GlobalParams::config_filename);
 
     // Initialize global configuration parameters (can be overridden with command-line arguments)
-    GlobalParams::verbose_mode = config["verbose_mode"].as<int>();
+    GlobalParams::verbose_mode = config["verbose_mode"].as<string>();
     GlobalParams::trace_mode = config["trace_mode"].as<bool>();
-    strcpy(GlobalParams::trace_filename, config["trace_filename"].as<string>().c_str());
+    GlobalParams::trace_filename = config["trace_filename"].as<string>();
     GlobalParams::mesh_dim_x = config["mesh_dim_x"].as<int>();
     GlobalParams::mesh_dim_y = config["mesh_dim_y"].as<int>();
     GlobalParams::r2r_link_length = config["r2r_link_length"].as<double>();
@@ -28,13 +28,13 @@ void loadConfiguration() {
     GlobalParams::flit_size = config["flit_size"].as<int>();
     GlobalParams::min_packet_size = config["min_packet_size"].as<int>();
     GlobalParams::max_packet_size = config["max_packet_size"].as<int>();
-    strcpy(GlobalParams::routing_algorithm, config["routing_algorithm"].as<string>().c_str());
-    strcpy(GlobalParams::routing_table_filename, config["routing_table_filename"].as<string>().c_str()); 
+    GlobalParams::routing_algorithm = config["routing_algorithm"].as<string>();
+    GlobalParams::routing_table_filename = config["routing_table_filename"].as<string>(); 
     GlobalParams::selection_strategy = config["selection_strategy"].as<string>();
     GlobalParams::packet_injection_rate = config["packet_injection_rate"].as<double>();
     GlobalParams::probability_of_retransmission = config["probability_of_retransmission"].as<double>();
-    GlobalParams::traffic_distribution = config["traffic_distribution"].as<int>();
-    strcpy(GlobalParams::traffic_table_filename, config["traffic_table_filename"].as<string>().c_str());
+    GlobalParams::traffic_distribution = config["traffic_distribution"].as<string>();
+    GlobalParams::traffic_table_filename = config["traffic_table_filename"].as<string>();
     GlobalParams::clock_period_ps = config["clock_period_ps"].as<int>();
     GlobalParams::simulation_time = config["simulation_time"].as<int>();
     GlobalParams::reset_time = config["reset_time"].as<int>();
@@ -268,7 +268,7 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::verbose_mode = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-trace")) {
 		GlobalParams::trace_mode = true;
-		strcpy(GlobalParams::trace_filename, arg_vet[++i]);
+		GlobalParams::trace_filename = arg_vet[++i];
 	    } else if (!strcmp(arg_vet[i], "-dimx"))
 		GlobalParams::mesh_dim_x = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-dimy"))
@@ -283,26 +283,15 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::min_packet_size = atoi(arg_vet[++i]);
 		GlobalParams::max_packet_size = atoi(arg_vet[++i]);
 	    } else if (!strcmp(arg_vet[i], "-routing")) {
-		char *routing = arg_vet[++i];
-		strcpy(GlobalParams::routing_algorithm, routing);
-		if (!strcmp(routing, ROUTING_DYAD))
+		GlobalParams::routing_algorithm = arg_vet[++i];
+		if (GlobalParams::routing_algorithm == ROUTING_DYAD)
 		    GlobalParams::dyad_threshold = atof(arg_vet[++i]);
-		else if (!strcmp(routing, ROUTING_TABLE_BASED)) {
-		    strcpy(GlobalParams::routing_table_filename, arg_vet[++i]);
+		else if (GlobalParams::routing_algorithm == ROUTING_TABLE_BASED) {
+		    GlobalParams::routing_table_filename = arg_vet[++i];
 		    GlobalParams::packet_injection_rate = 0;
 		} 
 	    } else if (!strcmp(arg_vet[i], "-sel")) {
-		char *selection = arg_vet[++i];
-		if (!strcmp(selection, "RANDOM"))
-		    GlobalParams::selection_strategy = "RANDOM";
-		else if (!strcmp(selection, "BUFFER_LEVEL"))
-		    GlobalParams::selection_strategy =
-			"BUFFER_LEVEL";
-		else if (!strcmp(selection, "NOP"))
-		    GlobalParams::selection_strategy = "NOP";
-		else
-		    GlobalParams::selection_strategy =
-			"INVALID_SELECTION";
+		    GlobalParams::selection_strategy = arg_vet[++i];
 	    } else if (!strcmp(arg_vet[i], "-pir")) {
 		GlobalParams::packet_injection_rate =
 		    atof(arg_vet[++i]);
@@ -348,8 +337,7 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		else if (!strcmp(traffic, "table")) {
 		    GlobalParams::traffic_distribution =
 			TRAFFIC_TABLE_BASED;
-		    strcpy(GlobalParams::traffic_table_filename,
-			   arg_vet[++i]);
+		    GlobalParams::traffic_table_filename = arg_vet[++i];
 		} else if (!strcmp(traffic, "local")) {
 		    GlobalParams::traffic_distribution = TRAFFIC_LOCAL;
 		    GlobalParams::locality=atof(arg_vet[++i]);
@@ -389,7 +377,7 @@ void configure(int arg_num, char *arg_vet[]) {
 
     for (int i = 1; i < arg_num; i++) {
 	    if (!strcmp(arg_vet[i], "-config")) {
-            strcpy(GlobalParams::config_filename, arg_vet[++i]);
+            GlobalParams::config_filename = arg_vet[++i];
             config_found = true;
             break;
         }
@@ -399,7 +387,7 @@ void configure(int arg_num, char *arg_vet[]) {
     {
         std::ifstream infile(CONFIG_FILENAME);
         if (infile.good())
-            strcpy(GlobalParams::config_filename, CONFIG_FILENAME);
+            GlobalParams::config_filename = CONFIG_FILENAME;
         else
         {
             cerr << "No configuration file found!" << endl;

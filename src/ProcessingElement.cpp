@@ -99,38 +99,22 @@ bool ProcessingElement::canShot(Packet & packet)
 
 	shot = (((double) rand()) / RAND_MAX < threshold);
 	if (shot) {
-	    switch (GlobalParams::traffic_distribution) {
-	    case TRAFFIC_RANDOM:
-		packet = trafficRandom();
-		break;
-
-	    case TRAFFIC_TRANSPOSE1:
-		packet = trafficTranspose1();
-		break;
-
-	    case TRAFFIC_TRANSPOSE2:
-		packet = trafficTranspose2();
-		break;
-
-	    case TRAFFIC_BIT_REVERSAL:
-		packet = trafficBitReversal();
-		break;
-
-	    case TRAFFIC_SHUFFLE:
-		packet = trafficShuffle();
-		break;
-
-	    case TRAFFIC_BUTTERFLY:
-		packet = trafficButterfly();
-		break;
-
-	    case TRAFFIC_LOCAL:
-		packet = trafficLocal();
-		break;
-
-	    default:
-		assert(false);
-	    }
+	    if (GlobalParams::traffic_distribution == TRAFFIC_RANDOM)
+		    packet = trafficRandom();
+        else if (GlobalParams::traffic_distribution == TRAFFIC_TRANSPOSE1)
+		    packet = trafficTranspose1();
+        else if (GlobalParams::traffic_distribution == TRAFFIC_TRANSPOSE2)
+    		packet = trafficTranspose2();
+        else if (GlobalParams::traffic_distribution == TRAFFIC_BIT_REVERSAL)
+		    packet = trafficBitReversal();
+        else if (GlobalParams::traffic_distribution == TRAFFIC_SHUFFLE)
+		    packet = trafficShuffle();
+        else if (GlobalParams::traffic_distribution == TRAFFIC_BUTTERFLY)
+		    packet = trafficButterfly();
+        else if (GlobalParams::traffic_distribution == TRAFFIC_LOCAL)
+		    packet = trafficLocal();
+        else
+		    assert(false);
 	}
     } else {			// Table based communication traffic
 	if (never_transmit)
