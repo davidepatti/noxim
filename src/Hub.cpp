@@ -316,21 +316,16 @@ void Hub::tileToAntenna()
 	{
 	    int channel = txChannels[i];
 
-	    switch (token_ring->getPolicy(channel))
-	    {
-		case TOKEN_PACKET:
+        string macPolicy = token_ring->getPolicy(channel).first;
+
+	    if (macPolicy == TOKEN_PACKET)
 		    txRadioProcessTokenPacket(channel);
-		    break;
-		case TOKEN_HOLD:
+	    else if (macPolicy == TOKEN_HOLD)
 		    txRadioProcessTokenHold(channel);
-		    break;
-		case TOKEN_MAX_HOLD:
+		else if (macPolicy == TOKEN_MAX_HOLD)
 		    txRadioProcessTokenMaxHold(channel);
-		    break;
-		default: assert(false);
-	    }
-
-
+		else
+            assert(false);
 	}
 
     }

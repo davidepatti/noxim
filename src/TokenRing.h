@@ -14,6 +14,7 @@
 #include <systemc.h>
 
 #include "Utils.h"
+#include <stdlib.h>
 
 using namespace std;
 
@@ -49,14 +50,15 @@ SC_MODULE(TokenRing)
 	    sensitive << reset;
 	    sensitive << clock.pos();
 	}
-	// TODO TURI: policy hardwired
-	//token_policy[0] = TOKEN_MAX_HOLD;
-	//token_policy[0] = TOKEN_HOLD;
-	token_policy[0] = TOKEN_PACKET;
 
+        for (map<int, ChannelConfig>::iterator i = GlobalParams::channel_configuration.begin(); 
+                i != GlobalParams::channel_configuration.end();
+                ++i) {
+            token_policy[i->first] = make_pair(i->second.macPolicy[0], i->second.macPolicy); 
+        }
     }
 
-    int getPolicy(int channel) { return token_policy[channel];}
+    pair<string, vector<string> > getPolicy(int channel) { return token_policy[channel];}
 
     private:
 
@@ -72,7 +74,7 @@ SC_MODULE(TokenRing)
     
     map<int,int> token_hold_count;
 
-    map<int,int> token_policy;
+    map<int,pair<string, vector<string> > >token_policy;
 
 };
 

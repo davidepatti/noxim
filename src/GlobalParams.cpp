@@ -10,9 +10,9 @@
 
 #include "GlobalParams.h"
 
-int GlobalParams::verbose_mode;
+string GlobalParams::verbose_mode;
 int GlobalParams::trace_mode;
-char GlobalParams::trace_filename[128];
+string GlobalParams::trace_filename;
 int GlobalParams::mesh_dim_x;
 int GlobalParams::mesh_dim_y;
 double GlobalParams::r2r_link_length;
@@ -21,15 +21,15 @@ int GlobalParams::buffer_depth;
 int GlobalParams::flit_size;
 int GlobalParams::min_packet_size;
 int GlobalParams::max_packet_size;
-char GlobalParams::routing_algorithm[128];
-char GlobalParams::routing_table_filename[128];
+string GlobalParams::routing_algorithm;
+string GlobalParams::routing_table_filename;
 string GlobalParams::selection_strategy;
 double GlobalParams::packet_injection_rate;
 double GlobalParams::probability_of_retransmission;
 double GlobalParams::locality;
-int GlobalParams::traffic_distribution;
-char GlobalParams::traffic_table_filename[128];
-char GlobalParams::config_filename[128];
+string GlobalParams::traffic_distribution;
+string GlobalParams::traffic_table_filename;
+string GlobalParams::config_filename;
 int GlobalParams::clock_period_ps;
 int GlobalParams::simulation_time;
 int GlobalParams::reset_time;

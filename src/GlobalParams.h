@@ -48,30 +48,30 @@ using namespace std;
 #define INVALID_SELECTION     -1
 
 // Traffic distribution
-#define TRAFFIC_RANDOM         0
-#define TRAFFIC_TRANSPOSE1     1
-#define TRAFFIC_TRANSPOSE2     2
-#define TRAFFIC_HOTSPOT        3
-#define TRAFFIC_TABLE_BASED    4
-#define TRAFFIC_BIT_REVERSAL   5
-#define TRAFFIC_SHUFFLE        6
-#define TRAFFIC_BUTTERFLY      7
-#define TRAFFIC_LOCAL	       8
+#define TRAFFIC_RANDOM         "TRAFFIC_RANDOM"
+#define TRAFFIC_TRANSPOSE1     "TRAFFIC_TRANSPOSE1"
+#define TRAFFIC_TRANSPOSE2     "TRAFFIC_TRANSPOSE2"
+#define TRAFFIC_HOTSPOT        "TRAFFIC_HOTSPOT"
+#define TRAFFIC_TABLE_BASED    "TRAFFIC_TABLE_BASED"
+#define TRAFFIC_BIT_REVERSAL   "TRAFFIC_BIT_REVERSAL"
+#define TRAFFIC_SHUFFLE        "TRAFFIC_SHUFFLE"
+#define TRAFFIC_BUTTERFLY      "TRAFFIC_BUTTERFLY"
+#define TRAFFIC_LOCAL	       "TRAFFIC_LOCAL"
 
 // Verbosity levels
-#define VERBOSE_OFF            0
-#define VERBOSE_LOW            1
-#define VERBOSE_MEDIUM         2
-#define VERBOSE_HIGH           3
+#define VERBOSE_OFF            "VERBOSE_OFF"
+#define VERBOSE_LOW            "VERBOSE_LOW"
+#define VERBOSE_MEDIUM         "VERBOSE_MEDIUM"
+#define VERBOSE_HIGH           "VERBOSE_HIGH"
 
 
 // Wireless MAC constants
 #define RELEASE_CHANNEL 1
 #define HOLD_CHANNEL 	2
 
-#define TOKEN_HOLD 	0
-#define TOKEN_MAX_HOLD 	1
-#define TOKEN_PACKET 	2
+#define TOKEN_HOLD             "TOKEN_HOLD"
+#define TOKEN_MAX_HOLD         "TOKEN_MAX_HOLD"
+#define TOKEN_PACKET           "TOKEN_PACKET"
 
 typedef struct {
     pair<double, double> ber;
@@ -122,9 +122,9 @@ typedef struct {
 } PowerConfig;
 
 struct GlobalParams {
-    static int verbose_mode;
+    static string verbose_mode;
     static int trace_mode;
-    static char trace_filename[128];
+    static string trace_filename;
     static int mesh_dim_x;
     static int mesh_dim_y;
     static double r2r_link_length;
@@ -133,15 +133,15 @@ struct GlobalParams {
     static int flit_size;
     static int min_packet_size;
     static int max_packet_size;
-    static char routing_algorithm[128];
-    static char routing_table_filename[128];
+    static string routing_algorithm;
+    static string routing_table_filename;
     static string selection_strategy;
     static double packet_injection_rate;
     static double probability_of_retransmission;
     static double locality;
-    static int traffic_distribution;
-    static char traffic_table_filename[128];
-    static char config_filename[128];
+    static string traffic_distribution;
+    static string traffic_table_filename;
+    static string config_filename;
     static int clock_period_ps;
     static int simulation_time;
     static int reset_time;
