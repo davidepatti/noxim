@@ -14,6 +14,7 @@
 void loadConfiguration() {
 
     cout << "Loading configuration from file " << GlobalParams::config_filename << endl;
+    //TODO TURI: controllare SE ESISTE!!
     YAML::Node config = YAML::LoadFile(GlobalParams::config_filename);
 
     // Initialize global configuration parameters (can be overridden with command-line arguments)
@@ -257,19 +258,18 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 	cout <<
 	    "Running with default parameters (use '-help' option to see how to override them)"
 	    << endl;
-    else {
-	for (int i = 1; i < arg_num; i++) {
-	    if (!strcmp(arg_vet[i], "-help")) {
-		showHelp(arg_vet[0]);
-		exit(0);
-	    } else if (!strcmp(arg_vet[i], "-config")){
-            i++;
-        } else if (!strcmp(arg_vet[i], "-verbose"))
+    else 
+    {
+	for (int i = 1; i < arg_num; i++) 
+	{
+	    if (!strcmp(arg_vet[i], "-verbose"))
 		GlobalParams::verbose_mode = atoi(arg_vet[++i]);
-	    else if (!strcmp(arg_vet[i], "-trace")) {
+	    else if (!strcmp(arg_vet[i], "-trace")) 
+	    {
 		GlobalParams::trace_mode = true;
 		GlobalParams::trace_filename = arg_vet[++i];
-	    } else if (!strcmp(arg_vet[i], "-dimx"))
+	    } 
+	    else if (!strcmp(arg_vet[i], "-dimx"))
 		GlobalParams::mesh_dim_x = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-dimy"))
 		GlobalParams::mesh_dim_y = atoi(arg_vet[++i]);
@@ -279,46 +279,52 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::use_winoc = true;
 	    else if (!strcmp(arg_vet[i], "-wirxsleep")) 
 		GlobalParams::use_wirxsleep = true;
-	    else if (!strcmp(arg_vet[i], "-size")) {
+	    else if (!strcmp(arg_vet[i], "-size")) 
+	    {
 		GlobalParams::min_packet_size = atoi(arg_vet[++i]);
 		GlobalParams::max_packet_size = atoi(arg_vet[++i]);
-	    } else if (!strcmp(arg_vet[i], "-routing")) {
+	    } 
+	    else if (!strcmp(arg_vet[i], "-routing")) 
+	    {
 		GlobalParams::routing_algorithm = arg_vet[++i];
 		if (GlobalParams::routing_algorithm == ROUTING_DYAD)
 		    GlobalParams::dyad_threshold = atof(arg_vet[++i]);
-		else if (GlobalParams::routing_algorithm == ROUTING_TABLE_BASED) {
+		else if (GlobalParams::routing_algorithm == ROUTING_TABLE_BASED) 
+		{
 		    GlobalParams::routing_table_filename = arg_vet[++i];
 		    GlobalParams::packet_injection_rate = 0;
 		} 
-	    } else if (!strcmp(arg_vet[i], "-sel")) {
-		    GlobalParams::selection_strategy = arg_vet[++i];
-	    } else if (!strcmp(arg_vet[i], "-pir")) {
-		GlobalParams::packet_injection_rate =
-		    atof(arg_vet[++i]);
+	    } 
+	    else if (!strcmp(arg_vet[i], "-sel")) {
+		GlobalParams::selection_strategy = arg_vet[++i];
+	    } 
+	    else if (!strcmp(arg_vet[i], "-pir")) 
+	    {
+		GlobalParams::packet_injection_rate = atof(arg_vet[++i]);
 		char *distribution = arg_vet[++i];
 		if (!strcmp(distribution, "poisson"))
-		    GlobalParams::probability_of_retransmission =
-			GlobalParams::packet_injection_rate;
-		else if (!strcmp(distribution, "burst")) {
+		    GlobalParams::probability_of_retransmission = GlobalParams::packet_injection_rate;
+		else if (!strcmp(distribution, "burst")) 
+		{
 		    double burstness = atof(arg_vet[++i]);
-		    GlobalParams::probability_of_retransmission =
-			GlobalParams::packet_injection_rate / (1 -
-								    burstness);
-		} else if (!strcmp(distribution, "pareto")) {
+		    GlobalParams::probability_of_retransmission = GlobalParams::packet_injection_rate / (1 - burstness);
+		} 
+		else if (!strcmp(distribution, "pareto")) {
 		    double Aon = atof(arg_vet[++i]);
 		    double Aoff = atof(arg_vet[++i]);
 		    double r = atof(arg_vet[++i]);
 		    GlobalParams::probability_of_retransmission =
 			GlobalParams::packet_injection_rate *
 			pow((1 - r), (1 / Aoff - 1 / Aon));
-		} else if (!strcmp(distribution, "custom"))
+		} 
+		else if (!strcmp(distribution, "custom"))
 		    GlobalParams::probability_of_retransmission = atof(arg_vet[++i]);
-		  else assert("Invalid pir format" && false);
-	    } else if (!strcmp(arg_vet[i], "-traffic")) {
+		else assert("Invalid pir format" && false);
+	    } 
+	    else if (!strcmp(arg_vet[i], "-traffic")) 
+	    {
 		char *traffic = arg_vet[++i];
-		if (!strcmp(traffic, "random"))
-		    GlobalParams::traffic_distribution =
-			TRAFFIC_RANDOM;
+		if (!strcmp(traffic, "random")) GlobalParams::traffic_distribution = TRAFFIC_RANDOM;
 		else if (!strcmp(traffic, "transpose1"))
 		    GlobalParams::traffic_distribution =
 			TRAFFIC_TRANSPOSE1;
@@ -343,16 +349,19 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		    GlobalParams::locality=atof(arg_vet[++i]);
 		}
 		else assert(false);
-	    } else if (!strcmp(arg_vet[i], "-hs")) {
+	    } 
+	    else if (!strcmp(arg_vet[i], "-hs")) 
+	    {
 		int node = atoi(arg_vet[++i]);
 		double percentage = atof(arg_vet[++i]);
 		pair < int, double >t(node, percentage);
 		GlobalParams::hotspots.push_back(t);
-	    } else if (!strcmp(arg_vet[i], "-warmup"))
+	    } 
+	    else if (!strcmp(arg_vet[i], "-warmup"))
 		GlobalParams::stats_warm_up_time = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-seed"))
 		GlobalParams::rnd_generator_seed = atoi(arg_vet[++i]);
- 	    else if (!strcmp(arg_vet[i], "-detailed"))
+	    else if (!strcmp(arg_vet[i], "-detailed"))
 		GlobalParams::detailed = true;
 	    else if (!strcmp(arg_vet[i], "-show_buf_stats"))
 		GlobalParams::show_buffer_stats = true;
@@ -361,6 +370,10 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		    atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-sim"))
 		GlobalParams::simulation_time = atoi(arg_vet[++i]);
+	    else if (!strcmp(arg_vet[i], "-config"))
+		// -config is managed from configure function
+		// i++ skips the configuration file name 
+		i++;
 	    else {
 		cerr << "Error: Invalid option: " << arg_vet[i] << endl;
 		exit(1);
@@ -374,6 +387,13 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 void configure(int arg_num, char *arg_vet[]) {
 
     bool config_found = false;
+
+    for (int i = 1; i < arg_num; i++) {
+	    if (!strcmp(arg_vet[i], "-help")) {
+		showHelp(arg_vet[0]);
+		exit(0);
+        }
+    }
 
     for (int i = 1; i < arg_num; i++) {
 	    if (!strcmp(arg_vet[i], "-config")) {
@@ -390,7 +410,7 @@ void configure(int arg_num, char *arg_vet[]) {
             GlobalParams::config_filename = CONFIG_FILENAME;
         else
         {
-            cerr << "No configuration file found!" << endl;
+            cerr << "No YAML configuration file found!\n Use -config to load examples from config_examples folder" << endl;
             exit(0);
         }
     }
