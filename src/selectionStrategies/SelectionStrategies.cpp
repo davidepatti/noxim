@@ -2,8 +2,8 @@
 
 SelectionStrategiesMap * SelectionStrategies::selectionStrategiesMap = 0;
 
-SelectionStrategy * SelectionStrategies::get(const string & routingAlgorithmName) {
-	SelectionStrategiesMap::iterator it = getSelectionStrategiesMap()->find(routingAlgorithmName);
+SelectionStrategy * SelectionStrategies::get(const string & selectionStrategyName) {
+	SelectionStrategiesMap::iterator it = getSelectionStrategiesMap()->find(selectionStrategyName);
 
 	if(it == getSelectionStrategiesMap()->end())
 		return 0;
