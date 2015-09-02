@@ -22,7 +22,9 @@
 #include "routingAlgorithms/RoutingAlgorithm.h"
 #include "routingAlgorithms/RoutingAlgorithms.h"
 #include "selectionStrategies/SelectionStrategy.h"
-#include "selectionStrategies/SelectionStrategies.h"
+#include "selectionStrategies/SelectionStrategy.h"
+#include "selectionStrategies/Selection_NOP.h"
+#include "selectionStrategies/Selection_BUFFER_LEVEL.h"
 
 using namespace std;
 
@@ -30,6 +32,8 @@ extern unsigned int drained_volume;
 
 SC_MODULE(Router)
 {
+    friend class Selection_NOP;
+    friend class Selection_BUFFER_LEVEL;
 
     // I/O Ports
     sc_in_clk clock;		                  // The input clock for the router
