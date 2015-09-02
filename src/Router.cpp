@@ -295,9 +295,7 @@ int Router::selectionFunction(const vector < int >&directions,
     if (directions.size() == 1)
 	return directions[0];
 
-    selectionStrategy->apply(this, directions, route_data);
-
-    return 0;
+    return selectionStrategy->apply(this, directions, route_data);
 }
 
 void Router::configure(const int _id,

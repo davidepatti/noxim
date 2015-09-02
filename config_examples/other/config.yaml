@@ -153,13 +153,18 @@ Energy:
         #   Algorithm:   [Static, Dynamic]
             default:     [1.20e-4, 6.00e-14]
             XY:          [1.20e-4, 6.00e-14]
+            WEST_FIRST:  [1.22e-4, 6.05e-14]
+            NORTH_LAST:  [1.22e-4, 6.05e-14]
+            NEGATIVE_FIRST: [1.22e-4, 6.05e-14]
+            ODD_EVEN:    [1.24e-4, 6.10e-14]
             DYAD:        [1.25e-4, 6.23e-14]
 
         selection:
         #   Strategy:    [Static, Dynamic]
             default:     [1.10e-4, 5.00e-14]
-            XY:          [1.10e-4, 5.00e-14]
-            DYAD:        [1.23e-4, 5.89e-14]
+            random:      [6.00e-7, 1.00e-16]
+            bufferlevel: [1.00e-6, 2.00e-16]
+            nop:         [6.00e-6, 3.00e-16]
 
     Hub:
         # [RX, TX] Contribution (W)
