@@ -12,6 +12,7 @@ Selection_RANDOM * Selection_RANDOM::getInstance() {
 }
 
 int Selection_RANDOM::apply(Router * router, const vector < int >&directions, const RouteData & route_data){
+
     return directions[rand() % directions.size()];
 }
 
