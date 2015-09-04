@@ -62,7 +62,7 @@ bool Buffer::deadlockFree()
 	full_cycles_counter=0;
     }
 
-    if (full_cycles_counter>1000) 
+    if (full_cycles_counter>10000) 
 	return false;
 
     return true;

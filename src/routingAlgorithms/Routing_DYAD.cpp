@@ -26,8 +26,7 @@ vector<int> Routing_DYAD::route(Router * router, const RouteData & routeData)
 
     directions = odd_even->route(router, routeData);
 
-    if (!router->inCongestion())
-        directions.resize(1);
+    if (!router->inCongestion()) directions.resize(1);
 
     return directions;
 }
