@@ -74,12 +74,15 @@ void Router::txProcess()
 	{
 	  int i = (start_from_port + j) % (DIRECTIONS + 2);
 	 
+	  /*
 	  if (!buffer[i].deadlockFree())
 	  {
 	      LOG << " deadlock on buffer input " << i << endl;
 	      buffer[i].Print(" deadlock ");
+	      assert(false);
 
 	  }
+	  */
 
 	  if (!buffer[i].IsEmpty()) 
 	    {
@@ -198,8 +201,8 @@ NoP_data Router::getCurrentNoPData()
 
     for (int j = 0; j < DIRECTIONS; j++) {
 	try {
-		NoP_data.channel_status_neighbor[j].available = (reservation_table.isAvailable(j));
 		NoP_data.channel_status_neighbor[j].free_slots = free_slots_neighbor[j].read();
+		NoP_data.channel_status_neighbor[j].available = (reservation_table.isAvailable(j));
 	}
 	catch (int e)
 	{
@@ -411,11 +414,11 @@ int Router::getNeighborId(int _id, int direction) const
 bool Router::inCongestion()
 {
     for (int i = 0; i < DIRECTIONS; i++) {
-	int flits =
-	    GlobalParams::buffer_depth - free_slots_neighbor[i];
-	if (flits >
-	    (int) (GlobalParams::buffer_depth *
-		   GlobalParams::dyad_threshold))
+
+	if (free_slots_neighbor[i]==NOT_VALID) continue;
+
+	int flits = GlobalParams::buffer_depth - free_slots_neighbor[i];
+	if (flits > (int) (GlobalParams::buffer_depth * GlobalParams::dyad_threshold))
 	    return true;
     }
 
