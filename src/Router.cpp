@@ -74,14 +74,12 @@ void Router::txProcess()
 	{
 	  int i = (start_from_port + j) % (DIRECTIONS + 2);
 	 
-	  /*
 	  if (!buffer[i].deadlockFree())
 	  {
-	      LOG << " deadlock on buffer " << i << endl;
+	      LOG << " deadlock on buffer input " << i << endl;
 	      buffer[i].Print(" deadlock ");
 
 	  }
-	  */
 
 	  if (!buffer[i].IsEmpty()) 
 	    {
@@ -100,10 +98,16 @@ void Router::txProcess()
 
 		  int o = route(route_data);
 
+		  LOG << " checking reservation availability of direction " << o << " for flit " << flit << endl;
 
 		  if (reservation_table.isAvailable(o)) 
 		  {
+		      LOG << " reserving direction " << o << " for flit " << flit << endl;
 		      reservation_table.reserve(i, o);
+		  }
+		  else
+		  {
+		      LOG << " cannot reserve direction " << o << " for flit " << flit << endl;
 		  }
 		}
 	    }
@@ -124,7 +128,7 @@ void Router::txProcess()
 	      {
 		  if (current_level_tx[o] == ack_tx[o].read()) 
 		  {
-		      if (GlobalParams::verbose_mode > VERBOSE_OFF) 
+		      //if (GlobalParams::verbose_mode > VERBOSE_OFF) 
 			  LOG << "Input[" << i << "] forward to Output[" << o << "], flit: " << flit << endl;
 
 		      flit_tx[o].write(flit);
@@ -156,14 +160,12 @@ void Router::txProcess()
 		      // Update stats
 		      if (o == DIRECTION_LOCAL) 
 		      {
-			  //LOG << "Consumed flit src " << flit.src_id << " dst = " << flit.dst_id << endl;
+			  LOG << "Consumed flit " << flit << endl;
 			  stats.receivedFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, flit);
 			  if (GlobalParams::
 				  max_volume_to_be_drained) 
 			  {
-			      if (drained_volume >=
-				      GlobalParams::
-				      max_volume_to_be_drained)
+			      if (drained_volume >= GlobalParams:: max_volume_to_be_drained)
 				  sc_stop();
 			      else 
 			      {
@@ -178,6 +180,12 @@ void Router::txProcess()
 			  routed_flits++;
 		      }
 		  }
+		  else
+		  {
+		      LOG << " cannot forward Input[" << i << "] forward to Output[" << o << "], flit: " << flit << endl;
+		      if (flit.flit_type == FLIT_TYPE_HEAD)
+			  reservation_table.release(o);
+		  }
 	      }
 	  }
       }
@@ -189,10 +197,15 @@ NoP_data Router::getCurrentNoPData()
     NoP_data NoP_data;
 
     for (int j = 0; j < DIRECTIONS; j++) {
-	NoP_data.channel_status_neighbor[j].free_slots =
-	    free_slots_neighbor[j].read();
-	NoP_data.channel_status_neighbor[j].available =
-	    (reservation_table.isAvailable(j));
+	try {
+		NoP_data.channel_status_neighbor[j].available = (reservation_table.isAvailable(j));
+		NoP_data.channel_status_neighbor[j].free_slots = free_slots_neighbor[j].read();
+	}
+	catch (int e)
+	{
+	    if (e!=NOT_VALID) assert(false);
+	    // Nothing to do if an NOT_VALID direction is caught
+	};
     }
 
     NoP_data.sender_id = local_id;
@@ -207,6 +220,7 @@ void Router::perCycleUpdate()
 	    free_slots[i].write(buffer[i].GetMaxBufferSize());
     } else {
         selectionStrategy->perCycleUpdate(this);
+
 	power.leakageRouter();
 	for (int i = 0; i < DIRECTIONS + 1; i++)
 	{
@@ -234,7 +248,7 @@ vector < int > Router::routingFunction(const RouteData & route_data)
             return dirv;
         }
     }
-    //LOG << "Wired routing for dst = " << route_data.dst_id << endl;
+    LOG << "Wired routing for dst = " << route_data.dst_id << endl;
 
     return routingAlgorithm->route(this, route_data);
 }
