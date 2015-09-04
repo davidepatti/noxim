@@ -22,7 +22,9 @@
 #include "routingAlgorithms/RoutingAlgorithm.h"
 #include "routingAlgorithms/RoutingAlgorithms.h"
 #include "selectionStrategies/SelectionStrategy.h"
-#include "selectionStrategies/SelectionStrategies.h"
+#include "selectionStrategies/SelectionStrategy.h"
+#include "selectionStrategies/Selection_NOP.h"
+#include "selectionStrategies/Selection_BUFFER_LEVEL.h"
 
 using namespace std;
 
@@ -30,6 +32,8 @@ extern unsigned int drained_volume;
 
 SC_MODULE(Router)
 {
+    friend class Selection_NOP;
+    friend class Selection_BUFFER_LEVEL;
 
     // I/O Ports
     sc_in_clk clock;		                  // The input clock for the router
@@ -98,15 +102,21 @@ SC_MODULE(Router)
 	sensitive << reset;
 	sensitive << clock.pos();
 	
-    routingAlgorithm = RoutingAlgorithms::get(GlobalParams::routing_algorithm);
+	routingAlgorithm = RoutingAlgorithms::get(GlobalParams::routing_algorithm);
 
-    if (routingAlgorithm == 0)
-        assert(false);
+	if (routingAlgorithm == 0)
+	{
+	    cerr << " FATAL: invalid routing -routing " << GlobalParams::routing_algorithm << ", check with noxim -help" << endl;
+	    exit(-1);
+	}
 
-    selectionStrategy = SelectionStrategies::get(GlobalParams::selection_strategy);
+	selectionStrategy = SelectionStrategies::get(GlobalParams::selection_strategy);
 
-    if (selectionStrategy == 0)
-        assert(false);
+	if (selectionStrategy == 0)
+	{
+	    cerr << " FATAL: invalid selection strategy -sel " << GlobalParams::selection_strategy << ", check with noxim -help" << endl;
+	    exit(-1);
+	}
     }
 
   private:

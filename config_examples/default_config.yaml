@@ -21,7 +21,6 @@ r2r_link_length: 1.0
 #   NEGATIVE_FIRST
 #   ODD_EVEN
 #   DYAD
-#   FULLY_ADAPTIVE
 #   TABLE_BASED
 # Each of the above labels should match a corresponding
 # implementation in the routingAlgorithms source code directory

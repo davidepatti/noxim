@@ -16,7 +16,6 @@ r2r_link_length: 1.0
 #   NEGATIVE_FIRST
 #   ODD_EVEN
 #   DYAD
-#   FULLY_ADAPTIVE
 #   TABLE_BASED
 routing_algorithm: XY
 routing_table_filename: ""

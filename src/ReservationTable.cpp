@@ -12,9 +12,9 @@
 
 ReservationTable::ReservationTable()
 {
+
   rtable.clear();
 }
-
 
 
 bool ReservationTable::isAvailable(const int port_out)
@@ -23,7 +23,9 @@ bool ReservationTable::isAvailable(const int port_out)
     if (rtable.find(port_out)==rtable.end())
 	rtable[port_out] = NOT_RESERVED;
 
-    assert(rtable[port_out]!=NOT_VALID);
+    if (rtable[port_out]==NOT_VALID) throw NOT_VALID;
+
+//    assert(rtable[port_out]!=NOT_VALID);
 
     return (rtable[port_out]==NOT_RESERVED);
 }

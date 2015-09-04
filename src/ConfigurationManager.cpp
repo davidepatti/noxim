@@ -17,6 +17,7 @@ void loadConfiguration() {
     //TODO TURI: controllare SE ESISTE!!
     YAML::Node config = YAML::LoadFile(GlobalParams::config_filename);
 
+
     // Initialize global configuration parameters (can be overridden with command-line arguments)
     GlobalParams::verbose_mode = config["verbose_mode"].as<string>();
     GlobalParams::trace_mode = config["trace_mode"].as<bool>();
@@ -109,12 +110,11 @@ void showHelp(char selfname[])
          << "\t\tNEGATIVE_FIRST\tNegative-First routing algorithm" << endl
          << "\t\tODD_EVEN\t\tOdd-Even routing algorithm" << endl
          << "\t\tDYAD T\t\tDyAD routing algorithm with threshold T" << endl
-         << "\t\tFULLY_ADAPTIVE\tFully-Adaptive routing algorithm" << endl
          << "\t\tTABLE_BASED FILENAME\tRouting Table Based routing algorithm with table in the specified file" << endl
          << "\t-sel TYPE\tSet the selection strategy to TYPE where TYPE is one of the following (default " << GlobalParams::selection_strategy << "):" << endl
-         << "\t\trandom\t\tRandom selection strategy" << endl
-         << "\t\tbufferlevel\tBuffer-Level Based selection strategy" << endl
-         << "\t\tnop\t\tNeighbors-on-Path selection strategy" << endl
+         << "\t\tRANDOM\t\tRandom selection strategy" << endl
+         << "\t\tBUFFER_LEVEL\tBuffer-Level Based selection strategy" << endl
+         << "\t\tNOP\t\tNeighbors-on-Path selection strategy" << endl
          <<	"\t-pir R TYPE\tSet the packet injection rate to the specified real value [0..1] (default " << GlobalParams::packet_injection_rate << ") " << "and the time distribution" << endl
          << "\t\t\tof traffic to TYPE where TYPE is one of the following:" << endl
          << "\t\tpoisson\t\tMemory-less Poisson distribution (default)" << endl
@@ -139,7 +139,7 @@ void showHelp(char selfname[])
          << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << GlobalParams::simulation_time << ")" << endl
          << endl
          << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <maurizio.palesi@unikore.it>" << endl
-         <<	"If you find this program useless please feel free to complain with Davide Patti <dpatti@dieei.unict.it>" << endl
+         <<	"If you find this program useless please feel free to complain with Davide Patti <davide.patti@dieei.unict.it>" << endl
          <<	"And if you want to send money please feel free to PayPal to Fabrizio Fazzino <fabrizio@fazzino.it>" << endl;
 }
 

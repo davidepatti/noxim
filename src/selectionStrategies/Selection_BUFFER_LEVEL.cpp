@@ -15,8 +15,20 @@ int Selection_BUFFER_LEVEL::apply(Router * router, const vector < int >&directio
     vector < int >best_dirs;
     int max_free_slots = 0;
     for (unsigned int i = 0; i < directions.size(); i++) {
+
+	bool available = false;
+
+	try {
+	    available = router->reservation_table.isAvailable(directions[i]);
+	}
+	catch (int error)
+	{
+	    if (error==NOT_VALID) continue;
+	    assert(false);
+	}
+
 	int free_slots = router->free_slots_neighbor[directions[i]].read();
-	bool available = router->reservation_table.isAvailable(directions[i]);
+
 	if (available) {
 	    if (free_slots > max_free_slots) {
 		max_free_slots = free_slots;

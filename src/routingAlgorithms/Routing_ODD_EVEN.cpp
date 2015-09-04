@@ -58,13 +58,6 @@ vector<int> Routing_ODD_EVEN::route(Router * router, const RouteData & routeData
         }
     }
 
-    if (!(directions.size() > 0 && directions.size() <= 2)) {
-        LOG << "\n PICCININI, CECCONI & ... :" << endl  // STAMPACCHIA
-            << source << endl
-            << destination << endl
-            << current << endl;
-
-    }
     assert(directions.size() > 0 && directions.size() <= 2);
 
     return directions;
