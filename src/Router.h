@@ -102,15 +102,21 @@ SC_MODULE(Router)
 	sensitive << reset;
 	sensitive << clock.pos();
 	
-    routingAlgorithm = RoutingAlgorithms::get(GlobalParams::routing_algorithm);
+	routingAlgorithm = RoutingAlgorithms::get(GlobalParams::routing_algorithm);
 
-    if (routingAlgorithm == 0)
-        assert(false);
+	if (routingAlgorithm == 0)
+	{
+	    cerr << " FATAL: invalid routing -routing " << GlobalParams::routing_algorithm << ", check with noxim -help" << endl;
+	    exit(-1);
+	}
 
-    selectionStrategy = SelectionStrategies::get(GlobalParams::selection_strategy);
+	selectionStrategy = SelectionStrategies::get(GlobalParams::selection_strategy);
 
-    if (selectionStrategy == 0)
-        assert(false);
+	if (selectionStrategy == 0)
+	{
+	    cerr << " FATAL: invalid selection strategy -sel " << GlobalParams::selection_strategy << ", check with noxim -help" << endl;
+	    exit(-1);
+	}
     }
 
   private:
