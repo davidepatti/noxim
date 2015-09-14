@@ -218,108 +218,108 @@ void Power::configureHub(int link_width,
 // Router buffer
 void Power::bufferRouterPush()
 {
-    power_breakdown_d.breakdown[BUFFER_PUSH_PWR_D].value += buffer_router_push_pwr_d;
+    power_dynamic.breakdown[BUFFER_PUSH_PWR_D].value += buffer_router_push_pwr_d;
 }
 
 void Power::bufferRouterPop()
 {
-    power_breakdown_d.breakdown[BUFFER_POP_PWR_D].value += buffer_router_pop_pwr_d;
+    power_dynamic.breakdown[BUFFER_POP_PWR_D].value += buffer_router_pop_pwr_d;
 }
 
 void Power::bufferRouterFront()
 {
-    power_breakdown_d.breakdown[BUFFER_FRONT_PWR_D].value += buffer_router_front_pwr_d;
+    power_dynamic.breakdown[BUFFER_FRONT_PWR_D].value += buffer_router_front_pwr_d;
 }
 
 // Hub to tile
 void Power::bufferToTilePush()
 {
-    power_breakdown_d.breakdown[BUFFER_TO_TILE_PUSH_PWR_D].value += buffer_to_tile_push_pwr_d;
+    power_dynamic.breakdown[BUFFER_TO_TILE_PUSH_PWR_D].value += buffer_to_tile_push_pwr_d;
 }
 
 void Power::bufferToTilePop()
 {
-    power_breakdown_d.breakdown[BUFFER_TO_TILE_POP_PWR_D].value += buffer_to_tile_pop_pwr_d;
+    power_dynamic.breakdown[BUFFER_TO_TILE_POP_PWR_D].value += buffer_to_tile_pop_pwr_d;
 }
 
 void Power::bufferToTileFront()
 {
 
-    power_breakdown_d.breakdown[BUFFER_TO_TILE_FRONT_PWR_D].value += buffer_to_tile_front_pwr_d;
+    power_dynamic.breakdown[BUFFER_TO_TILE_FRONT_PWR_D].value += buffer_to_tile_front_pwr_d;
 }
 
 // Hub from tile
 void Power::bufferFromTilePush()
 {
-    power_breakdown_d.breakdown[BUFFER_FROM_TILE_PUSH_PWR_D].value += buffer_from_tile_push_pwr_d;
+    power_dynamic.breakdown[BUFFER_FROM_TILE_PUSH_PWR_D].value += buffer_from_tile_push_pwr_d;
 }
 
 void Power::bufferFromTilePop()
 {
-    power_breakdown_d.breakdown[BUFFER_FROM_TILE_POP_PWR_D].value += buffer_from_tile_pop_pwr_d;
+    power_dynamic.breakdown[BUFFER_FROM_TILE_POP_PWR_D].value += buffer_from_tile_pop_pwr_d;
 }
 
 void Power::bufferFromTileFront()
 {
 
-    power_breakdown_d.breakdown[BUFFER_FROM_TILE_FRONT_PWR_D].value += buffer_from_tile_front_pwr_d;
+    power_dynamic.breakdown[BUFFER_FROM_TILE_FRONT_PWR_D].value += buffer_from_tile_front_pwr_d;
 }
 
 
 // Antenna buffers (RX/TX)
 void Power::antennaBufferPush()
 {
-    power_breakdown_d.breakdown[ANTENNA_BUFFER_PUSH_PWR_D].value += antenna_buffer_push_pwr_d;
+    power_dynamic.breakdown[ANTENNA_BUFFER_PUSH_PWR_D].value += antenna_buffer_push_pwr_d;
 }
 
 void Power::antennaBufferPop()
 {
-    power_breakdown_d.breakdown[ANTENNA_BUFFER_POP_PWR_D].value += antenna_buffer_pop_pwr_d;
+    power_dynamic.breakdown[ANTENNA_BUFFER_POP_PWR_D].value += antenna_buffer_pop_pwr_d;
 }
 
 void Power::antennaBufferFront()
 {
-    power_breakdown_d.breakdown[ANTENNA_BUFFER_FRONT_PWR_D].value += antenna_buffer_front_pwr_d;
+    power_dynamic.breakdown[ANTENNA_BUFFER_FRONT_PWR_D].value += antenna_buffer_front_pwr_d;
 }
 
 
 void Power::routing()
 {
-    power_breakdown_d.breakdown[ROUTING_PWR_D].value += routing_pwr_d;
+    power_dynamic.breakdown[ROUTING_PWR_D].value += routing_pwr_d;
 }
 
 void Power::selection()
 {
-    power_breakdown_d.breakdown[SELECTION_PWR_D].value +=selection_pwr_d ;
+    power_dynamic.breakdown[SELECTION_PWR_D].value +=selection_pwr_d ;
 }
 
 void Power::crossBar()
 {
-    power_breakdown_d.breakdown[CROSSBAR_PWR_D].value +=crossbar_pwr_d;
+    power_dynamic.breakdown[CROSSBAR_PWR_D].value +=crossbar_pwr_d;
 }
 
 void Power::r2rLink()
 {
-    power_breakdown_d.breakdown[LINK_R2R_PWR_D].value +=link_r2r_pwr_d;
+    power_dynamic.breakdown[LINK_R2R_PWR_D].value +=link_r2r_pwr_d;
 }
 
 void Power::r2hLink()
 {
-    power_breakdown_d.breakdown[LINK_R2H_PWR_D].value +=link_r2h_pwr_d;
+    power_dynamic.breakdown[LINK_R2H_PWR_D].value +=link_r2h_pwr_d;
 }
 
 void Power::networkInterface()
 {
-    power_breakdown_d.breakdown[NI_PWR_D].value +=ni_pwr_d;
+    power_dynamic.breakdown[NI_PWR_D].value +=ni_pwr_d;
 }
 
 
 double Power::getDynamicPower()
 {
     double power = 0.0;
-    for (int i = 0; i<power_breakdown_d.size; i++)
+    for (int i = 0; i<power_dynamic.size; i++)
     {
-	power+= power_breakdown_d.breakdown[i].value;
+	power+= power_dynamic.breakdown[i].value;
     }
 
     return power;
@@ -328,8 +328,8 @@ double Power::getDynamicPower()
 double Power::getStaticPower()
 {
     double power = 0.0;
-    for (int i = 0; i<power_breakdown_s.size; i++)
-	power+= power_breakdown_s.breakdown[i].value;
+    for (int i = 0; i<power_static.size; i++)
+	power+= power_static.breakdown[i].value;
 
     return power;
 }
@@ -345,7 +345,7 @@ double Power::attenuation2power(double attenuation)
 
 void Power::wirelessTx(int src,int dst,int length)
 {
-    power_breakdown_d.breakdown[WIRELESS_TX].value += default_tx_energy;
+    power_dynamic.breakdown[WIRELESS_TX].value += default_tx_energy;
     return;
 
     // TODO enable attenuation_map
@@ -353,28 +353,28 @@ void Power::wirelessTx(int src,int dst,int length)
     pair<int,int> key = pair<int,int>(src,dst);
     assert(attenuation_map.find(key)!=attenuation_map.end());
 
-    power_breakdown_d.breakdown[WIRELESS_TX].value += attenuation2power(attenuation_map[key]) * length;
+    power_dynamic.breakdown[WIRELESS_TX].value += attenuation2power(attenuation_map[key]) * length;
 }
 
 void Power::wirelessDynamicRx()
 {
-    power_breakdown_d.breakdown[WIRELESS_DYNAMIC_RX_PWR].value += wireless_rx_pwr;
+    power_dynamic.breakdown[WIRELESS_DYNAMIC_RX_PWR].value += wireless_rx_pwr;
 }
 
 void Power::wirelessSnooping()
 {
-    power_breakdown_d.breakdown[WIRELESS_SNOOPING].value += wireless_snooping;
+    power_dynamic.breakdown[WIRELESS_SNOOPING].value += wireless_snooping;
 }
 
 
 void Power::biasingRx()
 {
-    power_breakdown_s.breakdown[TRANSCEIVER_RX_PWR_BIASING].value += transceiver_rx_pwr_biasing;
+    power_static.breakdown[TRANSCEIVER_RX_PWR_BIASING].value += transceiver_rx_pwr_biasing;
 }
 
 void Power::biasingTx()
 {
-    power_breakdown_s.breakdown[TRANSCEIVER_TX_PWR_BIASING].value += transceiver_tx_pwr_biasing;
+    power_static.breakdown[TRANSCEIVER_TX_PWR_BIASING].value += transceiver_tx_pwr_biasing;
 
 }
 
@@ -384,43 +384,43 @@ void Power::biasingTx()
 // - Hub: takes the leakage value of buffer_from_tile/to_tile
 void Power::leakageBufferRouter()
 {
-    power_breakdown_s.breakdown[BUFFER_ROUTER_PWR_S].value +=buffer_router_pwr_s;
+    power_static.breakdown[BUFFER_ROUTER_PWR_S].value +=buffer_router_pwr_s;
 }
 
 void Power::leakageBufferToTile()
 {
-    power_breakdown_s.breakdown[BUFFER_TO_TILE_PWR_S].value +=buffer_to_tile_pwr_s;
+    power_static.breakdown[BUFFER_TO_TILE_PWR_S].value +=buffer_to_tile_pwr_s;
 }
 
 void Power::leakageBufferFromTile()
 {
-    power_breakdown_s.breakdown[BUFFER_FROM_TILE_PWR_S].value +=buffer_from_tile_pwr_s;
+    power_static.breakdown[BUFFER_FROM_TILE_PWR_S].value +=buffer_from_tile_pwr_s;
 }
 
 // Account for each buffer_rx (Targets) or buffer_tx (Initiators)
 void Power::leakageAntennaBuffer()
 {
-    power_breakdown_s.breakdown[ANTENNA_BUFFER_PWR_S].value +=(antenna_buffer_pwr_s);
+    power_static.breakdown[ANTENNA_BUFFER_PWR_S].value +=(antenna_buffer_pwr_s);
 }
 
 void Power::leakageLinkRouter2Router()
 {
-    //power_breakdown_s.breakdown[LINK_R2R_PWR_S].value +=link_r2r_pwr_s;
+    //power_static.breakdown[LINK_R2R_PWR_S].value +=link_r2r_pwr_s;
 }
 
 void Power::leakageLinkRouter2Hub()
 {
-    power_breakdown_s.breakdown[LINK_R2H_PWR_S].value +=link_r2h_pwr_s;
+    power_static.breakdown[LINK_R2H_PWR_S].value +=link_r2h_pwr_s;
 }
 
 void Power::leakageRouter()
 {
     // note: leakage contributions depending on instance number are 
     // accounted in specific separate leakage functions
-    power_breakdown_s.breakdown[ROUTING_PWR_S].value +=routing_pwr_s;
-    power_breakdown_s.breakdown[SELECTION_PWR_S].value +=selection_pwr_s;
-    power_breakdown_s.breakdown[CROSSBAR_PWR_S].value +=crossbar_pwr_s;
-    power_breakdown_s.breakdown[NI_PWR_S].value +=ni_pwr_s;
+    power_static.breakdown[ROUTING_PWR_S].value +=routing_pwr_s;
+    power_static.breakdown[SELECTION_PWR_S].value +=selection_pwr_s;
+    power_static.breakdown[CROSSBAR_PWR_S].value +=crossbar_pwr_s;
+    power_static.breakdown[NI_PWR_S].value +=ni_pwr_s;
 }
 
 
@@ -428,20 +428,20 @@ void Power::leakageRouter()
 void Power::leakageTransceiverRx()
 {
 
-    power_breakdown_s.breakdown[TRANSCEIVER_RX_PWR_S].value +=transceiver_rx_pwr_s;
+    power_static.breakdown[TRANSCEIVER_RX_PWR_S].value +=transceiver_rx_pwr_s;
 }
 
 void Power::leakageTransceiverTx()
 {
 
-    power_breakdown_s.breakdown[TRANSCEIVER_TX_PWR_S].value +=transceiver_tx_pwr_s;
+    power_static.breakdown[TRANSCEIVER_TX_PWR_S].value +=transceiver_tx_pwr_s;
 }
 
 void Power::printBreakDown(std::ostream & out)
 {
     assert(false);
-    //printMap("power_breakdown_d",power_breakdown_d,cout);
-    //printMap("power_breakdown_s",power_breakdown_s,cout);
+    //printMap("power_dynamic",power_dynamic,cout);
+    //printMap("power_static",power_static,cout);
 }
 
 
@@ -473,44 +473,44 @@ void Power::initPowerBreakdownEntry(PowerBreakdownEntry* pbe,string label)
 
 void Power::initPowerBreakdown()
 {
-    power_breakdown_d.size = NO_BREAKDOWN_ENTRIES_D;
-    power_breakdown_s.size = NO_BREAKDOWN_ENTRIES_S;
+    power_dynamic.size = NO_BREAKDOWN_ENTRIES_D;
+    power_static.size = NO_BREAKDOWN_ENTRIES_S;
 
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[BUFFER_PUSH_PWR_D], "buffer_push_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[BUFFER_POP_PWR_D],"buffer_pop_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[BUFFER_FRONT_PWR_D],"buffer_front_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[BUFFER_TO_TILE_PUSH_PWR_D],"buffer_to_tile_push_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[BUFFER_TO_TILE_POP_PWR_D],"buffer_to_tile_pop_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[BUFFER_TO_TILE_FRONT_PWR_D],"buffer_to_tile_front_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[BUFFER_FROM_TILE_PUSH_PWR_D],"buffer_from_tile_push_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[BUFFER_FROM_TILE_POP_PWR_D],"buffer_from_tile_pop_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[BUFFER_FROM_TILE_FRONT_PWR_D],"buffer_from_tile_front_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[ANTENNA_BUFFER_PUSH_PWR_D],"antenna_buffer_push_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[ANTENNA_BUFFER_POP_PWR_D],"antenna_buffer_pop_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[ANTENNA_BUFFER_FRONT_PWR_D],"antenna_buffer_front_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[ROUTING_PWR_D],"routing_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[SELECTION_PWR_D],"selection_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[CROSSBAR_PWR_D],"crossbar_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[LINK_R2R_PWR_D],"link_r2r_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[LINK_R2H_PWR_D],"link_r2h_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[NI_PWR_D],"ni_pwr_d");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[WIRELESS_TX],"wireless_tx");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[WIRELESS_DYNAMIC_RX_PWR],"wireless_dynamic_rx_pwr");
-    initPowerBreakdownEntry(&power_breakdown_d.breakdown[WIRELESS_SNOOPING],"wireless_snooping");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[BUFFER_PUSH_PWR_D], "buffer_push_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[BUFFER_POP_PWR_D],"buffer_pop_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[BUFFER_FRONT_PWR_D],"buffer_front_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[BUFFER_TO_TILE_PUSH_PWR_D],"buffer_to_tile_push_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[BUFFER_TO_TILE_POP_PWR_D],"buffer_to_tile_pop_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[BUFFER_TO_TILE_FRONT_PWR_D],"buffer_to_tile_front_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[BUFFER_FROM_TILE_PUSH_PWR_D],"buffer_from_tile_push_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[BUFFER_FROM_TILE_POP_PWR_D],"buffer_from_tile_pop_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[BUFFER_FROM_TILE_FRONT_PWR_D],"buffer_from_tile_front_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[ANTENNA_BUFFER_PUSH_PWR_D],"antenna_buffer_push_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[ANTENNA_BUFFER_POP_PWR_D],"antenna_buffer_pop_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[ANTENNA_BUFFER_FRONT_PWR_D],"antenna_buffer_front_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[ROUTING_PWR_D],"routing_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[SELECTION_PWR_D],"selection_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[CROSSBAR_PWR_D],"crossbar_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[LINK_R2R_PWR_D],"link_r2r_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[LINK_R2H_PWR_D],"link_r2h_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[NI_PWR_D],"ni_pwr_d");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[WIRELESS_TX],"wireless_tx");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[WIRELESS_DYNAMIC_RX_PWR],"wireless_dynamic_rx_pwr");
+    initPowerBreakdownEntry(&power_dynamic.breakdown[WIRELESS_SNOOPING],"wireless_snooping");
 
-    initPowerBreakdownEntry(&power_breakdown_s.breakdown[TRANSCEIVER_RX_PWR_BIASING],"transceiver_rx_pwr_biasing");
-    initPowerBreakdownEntry(&power_breakdown_s.breakdown[TRANSCEIVER_TX_PWR_BIASING],"transceiver_tx_pwr_biasing");
-    initPowerBreakdownEntry(&power_breakdown_s.breakdown[BUFFER_ROUTER_PWR_S],"buffer_router_pwr_s");
-    initPowerBreakdownEntry(&power_breakdown_s.breakdown[BUFFER_TO_TILE_PWR_S],"buffer_to_tile_pwr_s");
-    initPowerBreakdownEntry(&power_breakdown_s.breakdown[BUFFER_FROM_TILE_PWR_S],"buffer_from_tile_pwr_s");
-    initPowerBreakdownEntry(&power_breakdown_s.breakdown[ANTENNA_BUFFER_PWR_S],"antenna_buffer_pwr_s");
-    initPowerBreakdownEntry(&power_breakdown_s.breakdown[LINK_R2H_PWR_S],"link_r2h_pwr_s");
-    initPowerBreakdownEntry(&power_breakdown_s.breakdown[ROUTING_PWR_S],"routing_pwr_s");
-    initPowerBreakdownEntry(&power_breakdown_s.breakdown[SELECTION_PWR_S],"selection_pwr_s");
-    initPowerBreakdownEntry(&power_breakdown_s.breakdown[CROSSBAR_PWR_S],"crossbar_pwr_s");
-    initPowerBreakdownEntry(&power_breakdown_s.breakdown[NI_PWR_S],"ni_pwr_s");
-    initPowerBreakdownEntry(&power_breakdown_s.breakdown[TRANSCEIVER_RX_PWR_S],"transceiver_rx_pwr_s");
-    initPowerBreakdownEntry(&power_breakdown_s.breakdown[TRANSCEIVER_TX_PWR_S],"transceiver_tx_pwr_s");
+    initPowerBreakdownEntry(&power_static.breakdown[TRANSCEIVER_RX_PWR_BIASING],"transceiver_rx_pwr_biasing");
+    initPowerBreakdownEntry(&power_static.breakdown[TRANSCEIVER_TX_PWR_BIASING],"transceiver_tx_pwr_biasing");
+    initPowerBreakdownEntry(&power_static.breakdown[BUFFER_ROUTER_PWR_S],"buffer_router_pwr_s");
+    initPowerBreakdownEntry(&power_static.breakdown[BUFFER_TO_TILE_PWR_S],"buffer_to_tile_pwr_s");
+    initPowerBreakdownEntry(&power_static.breakdown[BUFFER_FROM_TILE_PWR_S],"buffer_from_tile_pwr_s");
+    initPowerBreakdownEntry(&power_static.breakdown[ANTENNA_BUFFER_PWR_S],"antenna_buffer_pwr_s");
+    initPowerBreakdownEntry(&power_static.breakdown[LINK_R2H_PWR_S],"link_r2h_pwr_s");
+    initPowerBreakdownEntry(&power_static.breakdown[ROUTING_PWR_S],"routing_pwr_s");
+    initPowerBreakdownEntry(&power_static.breakdown[SELECTION_PWR_S],"selection_pwr_s");
+    initPowerBreakdownEntry(&power_static.breakdown[CROSSBAR_PWR_S],"crossbar_pwr_s");
+    initPowerBreakdownEntry(&power_static.breakdown[NI_PWR_S],"ni_pwr_s");
+    initPowerBreakdownEntry(&power_static.breakdown[TRANSCEIVER_RX_PWR_S],"transceiver_rx_pwr_s");
+    initPowerBreakdownEntry(&power_static.breakdown[TRANSCEIVER_TX_PWR_S],"transceiver_tx_pwr_s");
 }
 
     

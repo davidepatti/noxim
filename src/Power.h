@@ -89,8 +89,8 @@ class Power {
     void printBreakDown(std::ostream & out);
 
 
-    PowerBreakdown* getDynamicPowerBreakDown(){ return &power_breakdown_d;}
-    PowerBreakdown* getStaticPowerBreakDown(){ return &power_breakdown_s;}
+    PowerBreakdown* getDynamicPowerBreakDown(){ return &power_dynamic;}
+    PowerBreakdown* getStaticPowerBreakDown(){ return &power_static;}
 
     void rxSleep(int cycles);
     bool isSleeping();
@@ -151,8 +151,8 @@ class Power {
 
     void printBreakDown(string label, const map<string,double> & m,std::ostream & out) const;
 
-    PowerBreakdown power_breakdown_d;
-    PowerBreakdown power_breakdown_s;
+    PowerBreakdown power_dynamic;
+    PowerBreakdown power_static;
 
     void initPowerBreakdownEntry(PowerBreakdownEntry* pbe,string label);
     void initPowerBreakdown();

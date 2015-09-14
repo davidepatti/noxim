@@ -371,15 +371,15 @@ void GlobalStats::showWirxStats(std::ostream & out)
 
 void GlobalStats::showPowerBreakDown(std::ostream & out)
 {
-    map<string,double> power_breakdown_d;
-    map<string,double> power_breakdown_s;
+    map<string,double> power_dynamic;
+    map<string,double> power_static;
 
     for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
 	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
 	{
-	    updatePowerBreakDown(power_breakdown_d, noc->t[x][y]->r->power.getDynamicPowerBreakDown());
+	    updatePowerBreakDown(power_dynamic, noc->t[x][y]->r->power.getDynamicPowerBreakDown());
 
-	    updatePowerBreakDown(power_breakdown_s, noc->t[x][y]->r->power.getStaticPowerBreakDown());
+	    updatePowerBreakDown(power_static, noc->t[x][y]->r->power.getStaticPowerBreakDown());
 	}
 
     for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();
@@ -391,15 +391,15 @@ void GlobalStats::showPowerBreakDown(std::ostream & out)
 	map<int,Hub*>::const_iterator i = noc->hub.find(hub_id);
 	Hub * h = i->second;
 
-	    updatePowerBreakDown(power_breakdown_d, 
+	    updatePowerBreakDown(power_dynamic, 
 		h->power.getDynamicPowerBreakDown());
 
-	    updatePowerBreakDown(power_breakdown_s, 
+	    updatePowerBreakDown(power_static, 
 		h->power.getStaticPowerBreakDown());
     }
 
-    printMap("power_breakdown_d",power_breakdown_d,out);
-    printMap("power_breakdown_s",power_breakdown_s,out);
+    printMap("power_dynamic",power_dynamic,out);
+    printMap("power_static",power_static,out);
 
 }
 
