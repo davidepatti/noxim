@@ -89,7 +89,7 @@ class GlobalStats {
 
   private:
     const NoC *noc;
-    void updatePowerBreakDown(map<string,double> &dst,const map<string,double>& src);
+    void updatePowerBreakDown(map<string,double> &dst,PowerBreakdown* src);
 };
 
 #endif

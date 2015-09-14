@@ -314,11 +314,11 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 
 }
 
-void GlobalStats::updatePowerBreakDown(map<string,double> &dst,const map<string,double>& src)
+void GlobalStats::updatePowerBreakDown(map<string,double> &dst,PowerBreakdown* src)
 {
-    for (map<string,double>::const_iterator i=src.begin();i!=src.end();i++)
+    for (int i=0;i!=src->size;i++)
     {
-	dst[i->first]+=i->second;
+	dst[src->breakdown[i].label]+=src->breakdown[i].value;
     }
 }
 
@@ -377,11 +377,9 @@ void GlobalStats::showPowerBreakDown(std::ostream & out)
     for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
 	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
 	{
-	    updatePowerBreakDown(power_breakdown_d, 
-		noc->t[x][y]->r->power.getDynamicPowerBreakDown());
+	    updatePowerBreakDown(power_breakdown_d, noc->t[x][y]->r->power.getDynamicPowerBreakDown());
 
-	    updatePowerBreakDown(power_breakdown_s, 
-		noc->t[x][y]->r->power.getStaticPowerBreakDown());
+	    updatePowerBreakDown(power_breakdown_s, noc->t[x][y]->r->power.getStaticPowerBreakDown());
 	}
 
     for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();

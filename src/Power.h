@@ -17,8 +17,9 @@
 
 #include "yaml-cpp/yaml.h"
 
-using namespace std;
 
+
+using namespace std;
 
 class Power {
 
@@ -52,6 +53,7 @@ class Power {
     void bufferFromTileFront(); 
     void antennaBufferPush();
     void antennaBufferPop();
+
     void antennaBufferFront(); 
     void wirelessTx(int src,int dst,int length);
     void wirelessDynamicRx();
@@ -85,8 +87,10 @@ class Power {
 
 
     void printBreakDown(std::ostream & out);
-    map<string,double> getDynamicPowerBreakDown(){ return power_breakdown_d;}
-    map<string,double> getStaticPowerBreakDown(){ return power_breakdown_s;}
+
+
+    PowerBreakdown* getDynamicPowerBreakDown(){ return &power_breakdown_d;}
+    PowerBreakdown* getStaticPowerBreakDown(){ return &power_breakdown_s;}
 
     void rxSleep(int cycles);
     bool isSleeping();
@@ -147,8 +151,15 @@ class Power {
 
     void printBreakDown(string label, const map<string,double> & m,std::ostream & out) const;
 
-    map<string,double> power_breakdown_d;
-    map<string,double> power_breakdown_s;
+    PowerBreakdown power_breakdown_d;
+    PowerBreakdown power_breakdown_s;
+
+    void initPowerBreakdownEntry(PowerBreakdownEntry* pbe,string label);
+    void initPowerBreakdown();
+
+
+
+
 
     int sleep_end_cycle;
 

@@ -119,4 +119,63 @@ struct Flit {
 		&& flit.use_low_voltage_path == use_low_voltage_path);
 }};
 
+
+typedef struct 
+{
+    string label;
+    double value;
+} PowerBreakdownEntry;
+
+
+enum
+{
+    BUFFER_PUSH_PWR_D,
+    BUFFER_POP_PWR_D,
+    BUFFER_FRONT_PWR_D,
+    BUFFER_TO_TILE_PUSH_PWR_D,
+    BUFFER_TO_TILE_POP_PWR_D,
+    BUFFER_TO_TILE_FRONT_PWR_D,
+    BUFFER_FROM_TILE_PUSH_PWR_D,
+    BUFFER_FROM_TILE_POP_PWR_D,
+    BUFFER_FROM_TILE_FRONT_PWR_D,
+    ANTENNA_BUFFER_PUSH_PWR_D,
+    ANTENNA_BUFFER_POP_PWR_D,
+    ANTENNA_BUFFER_FRONT_PWR_D,
+    ROUTING_PWR_D,
+    SELECTION_PWR_D,
+    CROSSBAR_PWR_D,
+    LINK_R2R_PWR_D,
+    LINK_R2H_PWR_D,
+    NI_PWR_D,
+    WIRELESS_TX,
+    WIRELESS_DYNAMIC_RX_PWR,
+    WIRELESS_SNOOPING,
+    NO_BREAKDOWN_ENTRIES_D
+};
+
+enum
+{
+    TRANSCEIVER_RX_PWR_BIASING,
+    TRANSCEIVER_TX_PWR_BIASING,
+    BUFFER_ROUTER_PWR_S,
+    BUFFER_TO_TILE_PWR_S,
+    BUFFER_FROM_TILE_PWR_S,
+    ANTENNA_BUFFER_PWR_S,
+    LINK_R2H_PWR_S,
+    ROUTING_PWR_S,
+    SELECTION_PWR_S,
+    CROSSBAR_PWR_S,
+    NI_PWR_S,
+    TRANSCEIVER_RX_PWR_S,
+    TRANSCEIVER_TX_PWR_S,
+    NO_BREAKDOWN_ENTRIES_S
+};
+
+typedef struct 
+{
+    int size;
+    PowerBreakdownEntry breakdown[NO_BREAKDOWN_ENTRIES_D+NO_BREAKDOWN_ENTRIES_S];
+} PowerBreakdown;
+
+
 #endif
