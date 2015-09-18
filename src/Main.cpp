@@ -14,13 +14,28 @@
 #include "DataStructs.h"
 #include "GlobalParams.h"
 
+#include <csignal>
+
 using namespace std;
 
 // need to be globally visible to allow "-volume" simulation stop
 unsigned int drained_volume;
+NoC *n;
+
+void signalHandler( int signum )
+{
+    cout << "\b\b  " << endl;
+    cout << endl;
+    cout << "Current Statistics:" << endl;
+    cout << "(" << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " cycles executed)" << endl;
+    GlobalStats gs(n);
+    gs.showStats(std::cout, GlobalParams::detailed);
+}
 
 int sc_main(int arg_num, char *arg_vet[])
 {
+    signal(SIGQUIT, signalHandler);  
+
     // TEMP
     drained_volume = 0;
 
@@ -36,7 +51,7 @@ int sc_main(int arg_num, char *arg_vet[])
     sc_signal <bool> reset;
 
     // NoC instance
-    NoC *n = new NoC("NoC");
+    n = new NoC("NoC");
 
     n->clock(clock);
     n->reset(reset);
