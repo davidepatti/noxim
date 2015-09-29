@@ -210,7 +210,7 @@ inline int selectChannel(int src_hub, int dst_hub)
 
     if (intersection.size()==0) return NOT_VALID;
 
-    return intersection[0];
+    return intersection[rand()%intersection.size()];
 
 }
 
