@@ -123,6 +123,7 @@ void showHelp(char selfname[])
          << "\t\tcustom R\tCustom distribution with given real probability of retransmission" << endl
          << "\t-traffic TYPE\tSet the spatial distribution of traffic to TYPE where TYPE is one of the following (default " << GlobalParams::traffic_distribution << "):" << endl
          << "\t\trandom\t\tRandom traffic distribution" << endl
+         << "\t\tlocal L\t\tRandom traffic with a fraction L (0..1) of packets having a destination connected to the local hub, i.e. not using wireless" << endl
          << "\t\ttranspose1\tTranspose matrix 1 traffic distribution" << endl
          << "\t\ttranspose2\tTranspose matrix 2 traffic distribution" << endl
          << "\t\tbitreversal\tBit-reversal traffic distribution" << endl
