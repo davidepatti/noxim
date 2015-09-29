@@ -81,7 +81,7 @@ void NoC::buildMesh()
 
 	if (no_channels > 1)
 	{
-	    cerr << " WARNING, currently multi-channel per hub are unsupported, using default_tx_energy" << endl;
+	    cerr << " WARNING: Power model currently not supporting multi-channel per hub, using default_tx_energy" << endl;
 	}
 
 	int data_rate_gbs;
