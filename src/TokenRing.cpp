@@ -106,16 +106,20 @@ void TokenRing::attachHub(int channel, int hub, sc_in<int>* hub_token_holder_por
 	current_token_holder[channel]->bind(*(token_holder_signals[channel]));
 	current_token_expiration[channel]->bind(*(token_expiration_signals[channel]));
 
-	// checking max hold cycles vs wireless transmission latency
-	// consistency
-    //TODO move this check: max_hold_cycles depends on the Channel not on the Hub
+	// initial value that will be overwritten if mac policy != TOKEN_PACKET
+	token_hold_count[channel] = 0;
+
     
         if (GlobalParams::channel_configuration[channel].macPolicy[0] != TOKEN_PACKET) {
+	    // checking max hold cycles vs wireless transmission latency
+	    // consistency
+	    //TODO move this check: max_hold_cycles depends on the Channel not on the Hub
             double delay_ps = 1000*GlobalParams::flit_size/GlobalParams::channel_configuration[channel].dataRate;
-	        int cycles = ceil(delay_ps/GlobalParams::clock_period_ps);
-	        int max_hold_cycles = atoi(GlobalParams::channel_configuration[channel].macPolicy[1].c_str());
-            cout << max_hold_cycles;
-	        assert(cycles< max_hold_cycles);
+	    int cycles = ceil(delay_ps/GlobalParams::clock_period_ps);
+	    int max_hold_cycles = atoi(GlobalParams::channel_configuration[channel].macPolicy[1].c_str());
+	    assert(cycles< max_hold_cycles);
+
+	    token_hold_count[channel] = atoi(GlobalParams::channel_configuration[channel].macPolicy[1].c_str());
         }
     }	
 
@@ -130,7 +134,6 @@ void TokenRing::attachHub(int channel, int hub, sc_in<int>* hub_token_holder_por
 
     //LOG << "Attaching Hub " << hub << " to the token ring for channel " << channel << endl;
     rings_mapping[channel].push_back(hub); 
-    token_hold_count[channel] = atoi(GlobalParams::channel_configuration[channel].macPolicy[1].c_str());
 }
 
 
