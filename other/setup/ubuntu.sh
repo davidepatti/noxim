@@ -9,17 +9,20 @@ sudo apt-get -y install git || \
     sudo apt-get update && \
     sudo apt-get -y install git
 sudo apt-get -y install libboost-dev
-sudo apt-get -y install libyaml-cpp-dev || \
-    sudo apt-get -y install cmake && \
-    git clone https://github.com/jbeder/yaml-cpp && \
-    cd yaml-cpp/ && \
-    mkdir lib && \
-    cd lib && \
-    cmake .. && \
-    make && \
-    sudo make install
 
-cd ../..
+sudo apt-get -y install libyaml-cpp-dev || \
+    if [ $(dpkg -s libyaml-cpp-dev 2>/dev/null | grep "ok installed" | wc -l) -eq 0 ]
+    then
+        sudo apt-get -y install cmake && \
+        git clone https://github.com/jbeder/yaml-cpp && \
+        cd yaml-cpp/ && \
+        mkdir lib && \
+        cd lib && \
+        cmake .. && \
+        make && \
+        sudo make install
+        cd ../..
+    fi
 
 wget http://www.accellera.org/images/downloads/standards/systemc/systemc-2.3.1.tgz
 tar -xzf systemc-2.3.1.tgz
