@@ -49,4 +49,4 @@ cd noxim/bin
 
 make
 
-./noxim -config ../config_examples/default-config.yaml .
+./noxim -config ../config_examples/default_config.yaml .
