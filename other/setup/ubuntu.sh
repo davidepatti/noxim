@@ -38,7 +38,7 @@ make
 make install
 cd ..
 echo `pwd`/lib-* > systemc.conf
-sudo mv systemc.conf /etc/ld.so.conf.d/
+sudo ln -s `pwd`/systemc.conf /etc/ld.so.conf.d/noxim_systemc.conf
 sudo ldconfig
 cd ../..
 
