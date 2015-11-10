@@ -34,46 +34,47 @@ void Hub::wirxPowerManager()
     //cout << endl;
     */
 
+
+    // WIRXSLEEP - Check wheter accounting buffer to tile leakage
+    // check if there is at least one not empty antenna RX buffer
+
+
+    for (int port=0;port<num_ports;port++)
+    {
+	if (!buffer_to_tile[port].IsEmpty() || 
+		!antenna2tile_reservation_table.isAvailable(port))
+		power.leakageBufferToTile();
+
+	else
+	    buffer_to_tile_poweroff_cycles[port]++;
+    }
+
+
+    // WIRXSLEEP - Check wheter accounting antenna RX buffer 
+    // check if there is at least one not empty antenna RX buffer
+    // To be only applied if the current hub is in WIRXSLEEP_ON mode
+
     if (power.isSleeping())
     {
 	total_sleep_cycles++;
 
-	bool account_buffer_to_tile_leakage = false;
-	// check if there is at least one not empty antenna RX buffer
 	for (int i=0;i<rxChannels.size();i++)
 	{
 	    int ch_id = rxChannels[i];
 
 	    if (!target[ch_id]->buffer_rx.IsEmpty())
-	    {
-		account_buffer_to_tile_leakage = true;
 		power.leakageAntennaBuffer();
-	    }
 	    else
 		buffer_rx_sleep_cycles[ch_id]++;
 	}
-
-
-	for (int i = 0; i < num_ports; i++) 
-	{
-	    if (account_buffer_to_tile_leakage || !buffer_to_tile[i].IsEmpty())
-		power.leakageBufferToTile();
-	    else
-		buffer_to_tile_sleep_cycles[i]++;
-	}
-	
     }
-    else
+    else // not sleeping
     {
 	power.wirelessSnooping();
 	
 	for (int i=0;i<rxChannels.size();i++)
 	    power.leakageAntennaBuffer();
 
-	for (int i = 0; i < num_ports; i++) 
-	{
-		power.leakageBufferToTile();
-	}
 	power.leakageTransceiverRx();
 	power.biasingRx();
     }
@@ -352,9 +353,9 @@ void Hub::tileToAntenna()
 
 		assert(channel!=NOT_VALID && "hubs are connected by any channel");
 
-		if (wireless_reservation_table.isAvailable(channel)) 
+		if (tile2antenna_reservation_table.isAvailable(channel)) 
 		{
-		    wireless_reservation_table.reserve(i, channel);
+		    tile2antenna_reservation_table.reserve(i, channel);
 		}
 		else
 		{
@@ -378,7 +379,7 @@ void Hub::tileToAntenna()
 
 	    assert(r_from_tile[i] == DIRECTION_WIRELESS);
 
-	    int channel = wireless_reservation_table.getOutputPort(i);
+	    int channel = tile2antenna_reservation_table.getOutputPort(i);
 
 	    if (channel != NOT_RESERVED) 
 	    {
@@ -389,7 +390,7 @@ void Hub::tileToAntenna()
 		    power.bufferFromTilePop();
 		    init[channel]->buffer_tx.Push(flit);
 		    power.antennaBufferPush();
-		    if (flit.flit_type == FLIT_TYPE_TAIL) wireless_reservation_table.release(channel);
+		    if (flit.flit_type == FLIT_TYPE_TAIL) tile2antenna_reservation_table.release(channel);
 		}
 
 

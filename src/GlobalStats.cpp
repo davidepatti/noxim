@@ -325,8 +325,8 @@ void GlobalStats::updatePowerBreakDown(map<string,double> &dst,PowerBreakdown* s
 void GlobalStats::showWirxStats(std::ostream & out)
 {
     out << "wirxsleep_stats = [" << endl;
-    out << "%\tTotal Sleep Cycles (T), antenna BufferRX sleep cycles (ARX), BufferToTile sleep cycles (TTRX) " << endl;
-    out << "%\tHUB\tT\tARX\tTTRX\t" << endl;
+    out << "%\tSleep Cycles Fraction (S), Useful (U), BufferToTile poweroff fraction (PO) " << endl;
+    out << "%\tHUB\tS\tU\tPO\t" << endl;
 
     std::streamsize p = out.precision();
 
@@ -337,10 +337,8 @@ void GlobalStats::showWirxStats(std::ostream & out)
             ++it)
     {
 
-	out.precision(2);
+	out.precision(4);
 
-
-	
 	int hub_id = it->first;
 
 	map<int,Hub*>::const_iterator i = noc->hub.find(hub_id);
@@ -352,13 +350,16 @@ void GlobalStats::showWirxStats(std::ostream & out)
 	for (map<int,int>::iterator i = h->buffer_rx_sleep_cycles.begin();
 		i!=h->buffer_rx_sleep_cycles.end();i++)
 	    s+=i->second;
+
 	out << (double)s/h->buffer_rx_sleep_cycles.size()/h->total_sleep_cycles << "\t";
 
 	s = 0;
-	for (map<int,int>::iterator i = h->buffer_to_tile_sleep_cycles.begin();
-		i!=h->buffer_to_tile_sleep_cycles.end();i++)
+	for (map<int,int>::iterator i = h->buffer_to_tile_poweroff_cycles.begin();
+		i!=h->buffer_to_tile_poweroff_cycles.end();i++)
+	{
 	    s+=i->second;
-	out << (double)s/h->buffer_to_tile_sleep_cycles.size()/h->total_sleep_cycles << endl;
+	}
+	out << (double)s/h->buffer_to_tile_poweroff_cycles.size()/total_cycles << endl;
     }
 
     out << "];" << endl;

@@ -66,9 +66,8 @@ SC_MODULE(Hub)
 
     int start_from_port; // Port from which to start the reservation cycle
 
-    ReservationTable reservation_table;	// Switch reservation table
-    ReservationTable in_reservation_table;	// Switch reservation table
-    ReservationTable wireless_reservation_table;// Wireless reservation table
+    ReservationTable antenna2tile_reservation_table;	// Switch reservation table
+    ReservationTable tile2antenna_reservation_table;// Wireless reservation table
 
     void perCycleUpdate();
     void updateRxPower();
@@ -84,7 +83,7 @@ SC_MODULE(Hub)
 
     int total_sleep_cycles;
     map<int,int> buffer_rx_sleep_cycles;
-    map<int,int> buffer_to_tile_sleep_cycles;
+    map<int,int> buffer_to_tile_poweroff_cycles;
 
     // Constructor
 
