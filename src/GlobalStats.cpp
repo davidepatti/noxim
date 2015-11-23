@@ -351,7 +351,7 @@ void GlobalStats::showWirxStats(std::ostream & out)
 		i!=h->buffer_rx_sleep_cycles.end();i++)
 	    s+=i->second;
 
-	out << (double)s/h->buffer_rx_sleep_cycles.size()/h->total_sleep_cycles << "\t";
+	out << (double)s/h->buffer_rx_sleep_cycles.size()/total_cycles << "\t";
 
 	s = 0;
 	for (map<int,int>::iterator i = h->buffer_to_tile_poweroff_cycles.begin();
