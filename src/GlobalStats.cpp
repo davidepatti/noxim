@@ -325,8 +325,8 @@ void GlobalStats::updatePowerBreakDown(map<string,double> &dst,PowerBreakdown* s
 void GlobalStats::showWirxStats(std::ostream & out)
 {
     out << "wirxsleep_stats = [" << endl;
-    out << "%\tSleep Cycles Fraction (S), Useful (U), BufferToTile poweroff fraction (PO) " << endl;
-    out << "%\tHUB\tS\tU\tPO\t" << endl;
+    out << "%\tFraction of: RX Transceiver off (TRXoff), AntennaBufferRX off (ABRXoff), BufferToTile off (BTToff) " << endl;
+    out << "%\tTRXoff\tABRoff\tU\tBTToff\t" << endl;
 
     std::streamsize p = out.precision();
 
