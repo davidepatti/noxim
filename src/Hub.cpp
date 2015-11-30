@@ -24,20 +24,9 @@ int Hub::route(Flit& f)
 
 void Hub::wirxPowerManager()
 {
-    /*
-    //LOG << " buffer_to_tile STATUS: " << endl;
-    for (int i = 0; i < num_ports; i++) 
-    {
-	//if (!buffer_to_tile[i].IsEmpty()) cout << "*"; else cout << ".";
-
-    }
-    //cout << endl;
-    */
-
 
     // WIRXSLEEP - Check wheter accounting buffer to tile leakage
     // check if there is at least one not empty antenna RX buffer
-
 
     for (int port=0;port<num_ports;port++)
     {
@@ -49,32 +38,29 @@ void Hub::wirxPowerManager()
 	    buffer_to_tile_poweroff_cycles[port]++;
     }
 
+    for (int i=0;i<rxChannels.size();i++)
+    {
+	int ch_id = rxChannels[i];
+
+	if (!target[ch_id]->buffer_rx.IsEmpty())
+	{
+	    LOG << " POWER RX ANTENNA " << endl;
+	    power.leakageAntennaBuffer();
+	}
+	else
+	    buffer_rx_sleep_cycles[ch_id]++;
+    }
 
     // WIRXSLEEP - Check wheter accounting antenna RX buffer 
     // check if there is at least one not empty antenna RX buffer
     // To be only applied if the current hub is in WIRXSLEEP_ON mode
 
     if (power.isSleeping())
-    {
 	total_sleep_cycles++;
 
-	for (int i=0;i<rxChannels.size();i++)
-	{
-	    int ch_id = rxChannels[i];
-
-	    if (!target[ch_id]->buffer_rx.IsEmpty())
-		power.leakageAntennaBuffer();
-	    else
-		buffer_rx_sleep_cycles[ch_id]++;
-	}
-    }
     else // not sleeping
     {
 	power.wirelessSnooping();
-	
-	for (int i=0;i<rxChannels.size();i++)
-	    power.leakageAntennaBuffer();
-
 	power.leakageTransceiverRx();
 	power.biasingRx();
     }
@@ -82,33 +68,9 @@ void Hub::wirxPowerManager()
 }
 
 
-void Hub::perCycleUpdate()
-{
-    // Mandatory leakage contributions **************************
-    //
-    // Initiators buffer_tx
-    for (int i=0;i<txChannels.size();i++)
-    {
-	power.leakageAntennaBuffer();
-    }
-
-    // buffer from tile connections
-    for (int i = 0; i < num_ports; i++) 
-    {
-	power.leakageBufferFromTile();
-	power.leakageLinkRouter2Hub();
-    }
-
-    power.leakageTransceiverTx();
-    power.biasingTx();
-    //***********************************************************
-
-
-}
 
 void Hub::updateRxPower()
 {
-
     if (GlobalParams::use_wirxsleep)
 	wirxPowerManager();
     else
@@ -127,6 +89,84 @@ void Hub::updateRxPower()
 	power.biasingRx();
     }    
 }
+
+void Hub::txPowerManager()
+{
+    bool all_bft_empty = true;
+    bool all_abtx_empty = true;
+
+
+    for (int port=0; port<num_ports; port++)
+	if (!buffer_from_tile[port].IsEmpty())
+	{
+	    all_bft_empty = false;
+	    break;
+	}
+
+    for (int i=0;i<txChannels.size();i++)
+	if (!init[i]->buffer_tx.IsEmpty())
+	{
+	    all_abtx_empty = false;
+	    break;
+	}
+
+    // if there is at least one not empty buffer from tile
+    // we must power on transceiver and all antenna tx buffers
+    if (!all_bft_empty)
+    {
+	for (int i=0;i<txChannels.size();i++)
+	    power.leakageAntennaBuffer();
+
+	power.leakageTransceiverTx();
+	power.biasingTx();
+    }    
+    else // all buffer from tile empty
+    {
+	// antenna buffers also are empty, we can turn everything off
+	if (all_abtx_empty)
+	{
+	    for (int i=0;i<txChannels.size();i++)
+		abtxoff_cycles[i]++;
+
+	    total_ttxoff_cycles++;
+	}
+	else // selectively turn off empty antenna buffers
+	{
+	    // transceiver should be on in any case
+	    power.leakageTransceiverTx();
+	    power.biasingTx();
+
+	    // check the channels with empty antenna tx buffers
+	    for (int i=0;i<txChannels.size();i++)
+	    {
+		if (!init[i]->buffer_tx.IsEmpty())
+		    power.leakageAntennaBuffer();
+		else
+		    abtxoff_cycles[i]++;
+	    }
+	}
+    }
+}
+
+void Hub::updateTxPower()
+{
+    if (GlobalParams::use_wirxsleep)
+	txPowerManager();
+    else
+    {
+	for (int i=0;i<txChannels.size();i++)
+	    power.leakageAntennaBuffer();
+
+	power.leakageTransceiverTx();
+	power.biasingTx();
+    }    
+
+    // mandatory
+    power.leakageLinkRouter2Hub();
+    for (int i = 0; i < num_ports; i++) 
+	power.leakageBufferFromTile();
+}
+
 
 void Hub::txRadioProcessTokenPacket(int channel)
 {
@@ -220,7 +260,7 @@ void Hub::txRadioProcessTokenMaxHold(int channel)
 
 
 
-void Hub::antennaToTile()
+void Hub::antennaToTileProcess()
 {
     if (reset.read()) 
     {
@@ -232,6 +272,8 @@ void Hub::antennaToTile()
     } 
     else
     {
+	// IMPORTANT: do not move from here
+	// The rxPowerManager must perform its checks before the flits are removed from buffers
 	updateRxPower();
 	
 	for (int i = 0; i < num_ports; i++) 
@@ -295,7 +337,7 @@ void Hub::antennaToTile()
 }
 
 
-void Hub::tileToAntenna()
+void Hub::tileToAntennaProcess()
 {
     if (reset.read()) 
     {
@@ -426,4 +468,9 @@ void Hub::tileToAntenna()
 	}
 	ack_rx[i]->write(current_level_rx[i]);
     }
+
+    // IMPORTANT: do not move from here
+    // The txPowerManager assumes that all flit buffer write have been done
+    txPowerManager();
 }
+
