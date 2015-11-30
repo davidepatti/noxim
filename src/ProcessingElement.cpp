@@ -113,6 +113,8 @@ bool ProcessingElement::canShot(Packet & packet)
 		    packet = trafficButterfly();
         else if (GlobalParams::traffic_distribution == TRAFFIC_LOCAL)
 		    packet = trafficLocal();
+        else if (GlobalParams::traffic_distribution == TRAFFIC_ULOCAL)
+		    packet = trafficULocal();
         else
 		    assert(false);
 	}
@@ -176,6 +178,78 @@ Packet ProcessingElement::trafficLocal()
 
 }
 
+
+int ProcessingElement::findRandomDestination(int id, int hops)
+{
+    int inc_y = rand()%2?-1:1;
+    int inc_x = rand()%2?-1:1;
+    
+    Coord current =  id2Coord(id);
+    
+
+    //cout << "\n DIREZIONI " << inc_x << "   " << inc_y << endl;
+
+    for (int h = 0; h<hops; h++)
+    {
+	//cout << "\n CURRENT POS: " << current.x << " , " << current.y << endl;
+
+	if (current.x==0)
+	    if (inc_x<0) inc_x=0;
+
+	if (current.x== GlobalParams::mesh_dim_x-1)
+	    if (inc_x>0) inc_x=0;
+
+	if (current.y==0)
+	    if (inc_y<0) inc_y=0;
+
+	if (current.y==GlobalParams::mesh_dim_y-1)
+	    if (inc_y>0) inc_y=0;
+
+	if (rand()%2)
+	    current.x +=inc_x;
+	else
+	    current.y +=inc_y;
+    }
+    return coord2Id(current);
+}
+
+
+int roulette()
+{
+    int slices = GlobalParams::mesh_dim_x + GlobalParams::mesh_dim_y -2;
+
+
+    double r = rand()/(double)RAND_MAX;
+
+    //cout << "\n E' uscito il " << r << endl;
+
+    for (int i=1;i<=slices;i++)
+    {
+	if (r< (1-1/double(2<<i)))
+	{
+	    //cout << "\n sta nel settore " << i << endl;
+	    return i;
+	}
+    }
+    assert(false);
+    return 1;
+}
+
+
+Packet ProcessingElement::trafficULocal()
+{
+    Packet p;
+    p.src_id = local_id;
+
+    int target_hops = roulette();
+
+    p.dst_id = findRandomDestination(local_id,target_hops);
+
+    p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+    p.size = p.flit_left = getRandomSize();
+
+    return p;
+}
 
 Packet ProcessingElement::trafficRandom()
 {

@@ -57,6 +57,7 @@ using namespace std;
 #define TRAFFIC_SHUFFLE        "TRAFFIC_SHUFFLE"
 #define TRAFFIC_BUTTERFLY      "TRAFFIC_BUTTERFLY"
 #define TRAFFIC_LOCAL	       "TRAFFIC_LOCAL"
+#define TRAFFIC_ULOCAL	       "TRAFFIC_ULOCAL"
 
 // Verbosity levels
 #define VERBOSE_OFF            "VERBOSE_OFF"

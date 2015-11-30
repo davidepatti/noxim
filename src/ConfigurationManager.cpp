@@ -124,6 +124,7 @@ void showHelp(char selfname[])
          << "\t-traffic TYPE\tSet the spatial distribution of traffic to TYPE where TYPE is one of the following (default " << GlobalParams::traffic_distribution << "):" << endl
          << "\t\trandom\t\tRandom traffic distribution" << endl
          << "\t\tlocal L\t\tRandom traffic with a fraction L (0..1) of packets having a destination connected to the local hub, i.e. not using wireless" << endl
+         << "\t\tulocal\t\tRandom traffic with locality smooth distribution" << endl
          << "\t\ttranspose1\tTranspose matrix 1 traffic distribution" << endl
          << "\t\ttranspose2\tTranspose matrix 2 traffic distribution" << endl
          << "\t\tbitreversal\tBit-reversal traffic distribution" << endl
@@ -341,6 +342,9 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		else if (!strcmp(traffic, "shuffle"))
 		    GlobalParams::traffic_distribution =
 			TRAFFIC_SHUFFLE;
+		else if (!strcmp(traffic, "ulocal"))
+		    GlobalParams::traffic_distribution =
+			TRAFFIC_ULOCAL;
 		else if (!strcmp(traffic, "table")) {
 		    GlobalParams::traffic_distribution =
 			TRAFFIC_TABLE_BASED;
