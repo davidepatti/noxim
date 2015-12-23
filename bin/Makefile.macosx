@@ -1,0 +1,54 @@
+##### LIBRARIES CONFIGURATION #####
+
+# change to your path
+SYSTEMC := /usr/local/systemc-2.3.1
+# yaml-cpp installed via macports
+YAML    := /opt/local
+
+
+##### DIRECTORIES #####
+
+SYSTEMC_LIBS := $(wildcard $(SYSTEMC)/lib-*)
+
+SRCDIR  := ../src
+SUBDIRS := $(filter %/,$(wildcard $(SRCDIR)/*/))
+OBJDIR  := ./build
+
+SRCS := $(wildcard $(SRCDIR)/*.cpp) $(wildcard $(addsuffix *.cpp,$(SUBDIRS)))
+OBJS := $(subst $(SRCDIR),$(OBJDIR),$(SRCS:.cpp=.o))
+
+MODULE := noxim
+
+
+##### COMPILER OPTIONS #####
+
+CXX      := g++
+OPT      := -O3
+DEBUG    := # -g -DDEBUG
+OTHER    := -Wall# -Wno-deprecated
+CXXFLAGS := $(OPT) $(OTHER) $(DEBUG)
+
+INCDIR := -I$(SRCDIR) -isystem $(SYSTEMC)/include -I$(YAML)/include
+LIBDIR := -L$(SRCDIR) -L$(SYSTEMC_LIBS) -L$(YAML)/lib
+
+LIBS := -lsystemc -lm -lyaml-cpp 
+
+SPACE := $(subst ,, )
+VPATH := $(SRCDIR):$(subst $(SPACE),:,$(SUBDIRS))
+
+##### RULES #####
+
+$(MODULE): $(OBJS)
+	$(CXX) $(LIBDIR) $^ $(LIBS) -o $@ 2>&1 | c++filt
+
+$(OBJDIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(INCDIR) -c $< -o $@
+
+clean:
+	rm -f $(OBJS) $(MODULE) *~
+
+depend: 
+	makedepend $(SRCS) -Y -f- 2>/dev/null | sed 's_$(SRCDIR)_$(OBJDIR)_' > Makefile.deps
+
+-include Makefile.deps
