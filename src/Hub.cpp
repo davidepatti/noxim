@@ -24,7 +24,6 @@ int Hub::route(Flit& f)
 
 void Hub::wirxPowerManager()
 {
-
     // WIRXSLEEP - Check wheter accounting buffer to tile leakage
     // check if there is at least one not empty antenna RX buffer
 
@@ -269,69 +268,68 @@ void Hub::antennaToTileProcess()
 	    req_tx[i]->write(0);
 	    current_level_tx[i] = 0;
         }
+	return;
     } 
-    else
+
+    // IMPORTANT: do not move from here
+    // The rxPowerManager must perform its checks before the flits are removed from buffers
+    updateRxPower();
+    
+    for (int i = 0; i < num_ports; i++) 
     {
-	// IMPORTANT: do not move from here
-	// The rxPowerManager must perform its checks before the flits are removed from buffers
-	updateRxPower();
-	
-	for (int i = 0; i < num_ports; i++) 
-	{
-	    if (!buffer_to_tile[i].IsEmpty()) 
-	    {     
-		Flit flit = buffer_to_tile[i].Front();
+	if (!buffer_to_tile[i].IsEmpty()) 
+	{     
+	    Flit flit = buffer_to_tile[i].Front();
 
-		flit_tx[i].write(flit);
-		power.r2hLink();
-		current_level_tx[i] = 1 - current_level_tx[i];
-		req_tx[i].write(current_level_tx[i]);
-		LOG << "Flit moved from buffer_to_tile[" << i <<"] to signal flit_tx["<<i<<"] " << endl;
-		buffer_to_tile[i].Pop();
-		power.bufferToTilePop();
-	    } //if buffer not empty
+	    flit_tx[i].write(flit);
+	    power.r2hLink();
+	    current_level_tx[i] = 1 - current_level_tx[i];
+	    req_tx[i].write(current_level_tx[i]);
+	    LOG << "Flit moved from buffer_to_tile[" << i <<"] to signal flit_tx["<<i<<"] " << endl;
+	    buffer_to_tile[i].Pop();
+	    power.bufferToTilePop();
+	} //if buffer not empty
+    }
+
+    // stores routing decision
+    // need a vector to use this info to choose between the two
+    // tables
+    int * r = new int[rxChannels.size()];
+
+
+    for (unsigned int i=0;i<rxChannels.size();i++)
+    {
+	int channel = rxChannels[i];
+	if (!(target[channel]->buffer_rx.IsEmpty()))
+	{
+	    LOG << "Buffer_rx is not empty for channel " << channel << endl;
+	    Flit received_flit = target[channel]->buffer_rx.Front();
+	    power.antennaBufferFront();
+	    r[i] = tile2Port(received_flit.dst_id);
 	}
+    }
 
-	// stores routing decision
-	// need a vector to use this info to choose between the two
-	// tables
-	int * r = new int[rxChannels.size()];
+    for (unsigned int i = 0; i < rxChannels.size(); i++) 
+    {
+	int channel = rxChannels[i];
 
-
-	for (unsigned int i=0;i<rxChannels.size();i++)
+	if (!(target[channel]->buffer_rx.IsEmpty()))
 	{
-	    int channel = rxChannels[i];
-	    if (!(target[channel]->buffer_rx.IsEmpty()))
+	    Flit received_flit = target[channel]->buffer_rx.Front();
+	    power.antennaBufferFront();
+
+	    if ( !buffer_to_tile[r[i]].IsFull() ) 
 	    {
-		LOG << "Buffer_rx is not empty for channel " << channel << endl;
-		Flit received_flit = target[channel]->buffer_rx.Front();
-		power.antennaBufferFront();
-		r[i] = tile2Port(received_flit.dst_id);
+		target[channel]->buffer_rx.Pop();
+		power.antennaBufferPop();
+		LOG << "Moving flit from buffer_rx to buffer_to_tile, port " << r[i] << endl;
+
+		buffer_to_tile[r[i]].Push(received_flit);
+		power.bufferToTilePush();
 	    }
-	}
+	    else 
+		LOG << "WARNING, buffer full for port " << r[i] << endl;
 
-	for (unsigned int i = 0; i < rxChannels.size(); i++) 
-	{
-	    int channel = rxChannels[i];
-
-	    if (!(target[channel]->buffer_rx.IsEmpty()))
-	    {
-		Flit received_flit = target[channel]->buffer_rx.Front();
-		power.antennaBufferFront();
-
-		if ( !buffer_to_tile[r[i]].IsFull() ) 
-		{
-		    target[channel]->buffer_rx.Pop();
-		    power.antennaBufferPop();
-		    LOG << "Moving flit from buffer_rx to buffer_to_tile, port " << r[i] << endl;
-
-		    buffer_to_tile[r[i]].Push(received_flit);
-		    power.bufferToTilePush();
-		}
-		else 
-		    LOG << "WARNING, buffer full for port " << r[i] << endl;
-
-	    }
 	}
     }
 }
@@ -352,26 +350,25 @@ void Hub::tileToAntennaProcess()
             ack_rx[i]->write(0);
             current_level_rx[i] = 0;
 	}
+	return;
     } 
-    else 
+
+    for (unsigned int i =0 ;i<txChannels.size();i++)
     {
-	for (unsigned int i =0 ;i<txChannels.size();i++)
-	{
-	    int channel = txChannels[i];
+	int channel = txChannels[i];
 
-        string macPolicy = token_ring->getPolicy(channel).first;
+	string macPolicy = token_ring->getPolicy(channel).first;
 
-	    if (macPolicy == TOKEN_PACKET)
-		    txRadioProcessTokenPacket(channel);
-	    else if (macPolicy == TOKEN_HOLD)
-		    txRadioProcessTokenHold(channel);
-		else if (macPolicy == TOKEN_MAX_HOLD)
-		    txRadioProcessTokenMaxHold(channel);
-		else
-            assert(false);
-	}
-
+	if (macPolicy == TOKEN_PACKET)
+		txRadioProcessTokenPacket(channel);
+	else if (macPolicy == TOKEN_HOLD)
+		txRadioProcessTokenHold(channel);
+	    else if (macPolicy == TOKEN_MAX_HOLD)
+		txRadioProcessTokenMaxHold(channel);
+	    else
+	assert(false);
     }
+
 
     int * r_from_tile = new int[num_ports];
 

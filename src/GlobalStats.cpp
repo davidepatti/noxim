@@ -115,8 +115,7 @@ vector < vector < double > > GlobalStats::getMaxDelayMtx()
     return mtx;
 }
 
-double GlobalStats::getAverageThroughput(const int src_id,
-					      const int dst_id)
+double GlobalStats::getAverageThroughput(const int src_id, const int dst_id)
 {
     Tile *tile = noc->searchNode(dst_id);
 
@@ -125,6 +124,7 @@ double GlobalStats::getAverageThroughput(const int src_id,
     return tile->r->stats.getAverageThroughput(src_id);
 }
 
+/*
 double GlobalStats::getAverageThroughput()
 {
     unsigned int total_comms = 0;
@@ -145,6 +145,14 @@ double GlobalStats::getAverageThroughput()
     avg_throughput /= (double) total_comms;
 
     return avg_throughput;
+}
+*/
+
+double GlobalStats::getAggregatedThroughput()
+{
+    int total_cycles = GlobalParams::simulation_time - GlobalParams::stats_warm_up_time;
+
+    return (double)getReceivedFlits()/(double)(total_cycles);
 }
 
 unsigned int GlobalStats::getReceivedPackets()
@@ -175,12 +183,19 @@ unsigned int GlobalStats::getReceivedFlits()
 
 double GlobalStats::getThroughput()
 {
+
+    int number_of_ip = GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y;
+
+    return (double)getAggregatedThroughput()/(double)(number_of_ip);
+}
+
+// Only accounting IP that received at least one flit
+double GlobalStats::getActiveThroughput()
+{
     int total_cycles =
 	GlobalParams::simulation_time -
 	GlobalParams::stats_warm_up_time;
 
-    //  int number_of_ip = GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y;
-    //  return (double)getReceivedFlits()/(double)(total_cycles * number_of_ip);
 
     unsigned int n = 0;
     unsigned int trf = 0;
@@ -193,6 +208,7 @@ double GlobalStats::getThroughput()
 
 	    trf += rf;
 	}
+
     return (double) trf / (double) (total_cycles * n);
 
 }
@@ -299,12 +315,10 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 
     out << "% Total received packets: " << getReceivedPackets() << endl;
     out << "% Total received flits: " << getReceivedFlits() << endl;
-    out << "% Global average delay (cycles): " << getAverageDelay() <<
-	endl;
-    out << "% Global average throughput (flits/cycle): " <<
-	getAverageThroughput() << endl;
-    out << "% Throughput (flits/cycle/IP): " << getThroughput() << endl;
+    out << "% Global average delay (cycles): " << getAverageDelay() << endl;
     out << "% Max delay (cycles): " << getMaxDelay() << endl;
+    out << "% Network throughput (flits/cycle): " << getAggregatedThroughput() << endl;
+    out << "% Average IP throughput (flits/cycle/IP): " << getThroughput() << endl;
     out << "% Total energy (J): " << getTotalPower() << endl;
     out << "% \tDynamic energy (J): " << getDynamicPower() << endl;
     out << "% \tStatic energy (J): " << getStaticPower() << endl;
@@ -325,7 +339,8 @@ void GlobalStats::updatePowerBreakDown(map<string,double> &dst,PowerBreakdown* s
 void GlobalStats::showWirxStats(std::ostream & out)
 {
     std::streamsize p = out.precision();
-    int total_cycles = sc_time_stamp().to_double() / GlobalParams::clock_period_ps-GlobalParams::reset_time;
+    int total_cycles = sc_time_stamp().to_double() / GlobalParams::clock_period_ps - GlobalParams::reset_time;
+
     out.precision(4);
 
     out << "wirxsleep_stats_tx = [" << endl;
@@ -346,7 +361,7 @@ void GlobalStats::showWirxStats(std::ostream & out)
 	int s = 0;
 	for (map<int,int>::iterator i = h->abtxoff_cycles.begin(); i!=h->abtxoff_cycles.end();i++) s+=i->second;
 
-	out << (double)s/h->abtxoff_cycles.size()/total_cycles << "\t";
+	out << (double)s/h->abtxoff_cycles.size()/total_cycles << endl;
     }
 
     out << "];" << endl;

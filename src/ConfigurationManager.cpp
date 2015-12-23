@@ -164,7 +164,7 @@ void showConfig()
          << "- traffic_distribution = " << GlobalParams::traffic_distribution << endl
          << "- clock_period = " << GlobalParams::clock_period_ps << "ps" << endl
          << "- simulation_time = " << GlobalParams::simulation_time << endl
-         << "- stats_warm_up_time = " << GlobalParams::stats_warm_up_time << endl
+         << "- warm_up_time = " << GlobalParams::stats_warm_up_time << endl
          << "- rnd_generator_seed = " << GlobalParams::rnd_generator_seed << endl;
 }
 
@@ -281,7 +281,9 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 	    else if (!strcmp(arg_vet[i], "-winoc")) 
 		GlobalParams::use_winoc = true;
 	    else if (!strcmp(arg_vet[i], "-wirxsleep")) 
+	    {
 		GlobalParams::use_wirxsleep = true;
+	    }
 	    else if (!strcmp(arg_vet[i], "-size")) 
 	    {
 		GlobalParams::min_packet_size = atoi(arg_vet[++i]);
