@@ -468,6 +468,6 @@ void Hub::tileToAntennaProcess()
 
     // IMPORTANT: do not move from here
     // The txPowerManager assumes that all flit buffer write have been done
-    txPowerManager();
+    updateTxPower();
 }
 
