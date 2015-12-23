@@ -57,7 +57,7 @@ SC_MODULE(ProcessingElement)
     Packet trafficShuffle();	// Shuffle destination distribution
     Packet trafficButterfly();	// Butterfly destination distribution
     Packet trafficLocal();	// Random with locality
-
+    Packet trafficULocal();	// Random with locality
 
     GlobalTrafficTable *traffic_table;	// Reference to the Global traffic Table
     bool never_transmit;	// true if the PE does not transmit any packet 
@@ -69,6 +69,9 @@ SC_MODULE(ProcessingElement)
     void setBit(int &x, int w, int v);
     int getBit(int x, int w);
     double log2ceil(double x);
+
+    int roulett();
+    int findRandomDestination(int local_id,int hops);
 
     // Constructor
     SC_CTOR(ProcessingElement) {

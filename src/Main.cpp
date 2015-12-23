@@ -27,7 +27,7 @@ void signalHandler( int signum )
     cout << "\b\b  " << endl;
     cout << endl;
     cout << "Current Statistics:" << endl;
-    cout << "(" << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " cycles executed)" << endl;
+    cout << "(" << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " sim cycles executed)" << endl;
     GlobalStats gs(n);
     gs.showStats(std::cout, GlobalParams::detailed);
 }
@@ -89,19 +89,16 @@ int sc_main(int arg_num, char *arg_vet[])
     }
     // Reset the chip and run the simulation
     reset.write(1);
-    cout << "Reset..." << endl;
-    srand(GlobalParams::rnd_generator_seed);	// time(NULL));
-
-
+    cout << "Reset for " << (int)(GlobalParams::reset_time) << " cycles... " << endl;
+    srand(GlobalParams::rnd_generator_seed);
     sc_start(GlobalParams::reset_time, SC_NS);
+
     reset.write(0);
-    cout << " done! Now running for " << GlobalParams::
-	simulation_time << " cycles..." << endl;
+    cout << " done! Now running for " << GlobalParams:: simulation_time << " cycles..." << endl;
     sc_start(GlobalParams::simulation_time, SC_NS);
 
     // Close the simulation
-    if (GlobalParams::trace_mode)
-	sc_close_vcd_trace_file(tf);
+    if (GlobalParams::trace_mode) sc_close_vcd_trace_file(tf);
     cout << "Noxim simulation completed." << endl;
     cout << " ( " << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " cycles executed)" << endl;
 
@@ -110,7 +107,7 @@ int sc_main(int arg_num, char *arg_vet[])
     gs.showStats(std::cout, GlobalParams::detailed);
 
     if ((GlobalParams::max_volume_to_be_drained > 0) &&
-	(sc_time_stamp().to_double() / GlobalParams::clock_period_ps >=
+	(sc_time_stamp().to_double() / GlobalParams::clock_period_ps - GlobalParams::reset_time >=
 	 GlobalParams::simulation_time)) {
 	cout << endl
          << "WARNING! the number of flits specified with -volume option" << endl

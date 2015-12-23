@@ -109,11 +109,16 @@ double Stats::getAverageThroughput(const int src_id)
 
     assert(i >= 0);
 
+    // not using GlobalParams::simulation_time since 
+    // the value must takes into account the invokation time
+    // (when called before simulation ended, e.g. turi signal)
+    int current_sim_cycles = sc_time_stamp().to_double()/GlobalParams::clock_period_ps - warm_up_time - GlobalParams::reset_time;
+
     if (chist[i].total_received_flits == 0)
 	return -1.0;
     else
-	return (double) chist[i].total_received_flits /
-	    (double) chist[i].last_received_flit_time;
+	return (double) chist[i].total_received_flits / current_sim_cycles;
+	    //(double) chist[i].last_received_flit_time;
 }
 
 double Stats::getAverageThroughput()

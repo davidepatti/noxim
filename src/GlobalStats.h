@@ -44,10 +44,16 @@ class GlobalStats {
     // Returns tha matrix of max delay for any node of the network
      vector < vector < double > > getMaxDelayMtx();
 
-    // Returns the aggragated average throughput (flits/cycles)
-    double getAverageThroughput();
+    // Returns the aggregated average throughput (flits/cycles)
+    double getAggregatedThroughput();
 
-    // Returns the aggragated average throughput (flits/cycles) for
+    // Returns the average throughput per IP (flit/cycles/IP)
+    double getThroughput();
+
+    // Returns the average throughput considering only a active IP (flit/cycles/IP)
+    double getActiveThroughput();
+
+    // Returns the aggregated average throughput (flits/cycles) for
     // communication src_id->dst_id
     double getAverageThroughput(const int src_id, const int dst_id);
 
@@ -57,8 +63,6 @@ class GlobalStats {
     // Returns the total number of received flits
     unsigned int getReceivedFlits();
 
-    // Returns the maximum value of the accepted traffic
-    double getThroughput();
 
     // Returns the number of routed flits for each router
      vector < vector < unsigned long > > getRoutedFlitsMtx();

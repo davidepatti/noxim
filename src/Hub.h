@@ -66,25 +66,27 @@ SC_MODULE(Hub)
 
     int start_from_port; // Port from which to start the reservation cycle
 
-    ReservationTable reservation_table;	// Switch reservation table
-    ReservationTable in_reservation_table;	// Switch reservation table
-    ReservationTable wireless_reservation_table;// Wireless reservation table
+    ReservationTable antenna2tile_reservation_table;	// Switch reservation table
+    ReservationTable tile2antenna_reservation_table;// Wireless reservation table
 
-    void perCycleUpdate();
     void updateRxPower();
-    void antennaToTile();
-    void tileToAntenna();
+    void updateTxPower();
+    void antennaToTileProcess();
+    void tileToAntennaProcess();
 
     int route(Flit&);
     int tile2Port(int);
 
     void setFlitTransmissionCycles(int cycles,int ch_id) {flit_transmission_cycles[ch_id]=cycles;}
 
+    // Power stats
     Power power;
 
     int total_sleep_cycles;
-    map<int,int> buffer_rx_sleep_cycles;
-    map<int,int> buffer_to_tile_sleep_cycles;
+    int total_ttxoff_cycles;
+    map<int,int> buffer_rx_sleep_cycles; // antenna buffer RX power off cycles
+    map<int,int> abtxoff_cycles; // antenna buffer TX power off cycles
+    map<int,int> buffer_to_tile_poweroff_cycles;
 
     // Constructor
 
@@ -92,17 +94,14 @@ SC_MODULE(Hub)
 
 	if (GlobalParams::use_winoc)
 	{
-	    SC_METHOD(tileToAntenna);
+	    SC_METHOD(tileToAntennaProcess);
 	    sensitive << reset;
 	    sensitive << clock.pos();
 
-	    SC_METHOD(antennaToTile);
+	    SC_METHOD(antennaToTileProcess);
 	    sensitive << reset;
 	    sensitive << clock.pos();
 
-	    SC_METHOD(perCycleUpdate);
-	    sensitive << reset;
-	    sensitive << clock.pos();
 	}
 
 
@@ -157,8 +156,8 @@ SC_MODULE(Hub)
         }
 
         start_from_port = 0;
-
 	total_sleep_cycles = 0;
+	total_ttxoff_cycles = 0;
     }
 
 
@@ -172,6 +171,7 @@ SC_MODULE(Hub)
     void txRadioProcessTokenMaxHold(int channel);
 
     void wirxPowerManager();
+    void txPowerManager();
 };
 
 #endif

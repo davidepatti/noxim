@@ -95,15 +95,15 @@ void showHelp(char selfname[])
          << "Where [options] is one or more of the following ones:" << endl
          << "\t-help\t\tShow this help and exit" << endl
          << "\t-config\t\tLoad the specified configuration file" << endl
-         << "\t-verbose N\tVerbosity level (1=low, 2=medium, 3=high, default off)" << endl
-         << "\t-trace FILENAME\tTrace signals to a VCD file named 'FILENAME.vcd' (default off)" << endl
-         << "\t-dimx N\t\tSet the mesh X dimension to the specified integer value (default " << GlobalParams::mesh_dim_x << ")" << endl
-         << "\t-dimy N\t\tSet the mesh Y dimension to the specified integer value (default " << GlobalParams::mesh_dim_y << ")" << endl
-         << "\t-buffer N\tSet the buffer depth of each channel of the router to the specified integer value [flits] (default "<< GlobalParams::buffer_depth << ")" << endl
+         << "\t-verbose N\tVerbosity level (1=low, 2=medium, 3=high)" << endl
+         << "\t-trace FILENAME\tTrace signals to a VCD file named 'FILENAME.vcd'" << endl
+         << "\t-dimx N\t\tSet the mesh X dimension" << endl
+         << "\t-dimy N\t\tSet the mesh Y dimension" << endl
+         << "\t-buffer N\tSet the depth of router input buffers [flits]" << endl
          << "\t-winoc enable radio hub wireless transmission" << endl
-         << "\t-wirxsleep enable radio hub wireless receiver auto sleep" << endl
-         << "\t-size Nmin Nmax\tSet the minimum and maximum packet size to the specified integer values [flits] (default min=" << GlobalParams::min_packet_size << ", max=" << GlobalParams::max_packet_size << ")" << endl
-         << "\t-routing TYPE\tSet the routing algorithm to TYPE where TYPE is one of the following (default " << GlobalParams::routing_algorithm << "):" << endl
+         << "\t-wirxsleep enable radio hub wireless power manager" << endl
+         << "\t-size Nmin Nmax\tSet the minimum and maximum packet size [flits]" << endl
+         << "\t-routing TYPE\tSet the routing algorithm to one of the following:" << endl
          << "\t\tXY\t\tXY routing algorithm" << endl
          << "\t\tWEST_FIRST\tWest-First routing algorithm" << endl
          << "\t\tNORTH_LAST\tNorth-Last routing algorithm" << endl
@@ -111,19 +111,20 @@ void showHelp(char selfname[])
          << "\t\tODD_EVEN\t\tOdd-Even routing algorithm" << endl
          << "\t\tDYAD T\t\tDyAD routing algorithm with threshold T" << endl
          << "\t\tTABLE_BASED FILENAME\tRouting Table Based routing algorithm with table in the specified file" << endl
-         << "\t-sel TYPE\tSet the selection strategy to TYPE where TYPE is one of the following (default " << GlobalParams::selection_strategy << "):" << endl
+         << "\t-sel TYPE\tSet the selection strategy to one of the following:" << endl
          << "\t\tRANDOM\t\tRandom selection strategy" << endl
          << "\t\tBUFFER_LEVEL\tBuffer-Level Based selection strategy" << endl
          << "\t\tNOP\t\tNeighbors-on-Path selection strategy" << endl
-         <<	"\t-pir R TYPE\tSet the packet injection rate to the specified real value [0..1] (default " << GlobalParams::packet_injection_rate << ") " << "and the time distribution" << endl
-         << "\t\t\tof traffic to TYPE where TYPE is one of the following:" << endl
-         << "\t\tpoisson\t\tMemory-less Poisson distribution (default)" << endl
+         <<	"\t-pir R TYPE\tSet the packet injection rate R [0..1] and the time distribution TYPE" << endl
+         << "\t\t\twhere TYPE is one of the following:" << endl
+         << "\t\tpoisson\t\tMemory-less Poisson distribution" << endl
          << "\t\tburst R\t\tBurst distribution with given real burstness" << endl
          << "\t\tpareto on off r\tSelf-similar Pareto distribution with given real parameters (alfa-on alfa-off r)" << endl
          << "\t\tcustom R\tCustom distribution with given real probability of retransmission" << endl
-         << "\t-traffic TYPE\tSet the spatial distribution of traffic to TYPE where TYPE is one of the following (default " << GlobalParams::traffic_distribution << "):" << endl
+         << "\t-traffic TYPE\tSet the spatial distribution of traffic to TYPE where TYPE is one of the following:" << endl
          << "\t\trandom\t\tRandom traffic distribution" << endl
          << "\t\tlocal L\t\tRandom traffic with a fraction L (0..1) of packets having a destination connected to the local hub, i.e. not using wireless" << endl
+         << "\t\tulocal\t\tRandom traffic with locality smooth distribution" << endl
          << "\t\ttranspose1\tTranspose matrix 1 traffic distribution" << endl
          << "\t\ttranspose2\tTranspose matrix 2 traffic distribution" << endl
          << "\t\tbitreversal\tBit-reversal traffic distribution" << endl
@@ -131,17 +132,18 @@ void showHelp(char selfname[])
          << "\t\tshuffle\t\tShuffle traffic distribution" << endl
          <<	"\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file" << endl
          << "\t-hs ID P\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)" << endl
-         << "\t-warmup N\tStart to collect statistics after N cycles (default " << GlobalParams::stats_warm_up_time << ")" << endl
+         << "\t-warmup N\tStart to collect statistics after N cycles" << endl
          << "\t-seed N\t\tSet the seed of the random generator (default time())" << endl
          << "\t-detailed\tShow detailed statistics" << endl
-         << "\t-show_buf_stats\tShow buffers statistics (default " << GlobalParams::show_buffer_stats << ")" << endl
+         << "\t-show_buf_stats\tShow buffers statistics" << endl
          << "\t-volume N\tStop the simulation when either the maximum number of cycles has been reached or N flits have" << endl
          << "\t\t\tbeen delivered" << endl
-         << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << GlobalParams::simulation_time << ")" << endl
+         << "\t-sim N\t\tRun for the specified simulation time [cycles]" << endl
          << endl
          << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <maurizio.palesi@unikore.it>" << endl
          <<	"If you find this program useless please feel free to complain with Davide Patti <davide.patti@dieei.unict.it>" << endl
-         <<	"And if you want to send money please feel free to PayPal to Fabrizio Fazzino <fabrizio@fazzino.it>" << endl;
+         <<	"If you want to send money please feel free to PayPal to Fabrizio Fazzino <fabrizio@fazzino.it>" << endl
+         <<	"and if need to solve any other problem of your life please contact Turi Monteleone <salvatore.monteleone@dieei.unict.it>" << endl;
 }
 
 void showConfig()
@@ -162,7 +164,7 @@ void showConfig()
          << "- traffic_distribution = " << GlobalParams::traffic_distribution << endl
          << "- clock_period = " << GlobalParams::clock_period_ps << "ps" << endl
          << "- simulation_time = " << GlobalParams::simulation_time << endl
-         << "- stats_warm_up_time = " << GlobalParams::stats_warm_up_time << endl
+         << "- warm_up_time = " << GlobalParams::stats_warm_up_time << endl
          << "- rnd_generator_seed = " << GlobalParams::rnd_generator_seed << endl;
 }
 
@@ -279,7 +281,9 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 	    else if (!strcmp(arg_vet[i], "-winoc")) 
 		GlobalParams::use_winoc = true;
 	    else if (!strcmp(arg_vet[i], "-wirxsleep")) 
+	    {
 		GlobalParams::use_wirxsleep = true;
+	    }
 	    else if (!strcmp(arg_vet[i], "-size")) 
 	    {
 		GlobalParams::min_packet_size = atoi(arg_vet[++i]);
@@ -341,6 +345,9 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		else if (!strcmp(traffic, "shuffle"))
 		    GlobalParams::traffic_distribution =
 			TRAFFIC_SHUFFLE;
+		else if (!strcmp(traffic, "ulocal"))
+		    GlobalParams::traffic_distribution =
+			TRAFFIC_ULOCAL;
 		else if (!strcmp(traffic, "table")) {
 		    GlobalParams::traffic_distribution =
 			TRAFFIC_TABLE_BASED;

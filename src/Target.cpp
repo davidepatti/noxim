@@ -38,10 +38,10 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 
 	if (my_flit->flit_type==FLIT_TYPE_HEAD)
 	{
-	    if (hub->in_reservation_table.isAvailable(dst_port))
+	    if (hub->antenna2tile_reservation_table.isAvailable(dst_port))
 	    {
 		//LOG << "Reserving output port " << dst_port << " for channel " << local_id << endl;
-		hub->in_reservation_table.reserve(local_id, dst_port);
+		hub->antenna2tile_reservation_table.reserve(local_id, dst_port);
 	    }
 	    else
 	    {
@@ -54,7 +54,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 	if (my_flit->flit_type == FLIT_TYPE_TAIL) 
 	{
 	    //LOG << "Releasing reservation for output port " << dst_port << endl;
-	    hub->in_reservation_table.release(dst_port);
+	    hub->antenna2tile_reservation_table.release(dst_port);
 	}
 	
 
