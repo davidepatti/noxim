@@ -22,8 +22,11 @@
 ./build/GlobalStats.o: ../src/routingAlgorithms/RoutingAlgorithms.h
 ./build/GlobalStats.o: ../src/routingAlgorithms/RoutingAlgorithm.h
 ./build/GlobalStats.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/GlobalStats.o: ../src/selectionStrategies/SelectionStrategies.h
+./build/GlobalStats.o: ../src/selectionStrategies/Selection_NOP.h
 ./build/GlobalStats.o: ../src/selectionStrategies/SelectionStrategy.h
+./build/GlobalStats.o: ../src/selectionStrategies/SelectionStrategies.h
+./build/GlobalStats.o: ../src/Router.h
+./build/GlobalStats.o: ../src/selectionStrategies/Selection_BUFFER_LEVEL.h
 ./build/GlobalStats.o: ../src/ProcessingElement.h ../src/GlobalTrafficTable.h
 ./build/GlobalStats.o: ../src/Hub.h ../src/Initiator.h ../src/Target.h
 ./build/GlobalStats.o: ../src/TokenRing.h ../src/Channel.h
@@ -51,8 +54,11 @@
 ./build/Main.o: ../src/routingAlgorithms/RoutingAlgorithms.h
 ./build/Main.o: ../src/routingAlgorithms/RoutingAlgorithm.h
 ./build/Main.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/Main.o: ../src/selectionStrategies/SelectionStrategies.h
+./build/Main.o: ../src/selectionStrategies/Selection_NOP.h
 ./build/Main.o: ../src/selectionStrategies/SelectionStrategy.h
+./build/Main.o: ../src/selectionStrategies/SelectionStrategies.h
+./build/Main.o: ../src/Router.h
+./build/Main.o: ../src/selectionStrategies/Selection_BUFFER_LEVEL.h
 ./build/Main.o: ../src/ProcessingElement.h ../src/GlobalTrafficTable.h
 ./build/Main.o: ../src/Hub.h ../src/Initiator.h ../src/Target.h
 ./build/Main.o: ../src/TokenRing.h ../src/Channel.h ../src/GlobalStats.h
@@ -65,8 +71,11 @@
 ./build/NoC.o: ../src/routingAlgorithms/RoutingAlgorithms.h
 ./build/NoC.o: ../src/routingAlgorithms/RoutingAlgorithm.h
 ./build/NoC.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/NoC.o: ../src/selectionStrategies/SelectionStrategies.h
+./build/NoC.o: ../src/selectionStrategies/Selection_NOP.h
 ./build/NoC.o: ../src/selectionStrategies/SelectionStrategy.h
+./build/NoC.o: ../src/selectionStrategies/SelectionStrategies.h
+./build/NoC.o: ../src/Router.h
+./build/NoC.o: ../src/selectionStrategies/Selection_BUFFER_LEVEL.h
 ./build/NoC.o: ../src/ProcessingElement.h ../src/GlobalTrafficTable.h
 ./build/NoC.o: ../src/Hub.h ../src/Initiator.h ../src/Target.h
 ./build/NoC.o: ../src/TokenRing.h ../src/Channel.h
@@ -86,8 +95,11 @@
 ./build/Router.o: ../src/routingAlgorithms/RoutingAlgorithms.h
 ./build/Router.o: ../src/routingAlgorithms/RoutingAlgorithm.h
 ./build/Router.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/Router.o: ../src/selectionStrategies/SelectionStrategies.h
+./build/Router.o: ../src/selectionStrategies/Selection_NOP.h
 ./build/Router.o: ../src/selectionStrategies/SelectionStrategy.h
+./build/Router.o: ../src/selectionStrategies/SelectionStrategies.h
+./build/Router.o: ../src/Router.h
+./build/Router.o: ../src/selectionStrategies/Selection_BUFFER_LEVEL.h
 ./build/Stats.o: ../src/Stats.h ../src/DataStructs.h ../src/GlobalParams.h
 ./build/Stats.o: ../src/Power.h
 ./build/Target.o: ../src/Hub.h ../src/DataStructs.h ../src/GlobalParams.h
@@ -101,171 +113,45 @@
 ./build/routingAlgorithms/Routing_DYAD.o: ../src/routingAlgorithms/Routing_DYAD.h
 ./build/routingAlgorithms/Routing_DYAD.o: ../src/routingAlgorithms/RoutingAlgorithm.h
 ./build/routingAlgorithms/Routing_DYAD.o: ../src/routingAlgorithms/RoutingAlgorithms.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/Router.h ../src/DataStructs.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/GlobalParams.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/Buffer.h ../src/Stats.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/Power.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/GlobalRoutingTable.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/LocalRoutingTable.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/ReservationTable.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/routingAlgorithms/RoutingAlgorithm.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/DataStructs.h ../src/Utils.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/routingAlgorithms/RoutingAlgorithms.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/selectionStrategies/SelectionStrategies.h
-./build/routingAlgorithms/Routing_DYAD.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/routingAlgorithms/Routing_FULLY_ADAPTIVE.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/routingAlgorithms/RoutingAlgorithm.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/routingAlgorithms/RoutingAlgorithms.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/Router.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/DataStructs.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/GlobalParams.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/Buffer.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/Stats.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/Power.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/GlobalRoutingTable.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/LocalRoutingTable.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/ReservationTable.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/routingAlgorithms/RoutingAlgorithm.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/DataStructs.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/routingAlgorithms/RoutingAlgorithms.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/selectionStrategies/SelectionStrategies.h
-./build/routingAlgorithms/Routing_FULLY_ADAPTIVE.o: ../src/selectionStrategies/SelectionStrategy.h
+./build/routingAlgorithms/Routing_DYAD.o: ../src/Router.h
 ./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/routingAlgorithms/Routing_NEGATIVE_FIRST.h
 ./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/routingAlgorithms/RoutingAlgorithm.h
 ./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/routingAlgorithms/RoutingAlgorithms.h
 ./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/Router.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/DataStructs.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/GlobalParams.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/Buffer.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/Stats.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/Power.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/GlobalRoutingTable.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/LocalRoutingTable.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/ReservationTable.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/routingAlgorithms/RoutingAlgorithm.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/DataStructs.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/routingAlgorithms/RoutingAlgorithms.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/selectionStrategies/SelectionStrategies.h
-./build/routingAlgorithms/Routing_NEGATIVE_FIRST.o: ../src/selectionStrategies/SelectionStrategy.h
 ./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/routingAlgorithms/Routing_NORTH_LAST.h
 ./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/routingAlgorithms/RoutingAlgorithm.h
 ./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/routingAlgorithms/RoutingAlgorithms.h
 ./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/Router.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/DataStructs.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/GlobalParams.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/Buffer.h ../src/Stats.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/Power.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/GlobalRoutingTable.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/LocalRoutingTable.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/ReservationTable.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/routingAlgorithms/RoutingAlgorithm.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/DataStructs.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/routingAlgorithms/RoutingAlgorithms.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/selectionStrategies/SelectionStrategies.h
-./build/routingAlgorithms/Routing_NORTH_LAST.o: ../src/selectionStrategies/SelectionStrategy.h
 ./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/routingAlgorithms/Routing_ODD_EVEN.h
 ./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/routingAlgorithms/RoutingAlgorithm.h
 ./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/routingAlgorithms/RoutingAlgorithms.h
 ./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/Router.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/DataStructs.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/GlobalParams.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/Buffer.h ../src/Stats.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/Power.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/GlobalRoutingTable.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/LocalRoutingTable.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/ReservationTable.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/routingAlgorithms/RoutingAlgorithm.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/DataStructs.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/routingAlgorithms/RoutingAlgorithms.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/selectionStrategies/SelectionStrategies.h
-./build/routingAlgorithms/Routing_ODD_EVEN.o: ../src/selectionStrategies/SelectionStrategy.h
 ./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/routingAlgorithms/Routing_TABLE_BASED.h
 ./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/routingAlgorithms/RoutingAlgorithm.h
 ./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/routingAlgorithms/RoutingAlgorithms.h
 ./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/Router.h
+./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/GlobalRoutingTable.h
 ./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/DataStructs.h
 ./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/GlobalParams.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/Buffer.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/Stats.h ../src/Power.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/GlobalRoutingTable.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/LocalRoutingTable.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/ReservationTable.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/routingAlgorithms/RoutingAlgorithm.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/DataStructs.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/routingAlgorithms/RoutingAlgorithms.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/selectionStrategies/SelectionStrategies.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/routingAlgorithms/Routing_TABLE_BASED.o: ../src/GlobalRoutingTable.h
 ./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/routingAlgorithms/Routing_WEST_FIRST.h
 ./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/routingAlgorithms/RoutingAlgorithm.h
 ./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/routingAlgorithms/RoutingAlgorithms.h
 ./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/Router.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/DataStructs.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/GlobalParams.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/Buffer.h ../src/Stats.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/Power.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/GlobalRoutingTable.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/LocalRoutingTable.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/ReservationTable.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/routingAlgorithms/RoutingAlgorithm.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/DataStructs.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/routingAlgorithms/RoutingAlgorithms.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/selectionStrategies/SelectionStrategies.h
-./build/routingAlgorithms/Routing_WEST_FIRST.o: ../src/selectionStrategies/SelectionStrategy.h
 ./build/routingAlgorithms/Routing_XY.o: ../src/routingAlgorithms/Routing_XY.h
 ./build/routingAlgorithms/Routing_XY.o: ../src/routingAlgorithms/RoutingAlgorithm.h
 ./build/routingAlgorithms/Routing_XY.o: ../src/routingAlgorithms/RoutingAlgorithms.h
-./build/routingAlgorithms/Routing_XY.o: ../src/Router.h ../src/DataStructs.h
-./build/routingAlgorithms/Routing_XY.o: ../src/GlobalParams.h ../src/Buffer.h
-./build/routingAlgorithms/Routing_XY.o: ../src/Stats.h ../src/Power.h
-./build/routingAlgorithms/Routing_XY.o: ../src/GlobalRoutingTable.h
-./build/routingAlgorithms/Routing_XY.o: ../src/LocalRoutingTable.h
-./build/routingAlgorithms/Routing_XY.o: ../src/ReservationTable.h
-./build/routingAlgorithms/Routing_XY.o: ../src/Utils.h
-./build/routingAlgorithms/Routing_XY.o: ../src/routingAlgorithms/RoutingAlgorithm.h
-./build/routingAlgorithms/Routing_XY.o: ../src/DataStructs.h ../src/Utils.h
-./build/routingAlgorithms/Routing_XY.o: ../src/routingAlgorithms/RoutingAlgorithms.h
-./build/routingAlgorithms/Routing_XY.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/routingAlgorithms/Routing_XY.o: ../src/selectionStrategies/SelectionStrategies.h
-./build/routingAlgorithms/Routing_XY.o: ../src/selectionStrategies/SelectionStrategy.h
+./build/routingAlgorithms/Routing_XY.o: ../src/Router.h
 ./build/selectionStrategies/SelectionStrategies.o: ../src/selectionStrategies/SelectionStrategies.h
 ./build/selectionStrategies/SelectionStrategies.o: ../src/selectionStrategies/SelectionStrategy.h
+./build/selectionStrategies/Selection_BUFFER_LEVEL.o: ../src/selectionStrategies/Selection_BUFFER_LEVEL.h
+./build/selectionStrategies/Selection_BUFFER_LEVEL.o: ../src/selectionStrategies/SelectionStrategy.h
+./build/selectionStrategies/Selection_BUFFER_LEVEL.o: ../src/selectionStrategies/SelectionStrategies.h
+./build/selectionStrategies/Selection_BUFFER_LEVEL.o: ../src/Router.h
+./build/selectionStrategies/Selection_NOP.o: ../src/selectionStrategies/Selection_NOP.h
+./build/selectionStrategies/Selection_NOP.o: ../src/selectionStrategies/SelectionStrategy.h
+./build/selectionStrategies/Selection_NOP.o: ../src/selectionStrategies/SelectionStrategies.h
+./build/selectionStrategies/Selection_NOP.o: ../src/Router.h
 ./build/selectionStrategies/Selection_RANDOM.o: ../src/selectionStrategies/Selection_RANDOM.h
 ./build/selectionStrategies/Selection_RANDOM.o: ../src/selectionStrategies/SelectionStrategy.h
 ./build/selectionStrategies/Selection_RANDOM.o: ../src/selectionStrategies/SelectionStrategies.h
 ./build/selectionStrategies/Selection_RANDOM.o: ../src/Router.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/DataStructs.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/GlobalParams.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/Buffer.h ../src/Stats.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/Power.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/GlobalRoutingTable.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/LocalRoutingTable.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/ReservationTable.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/Utils.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/routingAlgorithms/RoutingAlgorithm.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/DataStructs.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/Utils.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/routingAlgorithms/RoutingAlgorithms.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/routingAlgorithms/RoutingAlgorithm.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/selectionStrategies/SelectionStrategy.h
-./build/selectionStrategies/Selection_RANDOM.o: ../src/selectionStrategies/SelectionStrategies.h
