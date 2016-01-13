@@ -20,6 +20,7 @@
 using namespace std;
 
 #define CONFIG_FILENAME        "config.yaml"
+#define POWER_CONFIG_FILENAME  "power.yaml"
 
 // Define the directions as numbers
 #define DIRECTIONS             4
@@ -143,6 +144,7 @@ struct GlobalParams {
     static string traffic_distribution;
     static string traffic_table_filename;
     static string config_filename;
+    static string power_config_filename;
     static int clock_period_ps;
     static int simulation_time;
     static int reset_time;
