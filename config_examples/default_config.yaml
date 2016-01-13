@@ -1,3 +1,5 @@
+# Simple default config of a 4x4 mesh
+# Each parameter is overwritten when corresponding command line value is set
 #
 # NOC & WIRED CONFIGURATION
 #
