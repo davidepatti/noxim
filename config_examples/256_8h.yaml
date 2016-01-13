@@ -1,0 +1,120 @@
+#
+# NOC & WIRED CONFIGURATION
+#
+# TODO: REPLACE WITH 32
+mesh_dim_x: 16
+mesh_dim_y: 16
+buffer_depth: 4
+flit_size: 64
+r2h_link_length: 2.0
+r2r_link_length: 1.0
+
+# Routing algorithms:
+#   XY
+#   WEST_FIRST
+#   NORTH_LAST
+#   NEGATIVE_FIRST
+#   ODD_EVEN
+#   DYAD
+#   TABLE_BASED
+routing_algorithm: XY
+routing_table_filename: ""
+
+# Routing specific parameters
+#   dyad_threshold: double
+dyad_threshold: 0.6
+
+# Selection Strategies:
+#   RANDOM
+#   BUFFER_LEVEL
+#   NOP
+selection_strategy: RANDOM
+
+#
+# WIRELESS CONFIGURATION
+#
+Hubs:
+    defaults:
+        rxChannels: [0]
+        txChannels: [0]
+        attachedNodes: []
+        toTileBufferSize: 4
+        fromTileBufferSize: 4
+        rxBufferSize: 64
+        txBufferSize: 64
+
+    0:
+        attachedNodes: [49,50,65,66]
+    1:
+        attachedNodes: [53,54,69,70]
+    2:
+        attachedNodes: [57,58,73,74]
+    3:
+        attachedNodes: [61,62,77,78]
+    4:
+        attachedNodes: [177,178,193,194]
+    5:
+        attachedNodes: [181,182,197,198]
+    6:
+        attachedNodes: [185,186,201,202]
+    7:
+        attachedNodes: [189,190,205,206]
+
+
+
+
+Channels:
+    defaults:
+        dataRate: 64
+        ber: [0, 0]
+        #[TOKEN_PACKET]
+        #[TOKEN_HOLD, num_hold_cycles]
+        #[TOKEN_MAX_HOLD, max_hold_cycles]
+        mac_policy: [TOKEN_PACKET]
+
+    0:
+        ber: [0, 0]
+
+#
+# SIMULATION PARAMETERS
+#
+clock_period_ps: 1000
+reset_time: 1000
+simulation_time: 10000
+stats_warm_up_time: 1000
+detailed: false
+max_volume_to_be_drained: 0
+show_buffer_stats: false
+
+# Winoc
+use_winoc: false
+use_wirxsleep: false
+
+# Verbosity level:
+#   VERBOSE_OFF
+#   VERBOSE_LOW
+#   VERBOSE_MEDIUM
+#   VERBOSE_HIGH
+verbose_mode: VERBOSE_OFF
+
+# Trace
+trace_mode: false
+trace_filename: ""
+
+min_packet_size: 12
+max_packet_size: 12
+packet_injection_rate: 0.01
+probability_of_retransmission: 0.01
+
+# Traffic distribution:
+#   TRAFFIC_RANDOM
+#   TRAFFIC_TRANSPOSE1
+#   TRAFFIC_TRANSPOSE2
+#   TRAFFIC_HOTSPOT
+#   TRAFFIC_TABLE_BASED
+#   TRAFFIC_BIT_REVERSAL
+#   TRAFFIC_SHUFFLE
+#   TRAFFIC_BUTTERFLY
+traffic_distribution: TRAFFIC_RANDOM
+traffic_table_filename: "t.txt"
+

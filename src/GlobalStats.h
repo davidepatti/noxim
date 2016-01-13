@@ -63,6 +63,9 @@ class GlobalStats {
     // Returns the total number of received flits
     unsigned int getReceivedFlits();
 
+    // number of packets that used the wireless network
+    unsigned int getWirelessPackets();
+
 
     // Returns the number of routed flits for each router
      vector < vector < unsigned long > > getRoutedFlitsMtx();
