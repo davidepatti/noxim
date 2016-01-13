@@ -10,7 +10,11 @@ Energy:
         - [8, 16, 2.08e-3, 5.36e-13, 0,  4.47e-13]
         - [8, 32, 2.30e-3, 1.03e-12, 0,  8.26e-13]
         - [8, 64, 7.91e-3, 2.08e-12, 0,  1.58e-12]
+        - [16, 64, 15.0e-3, 3.20e-12, 0,  2.70e-12] # interpolated
+        - [64, 64, 0.06, 1.0e-11, 0, 0.9e-11  ]     # interpolated
+        - [256, 64, 226.0e-3, 4.0e-11, 0,  3.4e-11] # interpolated
 
+    # LinkBitLine energy in the form [ Length (mm) Leakage Dynamic ] 
     # Energy(J) for a single bitline. Total flit energy will 
     # be obtained  as flit_size x reported Energy.
     LinkBitLine:
@@ -32,26 +36,24 @@ Energy:
 
         network_interface:
         #   - [FlitSize, Static, Dynamic]
-            - [16, 4.43e-4, 2.50e-13]
-            - [32, 8.64e-4, 4.22e-13]
-            - [64, 1.72e-3, 8.35e-13]
+            - [16, 0.0, 0.0]
+            - [32, 0.0, 0.0]
+            - [64, 0.0, 0.0]
+            #- [16, 4.43e-4, 2.50e-13]
+            #- [32, 8.64e-4, 4.22e-13]
+            #- [64, 1.72e-3, 8.35e-13]
 
         routing:
         #   Algorithm:   [Static, Dynamic]
             default:     [1.20e-4, 6.00e-14]
             XY:          [1.20e-4, 6.00e-14]
-            WEST_FIRST:  [1.22e-4, 6.05e-14]
-            NORTH_LAST:  [1.22e-4, 6.05e-14]
-            NEGATIVE_FIRST: [1.22e-4, 6.05e-14]
-            ODD_EVEN:    [1.24e-4, 6.10e-14]
             DYAD:        [1.25e-4, 6.23e-14]
 
         selection:
         #   Strategy:    [Static, Dynamic]
             default:     [1.10e-4, 5.00e-14]
-            random:      [6.00e-7, 1.00e-16]
-            bufferlevel: [1.00e-6, 2.00e-16]
-            nop:         [6.00e-6, 3.00e-16]
+            XY:          [1.10e-4, 5.00e-14]
+            DYAD:        [1.23e-4, 5.89e-14]
 
     Hub:
         # [RX, TX] Contribution (W)
@@ -69,7 +71,6 @@ Energy:
         # TX Dynamic Contribution in W (To be divided for Datarate)
         default_tx_energy: 1e-2
 
-    # CURRENTLY UNSUPPORTED
         tx_attenuation_map:
         #   - [TX Hub ID, RX Hub ID, Attenuation]
             - [0, 1, 1.1]
