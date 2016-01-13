@@ -229,6 +229,25 @@ vector < vector < unsigned long > > GlobalStats::getRoutedFlitsMtx()
     return mtx;
 }
 
+unsigned int GlobalStats::getWirelessPackets()
+{
+    unsigned int packets = 0;
+
+    // Wireless noc
+    for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();
+            it != GlobalParams::hub_configuration.end();
+            ++it)
+    {
+	int hub_id = it->first;
+
+	map<int,Hub*>::const_iterator i = noc->hub.find(hub_id);
+	Hub * h = i->second;
+
+	packets+= h->wireless_communications_counter;
+    }
+    return packets;
+}
+
 double GlobalStats::getDynamicPower()
 {
     double power = 0.0;
@@ -315,6 +334,7 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 
     out << "% Total received packets: " << getReceivedPackets() << endl;
     out << "% Total received flits: " << getReceivedFlits() << endl;
+    out << "% Average wireless utilization: " << getWirelessPackets()/(double)getReceivedPackets() << endl;
     out << "% Global average delay (cycles): " << getAverageDelay() << endl;
     out << "% Max delay (cycles): " << getMaxDelay() << endl;
     out << "% Network throughput (flits/cycle): " << getAggregatedThroughput() << endl;

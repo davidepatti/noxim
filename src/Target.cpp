@@ -42,6 +42,10 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 	    {
 		//LOG << "Reserving output port " << dst_port << " for channel " << local_id << endl;
 		hub->antenna2tile_reservation_table.reserve(local_id, dst_port);
+
+		// The number of commucation using the wireless network, accounting also
+		// partial wired path
+		hub->wireless_communications_counter++;
 	    }
 	    else
 	    {

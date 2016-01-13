@@ -88,6 +88,8 @@ SC_MODULE(Hub)
     map<int,int> abtxoff_cycles; // antenna buffer TX power off cycles
     map<int,int> buffer_to_tile_poweroff_cycles;
 
+    int wireless_communications_counter;
+
     // Constructor
 
     Hub(sc_module_name nm, int id, TokenRing * tr): sc_module(nm) {
@@ -155,9 +157,10 @@ SC_MODULE(Hub)
             target[rxChannels[i]]->buffer_rx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].rxBufferSize);
         }
 
-        start_from_port = 0;
+	start_from_port = 0;
 	total_sleep_cycles = 0;
 	total_ttxoff_cycles = 0;
+	wireless_communications_counter = 0;
     }
 
 

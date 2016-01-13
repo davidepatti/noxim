@@ -26,6 +26,7 @@ void Hub::wirxPowerManager()
 {
     // WIRXSLEEP - Check wheter accounting buffer to tile leakage
     // check if there is at least one not empty antenna RX buffer
+    //
 
     for (int port=0;port<num_ports;port++)
     {
@@ -37,13 +38,13 @@ void Hub::wirxPowerManager()
 	    buffer_to_tile_poweroff_cycles[port]++;
     }
 
+    
     for (int i=0;i<rxChannels.size();i++)
     {
 	int ch_id = rxChannels[i];
 
 	if (!target[ch_id]->buffer_rx.IsEmpty())
 	{
-	    LOG << " POWER RX ANTENNA " << endl;
 	    power.leakageAntennaBuffer();
 	}
 	else
@@ -75,6 +76,9 @@ void Hub::updateRxPower()
     else
     {
 	power.wirelessSnooping();
+	power.leakageTransceiverRx();
+	power.biasingRx();
+
 	for (int i=0;i<rxChannels.size();i++)
 	{
 	    power.leakageAntennaBuffer();
@@ -84,8 +88,6 @@ void Hub::updateRxPower()
 	{
 	    power.leakageBufferToTile();
 	}
-	power.leakageTransceiverRx();
-	power.biasingRx();
     }    
 }
 
