@@ -13,10 +13,28 @@
 
 void loadConfiguration() {
 
-    cout << "Loading configuration from file " << GlobalParams::config_filename << endl;
-    //TODO TURI: controllare SE ESISTE!!
-    YAML::Node config = YAML::LoadFile(GlobalParams::config_filename);
+    YAML::Node config;
+    YAML::Node power_config;
 
+    cout << "Loading configuration from file \"" << GlobalParams::config_filename << "\"...";
+    try {
+        config = YAML::LoadFile(GlobalParams::config_filename);
+        cout << " Done" << endl;
+    } catch (YAML::BadFile &e){
+        cout << " Failed" << endl;
+        cerr << "The specified YAML configuration file was not found!" << endl;
+        exit(0);
+    }
+
+    cout << "Loading power configurations from file \"" << GlobalParams::power_config_filename << "\"...";
+    try {
+        power_config = YAML::LoadFile(GlobalParams::power_config_filename);
+        cout << " Done" << endl;
+    } catch (YAML::BadFile &e){
+        cout << " Failed" << endl;
+        cerr << "The specified YAML power configurations file was not found!" << endl;
+        exit(0);
+    }
 
     // Initialize global configuration parameters (can be overridden with command-line arguments)
     GlobalParams::verbose_mode = config["verbose_mode"].as<string>();
@@ -86,7 +104,7 @@ void loadConfiguration() {
         node[channel_id] = GlobalParams::channel_configuration[channel_id];
     }
 
-    GlobalParams::power_configuration = config["Energy"].as<PowerConfig>();
+    GlobalParams::power_configuration = power_config["Energy"].as<PowerConfig>();
 }
 
 void showHelp(char selfname[])
@@ -95,6 +113,7 @@ void showHelp(char selfname[])
          << "Where [options] is one or more of the following ones:" << endl
          << "\t-help\t\tShow this help and exit" << endl
          << "\t-config\t\tLoad the specified configuration file" << endl
+         << "\t-power\t\tLoad the specified power configurations file" << endl
          << "\t-verbose N\tVerbosity level (1=low, 2=medium, 3=high)" << endl
          << "\t-trace FILENAME\tTrace signals to a VCD file named 'FILENAME.vcd'" << endl
          << "\t-dimx N\t\tSet the mesh X dimension" << endl
@@ -378,7 +397,7 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		    atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-sim"))
 		GlobalParams::simulation_time = atoi(arg_vet[++i]);
-	    else if (!strcmp(arg_vet[i], "-config"))
+	    else if (!strcmp(arg_vet[i], "-config") || !strcmp(arg_vet[i], "-power"))
 		// -config is managed from configure function
 		// i++ skips the configuration file name 
 		i++;
@@ -395,6 +414,7 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 void configure(int arg_num, char *arg_vet[]) {
 
     bool config_found = false;
+    bool power_config_found = false;
 
     for (int i = 1; i < arg_num; i++) {
 	    if (!strcmp(arg_vet[i], "-help")) {
@@ -419,6 +439,26 @@ void configure(int arg_num, char *arg_vet[]) {
         else
         {
             cerr << "No YAML configuration file found!\n Use -config to load examples from config_examples folder" << endl;
+            exit(0);
+        }
+    }
+
+    for (int i = 1; i < arg_num; i++) {
+	    if (!strcmp(arg_vet[i], "-power")) {
+            GlobalParams::power_config_filename = arg_vet[++i];
+            power_config_found = true;
+            break;
+        }
+    }
+
+    if (!power_config_found)
+    {
+        std::ifstream infile(POWER_CONFIG_FILENAME);
+        if (infile.good())
+            GlobalParams::power_config_filename = POWER_CONFIG_FILENAME;
+        else
+        {
+            cerr << "No YAML power configurations file found!\n Use -power to load examples from config_examples folder" << endl;
             exit(0);
         }
     }
