@@ -43,6 +43,28 @@ void Buffer::Print(const char *prefix)
     cout << endl;
 }
 
+
+void Buffer::deadlockCheck()
+{
+    if (IsEmpty()) return;
+
+    Flit f = buffer.front();
+    
+    int seq = f.sequence_no;
+
+
+    if (last_front_flit_seq==seq)
+    {
+	full_cycles_counter++;
+    }
+    else
+    {
+	last_front_flit_seq = seq;
+	full_cycles_counter=0;
+    }
+}
+
+
 bool Buffer::deadlockFree()
 {
     if (IsEmpty()) return true;

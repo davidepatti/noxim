@@ -53,6 +53,7 @@ class Buffer {
     void Print(const char*);
     
     bool deadlockFree();
+    void deadlockCheck();
 
 
     inline string name() { return "Buffer";};
