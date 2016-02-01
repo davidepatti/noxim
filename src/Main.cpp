@@ -106,6 +106,7 @@ int sc_main(int arg_num, char *arg_vet[])
     GlobalStats gs(n);
     gs.showStats(std::cout, GlobalParams::detailed);
 
+
     if ((GlobalParams::max_volume_to_be_drained > 0) &&
 	(sc_time_stamp().to_double() / GlobalParams::clock_period_ps - GlobalParams::reset_time >=
 	 GlobalParams::simulation_time)) {
@@ -122,10 +123,10 @@ int sc_main(int arg_num, char *arg_vet[])
          << " Effective drained volume: " << drained_volume;
 #endif
 
+    }
+
 #ifdef DEADLOCK_AVOIDANCE
 	cout << "***** WARNING: DEADLOCK_AVOIDANCE ENABLED!" << endl;
 #endif
-    }
-
     return 0;
 }
