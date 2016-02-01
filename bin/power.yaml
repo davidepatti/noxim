@@ -46,6 +46,7 @@ Energy:
             - [5, 16, 3.78e-4, 1.20e-13]
             - [5, 32, 7.49e-4, 2.21e-13]
             - [5, 64, 1.49e-3, 4.00e-13]
+            - [5, 128, 2.75e-3, 8.0e-13] #interpolated
 
         network_interface:
         #   - [FlitSize, Static, Dynamic]
