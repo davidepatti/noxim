@@ -332,8 +332,12 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 	showWirxStats(out);
     }
 
+    int total_cycles = GlobalParams::simulation_time - GlobalParams::stats_warm_up_time;
     out << "% Total received packets: " << getReceivedPackets() << endl;
     out << "% Total received flits: " << getReceivedFlits() << endl;
+    out << "% Received/Ideal flits Ratio: " << getReceivedFlits()
+	/ (GlobalParams::packet_injection_rate * (GlobalParams::min_packet_size +
+		GlobalParams::max_packet_size)/2 * total_cycles * GlobalParams::mesh_dim_y * GlobalParams::mesh_dim_x) << endl;
     out << "% Average wireless utilization: " << getWirelessPackets()/(double)getReceivedPackets() << endl;
     out << "% Global average delay (cycles): " << getAverageDelay() << endl;
     out << "% Max delay (cycles): " << getMaxDelay() << endl;

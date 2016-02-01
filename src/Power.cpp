@@ -113,6 +113,7 @@ void Power::configureRouter(int link_width,
     // CrossBar
     // TODO future work: tuning of crossbar radix
     pair<int,int> xbar_k = pair<int,int>(5,GlobalParams::flit_size);
+    assert(GlobalParams::power_configuration.routerPowerConfig.crossbar_pm.find(xbar_k) != GlobalParams::power_configuration.routerPowerConfig.crossbar_pm.end());
     crossbar_pwr_s = W2J(GlobalParams::power_configuration.routerPowerConfig.crossbar_pm[xbar_k].first);
     crossbar_pwr_d = GlobalParams::power_configuration.routerPowerConfig.crossbar_pm[xbar_k].second;
     

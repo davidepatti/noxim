@@ -51,12 +51,17 @@ struct Channel: sc_module
 
     init_socket.register_invalidate_direct_mem_ptr(this, &Channel::invalidate_direct_mem_ptr);
     // bit rate is Gb/s
-    flit_transmission_delay_ps = 1000*GlobalParams::flit_size/GlobalParams::channel_configuration[local_id].dataRate;
+    int flit_transmission_delay_ps = 1000*GlobalParams::flit_size/GlobalParams::channel_configuration[local_id].dataRate;
     flit_transmission_cycles = ceil(((double)flit_transmission_delay_ps/GlobalParams::clock_period_ps));
+
+    cc_flit_transmission_delay_ps = flit_transmission_cycles * GlobalParams::clock_period_ps;
+
+
 
     if (GlobalParams::detailed)
     {
-	cout << "Channel " << local_id << " data rate " << GlobalParams::channel_configuration[local_id].dataRate << " Gbps, transmission delay " << flit_transmission_delay_ps << " ps, " << flit_transmission_cycles << " cycles " << endl; 
+	cout << "Channel " << local_id << " data rate " << GlobalParams::channel_configuration[local_id].dataRate << 
+	    " Gbps, flit transmission delay " << flit_transmission_delay_ps << " ps, (aligned to " << cc_flit_transmission_delay_ps << " ps) " << flit_transmission_cycles << " cycles " << endl; 
     }
 
     //LOG << "data rate " << GlobalParams::channel_configuration[local_id].dataRate << " Gbps, transmission delay " << flit_transmission_delay_ps << " ps, " << flit_transmission_cycles << " cycles " << endl; 
@@ -112,8 +117,8 @@ struct Channel: sc_module
   int getFlitTransmissionCycles() { return flit_transmission_cycles;}
 
     private:
-      int flit_transmission_delay_ps;
       int flit_transmission_cycles;
+      int cc_flit_transmission_delay_ps; // clock compliant
 
   std::map <tlm::tlm_generic_payload*, unsigned int> m_id_map;
 
