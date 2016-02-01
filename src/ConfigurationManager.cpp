@@ -122,6 +122,7 @@ void showHelp(char selfname[])
          << "\t-winoc enable radio hub wireless transmission" << endl
          << "\t-wirxsleep enable radio hub wireless power manager" << endl
          << "\t-size Nmin Nmax\tSet the minimum and maximum packet size [flits]" << endl
+         << "\t-flit N\tSet the flit size [bit]" << endl
          << "\t-routing TYPE\tSet the routing algorithm to one of the following:" << endl
          << "\t\tXY\t\tXY routing algorithm" << endl
          << "\t\tWEST_FIRST\tWest-First routing algorithm" << endl
@@ -201,6 +202,10 @@ void checkConfiguration()
 
     if (GlobalParams::buffer_depth < 1) {
 	cerr << "Error: buffer must be >= 1" << endl;
+	exit(1);
+    }
+    if (GlobalParams::flit_size <= 0) {
+	cerr << "Error: flit_size must be > 0" << endl;
 	exit(1);
     }
 
@@ -297,6 +302,8 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::mesh_dim_y = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-buffer"))
 		GlobalParams::buffer_depth = atoi(arg_vet[++i]);
+	    else if (!strcmp(arg_vet[i], "-flit"))
+		GlobalParams::flit_size = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-winoc")) 
 		GlobalParams::use_winoc = true;
 	    else if (!strcmp(arg_vet[i], "-wirxsleep")) 
