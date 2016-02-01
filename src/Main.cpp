@@ -121,6 +121,10 @@ int sc_main(int arg_num, char *arg_vet[])
 	     << endl
          << " Effective drained volume: " << drained_volume;
 #endif
+
+#ifdef DEADLOCK_AVOIDANCE
+	cout << "***** WARNING: DEADLOCK_AVOIDANCE ENABLED!" << endl;
+#endif
     }
 
     return 0;
