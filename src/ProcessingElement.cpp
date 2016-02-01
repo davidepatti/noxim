@@ -86,6 +86,10 @@ Flit ProcessingElement::nextFlit()
 
 bool ProcessingElement::canShot(Packet & packet)
 {
+#ifdef DEADLOCK_AVOIDANCE
+    if (local_id%2==0)
+	return false;
+#endif
     bool shot;
     double threshold;
 
@@ -267,16 +271,21 @@ Packet ProcessingElement::trafficRandom()
 	// check for hotspot destination
 	for (size_t i = 0; i < GlobalParams::hotspots.size(); i++) {
 
-	    if (rnd >= range_start
-		&& rnd <
-		range_start + GlobalParams::hotspots[i].second) {
-		if (local_id != GlobalParams::hotspots[i].first) {
+	    if (rnd >= range_start && rnd < range_start + GlobalParams::hotspots[i].second) {
+		if (local_id != GlobalParams::hotspots[i].first ) {
 		    p.dst_id = GlobalParams::hotspots[i].first;
 		}
 		break;
 	    } else
 		range_start += GlobalParams::hotspots[i].second;	// try next
 	}
+#ifdef DEADLOCK_AVOIDANCE
+	if (p.dst_id%2!=0)
+	{
+	    p.dst_id = (p.dst_id+1)%256;
+	}
+#endif
+
     } while (p.dst_id == p.src_id);
 
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
