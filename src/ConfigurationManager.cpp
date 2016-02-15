@@ -113,7 +113,6 @@ void setBufferToTile(int depth)
 
         YAML::Node hub_config_node = hubs_it->second;
 
-        GlobalParams::hub_configuration[hub_id] = hub_config_node.as<HubConfig>(); 
 	GlobalParams::hub_configuration[hub_id].toTileBufferSize = depth;
 
     }
@@ -129,7 +128,6 @@ void setBufferFromTile(int depth)
 
         YAML::Node hub_config_node = hubs_it->second;
 
-        GlobalParams::hub_configuration[hub_id] = hub_config_node.as<HubConfig>(); 
 	GlobalParams::hub_configuration[hub_id].fromTileBufferSize = depth;
 
     }
@@ -145,7 +143,6 @@ void setBufferAntenna(int depth)
 
         YAML::Node hub_config_node = hubs_it->second;
 
-        GlobalParams::hub_configuration[hub_id] = hub_config_node.as<HubConfig>(); 
 	GlobalParams::hub_configuration[hub_id].rxBufferSize = depth;
 	GlobalParams::hub_configuration[hub_id].txBufferSize = depth;
 
