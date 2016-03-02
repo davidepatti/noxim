@@ -156,7 +156,7 @@ struct GlobalParams {
     static unsigned int max_volume_to_be_drained;
     static bool show_buffer_stats;
     static bool use_winoc;
-    static bool use_wirxsleep;
+    static bool use_powermanager;
     static ChannelConfig default_channel_configuration;
     static map<int, ChannelConfig> channel_configuration;
     static HubConfig default_hub_configuration;

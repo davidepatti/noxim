@@ -329,7 +329,7 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 	out << "];" << endl;
 
 	showPowerBreakDown(out);
-	showWirxStats(out);
+	showPowerManagerStats(out);
     }
 
     int total_cycles = GlobalParams::simulation_time - GlobalParams::stats_warm_up_time;
@@ -360,14 +360,14 @@ void GlobalStats::updatePowerBreakDown(map<string,double> &dst,PowerBreakdown* s
     }
 }
 
-void GlobalStats::showWirxStats(std::ostream & out)
+void GlobalStats::showPowerManagerStats(std::ostream & out)
 {
     std::streamsize p = out.precision();
     int total_cycles = sc_time_stamp().to_double() / GlobalParams::clock_period_ps - GlobalParams::reset_time;
 
     out.precision(4);
 
-    out << "wirxsleep_stats_tx = [" << endl;
+    out << "powermanager_stats_tx = [" << endl;
     out << "%\tFraction of: TX Transceiver off (TTXoff), AntennaBufferTX off (ABTXoff) " << endl;
     out << "%\tHUB\tTTXoff\tABTXoff\t" << endl;
 
@@ -392,7 +392,7 @@ void GlobalStats::showWirxStats(std::ostream & out)
 
 
 
-    out << "wirxsleep_stats_rx = [" << endl;
+    out << "powermanager_stats_rx = [" << endl;
     out << "%\tFraction of: RX Transceiver off (TRXoff), AntennaBufferRX off (ABRXoff), BufferToTile off (BTToff) " << endl;
     out << "%\tHUB\tTRXoff\tABRXoff\tBTToff\t" << endl;
 

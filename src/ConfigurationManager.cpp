@@ -11,10 +11,10 @@
 #include "ConfigurationManager.h"
 #include <systemc.h> //Included for the function time() 
 
-void loadConfiguration() {
+YAML::Node config;
+YAML::Node power_config;
 
-    YAML::Node config;
-    YAML::Node power_config;
+void loadConfiguration() {
 
     cout << "Loading configuration from file \"" << GlobalParams::config_filename << "\"...";
     try {
@@ -66,7 +66,7 @@ void loadConfiguration() {
     //GlobalParams::hotspots;
     GlobalParams::show_buffer_stats = config["show_buffer_stats"].as<bool>();
     GlobalParams::use_winoc = config["use_winoc"].as<bool>();
-    GlobalParams::use_wirxsleep = config["use_wirxsleep"].as<bool>();
+    GlobalParams::use_powermanager = config["use_wirxsleep"].as<bool>();
     
     GlobalParams::default_hub_configuration = config["Hubs"]["defaults"].as<HubConfig>();
 
@@ -82,8 +82,6 @@ void loadConfiguration() {
 
         GlobalParams::hub_configuration[hub_id] = hub_config_node.as<HubConfig>(); 
 
-        YAML::Node node;
-        node[hub_id] = GlobalParams::hub_configuration[hub_id];
     }
 
     GlobalParams::default_channel_configuration = config["Channels"]["defaults"].as<ChannelConfig>();
@@ -100,12 +98,58 @@ void loadConfiguration() {
 
         GlobalParams::channel_configuration[channel_id] = channel_config_node.as<ChannelConfig>(); 
 
-        YAML::Node node;
-        node[channel_id] = GlobalParams::channel_configuration[channel_id];
     }
 
     GlobalParams::power_configuration = power_config["Energy"].as<PowerConfig>();
 }
+
+void setBufferToTile(int depth)
+{
+    for(YAML::const_iterator hubs_it = config["Hubs"].begin(); hubs_it != config["Hubs"].end(); ++hubs_it)
+    {   
+        int hub_id = hubs_it->first.as<int>(-1);
+        if (hub_id < 0)
+            continue;
+
+        YAML::Node hub_config_node = hubs_it->second;
+
+	GlobalParams::hub_configuration[hub_id].toTileBufferSize = depth;
+
+    }
+
+}
+void setBufferFromTile(int depth)
+{
+    for(YAML::const_iterator hubs_it = config["Hubs"].begin(); hubs_it != config["Hubs"].end(); ++hubs_it)
+    {   
+        int hub_id = hubs_it->first.as<int>(-1);
+        if (hub_id < 0)
+            continue;
+
+        YAML::Node hub_config_node = hubs_it->second;
+
+	GlobalParams::hub_configuration[hub_id].fromTileBufferSize = depth;
+
+    }
+
+}
+void setBufferAntenna(int depth)
+{
+    for(YAML::const_iterator hubs_it = config["Hubs"].begin(); hubs_it != config["Hubs"].end(); ++hubs_it)
+    {   
+        int hub_id = hubs_it->first.as<int>(-1);
+        if (hub_id < 0)
+            continue;
+
+        YAML::Node hub_config_node = hubs_it->second;
+
+	GlobalParams::hub_configuration[hub_id].rxBufferSize = depth;
+	GlobalParams::hub_configuration[hub_id].txBufferSize = depth;
+
+    }
+
+}
+
 
 void showHelp(char selfname[])
 {
@@ -119,6 +163,9 @@ void showHelp(char selfname[])
          << "\t-dimx N\t\tSet the mesh X dimension" << endl
          << "\t-dimy N\t\tSet the mesh Y dimension" << endl
          << "\t-buffer N\tSet the depth of router input buffers [flits]" << endl
+         << "\t-buffer_tt N\tSet the depth of hub buffers to tile [flits]" << endl
+         << "\t-buffer_ft N\tSet the depth of hub buffers to tile [flits]" << endl
+         << "\t-buffer_antenna N\tSet the depth of hub antenna buffers (RX/TX) [flits]" << endl
          << "\t-winoc enable radio hub wireless transmission" << endl
          << "\t-wirxsleep enable radio hub wireless power manager" << endl
          << "\t-size Nmin Nmax\tSet the minimum and maximum packet size [flits]" << endl
@@ -302,13 +349,19 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::mesh_dim_y = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-buffer"))
 		GlobalParams::buffer_depth = atoi(arg_vet[++i]);
+	    else if (!strcmp(arg_vet[i], "-buffer_tt"))
+		setBufferToTile(atoi(arg_vet[++i]));
+	    else if (!strcmp(arg_vet[i], "-buffer_ft"))
+		setBufferFromTile(atoi(arg_vet[++i]));
+	    else if (!strcmp(arg_vet[i], "-buffer_antenna"))
+		setBufferAntenna(atoi(arg_vet[++i]));
 	    else if (!strcmp(arg_vet[i], "-flit"))
 		GlobalParams::flit_size = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-winoc")) 
 		GlobalParams::use_winoc = true;
 	    else if (!strcmp(arg_vet[i], "-wirxsleep")) 
 	    {
-		GlobalParams::use_wirxsleep = true;
+		GlobalParams::use_powermanager = true;
 	    }
 	    else if (!strcmp(arg_vet[i], "-size")) 
 	    {
