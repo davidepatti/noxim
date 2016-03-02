@@ -22,16 +22,17 @@ int Hub::route(Flit& f)
 }
 
 
-void Hub::wirxPowerManager()
+void Hub::rxPowerManager()
 {
-    // WIRXSLEEP - Check wheter accounting buffer to tile leakage
-    // check if there is at least one not empty antenna RX buffer
-    //
+    // Check wheter accounting or not buffer to tile leakage 
+    // For each port, two poweroff condition should be checked:
+    // - the buffer to tile is empty
+    // - it has not been reserved
 
     for (int port=0;port<num_ports;port++)
     {
 	if (!buffer_to_tile[port].IsEmpty() || 
-		!antenna2tile_reservation_table.isAvailable(port))
+	    !antenna2tile_reservation_table.isAvailable(port))
 		power.leakageBufferToTile();
 
 	else
@@ -51,9 +52,9 @@ void Hub::wirxPowerManager()
 	    buffer_rx_sleep_cycles[ch_id]++;
     }
 
-    // WIRXSLEEP - Check wheter accounting antenna RX buffer 
+    // Check wheter accounting antenna RX buffer 
     // check if there is at least one not empty antenna RX buffer
-    // To be only applied if the current hub is in WIRXSLEEP_ON mode
+    // To be only applied if the current hub is in RADIO_EVENT_SLEEP_ON mode
 
     if (power.isSleeping())
 	total_sleep_cycles++;
@@ -71,8 +72,8 @@ void Hub::wirxPowerManager()
 
 void Hub::updateRxPower()
 {
-    if (GlobalParams::use_wirxsleep)
-	wirxPowerManager();
+    if (GlobalParams::use_powermanager)
+	rxPowerManager();
     else
     {
 	power.wirelessSnooping();
@@ -93,65 +94,38 @@ void Hub::updateRxPower()
 
 void Hub::txPowerManager()
 {
-    bool all_bft_empty = true;
-    bool all_abtx_empty = true;
-
-
-    for (int port=0; port<num_ports; port++)
-	if (!buffer_from_tile[port].IsEmpty())
-	{
-	    all_bft_empty = false;
-	    break;
-	}
-
     for (int i=0;i<txChannels.size();i++)
-	if (!init[i]->buffer_tx.IsEmpty())
-	{
-	    all_abtx_empty = false;
-	    break;
-	}
-
-    // if there is at least one not empty buffer from tile
-    // we must power on transceiver and all antenna tx buffers
-    if (!all_bft_empty)
     {
-	for (int i=0;i<txChannels.size();i++)
+	// check if not empty or reserved
+	if (!init[i]->buffer_tx.IsEmpty() || 
+	    !tile2antenna_reservation_table.isAvailable(i) )
+	{
 	    power.leakageAntennaBuffer();
 
-	power.leakageTransceiverTx();
-	power.biasingTx();
-    }    
-    else // all buffer from tile empty
-    {
-	// antenna buffers also are empty, we can turn everything off
-	if (all_abtx_empty)
-	{
-	    for (int i=0;i<txChannels.size();i++)
-		abtxoff_cycles[i]++;
-
-	    total_ttxoff_cycles++;
-	}
-	else // selectively turn off empty antenna buffers
-	{
-	    // transceiver should be on in any case
-	    power.leakageTransceiverTx();
-	    power.biasingTx();
-
-	    // check the channels with empty antenna tx buffers
-	    for (int i=0;i<txChannels.size();i++)
+	    // check the second condition for turning off analog tx
+	    if (power.isSleeping())
 	    {
-		if (!init[i]->buffer_tx.IsEmpty())
-		    power.leakageAntennaBuffer();
-		else
-		    abtxoff_cycles[i]++;
+		analogtxoff_cycles[i]++;
 	    }
+	    else
+	    {
+		power.leakageTransceiverTx();
+		power.biasingTx();
+	    }
+	}
+	else
+	{   // abtx is empty and not reserved - turn off
+	    // note that this also applies to analog tx and serializer 
+	    abtxoff_cycles[i]++;
+	    analogtxoff_cycles[i]++;
+	    total_ttxoff_cycles++;
 	}
     }
 }
 
 void Hub::updateTxPower()
 {
-    if (GlobalParams::use_wirxsleep)
+    if (GlobalParams::use_powermanager)
 	txPowerManager();
     else
     {

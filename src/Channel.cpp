@@ -40,7 +40,7 @@ void Channel::accountWirelessRxPower()
 {
     for (unsigned int i = 0; i<hubs.size();i++)
     {
-	if (!GlobalParams::use_wirxsleep) 
+	if (!GlobalParams::use_powermanager) 
 	    hubs[i]->power.wirelessDynamicRx();
 	else
 	if (!(hubs[i]->power.isSleeping()))
@@ -51,7 +51,7 @@ void Channel::accountWirelessRxPower()
 
 void Channel::powerManager(int hub_dst_index, tlm::tlm_generic_payload& trans)
 {
-    if (!GlobalParams::use_wirxsleep) return;
+    if (!GlobalParams::use_powermanager) return;
 
     struct Flit* f = (struct Flit*)trans.get_data_ptr();
 

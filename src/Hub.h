@@ -86,6 +86,7 @@ SC_MODULE(Hub)
     int total_ttxoff_cycles;
     map<int,int> buffer_rx_sleep_cycles; // antenna buffer RX power off cycles
     map<int,int> abtxoff_cycles; // antenna buffer TX power off cycles
+    map<int,int> analogtxoff_cycles; // analog TX power off cycles
     map<int,int> buffer_to_tile_poweroff_cycles;
 
     int wireless_communications_counter;
@@ -145,8 +146,8 @@ SC_MODULE(Hub)
 	    current_token_expiration[txChannels[i]] = new sc_in<int>();
 	    flag[txChannels[i]] = new sc_out<int>();
             token_ring->attachHub(txChannels[i],local_id, current_token_holder[txChannels[i]],current_token_expiration[txChannels[i]],flag[txChannels[i]]);
-	    // wirxsleep currently assumes TOKEN_PACKET mac policy
-	    if (GlobalParams::use_wirxsleep)
+	    // power manager currently assumes TOKEN_PACKET mac policy
+	    if (GlobalParams::use_powermanager)
 		assert(token_ring->getPolicy(txChannels[i]).first==TOKEN_PACKET);
         }
 
@@ -173,7 +174,7 @@ SC_MODULE(Hub)
     void txRadioProcessTokenHold(int channel);
     void txRadioProcessTokenMaxHold(int channel);
 
-    void wirxPowerManager();
+    void rxPowerManager();
     void txPowerManager();
 };
 

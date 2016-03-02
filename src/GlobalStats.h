@@ -86,7 +86,7 @@ class GlobalStats {
 
     void showPowerBreakDown(std::ostream & out);
 
-    void showWirxStats(std::ostream & out);
+    void showPowerManagerStats(std::ostream & out);
 
 
 

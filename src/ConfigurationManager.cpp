@@ -66,7 +66,7 @@ void loadConfiguration() {
     //GlobalParams::hotspots;
     GlobalParams::show_buffer_stats = config["show_buffer_stats"].as<bool>();
     GlobalParams::use_winoc = config["use_winoc"].as<bool>();
-    GlobalParams::use_wirxsleep = config["use_wirxsleep"].as<bool>();
+    GlobalParams::use_powermanager = config["use_wirxsleep"].as<bool>();
     
     GlobalParams::default_hub_configuration = config["Hubs"]["defaults"].as<HubConfig>();
 
@@ -361,7 +361,7 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::use_winoc = true;
 	    else if (!strcmp(arg_vet[i], "-wirxsleep")) 
 	    {
-		GlobalParams::use_wirxsleep = true;
+		GlobalParams::use_powermanager = true;
 	    }
 	    else if (!strcmp(arg_vet[i], "-size")) 
 	    {

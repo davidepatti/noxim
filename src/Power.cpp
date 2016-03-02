@@ -456,7 +456,7 @@ void Power::rxSleep(int cycles)
 
 bool Power::isSleeping()
 {
-    assert(GlobalParams::use_wirxsleep);
+    assert(GlobalParams::use_powermanager);
     int now = (int)(sc_time_stamp().to_double()/GlobalParams::clock_period_ps);
 
     return (now<sleep_end_cycle);
