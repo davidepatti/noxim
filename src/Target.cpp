@@ -40,7 +40,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 	{
 	    if (hub->antenna2tile_reservation_table.isAvailable(dst_port))
 	    {
-		//LOG << "Reserving output port " << dst_port << " for channel " << local_id << endl;
+		LOG << "Reserving output port " << dst_port << " for channel " << local_id << " for flit " << *my_flit << endl;
 		hub->antenna2tile_reservation_table.reserve(local_id, dst_port);
 
 		// The number of commucation using the wireless network, accounting also
@@ -49,7 +49,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 	    }
 	    else
 	    {
-		LOG << "WARNING: cannot reserve output port " << dst_port << " for channel " << local_id << endl;
+		LOG << "WARNING: cannot reserve output port " << dst_port << " for channel " << local_id  << ", flit " << *my_flit << endl;
 		return;
 	    }
 
@@ -57,7 +57,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 
 	if (my_flit->flit_type == FLIT_TYPE_TAIL) 
 	{
-	    //LOG << "Releasing reservation for output port " << dst_port << endl;
+	    LOG << "Releasing reservation for output port " << dst_port << ", flit " << *my_flit << endl;
 	    hub->antenna2tile_reservation_table.release(dst_port);
 	}
 	
@@ -70,7 +70,7 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
     }
     else
     {
-	LOG << "WARNING: buffer_rx is full " << endl;
+	LOG << "WARNING: buffer_rx is full cannot store flit " << *my_flit << endl;
     }
 
 
