@@ -50,22 +50,24 @@ class Buffer {
     void Disable();
 
 
-    void Print(const char*);
+    void Print();
     
     bool deadlockFree();
     void deadlockCheck();
 
 
-    inline string name() { return "Buffer";};
-
+    void setLabel(string);
+    string getLabel() const;
 
   private:
 
     bool true_buffer;
-
+    bool deadlock_detected;
 
     int full_cycles_counter;
     int last_front_flit_seq;
+
+    string label;
 
     unsigned int max_buffer_size;
 

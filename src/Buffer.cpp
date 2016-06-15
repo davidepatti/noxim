@@ -23,9 +23,22 @@ Buffer::Buffer()
   true_buffer = true;
   full_cycles_counter = 0;
   last_front_flit_seq = NOT_VALID;
+  deadlock_detected = false;
 }
 
-void Buffer::Print(const char *prefix)
+
+void Buffer::setLabel(string l)
+{
+    //cout << "\n BUFFER LABEL: " << l << endl;
+    label = l;
+}
+
+string Buffer::getLabel() const
+{
+    return label;
+}
+
+void Buffer::Print()
 {
     queue<Flit> m = buffer;
 
@@ -33,7 +46,7 @@ void Buffer::Print(const char *prefix)
 
     char  t[] = "HBT";
 
-    LOG << prefix << " | ";
+    cout << label << " | ";
     while (!(m.empty()))
     {
 	Flit f = m.front();
@@ -46,12 +59,13 @@ void Buffer::Print(const char *prefix)
 
 void Buffer::deadlockCheck()
 {
+    // TOOD: add as parameter
+    int check_threshold = 50000;
+
     if (IsEmpty()) return;
 
     Flit f = buffer.front();
-    
     int seq = f.sequence_no;
-
 
     if (last_front_flit_seq==seq)
     {
@@ -59,8 +73,20 @@ void Buffer::deadlockCheck()
     }
     else
     {
+	if (deadlock_detected) 
+	{
+	    cout << " WRONG DEADLOCK detection, please increase the check_threshold " << endl;
+	    assert(false);
+	}
 	last_front_flit_seq = seq;
 	full_cycles_counter=0;
+    }
+
+    if (full_cycles_counter>check_threshold && !deadlock_detected) 
+    {
+	double current_time = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+	cout << "WARNING: DEADLOCK DETECTED at cycle " << current_time << " in buffer:  " << getLabel() << endl;
+	deadlock_detected = true;
     }
 }
 
@@ -84,8 +110,10 @@ bool Buffer::deadlockFree()
 	full_cycles_counter=0;
     }
 
-    if (full_cycles_counter>10000) 
+    if (full_cycles_counter>50000) 
+    {
 	return false;
+    }
 
     return true;
 
