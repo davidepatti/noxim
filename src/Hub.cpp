@@ -454,7 +454,7 @@ void Hub::tileToAntennaProcess()
 		else
 		{
 		    LOG << "Buffer Full: Cannot move flit " << flit << " from buffer_from_tile["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
-		    init[channel]->buffer_tx.Print();
+		    //init[channel]->buffer_tx.Print();
 		}
 
 	    }
@@ -492,7 +492,7 @@ void Hub::tileToAntennaProcess()
 	    else
 	    {
 		LOG << "Buffer full: Cannot store " << received_flit << " on port " << i << endl;
-		buffer_from_tile[i].Print();
+		//buffer_from_tile[i].Print();
 	    }
 
 
