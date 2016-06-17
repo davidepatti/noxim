@@ -29,7 +29,7 @@ SC_MODULE(TokenRing)
 
     map<int, sc_out<int>* > current_token_holder;
     map<int, sc_out<int>* > current_token_expiration;
-    map<int, map<int,sc_in<int>* > > flag;
+    map<int, map<int,sc_inout<int>* > > flag;
 
     map<int, sc_signal<int>* > token_holder_signals;
     map<int, sc_signal<int>* > token_expiration_signals;
@@ -37,7 +37,7 @@ SC_MODULE(TokenRing)
 
 
 
-    void attachHub(int channel, int hub, sc_in<int>* hub_token_holder_port, sc_in<int>* hub_token_expiration_port, sc_out<int>* hub_flag_port);
+    void attachHub(int channel, int hub, sc_in<int>* hub_token_holder_port, sc_in<int>* hub_token_expiration_port, sc_inout<int>* hub_flag_port);
 
     void updateTokens();
 

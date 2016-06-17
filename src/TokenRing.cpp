@@ -18,9 +18,11 @@ void TokenRing::updateTokenPacket(int channel)
 	    int num_hubs = rings_mapping[channel].size();
 
 	    token_position[channel] = (token_position[channel]+1)%num_hubs;
-	    LOG << "*** Token of channel " << channel << " has been assigned to hub " <<  rings_mapping[channel][token_position[channel]] << endl;
+	    LOG << "*** Token of channel " << channel << " has been assigned to Hub_" <<  rings_mapping[channel][token_position[channel]] << endl;
 
 	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]]);
+	    flag[channel][token_position[channel]]->write(HOLD_CHANNEL);
+
 	}
 }
 
@@ -34,7 +36,7 @@ void TokenRing::updateTokenMaxHold(int channel)
 	    int num_hubs = rings_mapping[channel].size();
 
 	    token_position[channel] = (token_position[channel]+1)%num_hubs;
-	    LOG << "*** Token of channel " << channel << " has been assigned to hub " <<  rings_mapping[channel][token_position[channel]] << endl;
+	    LOG << "*** Token of channel " << channel << " has been assigned to Hub_" <<  rings_mapping[channel][token_position[channel]] << endl;
 
 	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]]);
 	}
@@ -51,7 +53,7 @@ void TokenRing::updateTokenHold(int channel)
 	    int num_hubs = rings_mapping[channel].size();
 
 	    token_position[channel] = (token_position[channel]+1)%num_hubs;
-	    LOG << "*** Token of channel " << channel << " has been assigned to hub " <<  rings_mapping[channel][token_position[channel]] << endl;
+	    LOG << "*** Token of channel " << channel << " has been assigned to Hub_" <<  rings_mapping[channel][token_position[channel]] << endl;
 
 	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]]);
 	}
@@ -91,7 +93,7 @@ void TokenRing::updateTokens()
 }
 
 
-void TokenRing::attachHub(int channel, int hub, sc_in<int>* hub_token_holder_port, sc_in<int>* hub_token_expiration_port, sc_out<int>* hub_flag_port)
+void TokenRing::attachHub(int channel, int hub, sc_in<int>* hub_token_holder_port, sc_in<int>* hub_token_expiration_port, sc_inout<int>* hub_flag_port)
 {
     // If port for requested channel is not present, create the
     // port and connect a signal
@@ -123,7 +125,7 @@ void TokenRing::attachHub(int channel, int hub, sc_in<int>* hub_token_holder_por
         }
     }	
 
-    flag[channel][hub] = new sc_in<int>();
+    flag[channel][hub] = new sc_inout<int>();
     flag_signals[channel][hub] = new sc_signal<int>();
     flag[channel][hub]->bind(*(flag_signals[channel][hub]));
     hub_flag_port->bind(*(flag_signals[channel][hub]));
