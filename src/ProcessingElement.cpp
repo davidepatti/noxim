@@ -86,6 +86,17 @@ Flit ProcessingElement::nextFlit()
 
 bool ProcessingElement::canShot(Packet & packet)
 {
+    /* DEADLOCK TEST 
+	double current_time = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+
+	if (current_time >= 4100) 
+	{
+	    //if (current_time==3500)
+	         //cout << name() << " IN CODA " << packet_queue.size() << endl;
+	    return false;
+	}
+	//*/
+
 #ifdef DEADLOCK_AVOIDANCE
     if (local_id%2==0)
 	return false;
@@ -191,11 +202,9 @@ int ProcessingElement::findRandomDestination(int id, int hops)
     Coord current =  id2Coord(id);
     
 
-    //cout << "\n DIREZIONI " << inc_x << "   " << inc_y << endl;
 
     for (int h = 0; h<hops; h++)
     {
-	//cout << "\n CURRENT POS: " << current.x << " , " << current.y << endl;
 
 	if (current.x==0)
 	    if (inc_x<0) inc_x=0;
@@ -225,13 +234,11 @@ int roulette()
 
     double r = rand()/(double)RAND_MAX;
 
-    //cout << "\n E' uscito il " << r << endl;
 
     for (int i=1;i<=slices;i++)
     {
 	if (r< (1-1/double(2<<i)))
 	{
-	    //cout << "\n sta nel settore " << i << endl;
 	    return i;
 	}
     }
