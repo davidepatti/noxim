@@ -33,11 +33,14 @@ void Router::rxProcess()
 	    // 2) there is a free slot in the input buffer of direction i
 
 	    if ((req_rx[i].read() == 1 - current_level_rx[i])
-		&& !buffer[i].IsFull()) {
+		&& !buffer[i].IsFull()) 
+	    {
 		Flit received_flit = flit_rx[i].read();
 
 		// Store the incoming flit in the circular buffer
 		buffer[i].Push(received_flit);
+
+	        LOG << " Flit " << received_flit << " received from Input[" << i << "] " << endl;
 
 		power.bufferRouterPush();
 
@@ -58,6 +61,7 @@ void Router::rxProcess()
 
 void Router::txProcess()
 {
+
   if (reset.read()) 
     {
       // Clear outputs and indexes of transmitting protocol
@@ -75,6 +79,8 @@ void Router::txProcess()
 	  int i = (start_from_port + j) % (DIRECTIONS + 2);
 	 
 
+	  // Uncomment to enable deadlock checking on buffers. 
+	  // Please also set the appropriate threshold.
 	  // buffer[i].deadlockCheck();
 
 	  if (!buffer[i].IsEmpty()) 
@@ -237,11 +243,17 @@ vector < int > Router::routingFunction(const RouteData & route_data)
                 !sameRadioHub(local_id,route_data.dst_id)
            )
         {
-            LOG << "Setting direction HUB to reach destination node " << route_data.dst_id << endl;
+	    // check incoming direction for deadlock avoidance
 
-            vector<int> dirv;
-            dirv.push_back(DIRECTION_HUB);
-            return dirv;
+	    //if (route_data.dir_in!=DIRECTION_NORTH 
+	    //&& route_data.dir_in!=DIRECTION_SOUTH) 
+	    //{
+		LOG << "Setting direction HUB to reach destination node " << route_data.dst_id << endl;
+
+		vector<int> dirv;
+		dirv.push_back(DIRECTION_HUB);
+		return dirv;
+	    //}
         }
     }
     LOG << "Wired routing for dst = " << route_data.dst_id << endl;
@@ -322,7 +334,10 @@ void Router::configure(const int _id,
 	routing_table.configure(grt, _id);
 
     for (int i = 0; i < DIRECTIONS + 2; i++)
+    {
 	buffer[i].SetMaxBufferSize(_max_buffer_size);
+	buffer[i].setLabel(string(name())+"->buffer["+to_string(i)+"]");
+    }
 
     int row = _id / GlobalParams::mesh_dim_x;
     int col = _id % GlobalParams::mesh_dim_x;
