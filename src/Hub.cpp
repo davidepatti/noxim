@@ -40,7 +40,7 @@ void Hub::rxPowerManager()
     }
 
     
-    for (int i=0;i<rxChannels.size();i++)
+    for (unsigned int i=0;i<rxChannels.size();i++)
     {
 	int ch_id = rxChannels[i];
 
@@ -80,7 +80,7 @@ void Hub::updateRxPower()
 	power.leakageTransceiverRx();
 	power.biasingRx();
 
-	for (int i=0;i<rxChannels.size();i++)
+	for (unsigned int i=0;i<rxChannels.size();i++)
 	{
 	    power.leakageAntennaBuffer();
 	}
@@ -94,7 +94,7 @@ void Hub::updateRxPower()
 
 void Hub::txPowerManager()
 {
-    for (int i=0;i<txChannels.size();i++)
+    for (unsigned int i=0;i<txChannels.size();i++)
     {
 	// check if not empty or reserved
 	if (!init[i]->buffer_tx.IsEmpty() || 
@@ -129,7 +129,7 @@ void Hub::updateTxPower()
 	txPowerManager();
     else
     {
-	for (int i=0;i<txChannels.size();i++)
+	for (unsigned int i=0;i<txChannels.size();i++)
 	    power.leakageAntennaBuffer();
 
 	power.leakageTransceiverTx();

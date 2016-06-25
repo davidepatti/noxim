@@ -6,6 +6,7 @@
 
 #include "DataStructs.h"
 #include <iomanip>
+#include <sstream>
 
 #ifdef DEBUG
 
@@ -222,5 +223,11 @@ inline void printMap(string label, const map<string,double> & m,std::ostream & o
 
     out << "];" << endl;
 }
+
+inline string i_to_string(int value)
+{
+    return static_cast<ostringstream*>( &(ostringstream() << value) )->str();
+}
+
 
 #endif

@@ -336,7 +336,7 @@ void Router::configure(const int _id,
     for (int i = 0; i < DIRECTIONS + 2; i++)
     {
 	buffer[i].SetMaxBufferSize(_max_buffer_size);
-	buffer[i].setLabel(string(name())+"->buffer["+to_string(i)+"]");
+	buffer[i].setLabel(string(name())+"->buffer["+i_to_string(i)+"]");
     }
 
     int row = _id / GlobalParams::mesh_dim_x;

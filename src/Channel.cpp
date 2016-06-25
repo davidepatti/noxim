@@ -49,7 +49,7 @@ void Channel::accountWirelessRxPower()
 }
 
 
-void Channel::powerManager(int hub_dst_index, tlm::tlm_generic_payload& trans)
+void Channel::powerManager(unsigned int hub_dst_index, tlm::tlm_generic_payload& trans)
 {
     if (!GlobalParams::use_powermanager) return;
 

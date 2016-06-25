@@ -56,7 +56,7 @@ SC_MODULE(Hub)
     map<int, sc_in<int>* > current_token_holder;
     map<int, sc_in<int>* > current_token_expiration;
     map<int, sc_inout<int>* > flag;
-    bool transmission_in_progress = false;
+    bool transmission_in_progress;
 
 
     map<int, Initiator*> init;
@@ -131,8 +131,8 @@ SC_MODULE(Hub)
         {
             buffer_from_tile[i].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].fromTileBufferSize);
             buffer_to_tile[i].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].toTileBufferSize);
-            buffer_from_tile[i].setLabel(string(name())+"->bft["+to_string(i)+"]");
-            buffer_to_tile[i].setLabel(string(name())+"->btt["+to_string(i)+"]");
+            buffer_from_tile[i].setLabel(string(name())+"->bft["+i_to_string(i)+"]");
+            buffer_to_tile[i].setLabel(string(name())+"->btt["+i_to_string(i)+"]");
         }
 
         current_level_rx = new bool[num_ports];
@@ -140,12 +140,14 @@ SC_MODULE(Hub)
 
         start_from_port = 0;
 
+    	transmission_in_progress = false;
+
         for (unsigned int i = 0; i < txChannels.size(); i++) {
             char txt[20];
             sprintf(txt, "init_%d", txChannels[i]);
             init[txChannels[i]] = new Initiator(txt,this);
             init[txChannels[i]]->buffer_tx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].txBufferSize);
-            init[txChannels[i]]->buffer_tx.setLabel(string(name())+"->abtx["+to_string(i)+"]");
+            init[txChannels[i]]->buffer_tx.setLabel(string(name())+"->abtx["+i_to_string(i)+"]");
 	    current_token_holder[txChannels[i]] = new sc_in<int>();
 	    current_token_expiration[txChannels[i]] = new sc_in<int>();
 	    flag[txChannels[i]] = new sc_inout<int>();
@@ -160,7 +162,7 @@ SC_MODULE(Hub)
             sprintf(txt, "target_%d", rxChannels[i]);
             target[rxChannels[i]] = new Target(txt, rxChannels[i], this);
             target[rxChannels[i]]->buffer_rx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].rxBufferSize);
-            target[rxChannels[i]]->buffer_rx.setLabel(string(name())+"->abrx["+to_string(i)+"]");
+            target[rxChannels[i]]->buffer_rx.setLabel(string(name())+"->abrx["+i_to_string(i)+"]");
         }
 
 	start_from_port = 0;
