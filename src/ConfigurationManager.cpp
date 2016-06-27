@@ -9,6 +9,7 @@
  */
 
 #include "ConfigurationManager.h"
+#include "Power.h"
 #include <systemc.h> //Included for the function time() 
 
 void loadConfiguration() {
@@ -36,7 +37,7 @@ void loadConfiguration() {
     GlobalParams::traffic_distribution = config["traffic_distribution"].as<int>();
     strcpy(GlobalParams::traffic_table_filename, config["traffic_table_filename"].as<string>().c_str());
     GlobalParams::clock_period_ps = config["clock_period_ps"].as<int>();
-    GlobalParams::simulation_time = config["simulation_time"].as<int>();
+    GlobalParams::simulation_time = config["simulation_time"].as<double>();
     GlobalParams::reset_time = config["reset_time"].as<int>();
     GlobalParams::stats_warm_up_time = config["stats_warm_up_time"].as<int>();
     GlobalParams::rnd_generator_seed = time(NULL);
@@ -50,6 +51,13 @@ void loadConfiguration() {
     
     GlobalParams::default_hub_configuration = config["Hubs"]["defaults"].as<HubConfig>();
 
+    GlobalParams::payload_pattern = config["payload_pattern"].as<int>();
+    strcpy(GlobalParams::interconnect_model_filename, config["interconnect_model_filename"].as<string>().c_str());
+    GlobalParams::link_pwr_model = config["link_pwr_model"].as<int>();
+    GlobalParams::use_script_mode = config["use_script_mode"].as<bool>();
+    GlobalParams::get_instant_noc_power = config["get_instant_noc_power"].as<bool>();
+    strcpy(GlobalParams::app_traffic_pathname, config["app_traffic_pathname"].as<string>().c_str());
+    
     for(YAML::const_iterator hubs_it = config["Hubs"].begin(); 
         hubs_it != config["Hubs"].end();
         ++hubs_it)
@@ -128,6 +136,7 @@ void showHelp(char selfname[])
          << "\t\tbutterfly\tButterfly traffic distribution" << endl
          << "\t\tshuffle\t\tShuffle traffic distribution" << endl
          <<	"\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file" << endl
+         <<	"\t\tapp \t\tTraffic Based on application with PE files in the folder APP" << endl
          << "\t-hs ID P\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)" << endl
          << "\t-warmup N\tStart to collect statistics after N cycles (default " << GlobalParams::stats_warm_up_time << ")" << endl
          << "\t-seed N\t\tSet the seed of the random generator (default time())" << endl
@@ -136,6 +145,22 @@ void showHelp(char selfname[])
          << "\t-volume N\tStop the simulation when either the maximum number of cycles has been reached or N flits have" << endl
          << "\t\t\tbeen delivered" << endl
          << "\t-sim N\t\tRun for the specified simulation time [cycles] (default " << GlobalParams::simulation_time << ")" << endl
+         << "\t-flit_size N\t Set the flit size with N(32 or 64) bits" << endl
+         << "\t-r2r_length N\t Set the r2r links' length with N mm" << endl
+         << "\t-link_pwr_model TYPE\t Set the link power model TYPE used in simulation : " << endl
+         << "\t\t static\t Use the classic link power model" << endl
+         << "\t\t crosstalk\t Use an improved link pwr model bit-accurate that takes into" << endl << "\t\t\t account crosstalk" << endl
+         << "\t-payload_pattern TYPE\t Set the flit's payload according to a payload TYPE : " << endl
+         << "\t\tbest\t only 0s contained in data flit's payload" << endl
+         << "\t\tworst\t data flit's payload is word with 010101 pattern followed" << endl << "\t\t\t by a word with 101010 pattern" << endl
+         << "\t\ttrue_rng flit's payload is randomly generated " << endl   
+         << "\t\tINFO\t There are others patterns available, see GlobalParams.h"  << endl   
+         << "\t-q\t\t Use of noxim script mode that stores all results in 1 line" << endl
+         << "\t-link_config FILENAME\t Set the link power model configuration file name with FILENAME" << endl
+         << "\t-instantPow \t Create a file when it is recorded NoC total power at each clock cycle" << endl
+         << "\t-appPath PATHNAME \t Set the folder name of application files " << endl
+         << "\t-own_header \t When -traffic app is on, consider the first packet data as the packet header in "<< endl << "\t\t\t NoC_tracesIPx files"<< endl
+         << "\t-alpha_trace \t Create alpha_file that records switching activity at each router's output" << endl
          << endl
          << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <maurizio.palesi@unikore.it>" << endl
          <<	"If you find this program useless please feel free to complain with Davide Patti <dpatti@dieei.unict.it>" << endl
@@ -161,7 +186,14 @@ void showConfig()
          << "- clock_period = " << GlobalParams::clock_period_ps << "ps" << endl
          << "- simulation_time = " << GlobalParams::simulation_time << endl
          << "- stats_warm_up_time = " << GlobalParams::stats_warm_up_time << endl
-         << "- rnd_generator_seed = " << GlobalParams::rnd_generator_seed << endl;
+         << "- rnd_generator_seed = " << GlobalParams::rnd_generator_seed << endl
+         << "- payload_pattern = " << GlobalParams::payload_pattern << endl
+         << "- r2r_link_length = " << GlobalParams::r2r_link_length << endl
+         << "- flit_size = " << GlobalParams::flit_size << endl
+         << "- link_pwr_model = " << GlobalParams::link_pwr_model << endl 
+         << "- interconnect filename = "  << GlobalParams::interconnect_model_filename << endl
+         << "- appPath = " << GlobalParams::app_traffic_pathname << endl
+         << endl;
 }
 
 void checkConfiguration()
@@ -231,7 +263,7 @@ void checkConfiguration()
     }
 
     if (GlobalParams::simulation_time < 0) {
-	cerr << "Error: simulation time must be positive" << endl;
+	cerr << "Error: simulation time must be positive " << GlobalParams::simulation_time << endl;
 	exit(1);
     }
 
@@ -345,6 +377,9 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		else if (!strcmp(traffic, "shuffle"))
 		    GlobalParams::traffic_distribution =
 			TRAFFIC_SHUFFLE;
+                else if (!strcmp(traffic, "app"))
+		    GlobalParams::traffic_distribution =
+			TRAFFIC_APPLICATION;
 		else if (!strcmp(traffic, "table")) {
 		    GlobalParams::traffic_distribution =
 			TRAFFIC_TABLE_BASED;
@@ -360,7 +395,10 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		double percentage = atof(arg_vet[++i]);
 		pair < int, double >t(node, percentage);
 		GlobalParams::hotspots.push_back(t);
-	    } else if (!strcmp(arg_vet[i], "-warmup"))
+	    } else if (!strcmp(arg_vet[i], "-appPath"))
+                strcpy(GlobalParams::app_traffic_pathname, arg_vet[++i]);
+            
+            else if (!strcmp(arg_vet[i], "-warmup"))
 		GlobalParams::stats_warm_up_time = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-seed"))
 		GlobalParams::rnd_generator_seed = atoi(arg_vet[++i]);
@@ -372,7 +410,66 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::max_volume_to_be_drained =
 		    atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-sim"))
-		GlobalParams::simulation_time = atoi(arg_vet[++i]);
+		GlobalParams::simulation_time = atof(arg_vet[++i]);
+            else if (!strcmp(arg_vet[i], "-link_pwr_model")){
+		char *link_pwr_mdl = arg_vet[++i];
+		if (!strcmp(link_pwr_mdl, "static"))
+		    GlobalParams::link_pwr_model =
+			STATIC_MODEL;
+		else if (!strcmp(link_pwr_mdl, "crosstalk"))
+		    GlobalParams::link_pwr_model =
+			CROSSTALK_MODEL;
+                else if (!strcmp(link_pwr_mdl, "palesi"))
+		    GlobalParams::link_pwr_model =
+			PALESI_MODEL;
+            }else if (!strcmp(arg_vet[i], "-flit_size"))
+		GlobalParams::flit_size = atoi(arg_vet[++i]);
+            else if (!strcmp(arg_vet[i], "-payload_pattern")) {
+		char *payload_pattern = arg_vet[++i];
+		if (!strcmp(payload_pattern, "best"))
+		    GlobalParams::payload_pattern =
+			PAYLOAD_0_BEST;
+		else if (!strcmp(payload_pattern, "worst"))
+		    GlobalParams::payload_pattern =
+			PAYLOAD_100_WORST;
+                else if (!strcmp(payload_pattern, "true_rng"))
+		    GlobalParams::payload_pattern =
+			PAYLOAD_RANDOM;
+                else if (!strcmp(payload_pattern, "50_worst"))
+		    GlobalParams::payload_pattern =
+			PAYLOAD_50_WORST;
+                else if (!strcmp(payload_pattern, "50_best"))
+		    GlobalParams::payload_pattern =
+			PAYLOAD_50_BEST;
+                else if (!strcmp(payload_pattern, "25_worst"))
+		    GlobalParams::payload_pattern =
+			PAYLOAD_25_WORST;
+                else if (!strcmp(payload_pattern, "25_best"))
+		    GlobalParams::payload_pattern =
+			PAYLOAD_25_BEST;
+                else if (!strcmp(payload_pattern, "75_worst"))
+		    GlobalParams::payload_pattern =
+			PAYLOAD_75_WORST;
+                else if (!strcmp(payload_pattern, "75_best"))
+		    GlobalParams::payload_pattern =
+			PAYLOAD_75_BEST;
+                else if (!strcmp(payload_pattern, "100_best"))
+		    GlobalParams::payload_pattern =
+			PAYLOAD_100_BEST;
+            } else if (!strcmp(arg_vet[i], "-r2r_length"))
+		GlobalParams::r2r_link_length =
+		    atoi(arg_vet[++i]);
+            else if (!strcmp(arg_vet[i], "-q"))
+		GlobalParams::use_script_mode = true;
+            else if (!strcmp(arg_vet[i], "-link_config")) {
+		strcpy(GlobalParams::interconnect_model_filename, arg_vet[++i]);
+	    }
+            else if(!strcmp(arg_vet[i], "-instantPow"))
+                GlobalParams::get_instant_noc_power = true;
+            else if(!strcmp(arg_vet[i], "-own_header"))
+                GlobalParams::use_own_header = true;
+            else if(!strcmp(arg_vet[i], "-alpha_trace"))
+                GlobalParams::alpha_trace = true;
 	    else {
 		cerr << "Error: Invalid option: " << arg_vet[i] << endl;
 		exit(1);
@@ -409,10 +506,11 @@ void configure(int arg_num, char *arg_vet[]) {
 
     loadConfiguration();
     parseCmdLine(arg_num, arg_vet);
-
+    
     checkConfiguration();
 
     // Show configuration
     if (GlobalParams::verbose_mode > VERBOSE_OFF)
 	showConfig();
 }
+

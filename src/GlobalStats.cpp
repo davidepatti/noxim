@@ -9,6 +9,8 @@
  */
 
 #include "GlobalStats.h"
+#include "ConfigurationManager.h"
+
 using namespace std;
 
 GlobalStats::GlobalStats(const NoC * _noc)
@@ -175,9 +177,11 @@ unsigned int GlobalStats::getReceivedFlits()
 
 double GlobalStats::getThroughput()
 {
-    int total_cycles =
+    //EM change int type to double
+    
+    double total_cycles =
 	GlobalParams::simulation_time -
-	GlobalParams::stats_warm_up_time;
+	(double)GlobalParams::stats_warm_up_time;
 
     //  int number_of_ip = GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y;
     //  return (double)getReceivedFlits()/(double)(total_cycles * number_of_ip);
@@ -262,6 +266,12 @@ double GlobalStats::getStaticPower()
 
 void GlobalStats::showStats(std::ostream & out, bool detailed)
 {
+    if(!GlobalParams::use_script_mode){ 
+ 
+    // Show configuration
+    if (GlobalParams::detailed)
+    showConfig();
+        
     out << "% Total received packets: " << getReceivedPackets() << endl;
     out << "% Total received flits: " << getReceivedFlits() << endl;
     out << "% Global average delay (cycles): " << getAverageDelay() <<
@@ -273,6 +283,7 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
     out << "% Total energy (J): " << getTotalPower() << endl;
     out << "% \tDynamic energy (J): " << getDynamicPower() << endl;
     out << "% \tStatic energy (J): " << getStaticPower() << endl;
+    out << "% Execution time (s): " << GlobalParams::texec << endl;
 
     if (GlobalParams::show_buffer_stats)
       showBufferStats(out);
@@ -313,6 +324,13 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 
 	showPowerBreakDown(out);
     }
+            
+    }else
+        
+        //In script mode, we need PowerBreakDown's data
+        showPowerBreakDown(out);
+    
+  
 }
 
 void GlobalStats::updatePowerBreakDown(map<string,double> &dst,const map<string,double>& src)
@@ -355,9 +373,67 @@ void GlobalStats::showPowerBreakDown(std::ostream & out)
 		h->power.getStaticPowerBreakDown());
     }
 
+    if(!GlobalParams::use_script_mode){
+    
     printMap("power_breakdown_d",power_breakdown_d,out);
     printMap("power_breakdown_s",power_breakdown_s,out);
+    
+    cout << endl;
+    //Dynamic Energy Mapping of the NOC
+    double totalLink = 0.0, oneLinkEnergy = 0.0, routerEnergy = 0.0;
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++){
+	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++){
+                totalLink = 0.0;
+		for(int dir = 0; dir < DIRECTIONS; dir++){
+                    oneLinkEnergy = noc->t[x][y]->r->power.getLinksEnergy(dir);
+                    totalLink += oneLinkEnergy;
+                    cout  << oneLinkEnergy << "\t";
+                }
+                //Dynamic energy
+                routerEnergy = noc->t[x][y]->r->power.get_selection_pwr_d() 
+                             + noc->t[x][y]->r->power.get_routing_pwr_d()
+                             + noc->t[x][y]->r->power.get_crossbar_pwr_d() 
+                             + noc->t[x][y]->r->power.get_buffer_front_pwr_d()
+                             + noc->t[x][y]->r->power.get_buffer_pop_pwr_d() 
+                             + noc->t[x][y]->r->power.get_buffer_push_pwr_d();
+                //routerEnergy = noc->t[x][y]->r->power.getTotalPower() - totalLink; // Total energy consumption
+                cout << " Router : " << routerEnergy << endl;
+            }
+    }                
 
+    } else {
+        //Data no 1 to 9
+        cout << getReceivedPackets() << " " << getReceivedFlits() << " " << getAverageDelay() << " " << getAverageThroughput() 
+        << " " << getThroughput() << " " << getMaxDelay() << " " << getTotalPower() << " " << getDynamicPower() << " " << getStaticPower() << " ";
+        //Data no 10 to 17
+        for (map<string,double>::const_iterator i = power_breakdown_d.begin();i!=power_breakdown_d.end();i++)
+	cout << i->second << " ";
+        //Data no 18 to 26
+        for (map<string,double>::const_iterator i = power_breakdown_s.begin();i!=power_breakdown_s.end();i++)
+	cout << i->second << " ";
+        //Data no 27
+        cout << GlobalParams::texec << " ";
+        //Data no 28 to [28 + (NoC_size * 5)] Mapping dynamic energy consumption so 1 router + 4 directions
+        //Example for the order : N E S W Router0 N E S W Router1 etc...
+        double oneLinkEnergy = 0.0, routerEnergy = 0.0;
+        for (int y = 0; y < GlobalParams::mesh_dim_y; y++){
+            for (int x = 0; x < GlobalParams::mesh_dim_x; x++){
+                for(int dir = 0; dir < DIRECTIONS; dir++){
+                    oneLinkEnergy = noc->t[x][y]->r->power.getLinksEnergy(dir);
+                    cout  << oneLinkEnergy << " ";
+                }
+                routerEnergy = noc->t[x][y]->r->power.get_selection_pwr_d() 
+                              + noc->t[x][y]->r->power.get_routing_pwr_d() 
+                              + noc->t[x][y]->r->power.get_crossbar_pwr_d()
+                              + noc->t[x][y]->r->power.get_buffer_push_pwr_d()
+                              + noc->t[x][y]->r->power.get_buffer_pop_pwr_d()
+                              + noc->t[x][y]->r->power.get_buffer_front_pwr_d();
+                
+                cout << routerEnergy << " ";
+            }
+        }
+        cout << endl;
+    }
 }
 
 

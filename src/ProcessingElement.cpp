@@ -9,6 +9,7 @@
  */
 
 #include "ProcessingElement.h"
+#include <string>
 
 int ProcessingElement::randInt(int min, int max)
 {
@@ -35,25 +36,81 @@ void ProcessingElement::txProcess()
     if (reset.read()) {
 	req_tx.write(0);
 	current_level_tx = 0;
+        
 	transmittedAtPreviousCycle = false;
+        transmissionIsComplete = false;
+        waitToSendPacket = false;      
+        cycleNextPacket = 0;   
+                        
+        if(GlobalParams::traffic_distribution == TRAFFIC_APPLICATION){
+            
+            if(peDataFile.is_open()){
+                if (GlobalParams::verbose_mode > VERBOSE_HIGH)
+                    cout << "Instant Power file already opened" << endl;                      
+            }else{
+           
+                if(GlobalParams::verbose_mode > VERBOSE_HIGH)
+                    cout << "File opening of PE number : " << local_id << endl;
+
+                std::string sId = int_to_string(local_id);
+                std::string pathApp(GlobalParams::app_traffic_pathname); 
+                fname = pathApp + "NoC_tracesIP" + sId;  //filename specific to one PE
+
+                peDataFile.open(fname.c_str()); //The file is only opened once during simulation for a comptutation time optimisation purpose
+                                                //The file will be automatically closed with ifstream destructor
+                if(!peDataFile){
+                    if(GlobalParams::verbose_mode > VERBOSE_HIGH)
+                    cerr << "Error reading file : "<< fname << endl;
+                    
+                    if(GlobalParams::verbose_mode > VERBOSE_HIGH)
+                        cout << "PE no " << local_id << " will not emit data during this simulation"<< endl;   
+                    
+                    never_transmit = true; //Same use as table traffic mode
+                }else {
+                    if(GlobalParams::verbose_mode > VERBOSE_HIGH)
+                        cout << "File " << fname << " successfully openened" << endl;
+                    never_transmit = false;
+                }                 
+            }
+        }
+        
     } else {
 	Packet packet;
-
-	if (canShot(packet)) {
-	    packet_queue.push(packet);
-	    transmittedAtPreviousCycle = true;
-	} else
+        bool shoot;
+        double now = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+        
+	if (shoot = canShot(packet)) {
+ 
+            if(GlobalParams::traffic_distribution != TRAFFIC_APPLICATION){
+                packet_queue.push(packet);
+                transmittedAtPreviousCycle = true;
+            } else {
+                if(now >= cycleNextPacket){
+                    packet_queue.push(packet);
+                    transmittedAtPreviousCycle = true;
+                } else {
+                    transmittedAtPreviousCycle = false;
+                }    
+            }         
+            
+	} else 
 	    transmittedAtPreviousCycle = false;
-
+            
+        
 
 	if (ack_tx.read() == current_level_tx) {
-	    if (!packet_queue.empty()) {
-		Flit flit = nextFlit();	// Generate a new flit
+	    if (!packet_queue.empty()) { 
+		Flit flit = nextFlit();	// Generate a new flit 
 		flit_tx->write(flit);	// Send the generated flit
-		current_level_tx = 1 - current_level_tx;	// Negate the old value for Alternating Bit Protocol (ABP)
+		current_level_tx = 1 - current_level_tx; //Negate the old value for Alternating Bit Protocol (ABP)
 		req_tx.write(current_level_tx);
-	    }
+                
+               
+	    } 
+                
 	}
+        
+       
     }
 }
 
@@ -68,7 +125,6 @@ Flit ProcessingElement::nextFlit()
     flit.sequence_no = packet.size - packet.flit_left;
     flit.sequence_length = packet.size;
     flit.hop_no = 0;
-    //  flit.payload     = DEFAULT_PAYLOAD;
 
     if (packet.size == packet.flit_left)
 	flit.flit_type = FLIT_TYPE_HEAD;
@@ -76,7 +132,12 @@ Flit ProcessingElement::nextFlit()
 	flit.flit_type = FLIT_TYPE_TAIL;
     else
 	flit.flit_type = FLIT_TYPE_BODY;
-
+ 
+    
+    //Erwan 22/06/15, payload to get a bit-accurate Noxim
+    flit.payload.data = init_Payload(flit);
+        
+        
     packet_queue.front().flit_left--;
     if (packet_queue.front().flit_left == 0)
 	packet_queue.pop();
@@ -84,14 +145,244 @@ Flit ProcessingElement::nextFlit()
     return flit;
 }
 
+/*  
+ * EM Generate a flit's data in according to the flit's type
+ */
+sc_uint<MAX_FLIT_PAYLOAD> ProcessingElement::init_Payload(Flit flit)
+{
+    Payload flit_data;
+    flit_data.data = 0x0000000000000000;
+     
+    if(GlobalParams::traffic_distribution == TRAFFIC_APPLICATION){
+       
+        if(GlobalParams::use_own_header){          
+            flit_data.data = body_Payload(flit);           
+        }else{
+        
+            if(flit.flit_type == FLIT_TYPE_HEAD){
+                flit_data.data[0]=1; 
+                flit_data.data[1]=0;
+
+                //Get the binary dst and src of the packet
+                string src = dec_to_bin(flit.src_id);
+                string dst = dec_to_bin(flit.dst_id);           
+                string pkt_size = dec_to_bin(flit.sequence_length);  
+                assert(("Src can't possibly be higher than flits size", src.length()< GlobalParams::flit_size));
+                assert(("Dst can't possibly be higher than flits size", dst.length()< GlobalParams::flit_size));
+                assert(("Packet can't possibly be higher than flits size", pkt_size.length()< GlobalParams::flit_size));
+                //And fill the head with
+                unsigned int i;
+                for(i=0; i < src.length();i++){
+                    if(src[i] == '0')
+                        flit_data.data[i+2] = 0;
+                    else
+                        flit_data.data[i+2] = 1;
+                }         
+                int start_dst = i+2;
+                assert(("start_dst can't be negative", start_dst >=0));
+                unsigned int j;        
+                for(j=0; j < dst.length();j++){
+                    if(dst[j] == '0')
+                        flit_data.data[start_dst+j] = 0;
+                    else
+                        flit_data.data[start_dst+j] = 1;
+                }
+                //Add of the packet size
+                int start_pkt_size = start_dst + j;
+                assert(("start_pkt_size can't be negative", start_pkt_size >=0));
+                for(unsigned int k=0; k < pkt_size.length();k++){
+                    if(pkt_size[k] == '0')
+                        flit_data.data[start_pkt_size+k] = 0;
+                    else
+                        flit_data.data[start_pkt_size+k] = 1;
+                }
+
+            } else{ 
+                    if(flit.flit_type == FLIT_TYPE_TAIL){
+                    flit_data.data[0]=0; 
+                    flit_data.data[1]=1;
+                    //The other bits stay at 0 for the tail     
+
+                    } else{
+                            flit_data.data = body_Payload(flit);                       
+                    }
+            }
+            
+        }
+         
+    }else{
+        flit_data.data = body_Payload(flit);
+    }    
+        
+   return flit_data.data;
+}
+
+/* 
+ * EM Generate a flit's data in according to the payload_pattern
+ */
+sc_uint<MAX_FLIT_PAYLOAD> ProcessingElement::body_Payload(Flit flit)
+{  
+    
+    if(GlobalParams::traffic_distribution == TRAFFIC_APPLICATION){
+        
+        if(GlobalParams::use_own_header){  
+            sc_uint<MAX_FLIT_PAYLOAD> flit_data = packet_queue.front().packet_data[flit.sequence_no].data;
+            flit.payload.data = flit_data;
+        }else{
+            sc_uint<MAX_FLIT_PAYLOAD> flit_data = packet_queue.front().packet_data[flit.sequence_no-1].data;
+            flit.payload.data = flit_data;
+        }
+        
+    } else{
+    
+        switch (GlobalParams::payload_pattern) {
+                case PAYLOAD_0_BEST:
+                    //Don't do anything, payloads' data is already initialized to 0
+                    break;
+
+                case PAYLOAD_100_WORST:
+                    if((flit.sequence_no%2)==0){
+                        for(int itt= 0; itt < GlobalParams::flit_size;itt++){                       
+                            if(itt%2==0){
+                                flit.payload.data[itt] = 1;
+                            }                  
+                        }  
+                    }else{
+                        for(int itt= 0; itt < GlobalParams::flit_size;itt++){  
+                            if(itt%2){
+                                flit.payload.data[itt] = 1;
+                            }                       
+                        }
+                    } 
+                    break;
+
+                case PAYLOAD_100_BEST:   
+                    // Fill the flit's payload with bits that switching at the same time in the way
+                    // In this case we keep switching activity at 1 
+                    if((flit.sequence_no%2)==0){
+                        for(int itt= 0; itt < GlobalParams::flit_size;itt++)
+                                flit.payload.data[itt] = 1;               
+                    }else{
+                        for(int itt= 0; itt < GlobalParams::flit_size;itt++)                   
+                                flit.payload.data[itt] = 0;
+                    }                
+                break;
+
+                case PAYLOAD_RANDOM:
+                    for(int itt= 0; itt < GlobalParams::flit_size;itt++)
+                        flit.payload.data[itt] = rand()%2;
+
+                    break;
+
+                case PAYLOAD_50_WORST:
+                    // Fill the half of the flit's payload as it was worst_case and 0s the bits remaining
+                    // In this case we keep switching activity at 0.5 as PAYLOAD_RANDOM but with a different pattern
+                    if((flit.sequence_no%2)==0){
+                        for(int itt= 0; itt < GlobalParams::flit_size/2 ;itt++){
+                            if(itt%2==0){
+                                flit.payload.data[itt] = 1;
+                            }               
+                        }  
+                    }else{
+                        for(int itt= 0; itt < GlobalParams::flit_size/2 ;itt++){  
+                            if(itt%2){
+                                flit.payload.data[itt] = 1;
+                            }                     
+                        }
+                    } 
+                    break;    
+
+                case PAYLOAD_50_BEST:   
+                    // Fill the half of the flit's payload with the half at 0 and others that switching at the same time in the way
+                    // In this case we keep switching activity at 0.5 as PAYLOAD_RANDOM but with a different pattern
+                    if((flit.sequence_no%2)==0){
+                        for(int itt= 0; itt < GlobalParams::flit_size/2 ;itt++)  
+                                flit.payload.data[itt] = 1;               
+                    }else{
+                        for(int itt= 0; itt < GlobalParams::flit_size/2 ;itt++)                     
+                                flit.payload.data[itt] = 0;
+
+                    }                
+                break;
+
+                case PAYLOAD_75_BEST:   
+                    // Fill the half of the flit's payload with the half at 0 and others that switching at the same time in the way
+                    // In this case we keep switching activity at 0.5 as PAYLOAD_RANDOM but with a different pattern
+                    if((flit.sequence_no%2)==0){
+                       for(int itt= 0; itt < GlobalParams::flit_size*0.75 ;itt++)  
+                                flit.payload.data[itt] = 1;               
+                    }else{
+                        for(int itt= 0; itt < GlobalParams::flit_size*0.75 ;itt++)                     
+                                flit.payload.data[itt] = 0;
+
+                    }                
+                break;
+
+                case PAYLOAD_75_WORST:
+                    // Fill the half of the flit's payload as it was worst_case and 0s the bits remaining
+                    // In this case we keep switching activity at 0.5 as PAYLOAD_RANDOM but with a different pattern
+                    if((flit.sequence_no%2)==0){
+                        for(int itt= 0; itt < GlobalParams::flit_size*0.75;itt++){                         
+                            if(itt%2==0){
+                                flit.payload.data[itt] = 1;
+                            }               
+                        }  
+                    }else{
+                        for(int itt= 0; itt < GlobalParams::flit_size*0.75;itt++){  
+                            if(itt%2){
+                                flit.payload.data[itt] = 1;
+                            }                     
+                        }
+                    } 
+                    break; 
+
+                     case PAYLOAD_25_BEST:   
+                    // Fill the half of the flit's payload with the half at 0 and others that switching at the same time in the way
+                    // In this case we keep switching activity at 0.5 as PAYLOAD_RANDOM but with a different pattern
+                    if((flit.sequence_no%2)==0){
+                        for(int itt= 0; itt < GlobalParams::flit_size*0.25 ;itt++)  
+                                flit.payload.data[itt] = 1;               
+                    }else{
+                        for(int itt= 0; itt < GlobalParams::flit_size*0.25 ;itt++)                     
+                                flit.payload.data[itt] = 0;
+
+                    }                
+                break;
+
+                case PAYLOAD_25_WORST:
+                    // Fill the half of the flit's payload as it was worst_case and 0s the bits remaining
+                    // In this case we keep switching activity at 0.5 as PAYLOAD_RANDOM but with a different pattern
+                    if((flit.sequence_no%2)==0){
+                        for(int itt= 0; itt < GlobalParams::flit_size*0.25 ;itt++){                         
+                            if(itt%2==0){
+                                flit.payload.data[itt] = 1;
+                            }               
+                        }  
+                    }else{
+                        for(int itt= 0; itt < GlobalParams::flit_size*0.25 ;itt++){  
+                            if(itt%2){
+                                flit.payload.data[itt] = 1;
+                            }                     
+                        }
+                    } 
+                break; 
+
+                default:
+                    assert(false);
+                }
+        }
+    
+    return flit.payload.data;
+}
+
+
 bool ProcessingElement::canShot(Packet & packet)
 {
     bool shot;
     double threshold;
-
     double now = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
-
-    if (GlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED) {
+    
+    if (GlobalParams::traffic_distribution != TRAFFIC_TABLE_BASED && GlobalParams::traffic_distribution != TRAFFIC_APPLICATION) {
 	if (!transmittedAtPreviousCycle)
 	    threshold = GlobalParams::packet_injection_rate;
 	else
@@ -132,7 +423,7 @@ bool ProcessingElement::canShot(Packet & packet)
 		assert(false);
 	    }
 	}
-    } else {			// Table based communication traffic
+    } else if(GlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED) { // Table based communication traffic
 	if (never_transmit)
 	    return false;
 
@@ -153,8 +444,122 @@ bool ProcessingElement::canShot(Packet & packet)
 		}
 	    }
 	}
-    }
+    } else {                         // Application based traffic
+        if (never_transmit) 
+	  return false;
+        
+        if (transmissionIsComplete)
+          return false;
+          
+          if(GlobalParams::verbose_mode > VERBOSE_MEDIUM)
+          cout << "Simulation time in cycles : " << now << " Time to send : " << cycleNextPacket << endl; 
+        
+        if(packet_queue.empty()){           
+            
+            if(now < cycleNextPacket){  //If true, it's not the time to send the packet.
+                 shot = false;
+            } else {
+                
+                if(!waitToSendPacket){  //Test if we have already read the line 
+                                        //and so if we wait the right time to send the packet 
+                    getline(peDataFile, line);
+                    
+                    if(line[0]!='\0' ){
 
+                        vector<string> readingPacket = splitString(line," ");
+                        /*App files contain time to send in ns, 
+                         * we must adapt it in cycles knowing noc frequency*/
+                        cycleNextPacket = string_to_double(readingPacket[0])/(GlobalParams::clock_period_ps)*1000;
+                        int dst = string_to_int(readingPacket[1]);
+                        int size_data = 0;
+                        int file_index = 0;
+                        
+                        if( GlobalParams::use_own_header){
+                            packet.make(local_id, dst, cycleNextPacket, readingPacket.size()-2); 
+                        } else {
+                            packet.make(local_id, dst, cycleNextPacket, readingPacket.size()); 
+                            //The packet size is the number of data flits + header and tail flits so readingPacket.size()-2 +2
+                        }
+
+                        for(unsigned int i=2; i<readingPacket.size(); i++){  //Data packets start at i=2
+                            Payload dataFlit;
+                            size_data = readingPacket[i].size();
+                            file_index = size_data-1;
+                            for(int j = 0; j < size_data; j++){ //Convert string to Payload (sc_uint)
+                                //if(j>= (MAX_FLIT_PAYLOAD - size_data))
+                                dataFlit.data[j] = (readingPacket[i][file_index]=='1')?1:0;
+                                
+                            file_index--;
+                            }       
+                            
+                            packet.packet_data.push_back(dataFlit);
+
+                            if(GlobalParams::verbose_mode > VERBOSE_MEDIUM)            
+                            cout << "Recording flit's payload : " << hex <<  packet.packet_data[i-2].data << dec << endl;
+                        }
+
+                        if(GlobalParams::verbose_mode > VERBOSE_MEDIUM)            
+                        cout << "dst : " << packet.dst_id << "  timestamp is : " << packet.timestamp << " Size : " << packet.size << endl;
+                            
+
+                        if(now < cycleNextPacket){
+                            shot = false;
+                            waitToSendPacket = true;
+                            if(GlobalParams::verbose_mode > VERBOSE_MEDIUM)    
+                            cout << "Im waiting to send data" << endl;
+                        } else {
+                            shot = true;              
+                        }
+
+                    } else {        
+                        transmissionIsComplete = true;  
+                        if(GlobalParams::verbose_mode > VERBOSE_MEDIUM) 
+                        cout << "transmission Complete !" << endl;
+                        peDataFile.close();
+                        shot = false;
+                    }
+                } else {    //It's time to send the packet!
+                        
+                    vector<string> readingPacket = splitString(line," ");
+                    cycleNextPacket = string_to_double(readingPacket[0])/(GlobalParams::clock_period_ps)*1000;
+                    int dst = string_to_int(readingPacket[1]);
+                    int size_data = readingPacket[2].size();
+                    int file_index = 0;
+                    
+                    if( GlobalParams::use_own_header){
+                            packet.make(local_id, dst, cycleNextPacket, readingPacket.size()-2); 
+                        } else {
+                            packet.make(local_id, dst, cycleNextPacket, readingPacket.size()); 
+                            //The packet size is the number of data flits + header and tail flits so readingPacket.size()-2 +2
+                    }
+                    
+                    for(unsigned int i=2; i<readingPacket.size(); i++){  //Data packets start at i=2
+                            Payload dataFlit;
+                            size_data = readingPacket[i].size();
+                            file_index = size_data-1;
+                            for(int j = 0; j < size_data; j++){ //Convert string to Payload (sc_uint)
+                                //if(j>= (MAX_FLIT_PAYLOAD - size_data))
+                                dataFlit.data[j] = (readingPacket[i][file_index]=='1')?1:0;
+                                
+                            file_index--;
+                            }    
+                        
+                        packet.packet_data.push_back(dataFlit);
+                        
+                        if(GlobalParams::verbose_mode > VERBOSE_MEDIUM)            
+                        cout << "Recording flit's payload : " << hex <<  packet.packet_data[i-2].data << dec << "  time : " << cycleNextPacket << endl;
+                    }
+                    
+                    shot = true;
+                    waitToSendPacket = false;   
+                    
+                    if(GlobalParams::verbose_mode > VERBOSE_MEDIUM)            
+                    cout << "dst : " << packet.dst_id << "  timestamp is : " << packet.timestamp << " Size : " << packet.size << " Can shot ? " << shot << endl;
+                    
+                }         
+            }
+        }
+    }  
     return shot;
 }
 

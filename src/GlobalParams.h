@@ -20,6 +20,7 @@
 using namespace std;
 
 #define CONFIG_FILENAME        "config.yaml"
+#define RESULTS_FILENAME       "raw_results.txt"
 
 // Define the directions as numbers
 #define DIRECTIONS             4
@@ -57,6 +58,8 @@ using namespace std;
 #define TRAFFIC_SHUFFLE        6
 #define TRAFFIC_BUTTERFLY      7
 #define TRAFFIC_LOCAL	       8
+#define TRAFFIC_APPLICATION    9
+//9, New traffic based on applications' Traffic and Payload
 
 // Verbosity levels
 #define VERBOSE_OFF            0
@@ -64,6 +67,27 @@ using namespace std;
 #define VERBOSE_MEDIUM         2
 #define VERBOSE_HIGH           3
 
+// Payload Patterns
+#define PAYLOAD_0_BEST      0 //payload will contain only 0s
+#define PAYLOAD_100_WORST   1 //example : 1010 followed by 0101 for a 4 bits flit
+#define PAYLOAD_100_BEST    2
+#define PAYLOAD_RANDOM      3
+#define PAYLOAD_50_WORST    4
+#define PAYLOAD_50_BEST     5
+#define PAYLOAD_25_WORST    6
+#define PAYLOAD_25_BEST     7
+#define PAYLOAD_75_WORST    8
+#define PAYLOAD_75_BEST     9
+
+
+
+// Links power models
+#define STATIC_MODEL        0
+#define CROSSTALK_MODEL     1
+#define PALESI_MODEL        2
+
+//MAX Payload  width
+#define MAX_FLIT_PAYLOAD    64
 
 // Wireless MAC constants
 #define RELEASE_CHANNEL 1
@@ -145,7 +169,7 @@ struct GlobalParams {
     static char traffic_table_filename[128];
     static char config_filename[128];
     static int clock_period_ps;
-    static int simulation_time;
+    static double simulation_time;
     static int reset_time;
     static int stats_warm_up_time;
     static int rnd_generator_seed;
@@ -162,6 +186,15 @@ struct GlobalParams {
     static map<int, HubConfig> hub_configuration;
     static map<int, int> hub_for_tile;
     static PowerConfig power_configuration;
+    static int link_pwr_model;
+    static int payload_pattern; 
+    static char interconnect_model_filename[128];
+    static bool use_script_mode;
+    static bool get_instant_noc_power;
+    static double texec;
+    static char app_traffic_pathname[128];
+    static bool use_own_header;
+    static bool alpha_trace;
 };
 
 #endif

@@ -324,3 +324,47 @@ Tile *NoC::searchNode(const int id) const
 
     return NULL;
 }
+
+/****************************************************************************
+ *   Erwan Moréac
+ *   This method computes the NoC power at each cycle at the time cycle now-1 
+ *   now-1 is to be sure that all routers power have been recorded
+ */
+void NoC::perCyclePower()
+{
+    if (reset.read()) {
+        maxPower = 0.0;
+        totalPower = 0.0;
+        string filepower = "powerSimCurve";
+        
+        if(streamPowerFile.is_open()){
+            if (GlobalParams::verbose_mode > VERBOSE_MEDIUM)
+                cout << "Instant Power file already opened" << endl;          
+        }else{
+            streamPowerFile.open(filepower.c_str());
+            if (GlobalParams::verbose_mode > VERBOSE_MEDIUM)
+                cout << "Opening Instant Power file" << endl;
+        }
+	
+    } else {
+        double instantPower = 0.0;        
+        double now = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+        
+        for (int i = 0; i < GlobalParams::mesh_dim_x; i++)
+            for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
+                for(int k = 0; k < 3; k++)
+                    if((now - 1)== t[i][j]->r->power.getInstantPower(k).first)
+                        instantPower += t[i][j]->r->power.getInstantPower(k).second;
+ 
+                if(maxPower < instantPower)
+                    maxPower = instantPower;
+                
+                totalPower += instantPower;               
+                streamPowerFile << (now - 1) << " " << instantPower << endl ;
+                
+        if (GlobalParams::verbose_mode > VERBOSE_MEDIUM)
+            cout << "NoC Power is " << instantPower << " at the time : " << now-1 << " the max power is : " << maxPower << endl;  
+    }
+}
+
+

@@ -23,6 +23,7 @@
 using namespace std;
 
 void configure(int arg_num, char *arg_vet[]);
+void showConfig();
 
 namespace YAML {
     template<>

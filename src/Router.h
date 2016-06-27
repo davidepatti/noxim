@@ -12,6 +12,7 @@
 #define __NOXIMROUTER_H__
 
 #include <systemc.h>
+#include <bitset>
 #include "DataStructs.h"
 #include "Buffer.h"
 #include "Stats.h"
@@ -23,6 +24,12 @@
 #include "routingAlgorithms/RoutingAlgorithms.h"
 #include "selectionStrategies/SelectionStrategy.h"
 #include "selectionStrategies/SelectionStrategies.h"
+
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -70,6 +77,14 @@ SC_MODULE(Router)
     unsigned long routed_flits;
     RoutingAlgorithm * routingAlgorithm; 
     SelectionStrategy * selectionStrategy; 
+    
+    sc_uint<MAX_FLIT_PAYLOAD> previous_payload[DIRECTIONS + 2]; //23/06/15 Erwan Memorize previous payload to compute the number
+                                                                //of transitions between concurrent flits
+    int transition_types[22];   //08/07/15, array that memorizes all occurrences of each transitions between 2 words
+    double current_alpha;       //Erwan, value to get instant value of switching activity
+    ofstream streamAlphaFile;
+    string alphaFileName;       //File name specific to a PE for application traffic
+    
     
     // Functions
 
@@ -130,6 +145,10 @@ SC_MODULE(Router)
 
     bool inCongestion();
     void ShowBuffersStats(std::ostream & out);
+        
+    void compute_nb_transitions(sc_uint<MAX_FLIT_PAYLOAD> cur_word,sc_uint<MAX_FLIT_PAYLOAD> previous_word, int array_transition[]);
+    //check the number of transitions to compute after link power consumption
+    
 };
 
 #endif

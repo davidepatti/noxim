@@ -76,7 +76,6 @@ class GlobalStats {
 
     void showBufferStats(std::ostream & out);
 
-
     void showPowerBreakDown(std::ostream & out);
 
 

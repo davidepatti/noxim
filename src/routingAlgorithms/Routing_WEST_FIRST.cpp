@@ -1,4 +1,4 @@
-#include "routing_WEST_FIRST.h"
+#include "Routing_WEST_FIRST.h"
 
 RoutingAlgorithmsRegister Routing_WEST_FIRST::routingAlgorithmsRegister("WEST_FIRST", getInstance());
 

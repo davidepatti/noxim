@@ -191,4 +191,90 @@ inline void printMap(string label, const map<string,double> & m,std::ostream & o
     out << "];" << endl;
 }
 
+
+/*  Erwan Moreac
+ *  splitString
+ * convert a string to a vector of string
+ * In order to get data from trace files
+ */
+inline vector<string> splitString(string input, string delimiter)
+  {
+     vector<string> output;
+     size_t start = 0;
+     size_t end = 0;
+ 
+     while (start != string::npos && end != string::npos)
+     {
+        start = input.find_first_not_of(delimiter, end);
+ 
+        if (start != string::npos)
+        {
+           end = input.find_first_of(delimiter, start);
+ 
+           if (end != string::npos)
+           {
+              output.push_back(input.substr(start, end - start));
+           }
+           else
+           {
+              output.push_back(input.substr(start));
+           }
+        }
+     }
+ return output; 
+}
+
+ inline double string_to_double( const std::string& s )
+ {
+   std::istringstream i(s);
+   double x;
+   if (!(i >> x)){
+     cerr << "could not convert string to double [ " << s  << " ] end of string !"<< endl; 
+     return 0;
+   }
+   return x;
+ } 
+
+ inline int string_to_int( const std::string& s){
+     
+    std::stringstream stream;
+    stream << s;
+    int res;
+    if (!(stream >>res)){
+        cerr << "could not convert string to int : " << s << endl;
+        return 0;
+    } 
+    
+    return res;
+ }
+ 
+ inline std::string int_to_string(int i)
+{
+    std::stringstream ss;
+    ss << i;
+    return ss.str();
+}
+ 
+ 
+inline string dec_to_bin(int number)
+{
+    string result = "";
+
+    do
+    {
+        if ( (number & 1) == 0 )
+            result += "0";
+        else
+            result += "1";
+
+        number >>= 1;
+    } while ( number );
+
+    reverse(result.begin(), result.end());
+    return result;
+}
+ 
+ 
+ 
+ 
 #endif

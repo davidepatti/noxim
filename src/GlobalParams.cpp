@@ -31,7 +31,7 @@ int GlobalParams::traffic_distribution;
 char GlobalParams::traffic_table_filename[128];
 char GlobalParams::config_filename[128];
 int GlobalParams::clock_period_ps;
-int GlobalParams::simulation_time;
+double GlobalParams::simulation_time;
 int GlobalParams::reset_time;
 int GlobalParams::stats_warm_up_time;
 int GlobalParams::rnd_generator_seed;
@@ -48,3 +48,15 @@ HubConfig GlobalParams::default_hub_configuration;
 map<int, HubConfig> GlobalParams::hub_configuration;
 map<int, int> GlobalParams::hub_for_tile;
 PowerConfig GlobalParams::power_configuration;
+int GlobalParams::payload_pattern;
+char GlobalParams::interconnect_model_filename[128];
+int GlobalParams::link_pwr_model;
+bool GlobalParams::use_script_mode;
+bool GlobalParams::get_instant_noc_power;
+double GlobalParams::texec;
+char GlobalParams::app_traffic_pathname[128];
+bool GlobalParams::use_own_header;
+bool GlobalParams::alpha_trace;
+
+
+
