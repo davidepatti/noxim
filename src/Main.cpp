@@ -13,6 +13,8 @@
 #include "GlobalStats.h"
 #include "DataStructs.h"
 #include "GlobalParams.h"
+#include <sys/time.h>
+//#include <iostream>
 
 using namespace std;
 
@@ -28,8 +30,12 @@ int sc_main(int arg_num, char *arg_vet[])
     cout << endl << "\t\tNoxim - the NoC Simulator" << endl;
     cout << "\t\t(C) University of Catania" << endl << endl;
 
+    sc_report_handler::set_actions (SC_WARNING, SC_DO_NOTHING);
+    
     configure(arg_num, arg_vet);
 
+    //Execution Time
+    timeval tbegin,tend;
 
     // Signals
     sc_clock clock("clock", GlobalParams::clock_period_ps, SC_PS);
@@ -38,6 +44,10 @@ int sc_main(int arg_num, char *arg_vet[])
     // NoC instance
     NoC *n = new NoC("NoC");
 
+    // Start timer
+    gettimeofday(&tbegin,NULL);
+    
+    
     n->clock(clock);
     n->reset(reset);
 
@@ -90,6 +100,12 @@ int sc_main(int arg_num, char *arg_vet[])
     cout << "Noxim simulation completed." << endl;
     cout << " ( " << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " cycles executed)" << endl;
 
+    
+    // End timer
+    gettimeofday(&tend,NULL);
+    // Compute execution time
+    GlobalParams::texec=((double)(1000*(tend.tv_sec-tbegin.tv_sec)+((tend.tv_usec-tbegin.tv_usec)/1000)))/1000.0;
+   
     // Show statistics
     GlobalStats gs(n);
     gs.showStats(std::cout, GlobalParams::detailed);
@@ -99,9 +115,9 @@ int sc_main(int arg_num, char *arg_vet[])
 	 GlobalParams::simulation_time)) {
 	cout << endl
          << "WARNING! the number of flits specified with -volume option" << endl
-	     << "has not been reached. ( " << drained_volume << " instead of " << GlobalParams::max_volume_to_be_drained << " )" << endl
+	 << "has not been reached. ( " << drained_volume << " instead of " << GlobalParams::max_volume_to_be_drained << " )" << endl
          << "You might want to try an higher value of simulation cycles" << endl
-	     << "using -sim option." << endl;
+	 << "using -sim option." << endl;
 
 #ifdef TESTING
 	cout << endl
@@ -113,3 +129,5 @@ int sc_main(int arg_num, char *arg_vet[])
 
     return 0;
 }
+
+

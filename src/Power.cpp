@@ -58,9 +58,23 @@ Power::Power()
     ni_pwr_d = 0.0;
     ni_pwr_s = 0.0;
 
-
     sleep_end_cycle = NOT_VALID;
 
+    for(int i=0; i<22;i++)
+        improved_link_model_d[i] = 0.0;
+    
+    for(int i=0;i<3;i++)
+        instantPower[i] = make_pair(0.0,0.0);
+    
+    IndexPower = 0;
+    TxPower = 0.0;
+    RxPower = 0.0;
+    LeakagePower = 0.0;
+    
+    for(int i=0; i<4;i++)
+           linksEnergy[i] = 0.0;
+    
+    flitDir = 0;
 }
 
 void Power::configureRouter(int link_width,
@@ -117,11 +131,23 @@ void Power::configureRouter(int link_width,
     assert(GlobalParams::power_configuration.linkBitLinePowerConfig.find(length_r2r)!=GlobalParams::power_configuration.linkBitLinePowerConfig.end());
     assert(GlobalParams::power_configuration.linkBitLinePowerConfig.find(length_r2h)!=GlobalParams::power_configuration.linkBitLinePowerConfig.end());
 
-
+    
     link_r2r_pwr_s= W2J(link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2r].first);
     link_r2r_pwr_d= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2r].second;
+    
+    //Erwan 18/06/15 Control if we are using wireless NoC, if it's not the case there is no r2h link
+    if (GlobalParams::use_winoc)
+    {
     link_r2h_pwr_s= W2J(link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2h].first);
     link_r2h_pwr_d= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2h].second;
+    }else{
+        link_r2h_pwr_s= 0.0;
+        link_r2h_pwr_d= 0.0;    
+    }
+    
+    //07/07/15 Improved Link power model
+    load_improved_link_model(GlobalParams::interconnect_model_filename);
+    
 }
 
 void Power::configureHub(int link_width,
@@ -141,11 +167,21 @@ void Power::configureHub(int link_width,
     assert(GlobalParams::power_configuration.bufferPowerConfig.front.find(key) != GlobalParams::power_configuration.bufferPowerConfig.front.end());
     assert(GlobalParams::power_configuration.bufferPowerConfig.pop.find(key) != GlobalParams::power_configuration.bufferPowerConfig.pop.end());
 
+     //Erwan 18/06/15 Control if we are using wireless NoC, this is to avoid undesired leakage power
+    if (GlobalParams::use_winoc)
+    {
     buffer_pwr_s = W2J(GlobalParams::power_configuration.bufferPowerConfig.leakage[key]);
     buffer_push_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.push[key];
     buffer_front_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.front[key];
     buffer_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop[key];
-
+    }else{
+        buffer_pwr_s = 0.0;
+        buffer_push_pwr_d = 0.0;
+        buffer_front_pwr_d = 0.0;
+        buffer_pop_pwr_d = 0.0;    
+    }
+    
+    
     // Buffer Antenna
     pair<int,int> akey = pair<int,int>(antenna_buffer_depth,antenna_buffer_item_size);
     
@@ -186,8 +222,15 @@ void Power::configureHub(int link_width,
     double length_r2h = GlobalParams::r2h_link_length;
     assert(GlobalParams::power_configuration.linkBitLinePowerConfig.find(length_r2h)!=GlobalParams::power_configuration.linkBitLinePowerConfig.end());
 
+    //Erwan 18/06/15 Control if we are using wireless NoC, this is to avoid undesired leakage power
+    if (GlobalParams::use_winoc)
+    {
     link_r2h_pwr_s= W2J(link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2h].first);
     link_r2h_pwr_d= link_width * GlobalParams::power_configuration.linkBitLinePowerConfig[length_r2h].second;
+    }else{
+        link_r2h_pwr_s= 0.0;
+        link_r2h_pwr_d= 0.0;   
+    }
 }
 
 
@@ -239,6 +282,11 @@ void Power::crossBar()
 void Power::r2rLink()
 {
     power_breakdown_d["link_r2r_pwr_d"]+=link_r2r_pwr_d;
+    //Update the link energy depending to the direction
+    linksEnergy[flitDir] += link_r2r_pwr_d;
+    
+    if(GlobalParams::verbose_mode > VERBOSE_LOW)
+    cout << "test" << linksEnergy[flitDir] << " dir is :"<< flitDir << endl;
 }
 
 void Power::r2hLink()
@@ -272,6 +320,79 @@ double Power::getStaticPower()
 
     return power;
 }
+
+
+pair<double,double> Power::getInstantPower(const int index)
+{
+    return instantPower[index];
+}
+
+
+void Power::setInstantPower()
+{   
+    double now = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+    //There is a language abuse, in fact it should be getTotalEnergy
+    double power = (getTxPower() + getRxPower() + getLeakagePower())/(GlobalParams::clock_period_ps*1.0e-12);
+    
+    if (GlobalParams::verbose_mode > VERBOSE_HIGH)
+    cout << "Total instant Power = " << power << endl;
+    
+    if(IndexPower > 2)
+        IndexPower = 0;
+        
+    instantPower[IndexPower] = make_pair(now,power);
+    IndexPower++;
+    
+}
+
+void Power::setTxPower(double val)
+{
+        TxPower = val;
+}
+
+void Power::setRxPower(double val)
+{   
+        RxPower = val;
+}
+
+void Power::setLeakagePower(double val)
+{
+       LeakagePower = val;
+}
+
+void Power::setIndexPower(int val)
+{    
+        IndexPower = val;
+}
+
+void Power::setFlitDir(const int direction)
+{
+        flitDir = direction;   
+}
+
+double Power::getTxPower()
+{
+    return TxPower;
+}
+
+double Power::getRxPower()
+{
+    return RxPower;
+}
+
+double Power::getLeakagePower()
+{
+    return LeakagePower;
+}
+
+int Power::getIndexPower()
+{
+    return IndexPower;
+}
+
+
+
+
 
 
 double Power::attenuation2power(double attenuation)
@@ -317,6 +438,7 @@ void Power::biasing()
 
 void Power::leakage()
 {
+
     power_breakdown_s["buffer_pwr_s"]+=buffer_pwr_s;
     power_breakdown_s["antenna_buffer_pwr_s"]+=antenna_buffer_pwr_s;
     power_breakdown_s["routing_pwr_s"]+=routing_pwr_s;
@@ -325,9 +447,26 @@ void Power::leakage()
     power_breakdown_s["link_r2r_pwr_s"]+=link_r2r_pwr_s;
     power_breakdown_s["link_r2h_pwr_s"]+=link_r2h_pwr_s;
     power_breakdown_s["transceiver_pwr_s"]+=transceiver_tx_pwr_s;
-    if (!isSleeping())
+    
+    double tmp = 0.0;
+    tmp += buffer_pwr_s;
+    tmp += antenna_buffer_pwr_s;
+    tmp += routing_pwr_s;
+    tmp += selection_pwr_s;
+    tmp += crossbar_pwr_s;
+    tmp += link_r2r_pwr_s;
+    tmp += link_r2h_pwr_s;
+    tmp += transceiver_tx_pwr_s;
+        
+    if (!isSleeping()){
 	power_breakdown_s["transceiver_pwr_s"]+=transceiver_rx_pwr_s;
+        tmp += transceiver_rx_pwr_s;
+    }
     power_breakdown_s["ni_pwr_s"]+=ni_pwr_s;
+    tmp += ni_pwr_s;
+    
+    LeakagePower = tmp;
+    
 }
 
 void Power::printBreakDown(std::ostream & out)
@@ -353,7 +492,167 @@ bool Power::isSleeping()
 
 }
 
+
+bool Power::load_improved_link_model(const char *fname)
+{
+  ifstream fin(fname, ios::in);
+
+  if (!fin)
+    return false;
+  
+  while (!fin.eof())
+    {
+      char line[1024];
+      fin.getline(line, sizeof(line)-1);
+
+      if (line[0] != '\0')
+	{
+	  if (line[0] != '#')
+	    {
+	      char   label[1024];
+	      double value;
+              double value2;
+              double value3;
+              double tmp = 0;
+              double tmp2 = 0;
+	      int params = sscanf(line, "%s %lf %lf %lf", label, &value, &value2, &value3);
+	      if (params != 4)
+		cerr << "WARNING: Invalid link power data format: " << line << endl;
+	      else
+		{ /* this function is called after yaml configuration so we
+                   * know r2r_link_length*/
+		  if (strcmp(label, "000") == 0){
+                    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[0] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "010") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[1] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "100_001") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[2] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "101") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[3] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "110_011") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[4] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "111") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[5] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "H00_00H") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[6] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "H0H") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[7] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "H01_10H") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[8] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "H1H") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[9] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "H10_01H") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[10] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "H11_11H") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[11] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "L00_00L") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[12] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "L0L") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[13] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "L01_10L") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[14] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "L1L") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[15] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "L10_01L") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[16] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "11L_L11") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[17] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "L0H_H0L") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[18] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "L1H_H1L") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[19] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "xLx") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[20] = tmp + tmp2 + value3;
+		  }else if (strcmp(label, "xHx") == 0){
+		    tmp = value * GlobalParams::r2r_link_length * GlobalParams::r2r_link_length;
+                    tmp2 = value2 * GlobalParams::r2r_link_length;
+		    improved_link_model_d[21] = tmp + tmp2 + value3;
+		  }else
+		    cerr << "WARNING: Invalid link power label: " << label << endl;
+		}
+	    }
+	}
+    }
+
+    //Display to check if the function is correct
+  if(GlobalParams::verbose_mode > VERBOSE_LOW){
+    for(int i=0;i<22;i++)
+        cout << endl << "improved_link_model_d["<<i<<"] = "<< improved_link_model_d[i];
+  
+    cout << endl;
+  }
+  
+  fin.close();
+
+  return true;
+}
+
+ void Power::r2rImproved_link(int transition_array[])
+ {
+     double somme = 0.0;
+     
+     for(int i = 0;i < 22;i++)
+         if(transition_array[i]!=0)
+         somme += improved_link_model_d[i] * transition_array[i];
+        
+     power_breakdown_d["link_r2r_pwr_d"]+= somme;  
+     
+     //We must update here the instant power
+     TxPower += somme;
+     
+     if(GlobalParams::verbose_mode > VERBOSE_LOW){
+         cout<< "link power consumption is : " << somme << endl;
+         cout<< "total link power consumption is : " << power_breakdown_d["link_r2r_pwr_d"] << endl;
+     }
+     
+     //Update the link energy depending to the direction
+     linksEnergy[flitDir] += somme;
+ }
     
 
 
+ 
+ 
 

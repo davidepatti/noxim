@@ -13,10 +13,16 @@
 
 #include <queue>
 #include <systemc.h>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cstdlib>
 
 #include "DataStructs.h"
 #include "GlobalTrafficTable.h"
 #include "Utils.h"
+#include "GlobalParams.h"
 
 using namespace std;
 
@@ -43,12 +49,22 @@ SC_MODULE(ProcessingElement)
     bool current_level_tx;	// Current level for Alternating Bit Protocol (ABP)
     queue < Packet > packet_queue;	// Local queue of packets
     bool transmittedAtPreviousCycle;	// Used for distributions with memory
-
+    
+    bool transmissionIsComplete;//Used for application traffic, true if all packets have been sent
+    bool waitToSendPacket;      //When the packet must wait before to be sent
+    ifstream peDataFile;        //File pointer that we must keep for PE methods
+    string fname;               //File name specific to a PE for application traffic
+    string line;                //We must keep the line if the packet must be sent later
+    double cycleNextPacket;     //In application traffic, the clock-cycle when the next packet must be sent    
+    
+    
     // Functions
     void rxProcess();		// The receiving process
     void txProcess();		// The transmitting process
     bool canShot(Packet & packet);	// True when the packet must be shot
     Flit nextFlit();	// Take the next flit of the current packet
+    sc_uint<MAX_FLIT_PAYLOAD> init_Payload(Flit flit); //Erwan 22/06/15, payload assignement for a flit, different according to flit-type
+    sc_uint<MAX_FLIT_PAYLOAD> body_Payload(Flit flit); //Payload assignement according to global_param payload_pattern
     Packet trafficTest();	// used for testing traffic
     Packet trafficRandom();	// Random destination distribution
     Packet trafficTranspose1();	// Transpose 1 destination distribution
@@ -58,6 +74,7 @@ SC_MODULE(ProcessingElement)
     Packet trafficButterfly();	// Butterfly destination distribution
     Packet trafficLocal();	// Random with locality
 
+    //Packet applicationTraffic();//Application traffic with packets payload from files
 
     GlobalTrafficTable *traffic_table;	// Reference to the Global traffic Table
     bool never_transmit;	// true if the PE does not transmit any packet 

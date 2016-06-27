@@ -6,8 +6,45 @@ mesh_dim_x: 4
 mesh_dim_y: 4
 buffer_depth: 4
 flit_size: 32
-r2h_link_length: 2.0
-r2r_link_length: 1.0
+r2h_link_length: 3.0
+r2r_link_length: 3.0
+
+# Payload Pattern
+# to study crosstalk effects regarding different switching activity alpha
+#
+# BEST_CASE  : 0 (payload will contain only 0s)
+# WORST_CASE : 1 (example : 1010 followed by 0101 for a 4 bits flit)
+# 100_BEST   : 2
+# RANDOM     : 3
+# 50_WORST   : 4
+# 50_BEST    : 5
+# 25_WORST   : 6
+# 25_BEST    : 7
+# 75_WORST   : 8
+# 75_BEST    : 9
+
+payload_pattern: 1
+interconnect_model_filename: "interco_65_layer4_sup1mm.txt"
+
+# Which Link power model
+# Enable the choice of a link power model
+#
+# STATIC_MODEL    : 0 interconnect model that uses an average value
+# CROSSTALK_MODEL : 1 bit-accurate link model that takes into account crosstalk
+# PALESI_MODEL    : 2 bit-accurate link model used by Maurizio Palesi
+link_pwr_model: 1
+
+# Script Mode
+# Enable Noxim to display all results in 1 file raw_results.txt
+use_script_mode : false
+
+# Instant noc power
+# create a file that stores NoC Power at each cycles
+get_instant_noc_power : false
+
+# Application path name
+# Give the directory where noxim will use the application files
+app_traffic_pathname : "./"
 
 # Routing algorithms:
 #   XY
@@ -41,8 +78,8 @@ Hubs:
         attachedNodes: []
         toTileBufferSize: 4
         fromTileBufferSize: 4
-        rxBufferSize: 4
-        txBufferSize: 4
+        rxBufferSize: 3
+        txBufferSize: 3
 
     0:
         attachedNodes: [0,1,4,5]
@@ -50,11 +87,11 @@ Hubs:
     1:
         attachedNodes: [2,3,6,7]
 
-    2:
-        attachedNodes: [8,9,12,13]
+#    2:
+#        attachedNodes: [8,9,10,11]
 
-    3:
-        attachedNodes: [10,11,14,15]
+#    3:
+#        attachedNodes: [10,11,14,15]
 
 Channels:
     defaults:
@@ -71,10 +108,11 @@ Channels:
 #
 # SIMULATION PARAMETERS
 #
-clock_period_ps: 1000
-reset_time: 1000
-simulation_time: 10000
-stats_warm_up_time: 1000
+# clock period for 700MHz
+clock_period_ps: 1429
+reset_time: 1
+simulation_time: 5000
+stats_warm_up_time: 50
 detailed: false
 max_volume_to_be_drained: 0
 show_buffer_stats: false
@@ -96,7 +134,7 @@ trace_filename: ""
 
 min_packet_size: 8
 max_packet_size: 8
-packet_injection_rate: 0.01
+packet_injection_rate: 0.018
 probability_of_retransmission: 0.01
 
 # Traffic distribution:
@@ -127,6 +165,8 @@ Energy:
 
     # Energy(J) for a single bitline. Total flit energy will 
     # be obtained  as flit_size x reported Energy.
+	#
+	#Link bitline values obtained with DSENT
     LinkBitLine:
     #   - [ Length (mm), Leakage, Dynamic ] 
         - [0.5, 4.76e-7, 2.50e-14]
@@ -135,6 +175,8 @@ Energy:
         - [2.0, 5.10e-7, 9.63e-14]
         - [2.5, 5.50e-7, 1.20e-13]
         - [3.0, 5.53e-7, 1.43e-13]
+        - [5.0, 0, 1.98e-13]
+        - [7.0, 0, 2.81e-13]
 
     Router:
         # [Static, Dynamic]
@@ -192,3 +234,5 @@ Energy:
             - [3, 0, 1.0]
             - [3, 1, 1.1]
             - [3, 2, 2.2]
+
+

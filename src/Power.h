@@ -67,13 +67,58 @@ class Power {
 	return (getDynamicPower() + getStaticPower());
     } 
 
+    double getTotalNIPower(){  
+        return power_breakdown_d["ni_pwr_d"] + power_breakdown_s["ni_pwr_s"] ;
+    }
+    double getTotalLinkPower(){
+        return power_breakdown_d["link_r2r_pwr_d"] + power_breakdown_s["link_r2r_pwr_s"];
+    }
+    
+    /*Load improved link power model, Returns true if ok, false otherwise*/
+    bool load_improved_link_model(const char *fname);
+    void r2rImproved_link(int transition_array[]);
+    
+    
+    /* Set and Get methods for instantPower 
+     * Get : return the pair of the buffer at the index in parameter
+     * Set : write in the buffer case the total instaneous current power of the router
+     *       with the time in cycles when it's recorded 
+     */
+    pair<double,double> getInstantPower(const int index);
+    void setInstantPower();
+    void setTxPower(double val);
+    void setRxPower(double val);
+    void setLeakagePower(double val);
+    void setIndexPower(int val);
+    double getTxPower();
+    double getRxPower();
+    double getLeakagePower();
+    int getIndexPower();
+    double getbuffer_push_pwr_d(){ return buffer_push_pwr_d;}
+    double getni_pwr_d(){ return ni_pwr_d;}
+    double getbuffer_front_pwr_d(){ return buffer_front_pwr_d;}
+    double getcrossbar_pwr_d(){ return crossbar_pwr_d;}
+    double getbuffer_pop_pwr_d(){ return buffer_pop_pwr_d;}
+    double getlink_r2r_pwr_d(){ return link_r2r_pwr_d;}
+    
+    int getFlitDir(){ return flitDir;}
+    void setFlitDir(const int direction);
+    double getLinksEnergy(const int index){return linksEnergy[index];}
+        
+    /*Get methods for total dynamic energy mapping*/
+    double get_selection_pwr_d(){return  power_breakdown_d["selection_pwr_d"];}
+    double get_routing_pwr_d(){return power_breakdown_d["routing_pwr_d"];}
+    double get_crossbar_pwr_d(){return power_breakdown_d["crossbar_pwr_d"];}
+    double get_buffer_push_pwr_d(){return power_breakdown_d["buffer_push_pwr_d"];}
+    double get_buffer_pop_pwr_d(){return power_breakdown_d["buffer_pop_pwr_d"];}
+    double get_buffer_front_pwr_d(){return power_breakdown_d["buffer_front_pwr_d"];}
 
     void printBreakDown(std::ostream & out);
     map<string,double> getDynamicPowerBreakDown(){ return power_breakdown_d;}
     map<string,double> getStaticPowerBreakDown(){ return power_breakdown_s;}
 
-    void rxSleep(int cycles);
-
+    void rxSleep(int cycles);   
+    
   private:
 
     double total_power_s;
@@ -113,6 +158,22 @@ class Power {
 
     double ni_pwr_d;
     double ni_pwr_s;
+    
+    /*Erwan Moréac 07/07/15, Add of improved link power model
+     *There are 22 transitions types */
+    double improved_link_model_d[22];
+    //Creation of a circular buffer of size 3 in order to record at each cycle the instaneous power
+    //First is the time and Second the instaneous power
+    pair<double,double>  instantPower[3];
+    double TxPower;
+    double RxPower;
+    double LeakagePower;
+    int IndexPower;
+    //An array of 4 energy consumption value to know energy consumption on each link
+    //[0]=NORTH [1]=EAST [2]=SOUTH [3]=WEST
+    double linksEnergy[DIRECTIONS];
+    //To know which direction the router is sending the flit
+    int flitDir;
 
     map< pair<int, int> , double>  attenuation_map;
     double attenuation2power(double);
@@ -131,3 +192,4 @@ class Power {
 };
 
 #endif
+

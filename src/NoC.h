@@ -77,10 +77,24 @@ SC_MODULE(NoC)
 
 	// Build the Mesh
 	buildMesh();
+        
+        if(GlobalParams::get_instant_noc_power){
+        SC_METHOD(perCyclePower);
+        sensitive << clock.pos();
+        sensitive << reset;
+        }
+        
     }
 
     // Support methods
     Tile *searchNode(const int id) const;
+    
+    //Method that computes the NoC instantaneous power
+    void perCyclePower();
+    
+    double maxPower;
+    double totalPower;
+    ofstream streamPowerFile;
 
   private:
 

@@ -1,0 +1,45 @@
+#	Erwan Moréac 07/07/15
+#
+# NOC INTERCONNECT CONFIGURATION
+#
+# using of improved link power model with values for each link transitions and
+# considering the 2 links neighbours' transition
+#
+# L is a link bitline that stays at low level between transition n-1 and n
+# H is a link bitline that stays at high level between transition n-1 and n
+# 0 is a link bitline that goes down at low level between transition n-1 and n
+# 1 is a link bitline that goes up at high level between transition n-1 and n
+#
+# /!\ CAUTION : - This file is for interconnect's length =<1mm
+#				- when length is >1mm this model uses 3 values (no 0s column)
+#
+# LINK CONFIGURATION : 
+#	Technology : 	65nm
+#	Metal layer: 	4
+#   Model type : 	=<1mm
+#	Bufferization : Full Bufferization
+#
+000			0.0	3.8311E-14	2.9891E-14
+010			0.0	1.0388E-13	9.0359E-15
+100_001		0.0	1.4291E-13	3.8947E-14
+101			0.0	1.1158E-13	7.6899E-14
+110_011		0.0	1.0819E-13	7.6264E-15
+111			0.0	3.6522E-14	2.3671E-14
+H00_00H		0.0	8.7295E-14	3.6032E-14
+H0H			0.0	1.2995E-13	4.4041E-14
+H01_10H		0.0	1.3141E-13	5.8892E-14
+H1H			0.0	1.0087E-13	1.0016E-14
+H10_01H		0.0	1.2510E-13	4.3767E-15
+H11_11H		0.0	7.3117E-14	1.5657E-14
+L00_00L		0.0	8.7303E-14	3.5951E-14
+L0L			0.0	1.2952E-13	4.4265E-14
+L01_10L		0.0	1.3174E-13	5.8867E-14
+L1L			0.0	1.0103E-13	9.8000E-15
+L10_01L		0.0	1.2548E-13	4.3424E-15
+11L_L11		0.0	7.3117E-14	1.5633E-14
+L0H_H0L		0.0	1.2990E-13	4.4091E-14
+L1H_H1L		0.0	1.0093E-13	9.9316E-15
+xLx			0.0	1.1087E-16	5.7114E-17
+xHx			0.0	1.1088E-16	5.7095E-17
+
+

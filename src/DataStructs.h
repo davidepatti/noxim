@@ -31,10 +31,11 @@ enum FlitType {
 
 // Payload -- Payload definition
 struct Payload {
-    sc_uint<32> data;	// Bus for the data to be exchanged
+    //Erwan 22/06/15 Increase of uint size
+    sc_bv<MAX_FLIT_PAYLOAD> data;	// Bus for the data to be exchanged
 
     inline bool operator ==(const Payload & payload) const {
-	return (payload.data == data);
+	return (payload.data == data);        
 }};
 
 // Packet -- Packet definition
@@ -45,7 +46,8 @@ struct Packet {
     int size;
     int flit_left;		// Number of remaining flits inside the packet
     bool use_low_voltage_path;
-
+    vector <Payload> packet_data; //Used with application traffic only
+    
     // Constructors
     Packet() { }
 

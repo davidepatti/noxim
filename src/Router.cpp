@@ -12,6 +12,7 @@
 
 void Router::rxProcess()
 {
+    power.setRxPower(0.0);
     if (reset.read()) {
 	// Clear outputs and indexes of receiving protocol
 	for (int i = 0; i < DIRECTIONS + 2; i++) {
@@ -35,11 +36,12 @@ void Router::rxProcess()
 	    if ((req_rx[i].read() == 1 - current_level_rx[i])
 		&& !buffer[i].IsFull()) {
 		Flit received_flit = flit_rx[i].read();
-
+     
 		// Store the incoming flit in the circular buffer
 		buffer[i].Push(received_flit);
 
 		power.bufferPush();
+        power.setRxPower(power.getRxPower() + power.getbuffer_push_pwr_d());
 
 		// Negate the old value for Alternating Bit Protocol (ABP)
 		current_level_rx[i] = 1 - current_level_rx[i];
@@ -48,16 +50,24 @@ void Router::rxProcess()
 		// if a new flit is injected from local PE
 		if (received_flit.src_id == local_id)
 		  power.networkInterface();
+                  power.setRxPower(power.getRxPower() + power.getni_pwr_d());
 	    }
 	    ack_rx[i].write(current_level_rx[i]);
 	}
     }
+    if (GlobalParams::verbose_mode > VERBOSE_HIGH)
+    cout << "fin update process RX du routeur " << local_id << " " << power.getRxPower() << endl;
+    
+    // On 3 processes Tx, Rx and perCycleUpdate, Rx is the last executed according to the scheduler
+    // So we sum the power here
+    power.setInstantPower();
 }
 
 
 
 void Router::txProcess()
 {
+  power.setTxPower(0.0);
   if (reset.read()) 
     {
       // Clear outputs and indexes of transmitting protocol
@@ -65,7 +75,16 @@ void Router::txProcess()
 	{
 	  req_tx[i].write(0);
 	  current_level_tx[i] = 0;
+          previous_payload[i] = 0;
 	}
+      // Clear transition array
+      for(int i = 0; i < 22;i++)
+          transition_types[i] = 0;
+      
+      //Name of file to store all alpha values
+      alphaFileName = "Alpha_file";
+      
+      
     } 
   else 
     {
@@ -73,13 +92,12 @@ void Router::txProcess()
       for (int j = 0; j < DIRECTIONS + 2; j++) 
 	{
 	  int i = (start_from_port + j) % (DIRECTIONS + 2);
-	 
+
 	  /*
 	  if (!buffer[i].deadlockFree())
 	  {
 	      LOG << " deadlock on buffer " << i << endl;
 	      buffer[i].Print(" deadlock ");
-
 	  }
 	  */
 
@@ -88,6 +106,7 @@ void Router::txProcess()
 
 	      Flit flit = buffer[i].Front();
 	      power.bufferFront();
+              power.setTxPower(power.getTxPower() + power.getbuffer_front_pwr_d());
 
 	      if (flit.flit_type == FLIT_TYPE_HEAD) 
 		{
@@ -125,19 +144,70 @@ void Router::txProcess()
 		  if (current_level_tx[o] == ack_tx[o].read()) 
 		  {
 		      if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-			  LOG << "Input[" << i << "] forward to Output[" << o << "], flit: " << flit << endl;
-
+			  LOG << "Input[" << i << "] forward to Output[" << o << "], flit: " << flit << endl << "Flit's Payload   : " 
+                              << hex << flit.payload.data << endl << "Previous payload : " << previous_payload[o] << dec << endl;
+                          //Erwan 22/06/15 check flit's payload and previous payload at this output
+                      
 		      flit_tx[o].write(flit);
+                      
+                      //Erwan,  define transitions between 2 following flits
+                      if(GlobalParams::link_pwr_model == CROSSTALK_MODEL)
+                         compute_nb_transitions(flit.payload.data,previous_payload[o],transition_types);
+                      
+                      if (GlobalParams::verbose_mode > VERBOSE_HIGH){
+                        for(int i =0; i<22; i++)
+                           cout << endl << "Transitions type " << i << " = " << transition_types[i];
+                      
+                      cout << endl;
+                      }
+                      
 		      if (o == DIRECTION_HUB)
 		      {
 			  power.r2hLink();
 			  LOG << "Forwarding to HUB " << endl;
+                          //We are computing instant power for wired NoC only
+                          //TODO make available for winoc
 		      }
 		      else
 		      {
-			  power.r2rLink();
+                          	 
+                        //Erwan, set the direction for the map of energy consumption
+                        power.setFlitDir(o);
+                          
+                        if(GlobalParams::link_pwr_model == CROSSTALK_MODEL){
+                            //Instant power upated in r2rImproved_link
+                            //if (o != DIRECTION_LOCAL)
+                            power.r2rImproved_link(transition_types);        
+                            
+                            if(GlobalParams::alpha_trace){
+                                //Write a new alpha value if direction is not local
+                                if (o != DIRECTION_LOCAL){
+                                    
+                                      if(streamAlphaFile.is_open()){
+                                            if (GlobalParams::verbose_mode > VERBOSE_MEDIUM)
+                                                cout << "Instant Alpha file already opened" << endl;          
+                                        }else{
+                                            streamAlphaFile.open(alphaFileName.c_str(),ios::app);
+                                            if (GlobalParams::verbose_mode > VERBOSE_MEDIUM)
+                                                cout << "Opening Instant Alpha file" << endl;
+
+                                            streamAlphaFile << setprecision (2) << fixed << current_alpha << "\n"; 
+                                            streamAlphaFile.close();
+                                        }
+                                }
+                            }
+                            
+                        }
+                        if(GlobalParams::link_pwr_model == STATIC_MODEL){
+                        power.r2rLink();
+                        power.setTxPower(power.getTxPower() + power.getlink_r2r_pwr_d());
+                        }
+                                             
 		      }
 
+                      //Current flit is now saved as previous payload at this output
+                      previous_payload[o] = flit.payload.data;
+                      
 		      power.crossBar();
 
 		      current_level_tx[o] = 1 - current_level_tx[o];
@@ -145,10 +215,13 @@ void Router::txProcess()
 		      buffer[i].Pop();
 
 		      power.bufferPop();
+                      
+                      power.setTxPower(power.getTxPower() + power.getbuffer_pop_pwr_d() + power.getcrossbar_pwr_d());
 
 		      // if flit has been consumed
 		      if (flit.dst_id == local_id)
 			  power.networkInterface();
+                          power.setTxPower(power.getTxPower() + power.getni_pwr_d());
 
 		      if (flit.flit_type == FLIT_TYPE_TAIL)
 			  reservation_table.release(o);
@@ -182,6 +255,8 @@ void Router::txProcess()
 	  }
       }
     }				// else reset read
+  if (GlobalParams::verbose_mode > VERBOSE_HIGH)
+  cout << "fin update process TX du routeur " << local_id << " " << power.getTxPower() << endl;
 }
 
 NoP_data Router::getCurrentNoPData()
@@ -207,8 +282,11 @@ void Router::perCycleUpdate()
 	    free_slots[i].write(buffer[i].GetMaxBufferSize());
     } else {
         selectionStrategy->perCycleUpdate(this);
+            //Instant power updated in leakage
 	    power.leakage();
     }
+    if (GlobalParams::verbose_mode > VERBOSE_HIGH)
+    cout << "fin update leakage du routeur " << local_id << " " << power.getLeakagePower()<< endl;
 }
 
 vector < int > Router::routingFunction(const RouteData & route_data)
@@ -408,3 +486,163 @@ void Router::ShowBuffersStats(std::ostream & out)
   for (int i=0; i<DIRECTIONS+2; i++)
     buffer[i].ShowStats(out);
 }
+
+    
+void Router::compute_nb_transitions(sc_uint<MAX_FLIT_PAYLOAD> cur_word,sc_uint<MAX_FLIT_PAYLOAD> previous_word, int array_transition[])
+{
+    int i,cpt;
+    char all_transitions[GlobalParams::flit_size];
+    
+    
+    // Clear transition arrays
+    for(i=0;i<GlobalParams::flit_size;i++)
+    {
+        all_transitions[i] = 'L';
+        
+        if(i<22)
+        transition_types[i] = 0;   
+    }
+    
+    cpt = 0; 
+    double cpt_alpha = 0;
+    //Compute all transitions on each bitline
+    for(i = 0; i < GlobalParams::flit_size; i++)
+    {
+        if((previous_word[i]==0)&&(cur_word[i]==0)){all_transitions[cpt]='L'; } // stay at Low
+	if((previous_word[i]==0)&&(cur_word[i]==1)){
+            all_transitions[cpt]='1'; // high level transition
+            //Current alpha computing
+            if(GlobalParams::alpha_trace)
+                cpt_alpha++;
+        } 
+	if((previous_word[i]==1)&&(cur_word[i]==0)){
+            all_transitions[cpt]='0'; // low level transition
+            //Current alpha computing
+            if(GlobalParams::alpha_trace)
+                cpt_alpha++;
+        } 
+	if((previous_word[i]==1)&&(cur_word[i]==1)){all_transitions[cpt]='H'; } // stay at High  
+        cpt++;
+
+    }
+    
+    //Current alpha computing
+    if(GlobalParams::alpha_trace)
+        current_alpha = cpt_alpha / GlobalParams::flit_size;
+    
+    
+    //Compute all transitions types that occurs with this 2 words between 3 wires by 3 wires
+    for(i = 0;i < GlobalParams::flit_size;i++)
+    {
+        //If edges bitlines, we consider 1 wire that stays at low (L))
+        if(i==0)
+        {
+            // (L)00    
+	    if(((all_transitions[i]=='0')&&(all_transitions[i+1]=='0'))){transition_types[12]++;}   
+            // (L)0L
+	    if((all_transitions[i]=='0')&&(all_transitions[i+1]=='L')){transition_types[13]++;}
+            // (L)01 
+	    if(((all_transitions[i]=='0')&&(all_transitions[i+1]=='1'))){transition_types[14]++;}   
+            // (L)1L   
+	    if((all_transitions[i]=='1')&&(all_transitions[i+1]=='L')){transition_types[15]++;}
+            // (L)10
+	    if(((all_transitions[i]=='1')&&(all_transitions[i+1]=='0'))){transition_types[16]++;}   
+            // (L)11
+	    if(((all_transitions[i]=='1')&&(all_transitions[i+1]=='1'))){transition_types[17]++;}   
+            // (L)0H 
+	    if(((all_transitions[i]=='0')&&(all_transitions[i+1]=='H'))){transition_types[18]++;}   
+            // (L)1H
+	    if(((all_transitions[i]=='1')&&(all_transitions[i+1]=='H'))){transition_types[19]++;}   
+            // xLx  
+	    if(all_transitions[i]=='L'){transition_types[20]++;}
+            // xHx  
+	    if(all_transitions[i]=='H'){transition_types[21]++;}
+            
+        }else if(i==(GlobalParams::flit_size - 1))
+            {
+                // 00(L)   
+                if(((all_transitions[i]=='0')&&(all_transitions[i-1]=='0'))){transition_types[12]++;}   
+                // L0(L)
+                if((all_transitions[i]=='0')&&(all_transitions[i-1]=='L')){transition_types[13]++;}
+                // 10(L)
+                if(((all_transitions[i]=='0')&&(all_transitions[i-1]=='1'))){transition_types[14]++;}   
+                // L1(L)   
+                if((all_transitions[i]=='1')&&(all_transitions[i-1]=='L')){transition_types[15]++;}
+                // 01(L)
+                if(((all_transitions[i]=='1')&&(all_transitions[i-1]=='0'))){transition_types[16]++;}   
+                // 11(L)
+                if(((all_transitions[i]=='1')&&(all_transitions[i-1]=='1'))){transition_types[17]++;}   
+                // H0(L)
+                if(((all_transitions[i]=='0')&&(all_transitions[i-1]=='H'))){transition_types[18]++;}   
+                // H1(L)   
+                if(((all_transitions[i]=='1')&&(all_transitions[i-1]=='H'))){transition_types[19]++;}   
+                // xLx  
+                if(all_transitions[i]=='L'){transition_types[20]++;}
+                // xHx  
+                if(all_transitions[i]=='H'){transition_types[21]++;}
+               
+            
+            }else{
+                // 000
+                if((all_transitions[i-1]=='0')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='0')){transition_types[0]++;}
+                // 010   
+		if((all_transitions[i-1]=='0')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='0')){transition_types[1]++;}
+                // 100 001
+		if(((all_transitions[i-1]=='1')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='0'))||
+                  ((all_transitions[i-1]=='0')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='1'))){transition_types[2]++;}
+                // 101   
+		if((all_transitions[i-1]=='1')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='1')){transition_types[3]++;}
+                // 110 011
+		if(((all_transitions[i-1]=='1')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='0'))||
+		  ((all_transitions[i-1]=='0')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='1'))){transition_types[4]++;}   
+                // 111   
+		if((all_transitions[i-1]=='1')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='1')){transition_types[5]++;}
+                // H00 00H
+		if(((all_transitions[i-1]=='H')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='0'))||
+		  ((all_transitions[i-1]=='0')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='H'))){transition_types[6]++;}   
+                // H0H   
+		if((all_transitions[i-1]=='H')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='H')){transition_types[7]++;}
+                // H01 10H
+		if(((all_transitions[i-1]=='H')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='1'))||
+		  ((all_transitions[i-1]=='1')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='H'))){transition_types[8]++;}   
+                //H1H   
+		if((all_transitions[i-1]=='H')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='H')){transition_types[9]++;}
+                //H10 01H
+		if(((all_transitions[i-1]=='H')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='0'))||
+		  ((all_transitions[i-1]=='0')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='H'))){transition_types[10]++;}   
+                // H11 11H   
+		if(((all_transitions[i-1]=='H')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='1'))||
+		  ((all_transitions[i-1]=='1')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='H'))){transition_types[11]++;}   
+                // L00 00L   
+		if(((all_transitions[i-1]=='L')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='0'))||
+		  ((all_transitions[i-1]=='0')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='L'))){transition_types[12]++;}   
+                // L0L
+		if((all_transitions[i-1]=='L')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='L')){transition_types[13]++;}
+                // L01 10L
+		if(((all_transitions[i-1]=='L')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='1'))||
+		  ((all_transitions[i-1]=='1')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='L'))){transition_types[14]++;}   
+                // L1L   
+		if((all_transitions[i-1]=='L')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='L')){transition_types[15]++;}
+                // L10 01L
+		if(((all_transitions[i-1]=='L')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='0'))||
+		  ((all_transitions[i-1]=='0')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='L'))){transition_types[16]++;}   
+                // 11L L11
+		if(((all_transitions[i-1]=='1')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='L'))||
+		  ((all_transitions[i-1]=='L')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='1'))){transition_types[17]++;}   
+                // L0H H0L
+		if(((all_transitions[i-1]=='L')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='H'))||
+		  ((all_transitions[i-1]=='H')&&(all_transitions[i]=='0')&&(all_transitions[i+1]=='L'))){transition_types[18]++;}   
+                // L1H H1L   
+		if(((all_transitions[i-1]=='L')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='H'))||
+		  ((all_transitions[i-1]=='H')&&(all_transitions[i]=='1')&&(all_transitions[i+1]=='L'))){transition_types[19]++;}   
+                // xLx  
+		if(all_transitions[i]=='L'){transition_types[20]++;}
+                // xHx  
+		if(all_transitions[i]=='H'){transition_types[21]++;}
+               
+        }   
+    }
+}
+
+
+
