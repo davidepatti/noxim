@@ -7,7 +7,8 @@ it can be downloaded from SourceForge under GPL license terms.
 
 If you use Noxim in your research, we would appreciate the following citation in any publications to which it has contributed:
 
-V. Catania, A. Mineo, S. Monteleone, M. Palesi, D. Patti. Noxim: An Open, Extensible and Cycle-accurate Network on Chip Simulator. *IEEE International Conference on Application-specific Systems, Architectures and Processors 2015. July 27-29, 2015, Toronto, Canada*.
+Vincenzo Catania, Andrea Mineo, Salvatore Monteleone, Maurizio Palesi, and Davide Patti. 2016. Cycle-Accurate Network on Chip Simulation with Noxim. *ACM Trans. Model. Comput. Simul. 27, 1, Article 4 (August 2016), 25 pages.* DOI: https://doi.org/10.1145/2953878
+
 
 What's New ? 
 ------------
