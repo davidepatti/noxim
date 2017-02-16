@@ -24,6 +24,7 @@ Quick Start
 -----------
 
 If you are working on Ubuntu, you can install noxim and all the dependencies with the following command:
+(be sure of copying the entire line, i.e., ending with "unbuntu.sh)
 
     bash <(wget -qO- --no-check-certificate https://raw.githubusercontent.com/davidepatti/noxim/master/other/setup/ubuntu.sh)
 
