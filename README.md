@@ -3,7 +3,7 @@ Noxim - the NoC Simulator
 
 Welcome to Noxim, the Network-on-Chip Simulator developed at the University of Catania (Italy).
 The Noxim simulator is developed using SystemC, a system description language based on C++, and
-it can be downloaded from SourceForge under GPL license terms.
+it can be downloaded under GPL license terms.
 
 **If you use Noxim in your research, we would appreciate the following citation in any publications to which it has contributed:**
 
