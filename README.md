@@ -12,7 +12,7 @@ Vincenzo Catania, Andrea Mineo, Salvatore Monteleone, Maurizio Palesi, and David
 
 What's New ? 
 ------------
-**[March 2017]** [Noxim tutorial slides](doc/noxim_tutorial.pdf) from lecture given at "Advanced Computer Architectures" (ELEC3219 - University of Southampton)
+**[April 2017]** [Noxim tutorial slides](doc/noxim_tutorial.pdf) from lecture given at "Advanced Computer Architectures" (ELEC3219 - University of Southampton)
 
 **[June 2015]** Massively improved version of Noxim. Major changes include:
 
