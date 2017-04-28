@@ -77,6 +77,7 @@ SC_MODULE(Router)
     
     // Functions
 
+    void process();
     void rxProcess();		// The receiving process
     void txProcess();		// The transmitting process
     void perCycleUpdate();
@@ -90,33 +91,29 @@ SC_MODULE(Router)
     // Constructor
 
     SC_CTOR(Router) {
-	SC_METHOD(rxProcess);
-	sensitive << reset;
-	sensitive << clock.pos();
+        SC_METHOD(process);
+        sensitive << reset;
+        sensitive << clock.pos();
 
-	SC_METHOD(txProcess);
-	sensitive << reset;
-	sensitive << clock.pos();
+        SC_METHOD(perCycleUpdate);
+        sensitive << reset;
+        sensitive << clock.pos();
 
-	SC_METHOD(perCycleUpdate);
-	sensitive << reset;
-	sensitive << clock.pos();
-	
-	routingAlgorithm = RoutingAlgorithms::get(GlobalParams::routing_algorithm);
+        routingAlgorithm = RoutingAlgorithms::get(GlobalParams::routing_algorithm);
 
-	if (routingAlgorithm == 0)
-	{
-	    cerr << " FATAL: invalid routing -routing " << GlobalParams::routing_algorithm << ", check with noxim -help" << endl;
-	    exit(-1);
-	}
+        if (routingAlgorithm == 0)
+        {
+            cerr << " FATAL: invalid routing -routing " << GlobalParams::routing_algorithm << ", check with noxim -help" << endl;
+            exit(-1);
+        }
 
-	selectionStrategy = SelectionStrategies::get(GlobalParams::selection_strategy);
+        selectionStrategy = SelectionStrategies::get(GlobalParams::selection_strategy);
 
-	if (selectionStrategy == 0)
-	{
-	    cerr << " FATAL: invalid selection strategy -sel " << GlobalParams::selection_strategy << ", check with noxim -help" << endl;
-	    exit(-1);
-	}
+        if (selectionStrategy == 0)
+        {
+            cerr << " FATAL: invalid selection strategy -sel " << GlobalParams::selection_strategy << ", check with noxim -help" << endl;
+            exit(-1);
+        }
     }
 
   private:
