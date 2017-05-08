@@ -10,6 +10,12 @@
 
 #include "Router.h"
 
+void Router::process()
+{
+    txProcess();
+    rxProcess();
+}
+
 void Router::rxProcess()
 {
     if (reset.read()) {
