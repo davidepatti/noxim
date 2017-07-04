@@ -63,7 +63,12 @@ Energy:
         #   Algorithm:   [Static, Dynamic]
             default:     [1.20e-4, 6.00e-14]
             XY:          [1.20e-4, 6.00e-14]
-            DYAD:        [1.25e-4, 6.23e-14]
+            DYAD:        [1.35e-4, 6.75e-14]
+            NEGATIVE_FIRST: [1.28e-4, 6.30e-14]
+            NORTH_LAST:  [1.28e-4, 6.30e-14]
+            WEST_FIRST:  [1.28e-4, 6.30e-14]
+            ODD_EVEN:    [1.32e-4, 6.60e-14]
+            TABLE_BASED: [2.40e-4, 12.00e-14]
 
         selection:
         #   Strategy:    [Static, Dynamic]
