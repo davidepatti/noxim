@@ -63,6 +63,8 @@ On MacOSX, when using macports, just type:
 
     sudo port install yaml-cpp
 
+Please also set properly the YAML path in the Makefile, as follows:
+YAML    := /opt/local/
 
 SystemC installation
 ----------------------------------
