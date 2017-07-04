@@ -224,10 +224,10 @@ inline void printMap(string label, const map<string,double> & m,std::ostream & o
     out << "];" << endl;
 }
 
-inline string i_to_string(int value)
-{
-    return static_cast<ostringstream*>( &(ostringstream() << value) )->str();
+template<typename T> std::string i_to_string(const T& t){
+         std::stringstream s;
+	 s << t;
+         return s.str();
 }
-
 
 #endif
