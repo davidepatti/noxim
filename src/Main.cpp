@@ -43,6 +43,11 @@ int sc_main(int arg_num, char *arg_vet[])
     cout << endl << "\t\tNoxim - the NoC Simulator" << endl;
     cout << "\t\t(C) University of Catania" << endl << endl;
 
+    cout << "Bibliography: " << endl;
+    cout << "Catania V., Mineo A., Monteleone S., Palesi M., and Patti D. (2016) Cycle-Accurate Network on Chip Simulation with Noxim. ACM Trans. Model. Comput. Simul. 27, 1, Article 4 (August 2016), 25 pages. DOI: https://doi.org/10.1145/2953878" << endl;
+    cout << endl;
+    cout << endl;
+
     configure(arg_num, arg_vet);
 
 
