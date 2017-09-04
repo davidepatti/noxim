@@ -6,6 +6,7 @@ The Noxim simulator is developed using SystemC, a system description language ba
 it can be downloaded under GPL license terms.
 
 **If you use Noxim in your research, we would appreciate the following citation in any publications to which it has contributed:**
+
 Vincenzo Catania, Andrea Mineo, Salvatore Monteleone, Maurizio Palesi, and Davide Patti. 2016. Cycle-Accurate Network on Chip Simulation with Noxim. ACM Transactions on Modeling and Computer Simulation. Volume 27 Issue 1, November 2016. DOI: https://doi.org/10.1145/2953878
 
 
