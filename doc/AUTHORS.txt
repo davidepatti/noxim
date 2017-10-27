@@ -13,7 +13,8 @@ Noxim is developed at the University of Catania (Italy) by the following team of
 - Davide Patti, PhD
   Email: davide.patti@dieei.unict.it
   Home: http://utenti.dieei.unict.it/users/dpatti/
-- Fabrizio Fazzino, PhD
+  
+- Fabrizio Fazzino
   Email: fabrizio@fazzino.it
   Home: http://www.fazzino.it/
 
