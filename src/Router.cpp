@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2015 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -39,12 +39,12 @@ void Router::rxProcess()
 	    // 2) there is a free slot in the input buffer of direction i
 
 	    if ((req_rx[i].read() == 1 - current_level_rx[i])
-		&& !buffer[i].IsFull()) 
+		&& !buffer[i][TODO_VC].IsFull()) 
 	    {
 		Flit received_flit = flit_rx[i].read();
 
 		// Store the incoming flit in the circular buffer
-		buffer[i].Push(received_flit);
+		buffer[i][TODO_VC].Push(received_flit);
 
 	        LOG << " Flit " << received_flit << " received from Input[" << i << "] " << endl;
 
@@ -89,10 +89,10 @@ void Router::txProcess()
 	  // Please also set the appropriate threshold.
 	  // buffer[i].deadlockCheck();
 
-	  if (!buffer[i].IsEmpty()) 
+	  if (!buffer[i][TODO_VC].IsEmpty()) 
 	    {
 
-	      Flit flit = buffer[i].Front();
+	      Flit flit = buffer[i][TODO_VC].Front();
 	      power.bufferRouterFront();
 
 	      if (flit.flit_type == FLIT_TYPE_HEAD) 
@@ -126,10 +126,10 @@ void Router::txProcess()
       // 2nd phase: Forwarding
       for (int i = 0; i < DIRECTIONS + 2; i++) 
       {
-	  if (!buffer[i].IsEmpty()) 
+	  if (!buffer[i][TODO_VC].IsEmpty()) 
 	  {
 	      // power contribution already computed in 1st phase
-	      Flit flit = buffer[i].Front();
+	      Flit flit = buffer[i][TODO_VC].Front();
 
 	      int o = reservation_table.getOutputPort(i);
 	      if (o != NOT_RESERVED) 
@@ -154,7 +154,7 @@ void Router::txProcess()
 
 		      current_level_tx[o] = 1 - current_level_tx[o];
 		      req_tx[o].write(current_level_tx[o]);
-		      buffer[i].Pop();
+		      buffer[i][TODO_VC].Pop();
 
 		      power.bufferRouterPop();
 
@@ -225,7 +225,7 @@ void Router::perCycleUpdate()
 {
     if (reset.read()) {
 	for (int i = 0; i < DIRECTIONS + 1; i++)
-	    free_slots[i].write(buffer[i].GetMaxBufferSize());
+	    free_slots[i].write(buffer[i][TODO_VC].GetMaxBufferSize());
     } else {
         selectionStrategy->perCycleUpdate(this);
 
@@ -341,20 +341,20 @@ void Router::configure(const int _id,
 
     for (int i = 0; i < DIRECTIONS + 2; i++)
     {
-	buffer[i].SetMaxBufferSize(_max_buffer_size);
-	buffer[i].setLabel(string(name())+"->buffer["+i_to_string(i)+"]");
+	buffer[i][TODO_VC].SetMaxBufferSize(_max_buffer_size);
+	buffer[i][TODO_VC].setLabel(string(name())+"->buffer["+i_to_string(i)+"]");
     }
 
     int row = _id / GlobalParams::mesh_dim_x;
     int col = _id % GlobalParams::mesh_dim_x;
     if (row == 0)
-      buffer[DIRECTION_NORTH].Disable();
+      buffer[DIRECTION_NORTH][TODO_VC].Disable();
     if (row == GlobalParams::mesh_dim_y-1)
-      buffer[DIRECTION_SOUTH].Disable();
+      buffer[DIRECTION_SOUTH][TODO_VC].Disable();
     if (col == 0)
-      buffer[DIRECTION_WEST].Disable();
+      buffer[DIRECTION_WEST][TODO_VC].Disable();
     if (col == GlobalParams::mesh_dim_x-1)
-      buffer[DIRECTION_EAST].Disable();
+      buffer[DIRECTION_EAST][TODO_VC].Disable();
 
 }
 
@@ -368,7 +368,7 @@ unsigned int Router::getFlitsCount()
     unsigned count = 0;
 
     for (int i = 0; i < DIRECTIONS + 2; i++)
-	count += buffer[i].Size();
+	count += buffer[i][TODO_VC].Size();
 
     return count;
 }
@@ -442,5 +442,5 @@ bool Router::inCongestion()
 void Router::ShowBuffersStats(std::ostream & out)
 {
   for (int i=0; i<DIRECTIONS+2; i++)
-    buffer[i].ShowStats(out);
+    buffer[i][TODO_VC].ShowStats(out);
 }

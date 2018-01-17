@@ -1,6 +1,14 @@
+/*
+ * Noxim - the NoC Simulator
+ *
+ * (C) 2005-2018 by the University of Catania
+ * For the complete list of authors refer to file ../doc/AUTHORS.txt
+ * For the license applied to these sources refer to file ../doc/LICENSE.txt
+ *
+ * This file contains the declaration of the global params needed by Noxim
+ * to forward configuration to every sub-block
+ */
 #include "Hub.h"
-
-
 
 int Hub::tile2Port(int id)
 {
@@ -31,7 +39,7 @@ void Hub::rxPowerManager()
 
     for (int port=0;port<num_ports;port++)
     {
-	if (!buffer_to_tile[port].IsEmpty() || 
+	if (!buffer_to_tile[port][TODO_VC].IsEmpty() || 
 	    !antenna2tile_reservation_table.isAvailable(port))
 		power.leakageBufferToTile();
 
@@ -267,25 +275,25 @@ void Hub::antennaToTileProcess()
     
     for (int i = 0; i < num_ports; i++) 
     {
-	if (!buffer_to_tile[i].IsEmpty()) 
+	if (!buffer_to_tile[i][TODO_VC].IsEmpty()) 
 	{     
-	    Flit flit = buffer_to_tile[i].Front();
+	    Flit flit = buffer_to_tile[i][TODO_VC].Front();
 
 	    if (current_level_tx[i] == ack_tx[i].read())
 	    {
-		LOG << "Flit " << flit << " moved from buffer_to_tile[" << i <<"] to signal flit_tx["<<i<<"] " << endl;
+		LOG << "Flit " << flit << " moved from buffer_to_tile[" << i <<"][" << TODO_VC << "] to signal flit_tx["<<i<<"] " << endl;
 
 		flit_tx[i].write(flit);
 		current_level_tx[i] = 1 - current_level_tx[i];
 		req_tx[i].write(current_level_tx[i]);
 
-		buffer_to_tile[i].Pop();
+		buffer_to_tile[i][TODO_VC].Pop();
 		power.bufferToTilePop();
 		power.r2hLink();
 	    } //if buffer not empty
 	    else
 	    {
-		LOG << "Flit " << flit << " cannot move from buffer_to_tile[" << i <<"] to signal flit_tx["<<i<<"] " << endl;
+		LOG << "Flit " << flit << " cannot move from buffer_to_tile[" << i <<"] [" << TODO_VC << "] to signal flit_tx["<<i<<"] " << endl;
 	    }
 	}
     }
@@ -317,13 +325,13 @@ void Hub::antennaToTileProcess()
 	    Flit received_flit = target[channel]->buffer_rx.Front();
 	    power.antennaBufferFront();
 
-	    if ( !buffer_to_tile[r[i]].IsFull() ) 
+	    if ( !buffer_to_tile[r[i]][TODO_VC].IsFull() ) 
 	    {
 		target[channel]->buffer_rx.Pop();
 		power.antennaBufferPop();
-		LOG << "Moving flit  " << received_flit << " from buffer_rx to buffer_to_tile, port " << r[i] << endl;
+		LOG << "Moving flit  " << received_flit << " from buffer_rx to buffer_to_tile, port [" << r[i] <<"][" << TODO_VC << "]" << endl;
 
-		buffer_to_tile[r[i]].Push(received_flit);
+		buffer_to_tile[r[i]][TODO_VC].Push(received_flit);
 		power.bufferToTilePush();
 	    }
 	    else 
@@ -394,11 +402,11 @@ void Hub::tileToAntennaProcess()
     {
 	int i = (start_from_port + j) % (num_ports);
 
-	if (!buffer_from_tile[i].IsEmpty()) 
+	if (!buffer_from_tile[i][TODO_VC].IsEmpty()) 
 	{
 	    LOG << "Reservation: buffer_from_tile not empty on port " << i << endl;
 
-	    Flit flit = buffer_from_tile[i].Front();
+	    Flit flit = buffer_from_tile[i][TODO_VC].Front();
 	    power.bufferFromTileFront();
 	    r_from_tile[i] = route(flit);
 
@@ -429,9 +437,9 @@ void Hub::tileToAntennaProcess()
     // 2nd phase: Forwarding
     for (int i = 0; i < num_ports; i++) 
     {
-	if (!buffer_from_tile[i].IsEmpty()) 
+	if (!buffer_from_tile[i][TODO_VC].IsEmpty()) 
 	{     
-	    Flit flit = buffer_from_tile[i].Front();
+	    Flit flit = buffer_from_tile[i][TODO_VC].Front();
 	    // powerFront already accounted in 1st phase
 
 	    assert(r_from_tile[i] == DIRECTION_WIRELESS);
@@ -442,7 +450,7 @@ void Hub::tileToAntennaProcess()
 	    {
 		if (!(init[channel]->buffer_tx.IsFull()) )
 		{
-		    buffer_from_tile[i].Pop();
+		    buffer_from_tile[i][TODO_VC].Pop();
 		    power.bufferFromTilePop();
 		    init[channel]->buffer_tx.Push(flit);
 		    power.antennaBufferPush();
@@ -469,22 +477,22 @@ void Hub::tileToAntennaProcess()
     for (int i = 0; i < num_ports; i++) 
     {
 	/*
-	if (!buffer_from_tile[i].deadlockFree())
+	if (!buffer_from_tile[i][TODO_VC].deadlockFree())
 	{
 	    LOG << " deadlock on buffer " << i << endl;
-	    buffer_from_tile[i].Print("deadlock");
+	    buffer_from_tile[i][TODO_VC].Print("deadlock");
 	}
 	*/
 
 	if (req_rx[i]->read() == 1 - current_level_rx[i]) 
 	{
 	    Flit received_flit = flit_rx[i]->read();
-	    if (!buffer_from_tile[i].IsFull())
+	    if (!buffer_from_tile[i][TODO_VC].IsFull())
 	    {
 
 		LOG << "Reading flit " << received_flit << " on port " << i << endl;
 
-		buffer_from_tile[i].Push(received_flit);
+		buffer_from_tile[i][TODO_VC].Push(received_flit);
 		power.bufferFromTilePush();
 
 		current_level_rx[i] = 1 - current_level_rx[i];
@@ -492,7 +500,7 @@ void Hub::tileToAntennaProcess()
 	    else
 	    {
 		LOG << "Buffer full: Cannot store " << received_flit << " on port " << i << endl;
-		//buffer_from_tile[i].Print();
+		//buffer_from_tile[i][TODO_VC].Print();
 	    }
 
 

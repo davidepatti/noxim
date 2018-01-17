@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2010 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -41,6 +41,7 @@ struct Payload {
 struct Packet {
     int src_id;
     int dst_id;
+    int vc_id;
     double timestamp;		// SC timestamp at packet generation
     int size;
     int flit_left;		// Number of remaining flits inside the packet
@@ -49,13 +50,14 @@ struct Packet {
     // Constructors
     Packet() { }
 
-    Packet(const int s, const int d, const double ts, const int sz) {
-	make(s, d, ts, sz);
+    Packet(const int s, const int d, const int vc, const double ts, const int sz) {
+	make(s, d, vc, ts, sz);
     }
 
-    void make(const int s, const int d, const double ts, const int sz) {
+    void make(const int s, const int d, const int vc, const double ts, const int sz) {
 	src_id = s;
 	dst_id = d;
+	vc_id = vc;
 	timestamp = ts;
 	size = sz;
 	flit_left = sz;
@@ -101,6 +103,7 @@ struct NoP_data {
 struct Flit {
     int src_id;
     int dst_id;
+    int vc_id; // Virtual Channel
     FlitType flit_type;	// The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
     int sequence_no;		// The sequence number of the flit inside the packet
     int sequence_length;
@@ -112,6 +115,7 @@ struct Flit {
     inline bool operator ==(const Flit & flit) const {
 	return (flit.src_id == src_id && flit.dst_id == dst_id
 		&& flit.flit_type == flit_type
+		&& flit.vc_id == vc_id
 		&& flit.sequence_no == sequence_no
 		&& flit.sequence_length == sequence_length
 		&& flit.payload == payload && flit.timestamp == timestamp

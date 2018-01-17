@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2015 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -148,8 +148,7 @@ bool ProcessingElement::canShot(Packet & packet)
 	if (shot) {
 	    for (unsigned int i = 0; i < dst_prob.size(); i++) {
 		if (prob < dst_prob[i].second) {
-		    packet.make(local_id, dst_prob[i].first, now,
-				getRandomSize());
+		    packet.make(local_id, dst_prob[i].first, 0, now, getRandomSize());
 		    break;
 		}
 	    }

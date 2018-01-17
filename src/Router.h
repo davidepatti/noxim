@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2010 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -63,7 +63,7 @@ SC_MODULE(Router)
     int local_id;		                // Unique ID
     int routing_type;		                // Type of routing algorithm
     int selection_type;
-    Buffer buffer[DIRECTIONS + 2];	        // Buffer for each input channel 
+    BufferBank buffer[DIRECTIONS + 2];	// buffer[direction][virtual_channel] 
     bool current_level_rx[DIRECTIONS + 2];	// Current level for Alternating Bit Protocol (ABP)
     bool current_level_tx[DIRECTIONS + 2];	// Current level for Alternating Bit Protocol (ABP)
     Stats stats;		                // Statistics

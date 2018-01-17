@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2010 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -47,8 +47,8 @@ SC_MODULE(Hub)
     sc_out<bool>* req_tx;	   
     sc_in<bool>* ack_tx;	  
 
-    Buffer* buffer_from_tile;   // Buffer for each port
-    Buffer* buffer_to_tile;     // Buffer for each port
+    BufferBank* buffer_from_tile;   // Buffer for each port
+    BufferBank* buffer_to_tile;     // Buffer for each port
     bool* current_level_rx;	// Current level for ABP
     bool* current_level_tx;	// Current level for ABP
 
@@ -124,15 +124,15 @@ SC_MODULE(Hub)
         req_tx = new sc_out<bool>[num_ports];
         ack_tx = new sc_in<bool>[num_ports];
 
-        buffer_from_tile = new Buffer[num_ports];
-        buffer_to_tile = new Buffer[num_ports];
+        buffer_from_tile = new BufferBank[num_ports];
+        buffer_to_tile = new BufferBank[num_ports];
         
         for(int i = 0; i < num_ports; i++)
         {
-            buffer_from_tile[i].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].fromTileBufferSize);
-            buffer_to_tile[i].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].toTileBufferSize);
-            buffer_from_tile[i].setLabel(string(name())+"->bft["+i_to_string(i)+"]");
-            buffer_to_tile[i].setLabel(string(name())+"->btt["+i_to_string(i)+"]");
+            buffer_from_tile[i][TODO_VC].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].fromTileBufferSize);
+            buffer_to_tile[i][TODO_VC].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].toTileBufferSize);
+            buffer_from_tile[i][TODO_VC].setLabel(string(name())+"->bft["+i_to_string(i)+"]");
+            buffer_to_tile[i][TODO_VC].setLabel(string(name())+"->btt["+i_to_string(i)+"]");
         }
 
         current_level_rx = new bool[num_ports];
