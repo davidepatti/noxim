@@ -48,8 +48,8 @@ class ReservationTable {
     // Asserts if port_out is not reserved or not valid
     void release(const int port_out);
 
-    // Returns the output port connected to port_in.
-    int getOutputPort(const int port_in);
+    // Returns the output port and virtual channel connected to port_in.
+    int getOutputPort(const int port_int, int & port_out, int & vc);
 
     // Makes output port no longer available for reservation/release
     void invalidate(const int port_out);

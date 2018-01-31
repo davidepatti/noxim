@@ -68,16 +68,6 @@ void Router::rxProcess()
     }
 }
 
-int Router::nextVirtualChannel(const BufferBank & bb, int cvc)
-{
-    int start = GlobalParams::n_virtual_channels;
-
-    while (bb[cvc].IsEmpty() && start--) 
-	cvc = (cvc+1)%GlobalParams::n_virtual_channels;
-
-    return cvc;
-}
-
 
 void Router::txProcess()
 {
@@ -97,58 +87,70 @@ void Router::txProcess()
       for (int j = 0; j < DIRECTIONS + 2; j++) 
 	{
 	  int i = (start_from_port + j) % (DIRECTIONS + 2);
-	  current_vc[i] = nextVirtualChannel(buffer[i],current_vc[i]);
 
+	  for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
+	  {
+	      int vc = (start_from_vc+k)%GlobalParams::n_virtual_channels;
+	      
+	      // Uncomment to enable deadlock checking on buffers. 
+	      // Please also set the appropriate threshold.
+	      // buffer[i].deadlockCheck();
 
-	  // Uncomment to enable deadlock checking on buffers. 
-	  // Please also set the appropriate threshold.
-	  // buffer[i].deadlockCheck();
+	      if (!buffer[i][vc].IsEmpty()) 
+	      {
+		  Flit flit = buffer[i][vc].Front();
+		  power.bufferRouterFront();
 
-	  if (!buffer[i][current_vc[i]].IsEmpty()) 
-	    {
+		  if (flit.flit_type == FLIT_TYPE_HEAD) 
+		    {
+		      // prepare data for routing
+		      RouteData route_data;
+		      route_data.current_id = local_id;
+		      route_data.src_id = flit.src_id;
+		      route_data.dst_id = flit.dst_id;
+		      route_data.dir_in = i;
+		      route_data.vc_id = flit.vc_id;
 
-	      Flit flit = buffer[i][current_vc[i]].Front();
-	      power.bufferRouterFront();
+		      int o = route(route_data);
 
-	      if (flit.flit_type == FLIT_TYPE_HEAD) 
-		{
-		  // prepare data for routing
-		  RouteData route_data;
-		  route_data.current_id = local_id;
-		  route_data.src_id = flit.src_id;
-		  route_data.dst_id = flit.dst_id;
-		  route_data.dir_in = i;
+		      LOG << " checking reservation availability of direction " << o << " for flit " << flit << endl;
 
-		  int o = route(route_data);
-
-		  LOG << " checking reservation availability of direction " << o << " for flit " << flit << endl;
-
-		  if (reservation_table.isAvailable(i,o)) 
-		  {
-		      LOG << " reserving direction " << o << " for flit " << flit << endl;
-		      reservation_table.reserve(i, flit.vc_id, o);
-		  }
-		  else
-		  {
-		      LOG << " cannot reserve direction " << o << " for flit " << flit << endl;
-		  }
+		      if (reservation_table.isAvailable(i,vc,o)) 
+		      {
+			  LOG << " reserving direction " << o << " for flit " << flit << endl;
+			  reservation_table.reserve(i, vc , o);
+		      }
+		      else
+		      {
+			  LOG << " cannot reserve direction " << o << " for flit " << flit << endl;
+		      }
+		    }
 		}
-	    }
-	}
-      start_from_port++;
+
+	  };
+
+	    
+	start_from_vc = (start_from_vc+1)%GlobalParams::n_virtual_channels;
+	start_from_port = (start_from_port + 1) % (DIRECTIONS + 2);
 
 
       // 2nd phase: Forwarding
       for (int i = 0; i < DIRECTIONS + 2; i++) 
       {
-	  if (!buffer[i][current_vc[i]].IsEmpty()) 
+	  int vc;
+	  int o;
+	  reservation_table.getReservation(i, o, vc);
+	  
+	  if (o != NOT_RESERVED) 
 	  {
-	      // power contribution already computed in 1st phase
-	      Flit flit = buffer[i][current_vc[i]].Front();
+	      reservation_table.updateIndex(o);
 
-	      int o = reservation_table.getOutputPort(i,flit.vc_id);
-	      if (o != NOT_RESERVED) 
+	      // e.g., can happen
+	      if (!buffer[i][vc].IsEmpty())  
 	      {
+		  // power contribution already computed in 1st phase
+		  Flit flit = buffer[i][vc].Front();
+
 		  if (current_level_tx[o] == ack_tx[o].read()) 
 		  {
 		      //if (GlobalParams::verbose_mode > VERBOSE_OFF) 
@@ -178,7 +180,7 @@ void Router::txProcess()
 			  power.networkInterface();
 
 		      if (flit.flit_type == FLIT_TYPE_TAIL)
-			  reservation_table.release(i,flit.vc_id,o);
+			  reservation_table.release(i,vc,o);
 
 		      // Update stats
 		      if (o == DIRECTION_LOCAL) 
@@ -210,7 +212,7 @@ void Router::txProcess()
 			  reservation_table.release(i,flit.vc_id,o);
 		  }
 	      }
-	  }
+	  } // if not reserved
       }
     }				// else reset read
 }

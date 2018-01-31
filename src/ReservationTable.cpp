@@ -20,6 +20,27 @@ ReservationTable::ReservationTable()
 }
 
 
+void ReservationTable::getReservation(const int port_in, int& port_out, int& vc)
+{
+    for (int o = 0;o<DIRECTIONS+2;o++)
+    {
+	for (int j=0; j<rtable[o].reservations.size(); j++)
+	{
+	    int i = (j+rtable[o].index)%rtable[o].reservations.size();
+
+	    if (rtable[o].reservations[i].input == port_in)
+	    {
+		port_out = o;
+		vc = rtable[o].reservations[i].vc;
+		return;
+	    }
+	}
+
+    }
+    port_out = NOT_RESERVED;
+}
+
+
 bool ReservationTable::isAvailable(const int port_in, const int vc, const int port_out)
 {
     for (int i=0;i<DIRECTIONS+2;i++)
@@ -57,34 +78,37 @@ void ReservationTable::reserve(const int port_in, const int vc, const int port_o
 
 void ReservationTable::release(const int port_in, const int vc, const int port_out)
 {
+
     for (vector<TReservation>::iterator i=rtable[port_out].reservations.begin(); 
 	    i != rtable[port_out].reservations.end(); i++)
     {
 	if (i->input == port_in && i->vc == vc)
 	{
 	    rtable[port_out].reservations.erase(i);
-	    if (
+	    int removed_index = i - i.begin();
+
+	    if (removed_index < rtable[port_out].index)
+		rtable[port_out].index--;
+	    else
+		if (rtable[port_out].index >= rtable[o].reservations.size())
+		    rtable[port_out].index = 0;
+
 	    return;
 	}
     }
 
 }
 
-int ReservationTable::getOutputPort(const int port_in)
+void ReservationTable::updateIndex(const int port_out)
 {
-
-    for (map<int,int>::iterator i=rtable.begin(); i!=rtable.end(); i++)
-    {
-	if (i->second == port_in)
-	    return i->first;		// port_in reserved outport i
-    }
-
-    // semantic: port_in currently doesn't reserve any out port
-    return NOT_RESERVED;
+    rtable[port_out].index = (rtable[port_out].index+1)%(rtable[port_out].reservations.size());
 }
+
+
 
 // makes port_out no longer available for reservation/release
 void ReservationTable::invalidate(const int port_out)
 {
+
     rtable[port_out] = NOT_VALID;
 }
