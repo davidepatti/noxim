@@ -12,43 +12,62 @@
 
 ReservationTable::ReservationTable()
 {
-
-  rtable.clear();
+    for (int i=0;i<DIRECTIONS+2;i++)
+    {
+	rtable[i].index = 0;
+	rtable[i].reservations.clear();
+    }
 }
 
 
-bool ReservationTable::isAvailable(const int port_out)
+bool ReservationTable::isAvailable(const int port_in, const int vc, const int port_out)
 {
+    for (int i=0;i<DIRECTIONS+2;i++)
+    {
+	if (i!=port_out)
+	{
+	    for (int j=0;j<rtable[i].reservations.size();j++)
+		if (rtable[i].reservations[j].input==port_it) 
+		    return false;
+	}
+    }
 
-    if (rtable.find(port_out)==rtable.end())
-	rtable[port_out] = NOT_RESERVED;
-
-    if (rtable[port_out]==NOT_VALID) throw NOT_VALID;
-
-//    assert(rtable[port_out]!=NOT_VALID);
-
-    return (rtable[port_out]==NOT_RESERVED);
+    for (int j=0;j<rtable[port_out].reservations.size();j++)
+	if (rtable[port_out].reservations[j].vc == vc)
+	    return false;
+    
+    return true;
 }
 
-void ReservationTable::reserve(const int port_in, const int port_out)
+void ReservationTable::reserve(const int port_in, const int vc, const int port_out)
 {
     // reservation of reserved/not valid ports is illegal. Correctness
     // should be assured by ReservationTable users
-    assert(isAvailable(port_out));
+    assert(isAvailable(port_in,vc, port_out));
 
-    rtable[port_out] = port_in;
+    TReservation r;
+    r.input = port_in;
+    r.vc = vc;
+
+    // TODO: a better policy could insert in a specific position as far a possible
+    // from the current index
+    rtable[port_out].reservations.push_back(r);
+
 }
 
-void ReservationTable::release(const int port_out)
+void ReservationTable::release(const int port_in, const int vc, const int port_out)
 {
+    for (vector<TReservation>::iterator i=rtable[port_out].reservations.begin(); 
+	    i != rtable[port_out].reservations.end(); i++)
+    {
+	if (i->input == port_in && i->vc == vc)
+	{
+	    rtable[port_out].reservations.erase(i);
+	    if (
+	    return;
+	}
+    }
 
-    // check wheter there is a port_out entry
-    assert(rtable.find(port_out)!=rtable.end());
-
-    // there is a valid reservation on port_out
-    assert(rtable[port_out]!=NOT_RESERVED);
-
-    rtable[port_out] = NOT_RESERVED;
 }
 
 int ReservationTable::getOutputPort(const int port_in)

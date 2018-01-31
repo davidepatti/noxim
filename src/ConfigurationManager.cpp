@@ -57,6 +57,7 @@ void loadConfiguration() {
     GlobalParams::traffic_table_filename = config["traffic_table_filename"].as<string>();
     GlobalParams::clock_period_ps = config["clock_period_ps"].as<int>();
     GlobalParams::simulation_time = config["simulation_time"].as<int>();
+    GlobalParams::n_virtual_channels = config["n_virtual_channels"].as<int>();
     GlobalParams::reset_time = config["reset_time"].as<int>();
     GlobalParams::stats_warm_up_time = config["stats_warm_up_time"].as<int>();
     GlobalParams::rnd_generator_seed = time(NULL);
@@ -222,6 +223,7 @@ void showConfig()
          << "- mesh_dim_x = " << GlobalParams::mesh_dim_x << endl
          << "- mesh_dim_y = " << GlobalParams::mesh_dim_y << endl
          << "- buffer_depth = " << GlobalParams::buffer_depth << endl
+         << "- n_virtual_channels = " << GlobalParams::n_virtual_channels << endl
          << "- max_packet_size = " << GlobalParams::max_packet_size << endl
          << "- routing_algorithm = " << GlobalParams::routing_algorithm << endl
       // << "- routing_table_filename = " << GlobalParams::routing_table_filename << endl
@@ -309,6 +311,10 @@ void checkConfiguration()
 	cerr << "Error: simulation time must be positive" << endl;
 	exit(1);
     }
+    if (GlobalParams::n_virtual_channels > MAX_VC) {
+	cerr << "Error: number of virtual channels must be less than " << MAX_VC <<endl;
+	exit(1);
+    }
 
     if (GlobalParams::stats_warm_up_time >
 	GlobalParams::simulation_time) {
@@ -349,6 +355,8 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::mesh_dim_y = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-buffer"))
 		GlobalParams::buffer_depth = atoi(arg_vet[++i]);
+	    else if (!strcmp(arg_vet[i], "-n_virtual_channels"))
+		GlobalParams::n_virtual_channels = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-buffer_tt"))
 		setBufferToTile(atoi(arg_vet[++i]));
 	    else if (!strcmp(arg_vet[i], "-buffer_ft"))

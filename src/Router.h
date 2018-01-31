@@ -57,19 +57,17 @@ SC_MODULE(Router)
 
     // Registers
 
-    /*
-       Coord position;                     // Router position inside the mesh
-     */
     int local_id;		                // Unique ID
     int routing_type;		                // Type of routing algorithm
     int selection_type;
-    BufferBank buffer[DIRECTIONS + 2];	// buffer[direction][virtual_channel] 
+    BufferBank buffer[DIRECTIONS + 2];		// buffer[direction][virtual_channel] 
+    int current_vc[DIRECTION+2]; 		// the current virtual channel for each input port
     bool current_level_rx[DIRECTIONS + 2];	// Current level for Alternating Bit Protocol (ABP)
     bool current_level_tx[DIRECTIONS + 2];	// Current level for Alternating Bit Protocol (ABP)
     Stats stats;		                // Statistics
     Power power;
-    LocalRoutingTable routing_table;	// Routing table
-    ReservationTable reservation_table;	// Switch reservation table
+    LocalRoutingTable routing_table;		// Routing table
+    ReservationTable reservation_table;		// Switch reservation table
     int start_from_port;	                // Port from which to start the reservation cycle
     unsigned long routed_flits;
     RoutingAlgorithm * routingAlgorithm; 

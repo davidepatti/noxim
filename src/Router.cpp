@@ -27,7 +27,7 @@ void Router::rxProcess()
 	routed_flits = 0;
 	local_drained = 0;
     } else {
-	// For each channel decide if a new flit can be accepted
+	// For each port decide if a new flit can be accepted
 	//
 	// This process simply sees a flow of incoming flits. All arbitration
 	// and wormhole related issues are addressed in the txProcess()
@@ -39,30 +39,44 @@ void Router::rxProcess()
 	    // 2) there is a free slot in the input buffer of direction i
 
 	    if ((req_rx[i].read() == 1 - current_level_rx[i])
-		&& !buffer[i][TODO_VC].IsFull()) 
 	    {
 		Flit received_flit = flit_rx[i].read();
 
-		// Store the incoming flit in the circular buffer
-		buffer[i][TODO_VC].Push(received_flit);
+		int vc = received_flit.vc_id;
 
-	        LOG << " Flit " << received_flit << " received from Input[" << i << "] " << endl;
+		if (!buffer[i][vc].IsFull()) 
+		{
 
-		power.bufferRouterPush();
+		    // Store the incoming flit in the circular buffer
+		    buffer[i][current_vc[i]].Push(received_flit);
 
-		// Negate the old value for Alternating Bit Protocol (ABP)
-		current_level_rx[i] = 1 - current_level_rx[i];
+		    LOG << " Flit " << received_flit << " received from Input[" << i << "] " << endl;
+
+		    power.bufferRouterPush();
+
+		    // Negate the old value for Alternating Bit Protocol (ABP)
+		    current_level_rx[i] = 1 - current_level_rx[i];
 
 
-		// if a new flit is injected from local PE
-		if (received_flit.src_id == local_id)
-		  power.networkInterface();
+		    // if a new flit is injected from local PE
+		    if (received_flit.src_id == local_id)
+		      power.networkInterface();
+		}
 	    }
 	    ack_rx[i].write(current_level_rx[i]);
 	}
     }
 }
 
+int Router::nextVirtualChannel(const BufferBank & bb, int cvc)
+{
+    int start = GlobalParams::n_virtual_channels;
+
+    while (bb[cvc].IsEmpty() && start--) 
+	cvc = (cvc+1)%GlobalParams::n_virtual_channels;
+
+    return cvc;
+}
 
 
 void Router::txProcess()
@@ -83,16 +97,17 @@ void Router::txProcess()
       for (int j = 0; j < DIRECTIONS + 2; j++) 
 	{
 	  int i = (start_from_port + j) % (DIRECTIONS + 2);
-	 
+	  current_vc[i] = nextVirtualChannel(buffer[i],current_vc[i]);
+
 
 	  // Uncomment to enable deadlock checking on buffers. 
 	  // Please also set the appropriate threshold.
 	  // buffer[i].deadlockCheck();
 
-	  if (!buffer[i][TODO_VC].IsEmpty()) 
+	  if (!buffer[i][current_vc[i]].IsEmpty()) 
 	    {
 
-	      Flit flit = buffer[i][TODO_VC].Front();
+	      Flit flit = buffer[i][current_vc[i]].Front();
 	      power.bufferRouterFront();
 
 	      if (flit.flit_type == FLIT_TYPE_HEAD) 
@@ -108,10 +123,10 @@ void Router::txProcess()
 
 		  LOG << " checking reservation availability of direction " << o << " for flit " << flit << endl;
 
-		  if (reservation_table.isAvailable(o)) 
+		  if (reservation_table.isAvailable(i,o)) 
 		  {
 		      LOG << " reserving direction " << o << " for flit " << flit << endl;
-		      reservation_table.reserve(i, o);
+		      reservation_table.reserve(i, flit.vc_id, o);
 		  }
 		  else
 		  {
@@ -126,12 +141,12 @@ void Router::txProcess()
       // 2nd phase: Forwarding
       for (int i = 0; i < DIRECTIONS + 2; i++) 
       {
-	  if (!buffer[i][TODO_VC].IsEmpty()) 
+	  if (!buffer[i][current_vc[i]].IsEmpty()) 
 	  {
 	      // power contribution already computed in 1st phase
-	      Flit flit = buffer[i][TODO_VC].Front();
+	      Flit flit = buffer[i][current_vc[i]].Front();
 
-	      int o = reservation_table.getOutputPort(i);
+	      int o = reservation_table.getOutputPort(i,flit.vc_id);
 	      if (o != NOT_RESERVED) 
 	      {
 		  if (current_level_tx[o] == ack_tx[o].read()) 
@@ -154,7 +169,7 @@ void Router::txProcess()
 
 		      current_level_tx[o] = 1 - current_level_tx[o];
 		      req_tx[o].write(current_level_tx[o]);
-		      buffer[i][TODO_VC].Pop();
+		      buffer[i][current_vc[i]].Pop();
 
 		      power.bufferRouterPop();
 
@@ -163,7 +178,7 @@ void Router::txProcess()
 			  power.networkInterface();
 
 		      if (flit.flit_type == FLIT_TYPE_TAIL)
-			  reservation_table.release(o);
+			  reservation_table.release(i,flit.vc_id,o);
 
 		      // Update stats
 		      if (o == DIRECTION_LOCAL) 
@@ -192,7 +207,7 @@ void Router::txProcess()
 		  {
 		      LOG << " cannot forward Input[" << i << "] forward to Output[" << o << "], flit: " << flit << endl;
 		      if (flit.flit_type == FLIT_TYPE_HEAD)
-			  reservation_table.release(o);
+			  reservation_table.release(i,flit.vc_id,o);
 		  }
 	      }
 	  }
@@ -343,6 +358,7 @@ void Router::configure(const int _id,
     {
 	buffer[i][TODO_VC].SetMaxBufferSize(_max_buffer_size);
 	buffer[i][TODO_VC].setLabel(string(name())+"->buffer["+i_to_string(i)+"]");
+	current_vc[i] = 0;
     }
 
     int row = _id / GlobalParams::mesh_dim_x;

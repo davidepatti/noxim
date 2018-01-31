@@ -33,6 +33,7 @@ string GlobalParams::config_filename;
 string GlobalParams::power_config_filename;
 int GlobalParams::clock_period_ps;
 int GlobalParams::simulation_time;
+int GlobalParams::n_virtual_channels;
 int GlobalParams::reset_time;
 int GlobalParams::stats_warm_up_time;
 int GlobalParams::rnd_generator_seed;

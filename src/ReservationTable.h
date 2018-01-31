@@ -17,6 +17,19 @@
 
 using namespace std;
 
+
+typedef struct Reservation
+{
+    int input;
+    int vc;
+} TReservation;
+
+typedef struct RTEntry
+{
+    vector<TReservation> reservations;
+    int index;
+} TRTEntry;
+
 class ReservationTable {
   public:
 
@@ -45,8 +58,10 @@ class ReservationTable {
   private:
 
 
-     map<int,int> rtable;	// reservation vector: rtable[i] gives the input
-    // port whose output port 'i' is connected to
+     TRTEntry rtable[DIRECTIONS+2];	// reservation vector: rtable[i] gives a RTEntry containing the set of input/VC 
+                                        // which reserved output port i
+                                        
+
 };
 
 #endif
