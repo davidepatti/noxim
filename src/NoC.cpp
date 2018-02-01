@@ -308,17 +308,6 @@ void NoC::buildMesh()
 	nop_data[GlobalParams::mesh_dim_x][j].west.write(tmp_NoP);
 
     }
-    
-
-    // invalidate reservation table entries for non-exhistent channels
-    for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
-	t[i][0]->r->reservation_table.invalidate(DIRECTION_NORTH);
-	t[i][GlobalParams::mesh_dim_y - 1]->r->reservation_table.invalidate(DIRECTION_SOUTH);
-    }
-    for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
-	t[0][j]->r->reservation_table.invalidate(DIRECTION_WEST);
-	t[GlobalParams::mesh_dim_x - 1][j]->r->reservation_table.invalidate(DIRECTION_EAST);
-    }
 }
 
 Tile *NoC::searchNode(const int id) const

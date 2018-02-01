@@ -38,7 +38,7 @@ void Router::rxProcess()
 	    // 1) there is an incoming request
 	    // 2) there is a free slot in the input buffer of direction i
 
-	    if ((req_rx[i].read() == 1 - current_level_rx[i])
+	    if (req_rx[i].read() == 1 - current_level_rx[i])
 	    {
 		Flit received_flit = flit_rx[i].read();
 
@@ -48,7 +48,7 @@ void Router::rxProcess()
 		{
 
 		    // Store the incoming flit in the circular buffer
-		    buffer[i][current_vc[i]].Push(received_flit);
+		    buffer[i][vc].Push(received_flit);
 
 		    LOG << " Flit " << received_flit << " received from Input[" << i << "] " << endl;
 
@@ -90,7 +90,7 @@ void Router::txProcess()
 
 	  for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
 	  {
-	      int vc = (start_from_vc+k)%GlobalParams::n_virtual_channels;
+	      int vc = (start_from_vc[i]+k)%(GlobalParams::n_virtual_channels);
 	      
 	      // Uncomment to enable deadlock checking on buffers. 
 	      // Please also set the appropriate threshold.
@@ -127,10 +127,11 @@ void Router::txProcess()
 		    }
 		}
 
-	  };
+	  }
+	    start_from_vc[i] = (start_from_vc[i]+1)%GlobalParams::n_virtual_channels;
+	}
 
 	    
-	start_from_vc = (start_from_vc+1)%GlobalParams::n_virtual_channels;
 	start_from_port = (start_from_port + 1) % (DIRECTIONS + 2);
 
 
@@ -171,7 +172,7 @@ void Router::txProcess()
 
 		      current_level_tx[o] = 1 - current_level_tx[o];
 		      req_tx[o].write(current_level_tx[o]);
-		      buffer[i][current_vc[i]].Pop();
+		      buffer[i][vc].Pop();
 
 		      power.bufferRouterPop();
 
@@ -214,7 +215,8 @@ void Router::txProcess()
 	      }
 	  } // if not reserved
       }
-    }				// else reset read
+
+    }   // loop directions		
 }
 
 NoP_data Router::getCurrentNoPData()
@@ -224,7 +226,7 @@ NoP_data Router::getCurrentNoPData()
     for (int j = 0; j < DIRECTIONS; j++) {
 	try {
 		NoP_data.channel_status_neighbor[j].free_slots = free_slots_neighbor[j].read();
-		NoP_data.channel_status_neighbor[j].available = (reservation_table.isAvailable(j));
+		NoP_data.channel_status_neighbor[j].available = (reservation_table.isNotReserved(j));
 	}
 	catch (int e)
 	{
@@ -352,15 +354,19 @@ void Router::configure(const int _id,
     stats.configure(_id, _warm_up_time);
 
     start_from_port = DIRECTION_LOCAL;
+  
 
     if (grt.isValid())
 	routing_table.configure(grt, _id);
 
     for (int i = 0; i < DIRECTIONS + 2; i++)
     {
-	buffer[i][TODO_VC].SetMaxBufferSize(_max_buffer_size);
-	buffer[i][TODO_VC].setLabel(string(name())+"->buffer["+i_to_string(i)+"]");
-	current_vc[i] = 0;
+	for (int vc = 0; vc < GlobalParams::n_virtual_channels; vc++)
+	{
+	    buffer[i][vc].SetMaxBufferSize(_max_buffer_size);
+	    buffer[i][vc].setLabel(string(name())+"->buffer["+i_to_string(i)+"]");
+	}
+	start_from_vc[i] = 0;
     }
 
     int row = _id / GlobalParams::mesh_dim_x;

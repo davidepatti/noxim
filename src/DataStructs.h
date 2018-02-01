@@ -71,6 +71,7 @@ struct RouteData {
     int src_id;
     int dst_id;
     int dir_in;			// direction from which the packet comes from
+    int vc_id;
 };
 
 struct ChannelStatus {

@@ -32,6 +32,7 @@ int Hub::route(Flit& f)
 
 void Hub::rxPowerManager()
 {
+    /*
     // Check wheter accounting or not buffer to tile leakage 
     // For each port, two poweroff condition should be checked:
     // - the buffer to tile is empty
@@ -74,6 +75,7 @@ void Hub::rxPowerManager()
 	power.biasingRx();
     }
 
+    */ // LAVORI
 }
 
 
@@ -102,6 +104,7 @@ void Hub::updateRxPower()
 
 void Hub::txPowerManager()
 {
+    /*
     for (unsigned int i=0;i<txChannels.size();i++)
     {
 	// check if not empty or reserved
@@ -129,6 +132,7 @@ void Hub::txPowerManager()
 	    total_ttxoff_cycles++;
 	}
     }
+    */ // LAVORI
 }
 
 void Hub::updateTxPower()
@@ -345,19 +349,19 @@ void Hub::antennaToTileProcess()
 void Hub::tileToAntennaProcess()
 {
     /*
-    double cycle = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
-    if (cycle > 0 && cycle < 58428)
-    {
-	if (local_id == 1)
-	{
-	    cout << "CYCLES " << cycle << endl;
-	    for (int j = 0; j < num_ports; j++) 
-		buffer_from_tile[j].Print();;
-	    init[0]->buffer_tx.Print();
-	    cout << endl;
-	}
-    }
-    */
+     
+   // double cycle = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+   // if (cycle > 0 && cycle < 58428)
+   // {
+   //     if (local_id == 1)
+   //     {
+   //         cout << "CYCLES " << cycle << endl;
+   //         for (int j = 0; j < num_ports; j++) 
+   //     	buffer_from_tile[j].Print();;
+   //         init[0]->buffer_tx.Print();
+   //         cout << endl;
+   //     }
+   // }
     
     if (reset.read()) 
     {
@@ -476,13 +480,11 @@ void Hub::tileToAntennaProcess()
 
     for (int i = 0; i < num_ports; i++) 
     {
-	/*
-	if (!buffer_from_tile[i][TODO_VC].deadlockFree())
-	{
-	    LOG << " deadlock on buffer " << i << endl;
-	    buffer_from_tile[i][TODO_VC].Print("deadlock");
-	}
-	*/
+//	if (!buffer_from_tile[i][TODO_VC].deadlockFree())
+//	{
+//	    LOG << " deadlock on buffer " << i << endl;
+//	    buffer_from_tile[i][TODO_VC].Print("deadlock");
+//	}
 
 	if (req_rx[i]->read() == 1 - current_level_rx[i]) 
 	{
@@ -511,5 +513,6 @@ void Hub::tileToAntennaProcess()
     // IMPORTANT: do not move from here
     // The txPowerManager assumes that all flit buffer write have been done
     updateTxPower();
+    */ //LAVORI
 }
 

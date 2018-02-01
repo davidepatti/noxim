@@ -37,31 +37,29 @@ class ReservationTable {
 
     inline string name() const {return "ReservationTable";};
 
-
     // check if port_out is reservable
-    bool isAvailable(const int port_out);
+    bool isAvailable(const int port_in, const int vc, const int port_out);
 
     // Connects port_in with port_out. Asserts if port_out is reserved
-    void reserve(const int port_in, const int port_out);
+    void reserve(const int port_in, const int vc, const int port_out);
 
     // Releases port_out connection. 
     // Asserts if port_out is not reserved or not valid
-    void release(const int port_out);
+    void release(const int port_in, const int vc, const int port_out);
 
     // Returns the output port and virtual channel connected to port_in.
-    int getOutputPort(const int port_int, int & port_out, int & vc);
+    void getReservation(const int port_int, int & port_out, int & vc);
 
-    // Makes output port no longer available for reservation/release
-    void invalidate(const int port_out);
+    // update the index of the reservation having highest priority in the current cycle
+    void updateIndex(const int port_out);
 
+    // check whether port_out has no reservations
+    bool isNotReserved(const int port_out);
 
   private:
 
-
      TRTEntry rtable[DIRECTIONS+2];	// reservation vector: rtable[i] gives a RTEntry containing the set of input/VC 
                                         // which reserved output port i
-                                        
-
 };
 
 #endif

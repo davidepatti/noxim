@@ -67,8 +67,8 @@ SC_MODULE(Hub)
 
     int start_from_port; // Port from which to start the reservation cycle
 
-    ReservationTable antenna2tile_reservation_table;	// Switch reservation table
-    ReservationTable tile2antenna_reservation_table;// Wireless reservation table
+    //ReservationTable antenna2tile_reservation_table;	// Switch reservation table
+    //ReservationTable tile2antenna_reservation_table;// Wireless reservation table
 
     void updateRxPower();
     void updateTxPower();

@@ -61,14 +61,12 @@ SC_MODULE(Router)
     int routing_type;		                // Type of routing algorithm
     int selection_type;
     BufferBank buffer[DIRECTIONS + 2];		// buffer[direction][virtual_channel] 
-    int current_vc[DIRECTION+2]; 		// the current virtual channel for each input port
     bool current_level_rx[DIRECTIONS + 2];	// Current level for Alternating Bit Protocol (ABP)
     bool current_level_tx[DIRECTIONS + 2];	// Current level for Alternating Bit Protocol (ABP)
     Stats stats;		                // Statistics
     Power power;
     LocalRoutingTable routing_table;		// Routing table
     ReservationTable reservation_table;		// Switch reservation table
-    int start_from_port;	                // Port from which to start the reservation cycle
     unsigned long routed_flits;
     RoutingAlgorithm * routingAlgorithm; 
     SelectionStrategy * selectionStrategy; 
@@ -129,6 +127,9 @@ SC_MODULE(Router)
     int NoPScore(const NoP_data & nop_data, const vector <int> & nop_channels) const;
     int reflexDirection(int direction) const;
     int getNeighborId(int _id, int direction) const;
+   
+    int start_from_port;	     // Port from which to start the reservation cycle
+    int start_from_vc[DIRECTIONS+2]; // VC from which to start the reservation cycle for the specific port
 
   public:
     unsigned int local_drained;

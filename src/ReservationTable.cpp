@@ -19,6 +19,11 @@ ReservationTable::ReservationTable()
     }
 }
 
+bool ReservationTable::isNotReserved(const int port_out)
+{
+    return (rtable[port_out].reservations.size()==0);
+}
+
 
 void ReservationTable::getReservation(const int port_in, int& port_out, int& vc)
 {
@@ -48,7 +53,7 @@ bool ReservationTable::isAvailable(const int port_in, const int vc, const int po
 	if (i!=port_out)
 	{
 	    for (int j=0;j<rtable[i].reservations.size();j++)
-		if (rtable[i].reservations[j].input==port_it) 
+		if (rtable[i].reservations[j].input==port_in) 
 		    return false;
 	}
     }
@@ -85,12 +90,12 @@ void ReservationTable::release(const int port_in, const int vc, const int port_o
 	if (i->input == port_in && i->vc == vc)
 	{
 	    rtable[port_out].reservations.erase(i);
-	    int removed_index = i - i.begin();
+	    int removed_index = i - rtable[port_out].reservations.begin();
 
 	    if (removed_index < rtable[port_out].index)
 		rtable[port_out].index--;
 	    else
-		if (rtable[port_out].index >= rtable[o].reservations.size())
+		if (rtable[port_out].index >= rtable[port_out].reservations.size())
 		    rtable[port_out].index = 0;
 
 	    return;
@@ -105,10 +110,3 @@ void ReservationTable::updateIndex(const int port_out)
 }
 
 
-
-// makes port_out no longer available for reservation/release
-void ReservationTable::invalidate(const int port_out)
-{
-
-    rtable[port_out] = NOT_VALID;
-}
