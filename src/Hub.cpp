@@ -263,6 +263,7 @@ void Hub::txRadioProcessTokenMaxHold(int channel)
 
 void Hub::antennaToTileProcess()
 {
+    /* LAVORI
     if (reset.read()) 
     {
         for (int i = 0; i < num_ports; i++) 
@@ -343,6 +344,7 @@ void Hub::antennaToTileProcess()
 
 	}
     }
+*/
 }
 
 

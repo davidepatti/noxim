@@ -10,6 +10,7 @@ mesh_dim_y: 4
 # number of flits for each router buffer
 buffer_depth: 4
 # size of flits, in bits
+n_virtual_channels: 1
 flit_size: 32
 # lenght in mm of router to hub connection
 r2h_link_length: 2.0

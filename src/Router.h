@@ -82,7 +82,6 @@ SC_MODULE(Router)
 		   GlobalRoutingTable & grt);
 
     unsigned long getRoutedFlits();	// Returns the number of routed flits 
-    unsigned int getFlitsCount();	// Returns the number of flits into the router
 
     // Constructor
 

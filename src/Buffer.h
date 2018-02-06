@@ -82,7 +82,7 @@ class Buffer {
     void UpdateMeanOccupancy();
 };
 
-typedef Buffer BufferBank[MAX_VC];
+typedef Buffer BufferBank[MAX_VIRTUAL_CHANNELS];
 
 
 #endif

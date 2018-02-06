@@ -129,10 +129,12 @@ SC_MODULE(Hub)
         
         for(int i = 0; i < num_ports; i++)
         {
+	    /* LAVORI
             buffer_from_tile[i][TODO_VC].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].fromTileBufferSize);
             buffer_to_tile[i][TODO_VC].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].toTileBufferSize);
             buffer_from_tile[i][TODO_VC].setLabel(string(name())+"->bft["+i_to_string(i)+"]");
             buffer_to_tile[i][TODO_VC].setLabel(string(name())+"->btt["+i_to_string(i)+"]");
+	    */
         }
 
         current_level_rx = new bool[num_ports];

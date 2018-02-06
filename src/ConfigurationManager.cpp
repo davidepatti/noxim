@@ -311,8 +311,8 @@ void checkConfiguration()
 	cerr << "Error: simulation time must be positive" << endl;
 	exit(1);
     }
-    if (GlobalParams::n_virtual_channels > MAX_VC) {
-	cerr << "Error: number of virtual channels must be less than " << MAX_VC <<endl;
+    if (GlobalParams::n_virtual_channels > MAX_VIRTUAL_CHANNELS) {
+	cerr << "Error: number of virtual channels must be less than " << MAX_VIRTUAL_CHANNELS <<endl;
 	exit(1);
     }
 
@@ -330,6 +330,24 @@ void checkConfiguration()
     }
 
 
+    if (GlobalParams::n_virtual_channels>1 && GlobalParams::selection_strategy.compare("NOP")==0)
+    {
+	cerr << "Error: NoP selection strategy can be used only with a single virtual channel" << endl;
+	exit(1);
+    }
+
+    if (GlobalParams::n_virtual_channels>1 && GlobalParams::selection_strategy.compare("BUFFER_LEVEL")==0)
+    {
+	cerr << "Error: Buffer level selection strategy can be used only with a single virtual channel" << endl;
+	exit(1);
+    }
+    if (GlobalParams::n_virtual_channels>MAX_VIRTUAL_CHANNELS) 
+    {
+	cerr << "Error: cannot use more than " << MAX_VIRTUAL_CHANNELS << " virtual channels." << endl
+	     << "If you need more vc please modify the MAX_VIRTUAL_CHANNELS definition in " << endl
+	     << "GlobalParams.h and compile again " << endl;
+	exit(1);
+    }
 }
 
 void parseCmdLine(int arg_num, char *arg_vet[])

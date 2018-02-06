@@ -244,7 +244,7 @@ void Router::perCycleUpdate()
 {
     if (reset.read()) {
 	for (int i = 0; i < DIRECTIONS + 1; i++)
-	    free_slots[i].write(buffer[i][TODO_VC].GetMaxBufferSize());
+	    free_slots[i].write(buffer[i][DEFAULT_VC].GetMaxBufferSize());
     } else {
         selectionStrategy->perCycleUpdate(this);
 
@@ -371,30 +371,24 @@ void Router::configure(const int _id,
 
     int row = _id / GlobalParams::mesh_dim_x;
     int col = _id % GlobalParams::mesh_dim_x;
-    if (row == 0)
-      buffer[DIRECTION_NORTH][TODO_VC].Disable();
-    if (row == GlobalParams::mesh_dim_y-1)
-      buffer[DIRECTION_SOUTH][TODO_VC].Disable();
-    if (col == 0)
-      buffer[DIRECTION_WEST][TODO_VC].Disable();
-    if (col == GlobalParams::mesh_dim_x-1)
-      buffer[DIRECTION_EAST][TODO_VC].Disable();
+
+    for (int vc = 0; vc<GlobalParams::n_virtual_channels; vc++)
+    {
+	if (row == 0)
+	  buffer[DIRECTION_NORTH][vc].Disable();
+	if (row == GlobalParams::mesh_dim_y-1)
+	  buffer[DIRECTION_SOUTH][vc].Disable();
+	if (col == 0)
+	  buffer[DIRECTION_WEST][vc].Disable();
+	if (col == GlobalParams::mesh_dim_x-1)
+	  buffer[DIRECTION_EAST][vc].Disable();
+    }
 
 }
 
 unsigned long Router::getRoutedFlits()
 {
     return routed_flits;
-}
-
-unsigned int Router::getFlitsCount()
-{
-    unsigned count = 0;
-
-    for (int i = 0; i < DIRECTIONS + 2; i++)
-	count += buffer[i][TODO_VC].Size();
-
-    return count;
 }
 
 
@@ -466,5 +460,6 @@ bool Router::inCongestion()
 void Router::ShowBuffersStats(std::ostream & out)
 {
   for (int i=0; i<DIRECTIONS+2; i++)
-    buffer[i][TODO_VC].ShowStats(out);
+      for (int vc=0; vc<GlobalParams::n_virtual_channels;vc++)
+	    buffer[i][vc].ShowStats(out);
 }

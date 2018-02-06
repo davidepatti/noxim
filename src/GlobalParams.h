@@ -23,16 +23,17 @@ using namespace std;
 #define POWER_CONFIG_FILENAME  "power.yaml"
 
 // Define the directions as numbers
-#define DIRECTIONS             4
-#define DIRECTION_NORTH        0
-#define DIRECTION_EAST         1
-#define DIRECTION_SOUTH        2
-#define DIRECTION_WEST         3
-#define DIRECTION_LOCAL        4
-#define DIRECTION_HUB          5
-#define DIRECTION_WIRELESS     747
-#define MAX_VC 2
-#define TODO_VC 0
+#define DIRECTIONS              4
+#define DIRECTION_NORTH         0
+#define DIRECTION_EAST          1
+#define DIRECTION_SOUTH         2
+#define DIRECTION_WEST          3
+#define DIRECTION_LOCAL         4
+#define DIRECTION_HUB           5
+#define DIRECTION_WIRELESS    747
+
+#define MAX_VIRTUAL_CHANNELS	8
+#define DEFAULT_VC 		0
 
 // Generic not reserved resource
 #define NOT_RESERVED          -2
@@ -44,11 +45,6 @@ using namespace std;
 #define ROUTING_DYAD           "DYAD"
 #define ROUTING_TABLE_BASED    "TABLE_BASED"
 
-// Selection strategies
-#define SEL_RANDOM             0
-#define SEL_BUFFER_LEVEL       1
-#define SEL_NOP                2
-#define INVALID_SELECTION     -1
 
 // Traffic distribution
 #define TRAFFIC_RANDOM         "TRAFFIC_RANDOM"

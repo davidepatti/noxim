@@ -86,9 +86,8 @@ int Selection_BUFFER_LEVEL::apply(Router * router, const vector < int >&directio
 
 void Selection_BUFFER_LEVEL::perCycleUpdate(Router * router) {
 	    // update current input buffers level to neighbors
-            assert(TODO_VC);
 	    for (int i = 0; i < DIRECTIONS + 1; i++)
-		router->free_slots[i].write(router->buffer[i][TODO_VC].getCurrentFreeSlots());
+		router->free_slots[i].write(router->buffer[i][DEFAULT_VC].getCurrentFreeSlots());
 
 	    // NoP selection: send neighbor info to each direction 'i'
 	    NoP_data current_NoP_data = router->getCurrentNoPData();
