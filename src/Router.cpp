@@ -22,7 +22,8 @@ void Router::rxProcess()
 	// Clear outputs and indexes of receiving protocol
 	for (int i = 0; i < DIRECTIONS + 2; i++) {
 	    ack_rx[i].write(0);
-	    current_level_rx[i] = 0;
+	    for (int j=0;j<MAX_VIRTUAL_CHANNELS;j++)
+		current_level_rx[i] = 0;
 	}
 	routed_flits = 0;
 	local_drained = 0;
@@ -31,6 +32,10 @@ void Router::rxProcess()
 	//
 	// This process simply sees a flow of incoming flits. All arbitration
 	// and wormhole related issues are addressed in the txProcess()
+	/*
+        if (local_id==1)
+	  LOG << "***APB DEBUG*** DIRECTION " << 3 << " CURRENT_LEVEL_RX: " << current_level_rx[3]<< ", ACK_RX: " <<  ack_rx[3].read() << endl;
+	  */
 
 	for (int i = 0; i < DIRECTIONS + 2; i++) {
 	    // To accept a new flit, the following conditions must match:
@@ -41,7 +46,6 @@ void Router::rxProcess()
 	    if (req_rx[i].read() == 1 - current_level_rx[i])
 	    {
 		Flit received_flit = flit_rx[i].read();
-
 		int vc = received_flit.vc_id;
 
 		if (!buffer[i][vc].IsFull()) 
@@ -50,12 +54,17 @@ void Router::rxProcess()
 		    // Store the incoming flit in the circular buffer
 		    buffer[i][vc].Push(received_flit);
 
-		    LOG << " Flit " << received_flit << " received from Input[" << i << "] " << endl;
+		    LOG << " Flit " << received_flit << " collected from Input[" << i << "][" << vc <<"]" << endl;
 
 		    power.bufferRouterPush();
 
 		    // Negate the old value for Alternating Bit Protocol (ABP)
 		    current_level_rx[i] = 1 - current_level_rx[i];
+		    /*
+		    if (local_id==1 && i==3)
+			  LOG << "***APB DEBUG*** DIRECTION " << i << "  Inverting CURRENT_LEVEL_RX  and ACK_RX to " << current_level_rx[i] << endl ;
+			  */
+		    //LOG << "*** APB DEBUG *** Inverting CURRENT_LEVEL to " << current_level_rx[i] ;
 
 
 		    // if a new flit is injected from local PE
@@ -83,6 +92,36 @@ void Router::txProcess()
     } 
   else 
     {
+ 
+	/*
+      if (local_id==0)
+	  cout << " ------------------------------------------------- buffers " << endl;
+
+      if (local_id==0)
+      {
+	  cout << "buffer 0" << endl;
+	  for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
+	      buffer[4][k].Print();
+      }
+      if (local_id==1)
+      {
+	  cout << "buffer 1 WEST" << endl;
+	  for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
+	      buffer[3][k].Print();
+	  cout << "buffer 1 EST" << endl;
+	  for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
+	      buffer[1][k].Print();
+      }
+      if (local_id==5)
+      {
+	  cout << "buffer 5" << endl;
+	  for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
+	      buffer[0][k].Print();
+      }
+      */
+
+      //if (local_id==0) LOG << "***APB DEBUG*** DIRECTION " << 1 << " CURRENT_LEVEL_TX: " << current_level_tx[1]<< ", ACK_TX: " <<  ack_tx[1].read() << endl;
+
       // 1st phase: Reservation
       for (int j = 0; j < DIRECTIONS + 2; j++) 
 	{
@@ -113,16 +152,19 @@ void Router::txProcess()
 
 		      int o = route(route_data);
 
-		      LOG << " checking reservation availability of direction " << o << " for flit " << flit << endl;
+		      //if (local_id==1) reservation_table.print();
+
+		      LOG << " checking reservation availability of Output " << o << " Input[" << i << "][" << vc << "] for flit " << flit << endl;
 
 		      if (reservation_table.isAvailable(i,vc,o)) 
 		      {
 			  LOG << " reserving direction " << o << " for flit " << flit << endl;
 			  reservation_table.reserve(i, vc , o);
+			  //if (local_id==1) reservation_table.print();
 		      }
 		      else
 		      {
-			  LOG << " cannot reserve direction " << o << " for flit " << flit << endl;
+			  LOG << " cannot reserve direction " << o << " (Not available) for flit " << flit << endl;
 		      }
 		    }
 		}
@@ -131,20 +173,18 @@ void Router::txProcess()
 	    start_from_vc[i] = (start_from_vc[i]+1)%GlobalParams::n_virtual_channels;
 	}
 
-	    
-	start_from_port = (start_from_port + 1) % (DIRECTIONS + 2);
-
+      start_from_port = (start_from_port + 1) % (DIRECTIONS + 2);
 
       // 2nd phase: Forwarding
       for (int i = 0; i < DIRECTIONS + 2; i++) 
       {
-	  int vc;
-	  int o;
-	  reservation_table.getReservation(i, o, vc);
+	  vector<pair<int,int> > reservations = reservation_table.getReservations(i);
 	  
-	  if (o != NOT_RESERVED) 
+	  if (reservations.size()!=0)
 	  {
-	      reservation_table.updateIndex(o);
+	      int rnd_idx = rand()%reservations.size();
+	      int o = reservations[rnd_idx].first;
+	      int vc = reservations[rnd_idx].second;
 
 	      // e.g., can happen
 	      if (!buffer[i][vc].IsEmpty())  
@@ -155,7 +195,7 @@ void Router::txProcess()
 		  if (current_level_tx[o] == ack_tx[o].read()) 
 		  {
 		      //if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-			  LOG << "Input[" << i << "] forward to Output[" << o << "], flit: " << flit << endl;
+			  LOG << "Input[" << i << "][" << vc << "] forward to Output[" << o << "], flit: " << flit << endl;
 
 		      flit_tx[o].write(flit);
 		      if (o == DIRECTION_HUB)
@@ -168,13 +208,14 @@ void Router::txProcess()
 			  power.r2rLink();
 		      }
 
-		      power.crossBar();
-
 		      current_level_tx[o] = 1 - current_level_tx[o];
+		      if (local_id==0 && o == 1)
+			  LOG << "***APB DEBUG*** DIRECTION " << o << "  Inverting CURRENT_LEVEL_TX  and REQ_TX to " << current_level_tx[o] << endl ;
 		      req_tx[o].write(current_level_tx[o]);
 		      buffer[i][vc].Pop();
 
 		      power.bufferRouterPop();
+		      power.crossBar();
 
 		      // if flit has been consumed
 		      if (flit.dst_id == local_id)
@@ -199,6 +240,9 @@ void Router::txProcess()
 				  local_drained++;
 			      }
 			  }
+
+			if (flit.flit_type == FLIT_TYPE_TAIL)
+			    cout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "DELIVERED " << flit.src_id << " " << flit.dst_id << endl;
 		      } 
 		      else if (i != DIRECTION_LOCAL) 
 		      {
@@ -208,15 +252,19 @@ void Router::txProcess()
 		  }
 		  else
 		  {
-		      LOG << " cannot forward Input[" << i << "] forward to Output[" << o << "], flit: " << flit << endl;
+		      LOG << " APB cannot forward Input[" << i << "][" << vc << "] forward to Output[" << o << "], flit: " << flit << endl;
+		      /*
 		      if (flit.flit_type == FLIT_TYPE_HEAD)
 			  reservation_table.release(i,flit.vc_id,o);
+			  */
 		  }
 	      }
 	  } // if not reserved
-      }
+      } // for loop directions
 
-    }   // loop directions		
+      if ((int)(sc_time_stamp().to_double() / GlobalParams::clock_period_ps)%2==0)
+	  reservation_table.updateIndex();
+    }   
 }
 
 NoP_data Router::getCurrentNoPData()

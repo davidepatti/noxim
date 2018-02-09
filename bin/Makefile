@@ -22,7 +22,7 @@ MODULE := noxim
 
 CXX      := g++
 OPT      := -O3
-DEBUG    := # -g -DDEBUG
+DEBUG    := #-g -DDEBUG
 OTHER    := -Wall -DSC_NO_WRITE_CHECK# -Wno-deprecated
 CXXFLAGS := $(OPT) $(OTHER) $(DEBUG)
 

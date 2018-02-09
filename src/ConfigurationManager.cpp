@@ -167,6 +167,7 @@ void showHelp(char selfname[])
          << "\t-buffer_tt N\tSet the depth of hub buffers to tile [flits]" << endl
          << "\t-buffer_ft N\tSet the depth of hub buffers to tile [flits]" << endl
          << "\t-buffer_antenna N\tSet the depth of hub antenna buffers (RX/TX) [flits]" << endl
+	 << "\t-vc N\tNumber of virtual channels" << endl
          << "\t-winoc enable radio hub wireless transmission" << endl
          << "\t-wirxsleep enable radio hub wireless power manager" << endl
          << "\t-size Nmin Nmax\tSet the minimum and maximum packet size [flits]" << endl
@@ -381,6 +382,8 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		setBufferFromTile(atoi(arg_vet[++i]));
 	    else if (!strcmp(arg_vet[i], "-buffer_antenna"))
 		setBufferAntenna(atoi(arg_vet[++i]));
+	    else if (!strcmp(arg_vet[i], "-vc"))
+		GlobalParams::n_virtual_channels = (atoi(arg_vet[++i]));
 	    else if (!strcmp(arg_vet[i], "-flit"))
 		GlobalParams::flit_size = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-winoc")) 

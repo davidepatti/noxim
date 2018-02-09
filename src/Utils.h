@@ -94,7 +94,7 @@ inline ostream & operator <<(ostream & os, const Flit & flit)
 	    break;
 	}
 
-	os <<  flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << ")";
+	os <<  flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << " VC " << flit.vc_id << ")";
     }
 
     return os;

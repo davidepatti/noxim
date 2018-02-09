@@ -47,14 +47,16 @@ class ReservationTable {
     // Asserts if port_out is not reserved or not valid
     void release(const int port_in, const int vc, const int port_out);
 
-    // Returns the output port and virtual channel connected to port_in.
-    void getReservation(const int port_int, int & port_out, int & vc);
+    // Returns the pairs of output port and virtual channel reserved by port_in
+    vector<pair<int,int> > getReservations(const int port_int);
 
     // update the index of the reservation having highest priority in the current cycle
-    void updateIndex(const int port_out);
+    void updateIndex();
 
     // check whether port_out has no reservations
     bool isNotReserved(const int port_out);
+
+    void print();
 
   private:
 

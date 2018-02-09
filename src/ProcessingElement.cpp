@@ -52,6 +52,8 @@ void ProcessingElement::txProcess()
 		flit_tx->write(flit);	// Send the generated flit
 		current_level_tx = 1 - current_level_tx;	// Negate the old value for Alternating Bit Protocol (ABP)
 		req_tx.write(current_level_tx);
+		if (flit.flit_type == FLIT_TYPE_HEAD)
+		    cout << "INJECTED " << flit.src_id << " " << flit.dst_id << endl;
 	    }
 	}
     }

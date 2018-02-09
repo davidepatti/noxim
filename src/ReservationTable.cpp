@@ -25,29 +25,25 @@ bool ReservationTable::isNotReserved(const int port_out)
 }
 
 
-void ReservationTable::getReservation(const int port_in, int& port_out, int& vc)
+vector<pair<int,int> > ReservationTable::getReservations(const int port_in)
 {
+    vector<pair<int,int> > reservations;
+
     for (int o = 0;o<DIRECTIONS+2;o++)
     {
-	for (int j=0; j<rtable[o].reservations.size(); j++)
+	if (rtable[o].reservations.size()>0)
 	{
-	    int i = (j+rtable[o].index)%rtable[o].reservations.size();
-
+	    int i = rtable[o].index;
 	    if (rtable[o].reservations[i].input == port_in)
-	    {
-		port_out = o;
-		vc = rtable[o].reservations[i].vc;
-		return;
-	    }
+		reservations.push_back(pair<int,int>(o,rtable[o].reservations[i].vc));
 	}
-
     }
-    port_out = NOT_RESERVED;
+    return reservations;
 }
-
 
 bool ReservationTable::isAvailable(const int port_in, const int vc, const int port_out)
 {
+    /*
     for (int i=0;i<DIRECTIONS+2;i++)
     {
 	if (i!=port_out)
@@ -63,7 +59,39 @@ bool ReservationTable::isAvailable(const int port_in, const int vc, const int po
 	    return false;
     
     return true;
+    */
+    /*
+    for (int j=0;j<rtable[port_out].reservations.size();j++)
+    {
+	if (vc==rtable[port_out].reservations[j].vc)
+	    return false;
+    }
+    return true;
+    */
+    for (int j=0;j<rtable[port_out].reservations.size();j++)
+    {
+	if ( (rtable[port_out].reservations[j].input != port_in) ||
+	     (rtable[port_out].reservations[j].input == port_in &&
+	      rtable[port_out].reservations[j].vc == vc) )
+	    return false;
+    }
+    return true;
 }
+
+void ReservationTable::print()
+{
+    for (int o=0;o<DIRECTIONS+2;o++)
+    {
+	cout << o << ": ";
+	for (int i=0;i<rtable[o].reservations.size();i++)
+	{
+	    cout << "<" << rtable[o].reservations[i].input << "," << rtable[o].reservations[i].vc << ">, ";
+	}
+	cout << " | " << rtable[o].index;
+	cout << endl;
+    }
+}
+
 
 void ReservationTable::reserve(const int port_in, const int vc, const int port_out)
 {
@@ -104,9 +132,13 @@ void ReservationTable::release(const int port_in, const int vc, const int port_o
 
 }
 
-void ReservationTable::updateIndex(const int port_out)
+void ReservationTable::updateIndex()
 {
-    rtable[port_out].index = (rtable[port_out].index+1)%(rtable[port_out].reservations.size());
+    for (int o=0;o<DIRECTIONS+2;o++)
+    {
+	if (rtable[o].reservations.size()>0)
+	    rtable[o].index = (rtable[o].index+1)%(rtable[o].reservations.size());
+    }
 }
 
 
