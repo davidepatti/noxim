@@ -373,9 +373,13 @@ void Hub::tileToAntennaProcess()
 	    flag[channel]->write(HOLD_CHANNEL);
 	}
 	
+	TBufferFullStatus empty;
+	memset(empty, sizeof(TBufferFullStatus),0);
+
 	for (int i = 0; i < num_ports; i++) 
 	{
             ack_rx[i]->write(0);
+	    buffer_full_status_rx[i].write(empty);
             current_level_rx[i] = 0;
 	}
 	return;

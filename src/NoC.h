@@ -51,6 +51,7 @@ SC_MODULE(NoC)
     // Signals
     sc_signal_NSWEH<bool> **req;
     sc_signal_NSWEH<bool> **ack;
+    sc_signal_NSWEH<TBufferFullStatus> **buffer_full_status;
     sc_signal_NSWEH<Flit> **flit;
     sc_signal_NSWE<int> **free_slots;
 

@@ -125,6 +125,7 @@ void NoC::buildMesh()
 
     req = new sc_signal_NSWEH<bool>*[dimX];
     ack = new sc_signal_NSWEH<bool>*[dimX];
+    buffer_full_status = new sc_signal_NSWEH<TBufferFullStatus>*[dimX];
     flit = new sc_signal_NSWEH<Flit>*[dimX];
 
     free_slots = new sc_signal_NSWE<int>*[dimX];
@@ -133,6 +134,7 @@ void NoC::buildMesh()
     for (int i=0; i < dimX; i++) {
         req[i] = new sc_signal_NSWEH<bool>[dimY];
         ack[i] = new sc_signal_NSWEH<bool>[dimY];
+	buffer_full_status[i] = new sc_signal_NSWEH<TBufferFullStatus>[dimY];
         flit[i] = new sc_signal_NSWEH<Flit>[dimY];
 
         free_slots[i] = new sc_signal_NSWE<int>[dimY];
@@ -183,46 +185,56 @@ void NoC::buildMesh()
 	    t[i][j]->req_rx[DIRECTION_NORTH] (req[i][j].south);
 	    t[i][j]->flit_rx[DIRECTION_NORTH] (flit[i][j].south);
 	    t[i][j]->ack_rx[DIRECTION_NORTH] (ack[i][j].north);
+	    t[i][j]->buffer_full_status_rx[DIRECTION_NORTH] (buffer_full_status[i][j].north);
 
 	    t[i][j]->req_rx[DIRECTION_EAST] (req[i + 1][j].west);
 	    t[i][j]->flit_rx[DIRECTION_EAST] (flit[i + 1][j].west);
 	    t[i][j]->ack_rx[DIRECTION_EAST] (ack[i + 1][j].east);
+	    t[i][j]->buffer_full_status_rx[DIRECTION_EAST] (buffer_full_status[i+1][j].east);
 
 	    t[i][j]->req_rx[DIRECTION_SOUTH] (req[i][j + 1].north);
 	    t[i][j]->flit_rx[DIRECTION_SOUTH] (flit[i][j + 1].north);
 	    t[i][j]->ack_rx[DIRECTION_SOUTH] (ack[i][j + 1].south);
+	    t[i][j]->buffer_full_status_rx[DIRECTION_SOUTH] (buffer_full_status[i][j+1].south);
 
 	    t[i][j]->req_rx[DIRECTION_WEST] (req[i][j].east);
 	    t[i][j]->flit_rx[DIRECTION_WEST] (flit[i][j].east);
 	    t[i][j]->ack_rx[DIRECTION_WEST] (ack[i][j].west);
+	    t[i][j]->buffer_full_status_rx[DIRECTION_WEST] (buffer_full_status[i][j].west);
 
 	    // Map Tx signals
 	    t[i][j]->req_tx[DIRECTION_NORTH] (req[i][j].north);
 	    t[i][j]->flit_tx[DIRECTION_NORTH] (flit[i][j].north);
 	    t[i][j]->ack_tx[DIRECTION_NORTH] (ack[i][j].south);
+	    t[i][j]->buffer_full_status_tx[DIRECTION_NORTH] (buffer_full_status[i][j].south);
 
 	    t[i][j]->req_tx[DIRECTION_EAST] (req[i + 1][j].east);
 	    t[i][j]->flit_tx[DIRECTION_EAST] (flit[i + 1][j].east);
 	    t[i][j]->ack_tx[DIRECTION_EAST] (ack[i + 1][j].west);
+	    t[i][j]->buffer_full_status_tx[DIRECTION_EAST] (buffer_full_status[i + 1][j].west);
 
 	    t[i][j]->req_tx[DIRECTION_SOUTH] (req[i][j + 1].south);
 	    t[i][j]->flit_tx[DIRECTION_SOUTH] (flit[i][j + 1].south);
 	    t[i][j]->ack_tx[DIRECTION_SOUTH] (ack[i][j + 1].north);
+	    t[i][j]->buffer_full_status_tx[DIRECTION_SOUTH] (buffer_full_status[i][j + 1].north);
 
 	    t[i][j]->req_tx[DIRECTION_WEST] (req[i][j].west);
 	    t[i][j]->flit_tx[DIRECTION_WEST] (flit[i][j].west);
 	    t[i][j]->ack_tx[DIRECTION_WEST] (ack[i][j].east);
+	    t[i][j]->buffer_full_status_tx[DIRECTION_WEST] (buffer_full_status[i][j].east);
 
 	    // TODO: check if hub signal is always required
 	    // signals/port when tile receives(rx) from hub
 	    t[i][j]->hub_req_rx(req[i][j].from_hub);
 	    t[i][j]->hub_flit_rx(flit[i][j].from_hub);
 	    t[i][j]->hub_ack_rx(ack[i][j].to_hub);
+	    t[i][j]->hub_buffer_full_status_rx(buffer_full_status[i][j].to_hub);
 
 	    // signals/port when tile transmits(tx) to hub
 	    t[i][j]->hub_req_tx(req[i][j].to_hub); // 7, sc_out
 	    t[i][j]->hub_flit_tx(flit[i][j].to_hub);
 	    t[i][j]->hub_ack_tx(ack[i][j].from_hub);
+	    t[i][j]->hub_buffer_full_status_tx(buffer_full_status[i][j].from_hub);
 
         // TODO: Review port index. Connect each Hub to all its Channels 
         map<int, int>::iterator it = GlobalParams::hub_for_tile.find(tile_id);
@@ -239,10 +251,12 @@ void NoC::buildMesh()
             hub[hub_id]->req_rx[port](req[i][j].to_hub);
             hub[hub_id]->flit_rx[port](flit[i][j].to_hub);
             hub[hub_id]->ack_rx[port](ack[i][j].from_hub);
+            hub[hub_id]->buffer_full_status_rx[port](buffer_full_status[i][j].from_hub);
 
             hub[hub_id]->flit_tx[port](flit[i][j].from_hub);
             hub[hub_id]->req_tx[port](req[i][j].from_hub);
             hub[hub_id]->ack_tx[port](ack[i][j].to_hub);
+            hub[hub_id]->buffer_full_status_tx[port](buffer_full_status[i][j].to_hub);
         }
 
         // Map buffer level signals (analogy with req_tx/rx port mapping)
@@ -280,7 +294,9 @@ void NoC::buildMesh()
 	tmp_NoP.channel_status_neighbor[i].available = false;
     }
 
+
     // Clear signals for borderline nodes
+
     for (int i = 0; i <= GlobalParams::mesh_dim_x; i++) {
 	req[i][0].south = 0;
 	ack[i][0].north = 0;

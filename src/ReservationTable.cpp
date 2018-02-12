@@ -33,9 +33,10 @@ vector<pair<int,int> > ReservationTable::getReservations(const int port_in)
     {
 	if (rtable[o].reservations.size()>0)
 	{
-	    int i = rtable[o].index;
-	    if (rtable[o].reservations[i].input == port_in)
-		reservations.push_back(pair<int,int>(o,rtable[o].reservations[i].vc));
+	    //int i = rtable[o].index;
+	    for (int i = 0;i<rtable[o].reservations.size();i++)
+		if (rtable[o].reservations[i].input == port_in)
+		    reservations.push_back(pair<int,int>(o,rtable[o].reservations[i].vc));
 	}
     }
     return reservations;

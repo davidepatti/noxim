@@ -42,10 +42,12 @@ SC_MODULE(Hub)
     sc_in<Flit>* flit_rx;
     sc_in<bool>* req_rx;
     sc_out<bool>* ack_rx;
+    sc_out<TBufferFullStatus>* buffer_full_status_rx;
 
     sc_out<Flit>* flit_tx;
     sc_out<bool>* req_tx;	   
     sc_in<bool>* ack_tx;	  
+    sc_in<TBufferFullStatus>* buffer_full_status_tx;
 
     BufferBank* buffer_from_tile;   // Buffer for each port
     BufferBank* buffer_to_tile;     // Buffer for each port
@@ -119,10 +121,12 @@ SC_MODULE(Hub)
         flit_rx = new sc_in<Flit>[num_ports];
         req_rx = new sc_in<bool>[num_ports];
         ack_rx = new sc_out<bool>[num_ports];
+        buffer_full_status_rx = new sc_out<TBufferFullStatus>[num_ports];
 
         flit_tx = new sc_out<Flit>[num_ports];
         req_tx = new sc_out<bool>[num_ports];
         ack_tx = new sc_in<bool>[num_ports];
+        buffer_full_status_tx = new sc_in<TBufferFullStatus>[num_ports];
 
         buffer_from_tile = new BufferBank[num_ports];
         buffer_to_tile = new BufferBank[num_ports];

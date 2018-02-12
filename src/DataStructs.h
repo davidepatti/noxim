@@ -100,6 +100,21 @@ struct NoP_data {
     };
 };
 
+struct TBufferFullStatus {
+    TBufferFullStatus()
+    {
+	for (int i=0;i<MAX_VIRTUAL_CHANNELS;i++)
+	    mask[i] = false;
+    };
+    inline bool operator ==(const TBufferFullStatus & bfs) const {
+	for (int i=0;i<MAX_VIRTUAL_CHANNELS;i++)
+	    if (mask[i] != bfs.mask[i]) return false;
+	return true;
+    };
+   
+    bool mask[MAX_VIRTUAL_CHANNELS];
+};
+
 // Flit -- Flit definition
 struct Flit {
     int src_id;

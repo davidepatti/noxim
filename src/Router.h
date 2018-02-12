@@ -43,10 +43,12 @@ SC_MODULE(Router)
     sc_in <Flit> flit_rx[DIRECTIONS + 2];	  // The input channels 
     sc_in <bool> req_rx[DIRECTIONS + 2];	  // The requests associated with the input channels
     sc_out <bool> ack_rx[DIRECTIONS + 2];	  // The outgoing ack signals associated with the input channels
+    sc_out <TBufferFullStatus> buffer_full_status_rx[DIRECTIONS+2];
 
     sc_out <Flit> flit_tx[DIRECTIONS + 2];   // The output channels
     sc_out <bool> req_tx[DIRECTIONS + 2];	  // The requests associated with the output channels
     sc_in <bool> ack_tx[DIRECTIONS + 2];	  // The outgoing ack signals associated with the output channels
+    sc_in <TBufferFullStatus> buffer_full_status_tx[DIRECTIONS+2];
 
     sc_out <int> free_slots[DIRECTIONS + 1];
     sc_in <int> free_slots_neighbor[DIRECTIONS + 1];
@@ -109,6 +111,9 @@ SC_MODULE(Router)
             cerr << " FATAL: invalid selection strategy -sel " << GlobalParams::selection_strategy << ", check with noxim -help" << endl;
             exit(-1);
         }
+
+
+
     }
 
   private:

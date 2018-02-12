@@ -22,8 +22,7 @@ void Router::rxProcess()
 	// Clear outputs and indexes of receiving protocol
 	for (int i = 0; i < DIRECTIONS + 2; i++) {
 	    ack_rx[i].write(0);
-	    for (int j=0;j<MAX_VIRTUAL_CHANNELS;j++)
-		current_level_rx[i] = 0;
+	    current_level_rx[i] = 0;
 	}
 	routed_flits = 0;
 	local_drained = 0;
@@ -73,10 +72,15 @@ void Router::rxProcess()
 		}
 	    }
 	    ack_rx[i].write(current_level_rx[i]);
+
+	    // updates the mask of VCs to prevent incoming data on full buffers
+	    TBufferFullStatus bfs;
+	    for (int vc=0;vc<GlobalParams::n_virtual_channels;vc++)
+		bfs.mask[vc] = buffer[i][vc].IsFull();
+	    buffer_full_status_rx[i].write(bfs);
 	}
     }
 }
-
 
 void Router::txProcess()
 {
@@ -150,9 +154,8 @@ void Router::txProcess()
 		      route_data.dir_in = i;
 		      route_data.vc_id = flit.vc_id;
 
+		      // TODO: see PER POSTERI (adaptive routing should not recompute route if already reserved)
 		      int o = route(route_data);
-
-		      //if (local_id==1) reservation_table.print();
 
 		      LOG << " checking reservation availability of Output " << o << " Input[" << i << "][" << vc << "] for flit " << flit << endl;
 
@@ -160,7 +163,6 @@ void Router::txProcess()
 		      {
 			  LOG << " reserving direction " << o << " for flit " << flit << endl;
 			  reservation_table.reserve(i, vc , o);
-			  //if (local_id==1) reservation_table.print();
 		      }
 		      else
 		      {
@@ -192,7 +194,8 @@ void Router::txProcess()
 		  // power contribution already computed in 1st phase
 		  Flit flit = buffer[i][vc].Front();
 
-		  if (current_level_tx[o] == ack_tx[o].read()) 
+		  if ( (current_level_tx[o] == ack_tx[o].read()) &&
+		       (buffer_full_status_tx[o].read().mask[vc] == false) ) 
 		  {
 		      //if (GlobalParams::verbose_mode > VERBOSE_OFF) 
 			  LOG << "Input[" << i << "][" << vc << "] forward to Output[" << o << "], flit: " << flit << endl;
@@ -241,8 +244,10 @@ void Router::txProcess()
 			      }
 			  }
 
+			  /*
 			if (flit.flit_type == FLIT_TYPE_TAIL)
 			    cout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "DELIVERED " << flit.src_id << " " << flit.dst_id << endl;
+			    */
 		      } 
 		      else if (i != DIRECTION_LOCAL) 
 		      {
