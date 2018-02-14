@@ -25,6 +25,9 @@ bool ReservationTable::isNotReserved(const int port_out)
 }
 
 
+/* For a given input, returns the set of output/vc reserved from that input.
+ * An index is required for each output entry, to avoid that multiple invokations
+ * with different inputs returns the same output in the same clock cycle. */
 vector<pair<int,int> > ReservationTable::getReservations(const int port_in)
 {
     vector<pair<int,int> > reservations;
@@ -33,50 +36,44 @@ vector<pair<int,int> > ReservationTable::getReservations(const int port_in)
     {
 	if (rtable[o].reservations.size()>0)
 	{
-	    //int i = rtable[o].index;
-	    for (int i = 0;i<rtable[o].reservations.size();i++)
-		if (rtable[o].reservations[i].input == port_in)
-		    reservations.push_back(pair<int,int>(o,rtable[o].reservations[i].vc));
+	    int current_index = rtable[o].index;
+	    if (rtable[o].reservations[current_index].input == port_in)
+		reservations.push_back(pair<int,int>(o,rtable[o].reservations[current_index].vc));
 	}
     }
     return reservations;
 }
 
-bool ReservationTable::isAvailable(const int port_in, const int vc, const int port_out)
+int ReservationTable::checkReservation(const TReservation r, const int port_out)
 {
-    /*
-    for (int i=0;i<DIRECTIONS+2;i++)
+    /* Sanity Check for forbidden table status:
+     * - same input/VC in a different output line */
+    for (int o=0;o<DIRECTIONS+2;o++)
     {
-	if (i!=port_out)
+	for (int i=0;i<rtable[o].reservations.size(); i++)
 	{
-	    for (int j=0;j<rtable[i].reservations.size();j++)
-		if (rtable[i].reservations[j].input==port_in) 
-		    return false;
+	    // In the current implementation this should never happen
+	    if (o!=port_out && rtable[o].reservations[i] == r)
+		assert(false); 
 	}
     }
-
-    for (int j=0;j<rtable[port_out].reservations.size();j++)
-	if (rtable[port_out].reservations[j].vc == vc)
-	    return false;
     
-    return true;
-    */
-    /*
-    for (int j=0;j<rtable[port_out].reservations.size();j++)
+     /* On a given output entry, reservations must differ by VC
+     *  Motivation: they will be interleaved cycle-by-cycle as index moves */
+
+    for (int i=0;i<rtable[port_out].reservations.size(); i++)
     {
-	if (vc==rtable[port_out].reservations[j].vc)
-	    return false;
+	// the reservation is already present
+	if (rtable[port_out].reservations[i] == r)
+	    return RT_ALREADY;
+
+	// the same VC for that output has been reserved by another input
+	if (rtable[port_out].reservations[i].input != r.input &&
+	    rtable[port_out].reservations[i].vc == r.vc)
+	    return RT_OUTVC_BUSY;
     }
-    return true;
-    */
-    for (int j=0;j<rtable[port_out].reservations.size();j++)
-    {
-	if ( (rtable[port_out].reservations[j].input != port_in) ||
-	     (rtable[port_out].reservations[j].input == port_in &&
-	      rtable[port_out].reservations[j].vc == vc) )
-	    return false;
-    }
-    return true;
+    return RT_AVAILABLE;
+
 }
 
 void ReservationTable::print()
@@ -94,15 +91,11 @@ void ReservationTable::print()
 }
 
 
-void ReservationTable::reserve(const int port_in, const int vc, const int port_out)
+void ReservationTable::reserve(const TReservation r, const int port_out)
 {
     // reservation of reserved/not valid ports is illegal. Correctness
     // should be assured by ReservationTable users
-    assert(isAvailable(port_in,vc, port_out));
-
-    TReservation r;
-    r.input = port_in;
-    r.vc = vc;
+    assert(checkReservation(r, port_out)==RT_AVAILABLE);
 
     // TODO: a better policy could insert in a specific position as far a possible
     // from the current index
@@ -110,13 +103,13 @@ void ReservationTable::reserve(const int port_in, const int vc, const int port_o
 
 }
 
-void ReservationTable::release(const int port_in, const int vc, const int port_out)
+void ReservationTable::release(const TReservation r, const int port_out)
 {
 
     for (vector<TReservation>::iterator i=rtable[port_out].reservations.begin(); 
 	    i != rtable[port_out].reservations.end(); i++)
     {
-	if (i->input == port_in && i->vc == vc)
+	if (*i == r)
 	{
 	    rtable[port_out].reservations.erase(i);
 	    int removed_index = i - rtable[port_out].reservations.begin();
@@ -130,7 +123,7 @@ void ReservationTable::release(const int port_in, const int vc, const int port_o
 	    return;
 	}
     }
-
+    assert(false); //trying to release a never made reservation  ?
 }
 
 void ReservationTable::updateIndex()

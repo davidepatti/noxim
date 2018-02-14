@@ -19,10 +19,12 @@ void Router::process()
 void Router::rxProcess()
 {
     if (reset.read()) {
+	TBufferFullStatus bfs;
 	// Clear outputs and indexes of receiving protocol
 	for (int i = 0; i < DIRECTIONS + 2; i++) {
 	    ack_rx[i].write(0);
 	    current_level_rx[i] = 0;
+	    buffer_full_status_rx[i].write(bfs);
 	}
 	routed_flits = 0;
 	local_drained = 0;
@@ -31,14 +33,9 @@ void Router::rxProcess()
 	//
 	// This process simply sees a flow of incoming flits. All arbitration
 	// and wormhole related issues are addressed in the txProcess()
-	/*
-        if (local_id==1)
-	  LOG << "***APB DEBUG*** DIRECTION " << 3 << " CURRENT_LEVEL_RX: " << current_level_rx[3]<< ", ACK_RX: " <<  ack_rx[3].read() << endl;
-	  */
 
 	for (int i = 0; i < DIRECTIONS + 2; i++) {
 	    // To accept a new flit, the following conditions must match:
-	    //
 	    // 1) there is an incoming request
 	    // 2) there is a free slot in the input buffer of direction i
 
@@ -49,7 +46,6 @@ void Router::rxProcess()
 
 		if (!buffer[i][vc].IsFull()) 
 		{
-
 		    // Store the incoming flit in the circular buffer
 		    buffer[i][vc].Push(received_flit);
 
@@ -59,17 +55,16 @@ void Router::rxProcess()
 
 		    // Negate the old value for Alternating Bit Protocol (ABP)
 		    current_level_rx[i] = 1 - current_level_rx[i];
-		    /*
-		    if (local_id==1 && i==3)
-			  LOG << "***APB DEBUG*** DIRECTION " << i << "  Inverting CURRENT_LEVEL_RX  and ACK_RX to " << current_level_rx[i] << endl ;
-			  */
-		    //LOG << "*** APB DEBUG *** Inverting CURRENT_LEVEL to " << current_level_rx[i] ;
-
 
 		    // if a new flit is injected from local PE
 		    if (received_flit.src_id == local_id)
 		      power.networkInterface();
 		}
+
+		else 
+		    // should not happen with the new TBufferFullStatus control signals
+		    // except for flit coming from local PE, which don't use it 
+		    assert(i== DIRECTION_LOCAL);
 	    }
 	    ack_rx[i].write(current_level_rx[i]);
 
@@ -96,36 +91,6 @@ void Router::txProcess()
     } 
   else 
     {
- 
-	/*
-      if (local_id==0)
-	  cout << " ------------------------------------------------- buffers " << endl;
-
-      if (local_id==0)
-      {
-	  cout << "buffer 0" << endl;
-	  for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
-	      buffer[4][k].Print();
-      }
-      if (local_id==1)
-      {
-	  cout << "buffer 1 WEST" << endl;
-	  for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
-	      buffer[3][k].Print();
-	  cout << "buffer 1 EST" << endl;
-	  for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
-	      buffer[1][k].Print();
-      }
-      if (local_id==5)
-      {
-	  cout << "buffer 5" << endl;
-	  for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
-	      buffer[0][k].Print();
-      }
-      */
-
-      //if (local_id==0) LOG << "***APB DEBUG*** DIRECTION " << 1 << " CURRENT_LEVEL_TX: " << current_level_tx[1]<< ", ACK_TX: " <<  ack_tx[1].read() << endl;
-
       // 1st phase: Reservation
       for (int j = 0; j < DIRECTIONS + 2; j++) 
 	{
@@ -157,20 +122,30 @@ void Router::txProcess()
 		      // TODO: see PER POSTERI (adaptive routing should not recompute route if already reserved)
 		      int o = route(route_data);
 
+		      TReservation r;
+		      r.input = i;
+		      r.vc = vc;
+
 		      LOG << " checking reservation availability of Output " << o << " Input[" << i << "][" << vc << "] for flit " << flit << endl;
 
-		      if (reservation_table.isAvailable(i,vc,o)) 
+		      int rt_status = reservation_table.checkReservation(r,o);
+
+		      if (rt_status == RT_AVAILABLE) 
 		      {
 			  LOG << " reserving direction " << o << " for flit " << flit << endl;
-			  reservation_table.reserve(i, vc , o);
+			  reservation_table.reserve(r, o);
 		      }
-		      else
+		      else if (rt_status == RT_ALREADY)
 		      {
-			  LOG << " cannot reserve direction " << o << " (Not available) for flit " << flit << endl;
+			  LOG << " RT_ALREADY reserved direction " << o << " for flit " << flit << endl;
 		      }
+		      else if (rt_status == RT_OUTVC_BUSY)
+		      {
+			  LOG << " RT_OUTVC_BUSY reservation direction " << o << " for flit " << flit << endl;
+		      }
+		      else assert(false); // no meaningful status here
 		    }
 		}
-
 	  }
 	    start_from_vc[i] = (start_from_vc[i]+1)%GlobalParams::n_virtual_channels;
 	}
@@ -185,10 +160,11 @@ void Router::txProcess()
 	  if (reservations.size()!=0)
 	  {
 	      int rnd_idx = rand()%reservations.size();
+
 	      int o = reservations[rnd_idx].first;
 	      int vc = reservations[rnd_idx].second;
 
-	      // e.g., can happen
+	      // can happen
 	      if (!buffer[i][vc].IsEmpty())  
 	      {
 		  // power contribution already computed in 1st phase
@@ -198,42 +174,36 @@ void Router::txProcess()
 		       (buffer_full_status_tx[o].read().mask[vc] == false) ) 
 		  {
 		      //if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-			  LOG << "Input[" << i << "][" << vc << "] forward to Output[" << o << "], flit: " << flit << endl;
+		      LOG << "Input[" << i << "][" << vc << "] forwarded to Output[" << o << "], flit: " << flit << endl;
 
 		      flit_tx[o].write(flit);
-		      if (o == DIRECTION_HUB)
-		      {
-			  power.r2hLink();
-			  LOG << "Forwarding to HUB " << flit << endl;
-		      }
-		      else
-		      {
-			  power.r2rLink();
-		      }
-
 		      current_level_tx[o] = 1 - current_level_tx[o];
-		      if (local_id==0 && o == 1)
-			  LOG << "***APB DEBUG*** DIRECTION " << o << "  Inverting CURRENT_LEVEL_TX  and REQ_TX to " << current_level_tx[o] << endl ;
 		      req_tx[o].write(current_level_tx[o]);
 		      buffer[i][vc].Pop();
+
+
+		      if (flit.flit_type == FLIT_TYPE_TAIL)
+		      {
+			  TReservation r;
+			  r.input = i;
+			  r.vc = vc;
+			  reservation_table.release(r,o);
+		      }
+
+		      /* Power & Stats ------------------------------------------------- */
+		      if (o == DIRECTION_HUB) power.r2hLink();
+		      else
+			  power.r2rLink();
 
 		      power.bufferRouterPop();
 		      power.crossBar();
 
-		      // if flit has been consumed
-		      if (flit.dst_id == local_id)
-			  power.networkInterface();
-
-		      if (flit.flit_type == FLIT_TYPE_TAIL)
-			  reservation_table.release(i,vc,o);
-
-		      // Update stats
 		      if (o == DIRECTION_LOCAL) 
 		      {
+			  power.networkInterface();
 			  LOG << "Consumed flit " << flit << endl;
 			  stats.receivedFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, flit);
-			  if (GlobalParams::
-				  max_volume_to_be_drained) 
+			  if (GlobalParams:: max_volume_to_be_drained) 
 			  {
 			      if (drained_volume >= GlobalParams:: max_volume_to_be_drained)
 				  sc_stop();
@@ -243,17 +213,10 @@ void Router::txProcess()
 				  local_drained++;
 			      }
 			  }
-
-			  /*
-			if (flit.flit_type == FLIT_TYPE_TAIL)
-			    cout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "DELIVERED " << flit.src_id << " " << flit.dst_id << endl;
-			    */
 		      } 
-		      else if (i != DIRECTION_LOCAL) 
-		      {
-			  // Increment routed flits counter
+		      else if (i != DIRECTION_LOCAL) // not generated locally
 			  routed_flits++;
-		      }
+		      /* End Power & Stats ------------------------------------------------- */
 		  }
 		  else
 		  {
@@ -321,20 +284,16 @@ vector < int > Router::routingFunction(const RouteData & route_data)
                 !sameRadioHub(local_id,route_data.dst_id)
            )
         {
-	    // check incoming direction for deadlock avoidance
-
-	    //if (route_data.dir_in!=DIRECTION_NORTH 
-	    //&& route_data.dir_in!=DIRECTION_SOUTH) 
-	    //{
-		LOG << "Setting direction HUB to reach destination node " << route_data.dst_id << endl;
+		if (GlobalParams::verbose_mode > VERBOSE_OFF) 
+		    LOG << "Setting direction HUB to reach destination node " << route_data.dst_id << endl;
 
 		vector<int> dirv;
 		dirv.push_back(DIRECTION_HUB);
 		return dirv;
-	    //}
         }
     }
-    LOG << "Wired routing for dst = " << route_data.dst_id << endl;
+    if (GlobalParams::verbose_mode > VERBOSE_OFF) 
+	LOG << "Wired routing for dst = " << route_data.dst_id << endl;
 
     return routingAlgorithm->route(this, route_data);
 }

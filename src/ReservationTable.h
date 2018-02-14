@@ -18,11 +18,15 @@
 using namespace std;
 
 
-typedef struct Reservation
+struct TReservation
 {
     int input;
     int vc;
-} TReservation;
+    inline bool operator ==(const TReservation & r) const
+    {
+	return (r.input==input && r.vc == vc);
+    }
+};
 
 typedef struct RTEntry
 {
@@ -37,15 +41,15 @@ class ReservationTable {
 
     inline string name() const {return "ReservationTable";};
 
-    // check if port_out is reservable
-    bool isAvailable(const int port_in, const int vc, const int port_out);
+    // check if the input/vc/output is a
+    int checkReservation(const TReservation r, const int port_out);
 
     // Connects port_in with port_out. Asserts if port_out is reserved
-    void reserve(const int port_in, const int vc, const int port_out);
+    void reserve(const TReservation r, const int port_out);
 
     // Releases port_out connection. 
     // Asserts if port_out is not reserved or not valid
-    void release(const int port_in, const int vc, const int port_out);
+    void release(const TReservation r, const int port_out);
 
     // Returns the pairs of output port and virtual channel reserved by port_in
     vector<pair<int,int> > getReservations(const int port_int);
