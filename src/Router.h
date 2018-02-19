@@ -111,9 +111,6 @@ SC_MODULE(Router)
             cerr << " FATAL: invalid selection strategy -sel " << GlobalParams::selection_strategy << ", check with noxim -help" << endl;
             exit(-1);
         }
-
-
-
     }
 
   private:

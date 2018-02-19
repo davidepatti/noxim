@@ -28,9 +28,9 @@ void Router::rxProcess()
 	}
 	routed_flits = 0;
 	local_drained = 0;
-    } else {
-	// For each port decide if a new flit can be accepted
-	//
+    } 
+    else 
+    {
 	// This process simply sees a flow of incoming flits. All arbitration
 	// and wormhole related issues are addressed in the txProcess()
 
@@ -180,7 +180,6 @@ void Router::txProcess()
 		      current_level_tx[o] = 1 - current_level_tx[o];
 		      req_tx[o].write(current_level_tx[o]);
 		      buffer[i][vc].Pop();
-
 
 		      if (flit.flit_type == FLIT_TYPE_TAIL)
 		      {
@@ -370,6 +369,8 @@ void Router::configure(const int _id,
 
     if (grt.isValid())
 	routing_table.configure(grt, _id);
+
+    reservation_table.setSize(DIRECTIONS+2);
 
     for (int i = 0; i < DIRECTIONS + 2; i++)
     {

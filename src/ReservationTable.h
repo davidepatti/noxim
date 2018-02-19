@@ -60,12 +60,14 @@ class ReservationTable {
     // check whether port_out has no reservations
     bool isNotReserved(const int port_out);
 
+    void setSize(const int n_outputs);
+
     void print();
 
   private:
 
-     TRTEntry rtable[DIRECTIONS+2];	// reservation vector: rtable[i] gives a RTEntry containing the set of input/VC 
-                                        // which reserved output port i
+     TRTEntry *rtable;	// reservation vector: rtable[i] gives a RTEntry containing the set of input/VC 
+			// which reserved output port i
 };
 
 #endif

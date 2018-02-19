@@ -12,7 +12,13 @@
 
 ReservationTable::ReservationTable()
 {
-    for (int i=0;i<DIRECTIONS+2;i++)
+}
+
+void ReservationTable::setSize(const int size)
+{
+    rtable = new TRTEntry[size];
+
+    for (int i=0;i<size;i++)
     {
 	rtable[i].index = 0;
 	rtable[i].reservations.clear();
@@ -73,7 +79,6 @@ int ReservationTable::checkReservation(const TReservation r, const int port_out)
 	    return RT_OUTVC_BUSY;
     }
     return RT_AVAILABLE;
-
 }
 
 void ReservationTable::print()
@@ -93,6 +98,8 @@ void ReservationTable::print()
 
 void ReservationTable::reserve(const TReservation r, const int port_out)
 {
+    // IMPORTANT: problem when used by Hub with more connections
+    //
     // reservation of reserved/not valid ports is illegal. Correctness
     // should be assured by ReservationTable users
     assert(checkReservation(r, port_out)==RT_AVAILABLE);

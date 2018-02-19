@@ -17,6 +17,7 @@ void NoC::buildMesh()
     token_ring->clock(clock);
     token_ring->reset(reset);
 
+
     char channel_name[16];
     for (map<int, ChannelConfig>::iterator it = GlobalParams::channel_configuration.begin();
             it != GlobalParams::channel_configuration.end();
@@ -33,6 +34,7 @@ void NoC::buildMesh()
             ++it)
     {
         int hub_id = it->first;
+	LOG << " hub id " <<  hub_id;
         HubConfig hub_config = it->second;
 
         sprintf(hub_name, "Hub_%d", hub_id);
@@ -91,7 +93,6 @@ void NoC::buildMesh()
 	}
 	else
 	    data_rate_gbs = NOT_VALID;
-
 
 	// TODO: update power model (configureHub to support different
 	// tx/tx buffer depth

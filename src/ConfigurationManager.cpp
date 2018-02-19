@@ -349,6 +349,11 @@ void checkConfiguration()
 	     << "GlobalParams.h and compile again " << endl;
 	exit(1);
     }
+    if (GlobalParams::n_virtual_channels>1 && GlobalParams::use_powermanager)
+    {
+	cerr << "Error: Power manager (-wirxsleep) option only supports a single virtual channel" << endl;
+	exit(1);
+    }
 }
 
 void parseCmdLine(int arg_num, char *arg_vet[])

@@ -24,7 +24,6 @@ int Hub::route(Flit& f)
 	    return tile2Port(f.dst_id);
 	}
     }
-
     return DIRECTION_WIRELESS;
 
 }
@@ -32,16 +31,18 @@ int Hub::route(Flit& f)
 
 void Hub::rxPowerManager()
 {
-    /*
     // Check wheter accounting or not buffer to tile leakage 
     // For each port, two poweroff condition should be checked:
     // - the buffer to tile is empty
     // - it has not been reserved
 
+    // currently only supported without VC
+    assert(GlobalParams::n_virtual_channels==1);
+
     for (int port=0;port<num_ports;port++)
     {
-	if (!buffer_to_tile[port][TODO_VC].IsEmpty() || 
-	    !antenna2tile_reservation_table.isAvailable(port))
+	if (!buffer_to_tile[port][DEFAULT_VC].IsEmpty() || 
+	    antenna2tile_reservation_table.isNotReserved(port))
 		power.leakageBufferToTile();
 
 	else
@@ -74,10 +75,7 @@ void Hub::rxPowerManager()
 	power.leakageTransceiverRx();
 	power.biasingRx();
     }
-
-    */ // LAVORI
 }
-
 
 
 void Hub::updateRxPower()
@@ -104,15 +102,13 @@ void Hub::updateRxPower()
 
 void Hub::txPowerManager()
 {
-    /*
     for (unsigned int i=0;i<txChannels.size();i++)
     {
 	// check if not empty or reserved
 	if (!init[i]->buffer_tx.IsEmpty() || 
-	    !tile2antenna_reservation_table.isAvailable(i) )
+	    tile2antenna_reservation_table.isNotReserved(i) )
 	{
 	    power.leakageAntennaBuffer();
-
 	    // check the second condition for turning off analog tx
 	    if (power.isSleeping())
 	    {
@@ -132,7 +128,6 @@ void Hub::txPowerManager()
 	    total_ttxoff_cycles++;
 	}
     }
-    */ // LAVORI
 }
 
 void Hub::updateTxPower()
@@ -161,7 +156,6 @@ void Hub::txRadioProcessTokenPacket(int channel)
     if (flag[channel]->read()==RELEASE_CHANNEL)
 	flag[channel]->write(HOLD_CHANNEL);
 	*/
-
     if (current_token_holder[channel]->read() == local_id
 	&& flag[channel]->read()!=RELEASE_CHANNEL)
     {
@@ -173,8 +167,9 @@ void Hub::txRadioProcessTokenPacket(int channel)
 	    if (flit.flit_type == FLIT_TYPE_HEAD) 
 		transmission_in_progress = true;
 
-	    //flag[channel]->write(HOLD_CHANNEL);
-	    LOG << "Requesting transmission transmission of flit " << flit << " on channel " << channel << endl;
+	    // TODO: check whether it would make sense to use transmission_in_progress to
+	    // avoid multiple notify()
+	    LOG << "Requesting transmission of flit " << flit << " on channel " << channel << endl;
 	    init[channel]->start_request_event.notify();
 
 	    if (is_tail)
@@ -194,7 +189,6 @@ void Hub::txRadioProcessTokenPacket(int channel)
 	    }
 	    else
 		LOG << "TOKEN_PACKET: Buffer_tx empty, but trasmission in progress: holding token for channel " << channel << endl;
-
 	}
     }
 }
@@ -209,7 +203,6 @@ void Hub::txRadioProcessTokenHold(int channel)
 	if (!init[channel]->buffer_tx.IsEmpty())
 	{
 	    //LOG << "Token holder for channel " << channel << " with not empty buffer_tx" << endl;
-
 	    if (current_token_expiration[channel]->read() < flit_transmission_cycles[channel])
 	    {
 		//LOG << "TOKEN_HOLD policy: Not enough token expiration time for sending channel " << channel << endl;
@@ -259,11 +252,8 @@ void Hub::txRadioProcessTokenMaxHold(int channel)
     }
 }
 
-
-
 void Hub::antennaToTileProcess()
 {
-    /* LAVORI
     if (reset.read()) 
     {
         for (int i = 0; i < num_ports; i++) 
@@ -278,36 +268,49 @@ void Hub::antennaToTileProcess()
     // The rxPowerManager must perform its checks before the flits are removed from buffers
     updateRxPower();
     
+    // Moves a flit from buffer_to_tile to the appropriate signal_tx, depending on the destination node
+    // No routing required: each port is associated to a prefixed tile
     for (int i = 0; i < num_ports; i++) 
     {
-	if (!buffer_to_tile[i][TODO_VC].IsEmpty()) 
-	{     
-	    Flit flit = buffer_to_tile[i][TODO_VC].Front();
+	// TODO: check blocking channel (like the blocking single signal ?)
+	for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
+	{
+	    int vc = (start_from_vc[i]+k)%(GlobalParams::n_virtual_channels);
 
-	    if (current_level_tx[i] == ack_tx[i].read())
-	    {
-		LOG << "Flit " << flit << " moved from buffer_to_tile[" << i <<"][" << TODO_VC << "] to signal flit_tx["<<i<<"] " << endl;
+	    if (!buffer_to_tile[i][vc].IsEmpty()) 
+	    {     
+		Flit flit = buffer_to_tile[i][vc].Front();
 
-		flit_tx[i].write(flit);
-		current_level_tx[i] = 1 - current_level_tx[i];
-		req_tx[i].write(current_level_tx[i]);
+		LOG << "Flit " << flit << " found on buffer_to_tile[" << i <<"][" << vc << "] " << endl;
+		if (current_level_tx[i] == ack_tx[i].read() &&
+			buffer_full_status_tx[i].read().mask[vc] == false)
+		{
+		    LOG << "Flit " << flit << " moved from buffer_to_tile[" << i <<"][" << vc << "] to signal flit_tx["<<i<<"] " << endl;
 
-		buffer_to_tile[i][TODO_VC].Pop();
-		power.bufferToTilePop();
-		power.r2hLink();
-	    } //if buffer not empty
-	    else
-	    {
-		LOG << "Flit " << flit << " cannot move from buffer_to_tile[" << i <<"] [" << TODO_VC << "] to signal flit_tx["<<i<<"] " << endl;
-	    }
+		    flit_tx[i].write(flit);
+		    current_level_tx[i] = 1 - current_level_tx[i];
+		    req_tx[i].write(current_level_tx[i]);
+
+		    buffer_to_tile[i][vc].Pop();
+		    power.bufferToTilePop();
+		    power.r2hLink();
+		    break; // port flit transmitted, skip remaining VCs
+		} 
+		else
+		{
+		    LOG << "Flit " << flit << " cannot move from buffer_to_tile[" << i <<"] [" << vc << "] to signal flit_tx["<<i<<"] " << endl;
+		}
+	    }//if buffer not empty
 	}
+	start_from_vc[i] = (start_from_vc[i]+1)%GlobalParams::n_virtual_channels;
     }
 
-    // stores routing decision
-    // need a vector to use this info to choose between the two
-    // tables
+    // Move a flit from antenna buffer_rx to the appropriate buffer_to_tile.
+    //
+    // Two different phases:
+    // 1) stores routing decision about the incoming flit (e.g., to which output port)
+    // 2) Moves the flits removing from antenna buffer_rx
     int * r = new int[rxChannels.size()];
-
 
     for (unsigned int i=0;i<rxChannels.size();i++)
     {
@@ -328,30 +331,27 @@ void Hub::antennaToTileProcess()
 	if (!(target[channel]->buffer_rx.IsEmpty()))
 	{
 	    Flit received_flit = target[channel]->buffer_rx.Front();
+	    int vc = received_flit.vc_id;
 	    power.antennaBufferFront();
 
-	    if ( !buffer_to_tile[r[i]][TODO_VC].IsFull() ) 
+	    if ( !buffer_to_tile[r[i]][vc].IsFull() ) 
 	    {
 		target[channel]->buffer_rx.Pop();
 		power.antennaBufferPop();
-		LOG << "Moving flit  " << received_flit << " from buffer_rx to buffer_to_tile, port [" << r[i] <<"][" << TODO_VC << "]" << endl;
+		LOG << "Moving flit  " << received_flit << " from buffer_rx to buffer_to_tile, port [" << r[i] <<"][" << vc << "]" << endl;
 
-		buffer_to_tile[r[i]][TODO_VC].Push(received_flit);
+		buffer_to_tile[r[i]][vc].Push(received_flit);
 		power.bufferToTilePush();
 	    }
 	    else 
-		LOG << "WARNING, buffer full for port " << r[i] << endl;
+		LOG << "WARNING, buffer full for port " << r[i] << " VC " << vc << endl;
 
 	}
     }
-*/
 }
-
 
 void Hub::tileToAntennaProcess()
 {
-    /*
-     
    // double cycle = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
    // if (cycle > 0 && cycle < 58428)
    // {
@@ -373,13 +373,11 @@ void Hub::tileToAntennaProcess()
 	    flag[channel]->write(HOLD_CHANNEL);
 	}
 	
-	TBufferFullStatus empty;
-	memset(empty, sizeof(TBufferFullStatus),0);
-
+	TBufferFullStatus bfs;
 	for (int i = 0; i < num_ports; i++) 
 	{
             ack_rx[i]->write(0);
-	    buffer_full_status_rx[i].write(empty);
+	    buffer_full_status_rx[i].write(bfs);
             current_level_rx[i] = 0;
 	}
 	return;
@@ -401,88 +399,124 @@ void Hub::tileToAntennaProcess()
 	assert(false);
     }
 
-
     int last_reserved = NOT_VALID;
 
-
-    int * r_from_tile = new int[num_ports];
+    // used to store routing decisions
+    int * r_from_tile[num_ports];
+    for (int i=0;i<num_ports;i++)
+	r_from_tile[i] = new int[GlobalParams::n_virtual_channels];
 
     // 1st phase: Reservation
     for (int j = 0; j < num_ports; j++) 
     {
 	int i = (start_from_port + j) % (num_ports);
 
-	if (!buffer_from_tile[i][TODO_VC].IsEmpty()) 
+	for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
 	{
-	    LOG << "Reservation: buffer_from_tile not empty on port " << i << endl;
+	    int vc = (start_from_vc[i]+k)%(GlobalParams::n_virtual_channels);
 
-	    Flit flit = buffer_from_tile[i][TODO_VC].Front();
-	    power.bufferFromTileFront();
-	    r_from_tile[i] = route(flit);
-
-	    if (flit.flit_type == FLIT_TYPE_HEAD) 
+	    if (!buffer_from_tile[i][vc].IsEmpty()) 
 	    {
-		assert(r_from_tile[i]==DIRECTION_WIRELESS);
-		int channel = selectChannel(local_id,tile2Hub(flit.dst_id));
+		LOG << "Reservation: buffer_from_tile[" << i <<"][" << vc << "] not empty " << endl;
 
-		assert(channel!=NOT_VALID && "hubs are not connected by any channel");
+		Flit flit = buffer_from_tile[i][vc].Front();
 
-		if (tile2antenna_reservation_table.isAvailable(channel)) 
+		assert(flit.vc_id == vc);
+
+		power.bufferFromTileFront();
+		r_from_tile[i][vc] = route(flit);
+
+		if (flit.flit_type == FLIT_TYPE_HEAD) 
 		{
-		    tile2antenna_reservation_table.reserve(i, channel);
-		    last_reserved = i;
-		}
-		else
-		{
-		    LOG << "Reservation:  wireless channel " << channel << " not available ..." << endl;
-		}
+		    TReservation r;
+		    r.input = i;
+		    r.vc = vc;
 
+		    assert(r_from_tile[i][vc]==DIRECTION_WIRELESS);
+		    int channel = selectChannel(local_id,tile2Hub(flit.dst_id));
+
+		    assert(channel!=NOT_VALID && "hubs are not connected by any channel");
+
+		    LOG << " checking reservation availability of Channel " << channel << " by Input[" << i << "][" << vc << "] for flit " << flit << endl;
+
+		    int rt_status = tile2antenna_reservation_table.checkReservation(r,channel);
+
+		    if (rt_status == RT_AVAILABLE) 
+		    {
+			LOG << "Reservation of channel " << channel << " from Hub Input port["<< i << "]["<<vc<<"] by flit " << flit << endl;
+			tile2antenna_reservation_table.reserve(r, channel);
+		    }
+		    else if (rt_status == RT_ALREADY)
+		    {
+			LOG << " RT_ALREADY reserved channel " << channel << " for flit " << flit << endl;
+		    }
+		    else if (rt_status == RT_OUTVC_BUSY)
+		    {
+			LOG << " RT_OUTVC_BUSY reservation for channel " << channel << " for flit " << flit << endl;
+		    }
+		    else assert(false); // no meaningful status here
+		}
 	    }
-	}
+	} 
+	start_from_vc[i] = (start_from_vc[i]+1)%GlobalParams::n_virtual_channels;
+    } // for num_ports
 
-    }
-
-    if (last_reserved!=NOT_VALID) start_from_port = (last_reserved+1)%num_ports;
+    if (last_reserved!=NOT_VALID) 
+	start_from_port = (last_reserved+1)%num_ports;
 
     // 2nd phase: Forwarding
     for (int i = 0; i < num_ports; i++) 
     {
-	if (!buffer_from_tile[i][TODO_VC].IsEmpty()) 
-	{     
-	    Flit flit = buffer_from_tile[i][TODO_VC].Front();
-	    // powerFront already accounted in 1st phase
+	  vector<pair<int,int> > reservations = tile2antenna_reservation_table.getReservations(i);
+	  
+	  if (reservations.size()!=0)
+	  {
+	      int rnd_idx = rand()%reservations.size();
 
-	    assert(r_from_tile[i] == DIRECTION_WIRELESS);
+	      int o = reservations[rnd_idx].first;
+	      int vc = reservations[rnd_idx].second;
 
-	    int channel = tile2antenna_reservation_table.getOutputPort(i);
+	      if (!buffer_from_tile[i][vc].IsEmpty()) 
+	      {     
+		  Flit flit = buffer_from_tile[i][vc].Front();
+		  // powerFront already accounted in 1st phase
 
-	    if (channel != NOT_RESERVED) 
-	    {
-		if (!(init[channel]->buffer_tx.IsFull()) )
-		{
-		    buffer_from_tile[i][TODO_VC].Pop();
-		    power.bufferFromTilePop();
-		    init[channel]->buffer_tx.Push(flit);
-		    power.antennaBufferPush();
-		    if (flit.flit_type == FLIT_TYPE_TAIL) 
-			tile2antenna_reservation_table.release(channel);
+		  assert(r_from_tile[i][vc] == DIRECTION_WIRELESS);
 
-		    LOG << "Flit " << flit << " moved from buffer_from_tile["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
-		}
-		else
-		{
-		    LOG << "Buffer Full: Cannot move flit " << flit << " from buffer_from_tile["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
-		    //init[channel]->buffer_tx.Print();
-		}
+		  int channel =  o;
 
-	    }
-	    else
-	    {
-		LOG << "Forwarding: No channel reserved for port direction " << i << ", flit " << flit << endl;
-	    }
-	}
+		  if (channel != NOT_RESERVED) 
+		  {
+		      if (!(init[channel]->buffer_tx.IsFull()) )
+		      {
+			  buffer_from_tile[i][vc].Pop();
+			  power.bufferFromTilePop();
+			  init[channel]->buffer_tx.Push(flit);
+			  power.antennaBufferPush();
+			  if (flit.flit_type == FLIT_TYPE_TAIL) 
+			  {
+			      TReservation r;
+			      r.input = i;
+			      r.vc = vc;
+			      tile2antenna_reservation_table.release(r,channel);
+			  }
 
-    }// for all the ports
+			  LOG << "Flit " << flit << " moved from buffer_from_tile["<<i<<"]["<<vc<<"]  to buffer_tx["<<channel<<"] " << endl;
+		      }
+		      else
+		      {
+			  LOG << "Buffer Full: Cannot move flit " << flit << " from buffer_from_tile["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
+			  //init[channel]->buffer_tx.Print();
+		      }
+		  }
+		  else
+		  {
+		      LOG << "Forwarding: No channel reserved for input port [" << i << "][" << vc << "], flit " << flit << endl;
+		  }
+	      }
+
+	}// for all the ports
+    }
 
     for (int i = 0; i < num_ports; i++) 
     {
@@ -495,30 +529,34 @@ void Hub::tileToAntennaProcess()
 	if (req_rx[i]->read() == 1 - current_level_rx[i]) 
 	{
 	    Flit received_flit = flit_rx[i]->read();
-	    if (!buffer_from_tile[i][TODO_VC].IsFull())
+	    int vc = received_flit.vc_id;
+	    LOG << "Reading " << received_flit << " from signal flit_rx[" << i << "]" << endl;
+
+	    if (!buffer_from_tile[i][vc].IsFull())
 	    {
+		LOG << "Storing " << received_flit << " on buffer_from_tile[" << i << "][" << vc << "]" << endl;
 
-		LOG << "Reading flit " << received_flit << " on port " << i << endl;
-
-		buffer_from_tile[i][TODO_VC].Push(received_flit);
+		buffer_from_tile[i][vc].Push(received_flit);
 		power.bufferFromTilePush();
 
 		current_level_rx[i] = 1 - current_level_rx[i];
 	    }
 	    else
 	    {
-		LOG << "Buffer full: Cannot store " << received_flit << " on port " << i << endl;
+		LOG << "Cannot store " << received_flit << " on buffer_from_tile[" << i << "][" << vc << "] (IsFull)" << endl;
 		//buffer_from_tile[i][TODO_VC].Print();
 	    }
-
-
 	}
 	ack_rx[i]->write(current_level_rx[i]);
+	// updates the mask of VCs to prevent incoming data on full buffers
+	TBufferFullStatus bfs;
+	for (int vc=0;vc<GlobalParams::n_virtual_channels;vc++)
+	    bfs.mask[vc] = buffer_from_tile[i][vc].IsFull();
+	buffer_full_status_rx[i].write(bfs);
     }
 
     // IMPORTANT: do not move from here
     // The txPowerManager assumes that all flit buffer write have been done
     updateTxPower();
-    */ //LAVORI
 }
 

@@ -68,9 +68,10 @@ SC_MODULE(Hub)
     map<int, int> tile2hub_mapping;
 
     int start_from_port; // Port from which to start the reservation cycle
+    int * start_from_vc; // VC from which to start the reservation cycle for the specific port
 
-    //ReservationTable antenna2tile_reservation_table;	// Switch reservation table
-    //ReservationTable tile2antenna_reservation_table;// Wireless reservation table
+    ReservationTable antenna2tile_reservation_table;	// Switch reservation table
+    ReservationTable tile2antenna_reservation_table;// Wireless reservation table
 
     void updateRxPower();
     void updateTxPower();
@@ -110,13 +111,15 @@ SC_MODULE(Hub)
 
 	}
 
-
         local_id = id;
 	token_ring = tr;
         num_ports = GlobalParams::hub_configuration[local_id].attachedNodes.size();
         attachedNodes = GlobalParams::hub_configuration[local_id].attachedNodes;
         rxChannels = GlobalParams::hub_configuration[local_id].rxChannels;
         txChannels = GlobalParams::hub_configuration[local_id].txChannels;
+
+	antenna2tile_reservation_table.setSize(num_ports);
+	tile2antenna_reservation_table.setSize(txChannels.size());
 
         flit_rx = new sc_in<Flit>[num_ports];
         req_rx = new sc_in<bool>[num_ports];
@@ -131,15 +134,7 @@ SC_MODULE(Hub)
         buffer_from_tile = new BufferBank[num_ports];
         buffer_to_tile = new BufferBank[num_ports];
         
-        for(int i = 0; i < num_ports; i++)
-        {
-	    /* LAVORI
-            buffer_from_tile[i][TODO_VC].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].fromTileBufferSize);
-            buffer_to_tile[i][TODO_VC].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].toTileBufferSize);
-            buffer_from_tile[i][TODO_VC].setLabel(string(name())+"->bft["+i_to_string(i)+"]");
-            buffer_to_tile[i][TODO_VC].setLabel(string(name())+"->btt["+i_to_string(i)+"]");
-	    */
-        }
+	start_from_vc = new int[num_ports];
 
         current_level_rx = new bool[num_ports];
         current_level_tx = new bool[num_ports];
@@ -147,6 +142,17 @@ SC_MODULE(Hub)
         start_from_port = 0;
 
     	transmission_in_progress = false;
+        for(int i = 0; i < num_ports; i++)
+        {
+	    for (int vc = 0;vc<GlobalParams::n_virtual_channels; vc++)
+	    {
+		buffer_from_tile[i][vc].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].fromTileBufferSize);
+		buffer_to_tile[i][vc].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].toTileBufferSize);
+		buffer_from_tile[i][vc].setLabel(string(name())+"->bft["+i_to_string(i)+"]["+i_to_string(vc)+"]");
+		buffer_to_tile[i][vc].setLabel(string(name())+"->btt["+i_to_string(i)+"]["+i_to_string(vc)+"]");
+	    }
+	    start_from_vc[i] = 0;
+        }
 
         for (unsigned int i = 0; i < txChannels.size(); i++) {
             char txt[20];
