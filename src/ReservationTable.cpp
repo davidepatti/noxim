@@ -14,11 +14,12 @@ ReservationTable::ReservationTable()
 {
 }
 
-void ReservationTable::setSize(const int size)
+void ReservationTable::setSize(const int n_outputs)
 {
-    rtable = new TRTEntry[size];
+    this->n_outputs = n_outputs;
+    rtable = new TRTEntry[n_outputs];
 
-    for (int i=0;i<size;i++)
+    for (int i=0;i<n_outputs;i++)
     {
 	rtable[i].index = 0;
 	rtable[i].reservations.clear();
@@ -27,9 +28,9 @@ void ReservationTable::setSize(const int size)
 
 bool ReservationTable::isNotReserved(const int port_out)
 {
+    assert(port_out<n_outputs);
     return (rtable[port_out].reservations.size()==0);
 }
-
 
 /* For a given input, returns the set of output/vc reserved from that input.
  * An index is required for each output entry, to avoid that multiple invokations
@@ -38,7 +39,7 @@ vector<pair<int,int> > ReservationTable::getReservations(const int port_in)
 {
     vector<pair<int,int> > reservations;
 
-    for (int o = 0;o<DIRECTIONS+2;o++)
+    for (int o = 0;o<n_outputs;o++)
     {
 	if (rtable[o].reservations.size()>0)
 	{
@@ -54,7 +55,7 @@ int ReservationTable::checkReservation(const TReservation r, const int port_out)
 {
     /* Sanity Check for forbidden table status:
      * - same input/VC in a different output line */
-    for (int o=0;o<DIRECTIONS+2;o++)
+    for (int o=0;o<n_outputs;o++)
     {
 	for (int i=0;i<rtable[o].reservations.size(); i++)
 	{
@@ -83,7 +84,7 @@ int ReservationTable::checkReservation(const TReservation r, const int port_out)
 
 void ReservationTable::print()
 {
-    for (int o=0;o<DIRECTIONS+2;o++)
+    for (int o=0;o<n_outputs;o++)
     {
 	cout << o << ": ";
 	for (int i=0;i<rtable[o].reservations.size();i++)
@@ -112,6 +113,7 @@ void ReservationTable::reserve(const TReservation r, const int port_out)
 
 void ReservationTable::release(const TReservation r, const int port_out)
 {
+    assert(port_out < n_outputs);
 
     for (vector<TReservation>::iterator i=rtable[port_out].reservations.begin(); 
 	    i != rtable[port_out].reservations.end(); i++)
@@ -135,7 +137,7 @@ void ReservationTable::release(const TReservation r, const int port_out)
 
 void ReservationTable::updateIndex()
 {
-    for (int o=0;o<DIRECTIONS+2;o++)
+    for (int o=0;o<n_outputs;o++)
     {
 	if (rtable[o].reservations.size()>0)
 	    rtable[o].index = (rtable[o].index+1)%(rtable[o].reservations.size());

@@ -67,7 +67,9 @@ class ReservationTable {
   private:
 
      TRTEntry *rtable;	// reservation vector: rtable[i] gives a RTEntry containing the set of input/VC 
-			// which reserved output port i
+			// which reserved output port
+
+     int n_outputs;
 };
 
 #endif

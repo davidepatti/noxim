@@ -520,17 +520,20 @@ void Hub::tileToAntennaProcess()
 
     for (int i = 0; i < num_ports; i++) 
     {
-//	if (!buffer_from_tile[i][TODO_VC].deadlockFree())
-//	{
-//	    LOG << " deadlock on buffer " << i << endl;
-//	    buffer_from_tile[i][TODO_VC].Print("deadlock");
-//	}
 
 	if (req_rx[i]->read() == 1 - current_level_rx[i]) 
 	{
 	    Flit received_flit = flit_rx[i]->read();
 	    int vc = received_flit.vc_id;
 	    LOG << "Reading " << received_flit << " from signal flit_rx[" << i << "]" << endl;
+
+	    /*
+	    if (!buffer_from_tile[i][vc].deadlockFree())
+	    {
+		LOG << " deadlock on buffer " << i << endl;
+		buffer_from_tile[i][vc].Print();
+	    }
+	    */
 
 	    if (!buffer_from_tile[i][vc].IsFull())
 	    {
