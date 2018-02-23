@@ -69,6 +69,9 @@ void loadConfiguration() {
     GlobalParams::use_winoc = config["use_winoc"].as<bool>();
     GlobalParams::use_powermanager = config["use_wirxsleep"].as<bool>();
     
+
+    set<int> channelSet;
+
     GlobalParams::default_hub_configuration = config["Hubs"]["defaults"].as<HubConfig>();
 
     for(YAML::const_iterator hubs_it = config["Hubs"].begin(); 
@@ -81,11 +84,18 @@ void loadConfiguration() {
 
         YAML::Node hub_config_node = hubs_it->second;
 
-        GlobalParams::hub_configuration[hub_id] = hub_config_node.as<HubConfig>(); 
+        GlobalParams::hub_configuration[hub_id] = hub_config_node.as<HubConfig>();
 
+        copy(GlobalParams::hub_configuration[hub_id].rxChannels.begin(), GlobalParams::hub_configuration[hub_id].rxChannels.end(), inserter(channelSet, channelSet.end()));
+        copy(GlobalParams::hub_configuration[hub_id].txChannels.begin(), GlobalParams::hub_configuration[hub_id].txChannels.end(), inserter(channelSet, channelSet.end()));
     }
 
-    GlobalParams::default_channel_configuration = config["Channels"]["defaults"].as<ChannelConfig>();
+    YAML::Node default_channel_config_node = config["Channels"]["defaults"];
+    GlobalParams::default_channel_configuration = default_channel_config_node.as<ChannelConfig>();
+
+    for (set<int>::iterator it = channelSet.begin(); it != channelSet.end(); ++it) {
+        GlobalParams::channel_configuration[*it] = default_channel_config_node.as<ChannelConfig>();
+    }
 
     for(YAML::const_iterator channels_it= config["Channels"].begin(); 
         channels_it != config["Channels"].end();
@@ -98,7 +108,6 @@ void loadConfiguration() {
         YAML::Node channel_config_node = channels_it->second;
 
         GlobalParams::channel_configuration[channel_id] = channel_config_node.as<ChannelConfig>(); 
-
     }
 
     GlobalParams::power_configuration = power_config["Energy"].as<PowerConfig>();
