@@ -90,15 +90,15 @@ void loadConfiguration() {
         copy(GlobalParams::hub_configuration[hub_id].txChannels.begin(), GlobalParams::hub_configuration[hub_id].txChannels.end(), inserter(channelSet, channelSet.end()));
     }
 
-    YAML::Node default_channel_config_node = config["Channels"]["defaults"];
+    YAML::Node default_channel_config_node = config["RadioChannels"]["defaults"];
     GlobalParams::default_channel_configuration = default_channel_config_node.as<ChannelConfig>();
 
     for (set<int>::iterator it = channelSet.begin(); it != channelSet.end(); ++it) {
         GlobalParams::channel_configuration[*it] = default_channel_config_node.as<ChannelConfig>();
     }
 
-    for(YAML::const_iterator channels_it= config["Channels"].begin(); 
-        channels_it != config["Channels"].end();
+    for(YAML::const_iterator channels_it= config["RadioChannels"].begin(); 
+        channels_it != config["RadioChannels"].end();
         ++channels_it)
     {    
         int channel_id = channels_it->first.as<int>(-1);

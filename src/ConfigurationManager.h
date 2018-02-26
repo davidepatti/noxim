@@ -29,24 +29,24 @@ namespace YAML {
     struct convert<HubConfig> {
         static Node encode(const HubConfig& hubConfig) {
             Node node;
-            node["attachedNodes"] = hubConfig.attachedNodes;
-            node["rxChannels"] = hubConfig.rxChannels;
-            node["txChannels"] = hubConfig.txChannels;
-            node["toTileBufferSize"] = hubConfig.toTileBufferSize;
-            node["fromTileBufferSize"] = hubConfig.fromTileBufferSize;
-            node["txBufferSize"] = hubConfig.txBufferSize;
-            node["rxBufferSize"] = hubConfig.rxBufferSize;
+            node["attached_nodes"] = hubConfig.attachedNodes;
+            node["rx_radio_channels"] = hubConfig.rxChannels;
+            node["tx_radio_channels"] = hubConfig.txChannels;
+            node["to_tile_buffer_size"] = hubConfig.toTileBufferSize;
+            node["from_tile_buffer_size"] = hubConfig.fromTileBufferSize;
+            node["tx_buffer_size"] = hubConfig.txBufferSize;
+            node["rx_buffer_size"] = hubConfig.rxBufferSize;
             return node;
         }
 
         static bool decode(const Node& node, HubConfig& hubConfig) {
-            hubConfig.attachedNodes = node["attachedNodes"].as<vector<int> >(GlobalParams::default_hub_configuration.attachedNodes);
-            hubConfig.rxChannels = node["rxChannels"].as<vector<int> >(GlobalParams::default_hub_configuration.rxChannels);
-            hubConfig.txChannels = node["txChannels"].as<vector<int> >(GlobalParams::default_hub_configuration.txChannels);
-            hubConfig.toTileBufferSize = node["toTileBufferSize"].as<int>(GlobalParams::default_hub_configuration.toTileBufferSize);
-            hubConfig.fromTileBufferSize = node["fromTileBufferSize"].as<int>(GlobalParams::default_hub_configuration.fromTileBufferSize);
-            hubConfig.txBufferSize = node["txBufferSize"].as<int>(GlobalParams::default_hub_configuration.txBufferSize);
-            hubConfig.rxBufferSize = node["rxBufferSize"].as<int>(GlobalParams::default_hub_configuration.rxBufferSize);
+            hubConfig.attachedNodes = node["attached_nodes"].as<vector<int> >(GlobalParams::default_hub_configuration.attachedNodes);
+            hubConfig.rxChannels = node["rx_radio_channels"].as<vector<int> >(GlobalParams::default_hub_configuration.rxChannels);
+            hubConfig.txChannels = node["tx_radio_channels"].as<vector<int> >(GlobalParams::default_hub_configuration.txChannels);
+            hubConfig.toTileBufferSize = node["to_tile_buffer_size"].as<int>(GlobalParams::default_hub_configuration.toTileBufferSize);
+            hubConfig.fromTileBufferSize = node["from_tile_buffer_size"].as<int>(GlobalParams::default_hub_configuration.fromTileBufferSize);
+            hubConfig.txBufferSize = node["tx_buffer_size"].as<int>(GlobalParams::default_hub_configuration.txBufferSize);
+            hubConfig.rxBufferSize = node["rx_buffer_size"].as<int>(GlobalParams::default_hub_configuration.rxBufferSize);
             return true;
         }
     };
@@ -56,14 +56,14 @@ namespace YAML {
         static Node encode(const ChannelConfig& channelConfig) {
             Node node;
             node["ber"] = channelConfig.ber;
-            node["dataRate"] = channelConfig.dataRate;
+            node["data_rate"] = channelConfig.dataRate;
             node["mac_policy"] = channelConfig.macPolicy;
             return node;
         }
 
         static bool decode(const Node& node, ChannelConfig& channelConfig) {
             channelConfig.ber = node["ber"].as<pair<double, double> >(GlobalParams::default_channel_configuration.ber);
-            channelConfig.dataRate = node["dataRate"].as<int>(GlobalParams::default_channel_configuration.dataRate);
+            channelConfig.dataRate = node["data_rate"].as<int>(GlobalParams::default_channel_configuration.dataRate);
             channelConfig.macPolicy = node["mac_policy"].as<vector<string> >(GlobalParams::default_channel_configuration.macPolicy);
             return true;
         }
