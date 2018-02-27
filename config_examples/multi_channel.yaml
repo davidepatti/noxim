@@ -1,4 +1,4 @@
-# Simple config of a 16x16 mesh with 8 RadioHubs
+# Simple config of a 16x16 mesh with 4 RadioHubs and radio channels
 # Each parameter is overwritten when corresponding command line value is set
 #
 # NOC & WIRED CONFIGURATION
@@ -48,8 +48,8 @@ selection_strategy: RANDOM
 Hubs:
     defaults:
     # channels from which Hub can receive/transmit
-        rx_radio_channels: [0]
-        tx_radio_channels: [0]
+        rx_radio_channels: [0,1]
+        tx_radio_channels: [0,1]
     # list of node tiles attached to the hub
         attached_nodes: []
     # size of buffers connecting the hub to tiles
@@ -67,31 +67,16 @@ Hubs:
 # sub-meshes
 
     0:
-        attached_nodes: [49,50,65,66]
+        attached_nodes: [51, 52, 67, 68]
 
     1:
-        attached_nodes: [53,54,69,70]
+        attached_nodes: [59, 60, 75, 76]
 
     2:
-        attached_nodes: [57,58,73,74]
+        attached_nodes: [179, 180, 195, 196]
 
     3:
-        attached_nodes: [61,62,77,78]
-
-    4:
-        attached_nodes: [177,178,193,194]
-
-    5:
-        attached_nodes: [181,182,197,198]
-
-    6:
-        attached_nodes: [185,186,201,202]
-
-    7:
-        attached_nodes: [189,190,205,206]
-
-
-
+        attached_nodes: [187,188,203,204]
 
 # Transmission channels configuration
 # each channel modelizes the transmission over a given frequency that
@@ -119,6 +104,13 @@ RadioChannels:
 
         mac_policy: [TOKEN_PACKET]
 
+# For each channel, different default values could be specified. In
+# this example, channel 0 has different faster data rate of 32 Gb/s,
+# while the other channels will use the default value of 16 specified
+# in the "defaults" section.
+    1:
+        dataRate: 32
+
 #
 # SIMULATION PARAMETERS
 #
@@ -138,7 +130,7 @@ show_buffer_stats: false
 # Winoc
 # enable wireless, when false, all wireless channel configuration is
 # ignored
-use_winoc: false
+use_winoc: true
 # experimental power saving strategy
 use_wirxsleep: false
 

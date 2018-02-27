@@ -101,17 +101,9 @@ RadioChannels:
     # who has the token, holds the packet until needed for
     # transmissions, until a max number of cycles is reached
         #[TOKEN_MAX_HOLD, max_hold_cycles]
-
         mac_policy: [TOKEN_PACKET]
 
-# For each channel, different default values could be specified. In
-# this example, channel 0 has different slower data rate of 8 Gb/s,
-# while the other channels will use the default value of 16 specified
-# in the "defaults" section.
-    0:
-        data_rate: 8
 
-#
 # SIMULATION PARAMETERS
 #
 clock_period_ps: 1000

@@ -85,7 +85,7 @@ RadioChannels:
     defaults:
     # data rate in Gb/s affect the number of cycles required for a
     # flit transmission
-        data_rate: 64
+        data_rate: 16
     # bit error rate (CURRENTLY UNSUPPORTED)
         ber: [0, 0]
     # mac policies:
