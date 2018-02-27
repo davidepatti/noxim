@@ -19,7 +19,6 @@
 
       while (1)
       {
-
 	  LOG << " *** waiting for transmissions" << endl;
 
 	  wait(start_request_event);

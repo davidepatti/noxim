@@ -58,8 +58,7 @@ SC_MODULE(Hub)
     map<int, sc_in<int>* > current_token_holder;
     map<int, sc_in<int>* > current_token_expiration;
     map<int, sc_inout<int>* > flag;
-    bool transmission_in_progress;
-
+    bool * transmission_in_progress;
 
     map<int, Initiator*> init;
     map<int, Target*> target;
@@ -135,15 +134,16 @@ SC_MODULE(Hub)
         buffer_to_tile = new BufferBank[num_ports];
         
 	start_from_vc = new int[num_ports];
+	transmission_in_progress = new bool[num_ports];
 
         current_level_rx = new bool[num_ports];
         current_level_tx = new bool[num_ports];
 
         start_from_port = 0;
 
-    	transmission_in_progress = false;
         for(int i = 0; i < num_ports; i++)
         {
+	    transmission_in_progress[i] = false;
 	    for (int vc = 0;vc<GlobalParams::n_virtual_channels; vc++)
 	    {
 		buffer_from_tile[i][vc].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].fromTileBufferSize);
@@ -156,6 +156,7 @@ SC_MODULE(Hub)
 
         for (unsigned int i = 0; i < txChannels.size(); i++) {
             char txt[20];
+	    cout << "CHAN " << i << endl;
             sprintf(txt, "init_%d", txChannels[i]);
             init[txChannels[i]] = new Initiator(txt,this);
             init[txChannels[i]]->buffer_tx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].txBufferSize);

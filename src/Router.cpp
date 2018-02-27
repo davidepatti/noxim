@@ -135,9 +135,9 @@ void Router::txProcess()
 			  LOG << " reserving direction " << o << " for flit " << flit << endl;
 			  reservation_table.reserve(r, o);
 		      }
-		      else if (rt_status == RT_ALREADY)
+		      else if (rt_status == RT_ALREADY_SAME)
 		      {
-			  LOG << " RT_ALREADY reserved direction " << o << " for flit " << flit << endl;
+			  LOG << " RT_ALREADY_SAME reserved direction " << o << " for flit " << flit << endl;
 		      }
 		      else if (rt_status == RT_OUTVC_BUSY)
 		      {

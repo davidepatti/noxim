@@ -61,7 +61,9 @@ int ReservationTable::checkReservation(const TReservation r, const int port_out)
 	{
 	    // In the current implementation this should never happen
 	    if (o!=port_out && rtable[o].reservations[i] == r)
-		assert(false); 
+	    {
+		return RT_ALREADY_OTHER_OUT;
+	    }
 	}
     }
     
@@ -72,7 +74,7 @@ int ReservationTable::checkReservation(const TReservation r, const int port_out)
     {
 	// the reservation is already present
 	if (rtable[port_out].reservations[i] == r)
-	    return RT_ALREADY;
+	    return RT_ALREADY_SAME;
 
 	// the same VC for that output has been reserved by another input
 	if (rtable[port_out].reservations[i].input != r.input &&

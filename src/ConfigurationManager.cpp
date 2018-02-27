@@ -379,8 +379,6 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::mesh_dim_y = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-buffer"))
 		GlobalParams::buffer_depth = atoi(arg_vet[++i]);
-	    else if (!strcmp(arg_vet[i], "-n_virtual_channels"))
-		GlobalParams::n_virtual_channels = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-buffer_tt"))
 		setBufferToTile(atoi(arg_vet[++i]));
 	    else if (!strcmp(arg_vet[i], "-buffer_ft"))
