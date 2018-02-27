@@ -10,12 +10,12 @@ mesh_dim_y: 4
 # number of flits for each router buffer
 buffer_depth: 4
 # size of flits, in bits
-n_virtual_channels: 1
 flit_size: 32
 # lenght in mm of router to hub connection
 r2h_link_length: 2.0
 # lenght in mm of router to router connection
 r2r_link_length: 1.0
+n_virtual_channels: 1
 
 # Routing algorithms:
 #   XY
@@ -48,16 +48,16 @@ selection_strategy: RANDOM
 Hubs:
     defaults:
     # channels from which Hub can receive/transmit
-        rxChannels: [0]
-        txChannels: [0]
+        rx_radio_channels: [0]
+        tx_radio_channels: [0]
     # list of node tiles attached to the hub
-        attachedNodes: []
+        attached_nodes: []
     # size of buffers connecting the hub to tiles
-        toTileBufferSize: 4
-        fromTileBufferSize: 4
+        to_tile_buffer_size: 4
+        from_tile_buffer_size: 4
     # size of antenna tx/rx
-        rxBufferSize: 4
-        txBufferSize: 4
+        rx_buffer_size: 4
+        tx_buffer_size: 4
 
 # for each hub, the same parameters specified above can be customized
 # If not specified, the above default values will be used
@@ -67,25 +67,25 @@ Hubs:
 # sub-meshes
 
     0:
-        attachedNodes: [0,1,4,5]
+        attached_nodes: [0,1,4,5]
 
     1:
-        attachedNodes: [2,3,6,7]
+        attached_nodes: [2,3,6,7]
 
     2:
-        attachedNodes: [8,9,12,13]
+        attached_nodes: [8,9,12,13]
 
     3:
-        attachedNodes: [10,11,14,15]
+        attached_nodes: [10,11,14,15]
 
 # Transmission channels configuration
 # each channel modelizes the transmission over a given frequency that
 # can be used by a set of communicating hubs
-Channels:
+RadioChannels:
     defaults:
-        # data rate in Gb/s affect the number of cycles required for a
+    # data rate in Gb/s affect the number of cycles required for a
     # flit transmission
-        dataRate: 16
+        data_rate: 16
     # bit error rate (CURRENTLY UNSUPPORTED)
         ber: [0, 0]
     # mac policies:
@@ -109,7 +109,7 @@ Channels:
 # while the other channels will use the default value of 16 specified
 # in the "defaults" section.
     0:
-        dataRate: 8
+        data_rate: 8
 
 #
 # SIMULATION PARAMETERS
