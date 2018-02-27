@@ -425,8 +425,10 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 	    } 
 	    else if (!strcmp(arg_vet[i], "-pir")) 
 	    {
+		
 		GlobalParams::packet_injection_rate = atof(arg_vet[++i]);
-		char *distribution = arg_vet[++i];
+		char *distribution = arg_vet[i+1<arg_num?++i:i];
+		
 		if (!strcmp(distribution, "poisson"))
 		    GlobalParams::probability_of_retransmission = GlobalParams::packet_injection_rate;
 		else if (!strcmp(distribution, "burst")) 
