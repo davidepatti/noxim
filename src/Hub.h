@@ -156,7 +156,6 @@ SC_MODULE(Hub)
 
         for (unsigned int i = 0; i < txChannels.size(); i++) {
             char txt[20];
-	    cout << "CHAN " << i << endl;
             sprintf(txt, "init_%d", txChannels[i]);
             init[txChannels[i]] = new Initiator(txt,this);
             init[txChannels[i]]->buffer_tx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].txBufferSize);
