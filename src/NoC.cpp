@@ -336,3 +336,7 @@ Tile *NoC::searchNode(const int id) const
 
     return NULL;
 }
+
+void NoC::showAscii()
+{
+}

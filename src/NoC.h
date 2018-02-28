@@ -78,6 +78,13 @@ SC_MODULE(NoC)
 
 	// Build the Mesh
 	buildMesh();
+
+	if (GlobalParams::show_ascii)
+	{
+	    SC_METHOD(showAscii);
+	    sensitive << clock.pos();
+	}
+
     }
 
     // Support methods
@@ -86,6 +93,7 @@ SC_MODULE(NoC)
   private:
 
     void buildMesh();
+    void showAscii();
 };
 
 //Hub * dd;

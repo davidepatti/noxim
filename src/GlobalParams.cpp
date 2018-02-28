@@ -43,6 +43,7 @@ unsigned int GlobalParams::max_volume_to_be_drained;
 vector <pair <int, double> > GlobalParams::hotspots;
 bool GlobalParams::show_buffer_stats;
 bool GlobalParams::use_winoc;
+bool GlobalParams::show_ascii;
 bool GlobalParams::use_powermanager;
 ChannelConfig GlobalParams::default_channel_configuration;
 map<int, ChannelConfig> GlobalParams::channel_configuration;
