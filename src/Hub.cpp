@@ -162,23 +162,11 @@ void Hub::txRadioProcessTokenPacket(int channel)
 	if (!init[channel]->buffer_tx.IsEmpty())
 	{
 	    Flit flit = init[channel]->buffer_tx.Front();
-	    bool is_tail = (flit.flit_type == FLIT_TYPE_TAIL);
-
-	    if (flit.flit_type == FLIT_TYPE_HEAD) 
-		transmission_in_progress[channel] = true;
 
 	    // TODO: check whether it would make sense to use transmission_in_progress to
 	    // avoid multiple notify()
-	    LOG << "*** [Ch"<<channel<<"] Requesting transmission of flit " << flit << endl;
+	    LOG << "*** [Ch"<<channel<<"] Requesting transmission event of flit " << flit << endl;
 	    init[channel]->start_request_event.notify();
-
-	    if (is_tail)
-	    {
-		LOG << "*** [Ch"<<channel<<"] tail sent " << flit << ", releasing token" << endl;
-		flag[channel]->write(RELEASE_CHANNEL);
-		// TODO: vector for multiple channel
-		transmission_in_progress[channel] = false;
-	    }
 	}
 	else
 	{

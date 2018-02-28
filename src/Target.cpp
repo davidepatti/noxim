@@ -12,7 +12,6 @@
 
 void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 {
-    // Obliged to implement read and write commands
     struct Flit* my_flit = (struct Flit*)trans.get_data_ptr();
 
     LOG << "*** [Ch" <<local_id << "] Received: " << *my_flit << endl;
@@ -31,6 +30,8 @@ void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
     }
     else
     {
+	// the response status will remain ERRROR
+	// signaling to the Initiator that something went wrong
 	LOG << "[Ch" <<local_id << "] WARNING: buffer_rx is full cannot store flit " << *my_flit << endl;
     }
 }
