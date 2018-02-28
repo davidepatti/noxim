@@ -38,7 +38,8 @@ class Power {
 	              int buffer_to_tile_depth, 
 	              int buffer_from_tile_depth, 
 		      int buffer_item_size, 
-		      int antenna_buffer_depth, 
+		      int antenna_buffer_rx_depth, 
+		      int antenna_buffer_tx_depth, 
 		      int antenna_buffer_item_size, 
 		      int data_rate_gbs);
 

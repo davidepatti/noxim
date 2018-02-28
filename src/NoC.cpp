@@ -34,7 +34,7 @@ void NoC::buildMesh()
             ++it)
     {
         int hub_id = it->first;
-	LOG << " hub id " <<  hub_id;
+	//LOG << " hub id " <<  hub_id;
         HubConfig hub_config = it->second;
 
         sprintf(hub_name, "Hub_%d", hub_id);
@@ -94,15 +94,15 @@ void NoC::buildMesh()
 	else
 	    data_rate_gbs = NOT_VALID;
 
-	// TODO: update power model (configureHub to support different
-	// tx/tx buffer depth
-	assert(GlobalParams::hub_configuration[hub_id].rxBufferSize==GlobalParams::hub_configuration[hub_id].txBufferSize);
+	// TODO: update power model (configureHub to support different tx/tx buffer depth in the power breakdown
+	// Currently, an averaged value is used when accounting in Power class methods
 	
 	hub[hub_id]->power.configureHub(GlobalParams::flit_size,
 		                        GlobalParams::hub_configuration[hub_id].toTileBufferSize,
 		                        GlobalParams::hub_configuration[hub_id].fromTileBufferSize,
 					GlobalParams::flit_size,
 					GlobalParams::hub_configuration[hub_id].rxBufferSize,
+					GlobalParams::hub_configuration[hub_id].txBufferSize,
 					GlobalParams::flit_size,
 					data_rate_gbs);
 
