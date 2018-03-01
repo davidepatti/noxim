@@ -12,7 +12,7 @@ Vincenzo Catania, Andrea Mineo, Salvatore Monteleone, Maurizio Palesi, and David
 
 What's New ? 
 ------------
-**[March 2018]** Long awaited Virtual Channels and Multiple radio-channels are finally in master version
+**[March 2018]** Long awaited Virtual Channels and RadioHub with multiple transmission channels are now in master version
 
   * Support for virtual channels for improved traffic management
   * Support for multiple radio-frequency channels for each Radio-Hub
