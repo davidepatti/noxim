@@ -13,6 +13,13 @@ Vincenzo Catania, Andrea Mineo, Salvatore Monteleone, Maurizio Palesi, and David
 
 What's New ? 
 ------------
+**[March 2018]** Long awaited Virtual Channels and Multiple radio-channels are finally in master version
+
+Details:
+  * Support for virtual channels for improved traffic management
+  * Support for multiple radio-frequency channels for each Radio-Hub
+  * New yaml examples (please update yours, since format is slightly different)
+  
 **[April 2017]** [Noxim tutorial slides](doc/noxim_tutorial.pdf) from lecture given at "Advanced Computer Architectures" (ELEC3219 - University of Southampton)
 
 **[June 2015]** Massively improved version of Noxim. Major changes include:
