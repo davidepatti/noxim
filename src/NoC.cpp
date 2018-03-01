@@ -10,8 +10,11 @@
 
 #include "NoC.h"
 
+using namespace std;
+
 void NoC::buildMesh()
 {
+
 
     token_ring = new TokenRing("tokenring");
     token_ring->clock(clock);
@@ -338,5 +341,28 @@ Tile *NoC::searchNode(const int id) const
 }
 
 void NoC::showAscii()
-{
+{ 
+    //cout << sc_time_stamp().to_double()/GlobalParams::clock_period_ps << endl;
+    system("clear");
+    //
+    // asciishow proof-of-concept #1 free slots
+   
+    for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
+    {
+	for (int s = 0; s<3; s++)
+	{
+	    for (int i = 0; i < GlobalParams::mesh_dim_x; i++)
+	    {
+		if (s==0)
+		    std::printf("|  %d  ",t[i][j]->r->buffer[s][0].getCurrentFreeSlots());
+		else
+		    if (s==1)
+			std::printf("|%d   %d",t[i][j]->r->buffer[s][0].getCurrentFreeSlots(),t[i][j]->r->buffer[3][0].getCurrentFreeSlots());
+		    else
+			std::printf("|__%d__",t[i][j]->r->buffer[2][0].getCurrentFreeSlots());
+	    }
+	    cout << endl;
+	}
+    }
 }
+

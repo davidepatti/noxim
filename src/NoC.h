@@ -79,6 +79,8 @@ SC_MODULE(NoC)
 	// Build the Mesh
 	buildMesh();
 
+	GlobalParams::show_ascii = true;
+
 	if (GlobalParams::show_ascii)
 	{
 	    SC_METHOD(showAscii);
