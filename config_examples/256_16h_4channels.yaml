@@ -48,8 +48,8 @@ selection_strategy: RANDOM
 Hubs:
     defaults:
     # channels from which Hub can receive/transmit
-        rx_radio_channels: [0]
-        tx_radio_channels: [0]
+        rx_radio_channels: [0,1,2,3]
+        tx_radio_channels: [0,1,2,3]
     # list of node tiles attached to the hub
         attached_nodes: []
     # size of buffers connecting the hub to tiles

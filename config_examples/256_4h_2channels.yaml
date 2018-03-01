@@ -1,4 +1,4 @@
-# Simple config of a 16x16 mesh with 16 RadioHubs
+# Simple config of a 16x16 mesh with 4 RadioHubs
 # Each parameter is overwritten when corresponding command line value is set
 #
 # NOC & WIRED CONFIGURATION
@@ -48,8 +48,8 @@ selection_strategy: RANDOM
 Hubs:
     defaults:
     # channels from which Hub can receive/transmit
-        rx_radio_channels: [0]
-        tx_radio_channels: [0]
+        rx_radio_channels: [0,1]
+        tx_radio_channels: [0,1]
     # list of node tiles attached to the hub
         attached_nodes: []
     # size of buffers connecting the hub to tiles
@@ -67,57 +67,16 @@ Hubs:
 # sub-meshes
 
     0:
-        attached_nodes: [17, 18, 33, 34]
+        attached_nodes: [51, 52, 67, 68]
 
     1:
-        attached_nodes: [21, 22, 37, 38]
+        attached_nodes: [59, 60, 75, 76]
 
     2:
-        attached_nodes: [25, 26, 41, 42]
+        attached_nodes: [179, 180, 195, 196]
 
     3:
-        attached_nodes: [29, 30, 45, 46]
-
-    4:
-        attached_nodes: [81, 82, 97, 98]
-
-    5:
-        attached_nodes: [85, 86, 101, 102]
-
-    6:
-        attached_nodes: [89, 90, 105, 106]
-
-    7:
-        attached_nodes: [93, 94, 109, 110]
-
-    8:
-        attached_nodes: [145, 146, 161, 162]
-
-    9:
-        attached_nodes: [149,150, 165, 166]
-
-    10:
-        attached_nodes: [153,154, 169, 170]
-
-    11:
-        attached_nodes: [157, 158, 173, 174]
-
-    12:
-        attached_nodes: [209, 210, 225, 226]
-
-    13:
-        attached_nodes: [213, 214, 229, 230]
-
-    14:
-        attached_nodes: [217, 218, 233, 234]
-
-    15:
-        attached_nodes: [221, 222, 237, 238]
-
-
-
-
-
+        attached_nodes: [187,188,203,204]
 
 # Transmission channels configuration
 # each channel modelizes the transmission over a given frequency that
