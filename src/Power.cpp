@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2015 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -140,7 +140,8 @@ void Power::configureHub(int link_width,
 	int buffer_to_tile_depth, // buffer to tile
 	int buffer_from_tile_depth, // buffer from tile
 	int buffer_item_size,
-	int antenna_buffer_depth, // rx/tx antenna buffers
+	int antenna_buffer_rx_depth, // rx/tx antenna buffers
+	int antenna_buffer_tx_depth, // rx/tx antenna buffers
 	int antenna_buffer_item_size,
 	int data_rate_gbs)
 {
@@ -170,8 +171,8 @@ void Power::configureHub(int link_width,
     buffer_from_tile_front_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.front[key_from_tile];
     buffer_from_tile_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop[key_from_tile];
    
-    // Buffer Antenna
-    pair<int,int> akey = pair<int,int>(antenna_buffer_depth,antenna_buffer_item_size);
+    // Buffer Antenna RX
+    pair<int,int> akey = pair<int,int>(antenna_buffer_rx_depth,antenna_buffer_item_size);
     
     assert(GlobalParams::power_configuration.bufferPowerConfig.leakage.find(akey) != GlobalParams::power_configuration.bufferPowerConfig.leakage.end());
     assert(GlobalParams::power_configuration.bufferPowerConfig.push.find(akey) != GlobalParams::power_configuration.bufferPowerConfig.push.end());
@@ -182,6 +183,25 @@ void Power::configureHub(int link_width,
     antenna_buffer_push_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.push[akey];
     antenna_buffer_front_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.front[akey];
     antenna_buffer_pop_pwr_d = GlobalParams::power_configuration.bufferPowerConfig.pop[akey];
+
+    // Buffer Antenna TX
+    akey = pair<int,int>(antenna_buffer_tx_depth,antenna_buffer_item_size);
+    
+    assert(GlobalParams::power_configuration.bufferPowerConfig.leakage.find(akey) != GlobalParams::power_configuration.bufferPowerConfig.leakage.end());
+    assert(GlobalParams::power_configuration.bufferPowerConfig.push.find(akey) != GlobalParams::power_configuration.bufferPowerConfig.push.end());
+    assert(GlobalParams::power_configuration.bufferPowerConfig.front.find(akey) != GlobalParams::power_configuration.bufferPowerConfig.front.end());
+    assert(GlobalParams::power_configuration.bufferPowerConfig.pop.find(akey) != GlobalParams::power_configuration.bufferPowerConfig.pop.end());
+
+    // TODO: currently both RX/RX values are aggregated and then an average is returned 
+    antenna_buffer_pwr_s += W2J(GlobalParams::power_configuration.bufferPowerConfig.leakage[akey]);
+    antenna_buffer_push_pwr_d += GlobalParams::power_configuration.bufferPowerConfig.push[akey];
+    antenna_buffer_front_pwr_d += GlobalParams::power_configuration.bufferPowerConfig.front[akey];
+    antenna_buffer_pop_pwr_d += GlobalParams::power_configuration.bufferPowerConfig.pop[akey];
+
+    antenna_buffer_pwr_s = antenna_buffer_pwr_s/2;
+    antenna_buffer_push_pwr_d = antenna_buffer_push_pwr_d/2; 
+    antenna_buffer_front_pwr_d = antenna_buffer_front_pwr_d/2;
+    antenna_buffer_pop_pwr_d = antenna_buffer_pop_pwr_d/2;
 
     attenuation_map = GlobalParams::power_configuration.hubPowerConfig.transmitter_attenuation_map;
 

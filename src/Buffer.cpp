@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2010 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -43,9 +43,11 @@ void Buffer::Print()
     queue<Flit> m = buffer;
 
     string bstr = "";
+   
 
     char  t[] = "HBT";
 
+    cout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "\t";
     cout << label << " | ";
     while (!(m.empty()))
     {

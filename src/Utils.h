@@ -1,3 +1,13 @@
+/*
+ * Noxim - the NoC Simulator
+ *
+ * (C) 2005-2018 by the University of Catania
+ * For the complete list of authors refer to file ../doc/AUTHORS.txt
+ * For the license applied to these sources refer to file ../doc/LICENSE.txt
+ *
+ * This file contains the declaration of the global params needed by Noxim
+ * to forward configuration to every sub-block
+ */
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
@@ -84,7 +94,7 @@ inline ostream & operator <<(ostream & os, const Flit & flit)
 	    break;
 	}
 
-	os <<  flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << ")";
+	os <<  flit.sequence_no << ", " << flit.src_id << "->" << flit.dst_id << " VC " << flit.vc_id << ")";
     }
 
     return os;
@@ -112,6 +122,15 @@ inline ostream & operator <<(ostream & os, const NoP_data & NoP_data)
     os << "]" << endl;
     return os;
 }
+inline ostream & operator <<(ostream & os, const TBufferFullStatus & bfs)
+{
+    os << "[" ;
+    for (int j = 0; j < GlobalParams::n_virtual_channels; j++)
+	os << bfs.mask[j] << " ";
+
+    os << "]" << endl;
+    return os;
+}
 
 inline ostream & operator <<(ostream & os, const Coord & coord)
 {
@@ -134,6 +153,11 @@ inline void sc_trace(sc_trace_file * &tf, const Flit & flit, string & name)
 inline void sc_trace(sc_trace_file * &tf, const NoP_data & NoP_data, string & name)
 {
     sc_trace(tf, NoP_data.sender_id, name + ".sender_id");
+}
+inline void sc_trace(sc_trace_file * &tf, const TBufferFullStatus & bfs, string & name)
+{
+    for (int j = 0; j < GlobalParams::n_virtual_channels; j++)
+	sc_trace(tf, bfs.mask[j], name + "VC "+to_string(j));
 }
 
 inline void sc_trace(sc_trace_file * &tf, const ChannelStatus & bs, string & name)

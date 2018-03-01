@@ -1,80 +1,38 @@
+/*
+ * Noxim - the NoC Simulator
+ *
+ * (C) 2005-2018 by the University of Catania
+ * For the complete list of authors refer to file ../doc/AUTHORS.txt
+ * For the license applied to these sources refer to file ../doc/LICENSE.txt
+ *
+ * This file contains the implementation of the buffer
+ */
 #include "Hub.h"
 #include "Target.h"
 
-
-
 void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )
 {
-    /*
-    tlm::tlm_command cmd = trans.get_command();
-    sc_dt::uint64    adr = trans.get_address() / 4;
-    unsigned char*   ptr = trans.get_data_ptr();
-    unsigned int     len = trans.get_data_length();
-    */
-    //unsigned char*   byt = trans.get_byte_enable_ptr();
-    //unsigned int     wid = trans.get_streaming_width();
-
-    // Obliged to check address range and check for unsupported features,
-    //   i.e. byte enables, streaming, and bursts
-    // Can ignore DMI hint and extensions
-    // Using the SystemC report handler is an acceptable way of signalling an error
-
-    //if (adr >= sc_dt::uint64(MEM_SIZE) || byt != 0 || len > 4 || wid < len)
-    /*
-    if (adr >= sc_dt::uint64(MEM_SIZE) || byt != 0 )
-	SC_REPORT_ERROR("TLM-2", "Target does not support given generic payload transaction");
-	*/
-
-    // Obliged to implement read and write commands
     struct Flit* my_flit = (struct Flit*)trans.get_data_ptr();
 
+    LOG << "*** [Ch" <<local_id << "] Received: " << *my_flit << endl;
 
-    LOG << "*** Received: " << *my_flit << endl;
-
+    // only moves received flit to the antenna buffer
+    // reservations stuff is done in the hub to avoid 
+    // race conditions on shared reservation table
     if (!buffer_rx.IsFull())
     {
-	
-	int dst_port = hub->tile2Port(my_flit->dst_id);
-
-	if (my_flit->flit_type==FLIT_TYPE_HEAD)
-	{
-	    if (hub->antenna2tile_reservation_table.isAvailable(dst_port))
-	    {
-		LOG << "Reserving output port " << dst_port << " for channel " << local_id << " for flit " << *my_flit << endl;
-		hub->antenna2tile_reservation_table.reserve(local_id, dst_port);
-
-		// The number of commucation using the wireless network, accounting also
-		// partial wired path
-		hub->wireless_communications_counter++;
-	    }
-	    else
-	    {
-		LOG << "WARNING: cannot reserve output port " << dst_port << " for channel " << local_id  << ", flit " << *my_flit << endl;
-		return;
-	    }
-
-	}
-
-	if (my_flit->flit_type == FLIT_TYPE_TAIL) 
-	{
-	    LOG << "Releasing reservation for output port " << dst_port << ", flit " << *my_flit << endl;
-	    hub->antenna2tile_reservation_table.release(dst_port);
-	}
-	
-
-	LOG << "Flit " << *my_flit << " moved to rx_buffer " << endl;
+	LOG << "*** [Ch" <<local_id << "] Flit " << *my_flit << " moved to buffer_rx " << endl;
 	buffer_rx.Push(*my_flit);
 	hub->power.antennaBufferPush();
 	// Obliged to set response status to indicate successful completion
 	trans.set_response_status( tlm::TLM_OK_RESPONSE );
+	//buffer_rx.Print();
     }
     else
     {
-	LOG << "WARNING: buffer_rx is full cannot store flit " << *my_flit << endl;
+	// the response status will remain ERRROR
+	// signaling to the Initiator that something went wrong
+	LOG << "[Ch" <<local_id << "] WARNING: buffer_rx is full cannot store flit " << *my_flit << endl;
     }
-
-
-    // FIXME: controlla commento in RadioProcess 
-
 }
 

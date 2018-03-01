@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2015 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -40,8 +40,10 @@ int sc_main(int arg_num, char *arg_vet[])
     drained_volume = 0;
 
     // Handle command-line arguments
-    cout << endl << "\t\tNoxim - the NoC Simulator" << endl;
-    cout << "\t\t(C) University of Catania" << endl << endl;
+    cout << "\t--------------------------------------------" << endl; 
+    cout << "\t\tNoxim - the NoC Simulator" << endl;
+    cout << "\t\t(C) University of Catania" << endl;
+    cout << "\t--------------------------------------------" << endl; 
 
     cout << "Catania V., Mineo A., Monteleone S., Palesi M., and Patti D. (2016) Cycle-Accurate Network on Chip Simulation with Noxim. ACM Trans. Model. Comput. Simul. 27, 1, Article 4 (August 2016), 25 pages. DOI: https://doi.org/10.1145/2953878" << endl;
     cout << endl;
@@ -93,18 +95,20 @@ int sc_main(int arg_num, char *arg_vet[])
     }
     // Reset the chip and run the simulation
     reset.write(1);
-    cout << "Reset for " << (int)(GlobalParams::reset_time) << " cycles... " << endl;
+    cout << "Reset for " << (int)(GlobalParams::reset_time) << " cycles... ";
     srand(GlobalParams::rnd_generator_seed);
     sc_start(GlobalParams::reset_time, SC_NS);
 
     reset.write(0);
-    cout << " done! Now running for " << GlobalParams:: simulation_time << " cycles..." << endl;
+    cout << " done! " << endl;
+    cout << " Now running for " << GlobalParams:: simulation_time << " cycles..." << endl;
     sc_start(GlobalParams::simulation_time, SC_NS);
 
     // Close the simulation
     if (GlobalParams::trace_mode) sc_close_vcd_trace_file(tf);
-    cout << "Noxim simulation completed." << endl;
-    cout << " ( " << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " cycles executed)" << endl;
+    cout << "Noxim simulation completed.";
+    cout << " (" << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " cycles executed)" << endl;
+    cout << endl;
 
     // Show statistics
     GlobalStats gs(n);

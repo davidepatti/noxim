@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2010 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -23,14 +23,22 @@ using namespace std;
 #define POWER_CONFIG_FILENAME  "power.yaml"
 
 // Define the directions as numbers
-#define DIRECTIONS             4
-#define DIRECTION_NORTH        0
-#define DIRECTION_EAST         1
-#define DIRECTION_SOUTH        2
-#define DIRECTION_WEST         3
-#define DIRECTION_LOCAL        4
-#define DIRECTION_HUB          5
-#define DIRECTION_WIRELESS     747
+#define DIRECTIONS              4
+#define DIRECTION_NORTH         0
+#define DIRECTION_EAST          1
+#define DIRECTION_SOUTH         2
+#define DIRECTION_WEST          3
+#define DIRECTION_LOCAL         4
+#define DIRECTION_HUB           5
+#define DIRECTION_WIRELESS    747
+
+#define MAX_VIRTUAL_CHANNELS	8
+#define DEFAULT_VC 		0
+
+#define RT_AVAILABLE 1
+#define RT_ALREADY_SAME -1
+#define RT_ALREADY_OTHER_OUT -2
+#define RT_OUTVC_BUSY -3
 
 // Generic not reserved resource
 #define NOT_RESERVED          -2
@@ -42,11 +50,6 @@ using namespace std;
 #define ROUTING_DYAD           "DYAD"
 #define ROUTING_TABLE_BASED    "TABLE_BASED"
 
-// Selection strategies
-#define SEL_RANDOM             0
-#define SEL_BUFFER_LEVEL       1
-#define SEL_NOP                2
-#define INVALID_SELECTION     -1
 
 // Traffic distribution
 #define TRAFFIC_RANDOM         "TRAFFIC_RANDOM"
@@ -147,6 +150,7 @@ struct GlobalParams {
     static string power_config_filename;
     static int clock_period_ps;
     static int simulation_time;
+    static int n_virtual_channels;
     static int reset_time;
     static int stats_warm_up_time;
     static int rnd_generator_seed;
@@ -156,6 +160,7 @@ struct GlobalParams {
     static unsigned int max_volume_to_be_drained;
     static bool show_buffer_stats;
     static bool use_winoc;
+    static bool ascii_monitor;
     static bool use_powermanager;
     static ChannelConfig default_channel_configuration;
     static map<int, ChannelConfig> channel_configuration;

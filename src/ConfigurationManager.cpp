@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2015 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -57,6 +57,7 @@ void loadConfiguration() {
     GlobalParams::traffic_table_filename = config["traffic_table_filename"].as<string>();
     GlobalParams::clock_period_ps = config["clock_period_ps"].as<int>();
     GlobalParams::simulation_time = config["simulation_time"].as<int>();
+    GlobalParams::n_virtual_channels = config["n_virtual_channels"].as<int>();
     GlobalParams::reset_time = config["reset_time"].as<int>();
     GlobalParams::stats_warm_up_time = config["stats_warm_up_time"].as<int>();
     GlobalParams::rnd_generator_seed = time(NULL);
@@ -68,6 +69,9 @@ void loadConfiguration() {
     GlobalParams::use_winoc = config["use_winoc"].as<bool>();
     GlobalParams::use_powermanager = config["use_wirxsleep"].as<bool>();
     
+
+    set<int> channelSet;
+
     GlobalParams::default_hub_configuration = config["Hubs"]["defaults"].as<HubConfig>();
 
     for(YAML::const_iterator hubs_it = config["Hubs"].begin(); 
@@ -80,14 +84,21 @@ void loadConfiguration() {
 
         YAML::Node hub_config_node = hubs_it->second;
 
-        GlobalParams::hub_configuration[hub_id] = hub_config_node.as<HubConfig>(); 
+        GlobalParams::hub_configuration[hub_id] = hub_config_node.as<HubConfig>();
 
+        copy(GlobalParams::hub_configuration[hub_id].rxChannels.begin(), GlobalParams::hub_configuration[hub_id].rxChannels.end(), inserter(channelSet, channelSet.end()));
+        copy(GlobalParams::hub_configuration[hub_id].txChannels.begin(), GlobalParams::hub_configuration[hub_id].txChannels.end(), inserter(channelSet, channelSet.end()));
     }
 
-    GlobalParams::default_channel_configuration = config["Channels"]["defaults"].as<ChannelConfig>();
+    YAML::Node default_channel_config_node = config["RadioChannels"]["defaults"];
+    GlobalParams::default_channel_configuration = default_channel_config_node.as<ChannelConfig>();
 
-    for(YAML::const_iterator channels_it= config["Channels"].begin(); 
-        channels_it != config["Channels"].end();
+    for (set<int>::iterator it = channelSet.begin(); it != channelSet.end(); ++it) {
+        GlobalParams::channel_configuration[*it] = default_channel_config_node.as<ChannelConfig>();
+    }
+
+    for(YAML::const_iterator channels_it= config["RadioChannels"].begin(); 
+        channels_it != config["RadioChannels"].end();
         ++channels_it)
     {    
         int channel_id = channels_it->first.as<int>(-1);
@@ -97,7 +108,6 @@ void loadConfiguration() {
         YAML::Node channel_config_node = channels_it->second;
 
         GlobalParams::channel_configuration[channel_id] = channel_config_node.as<ChannelConfig>(); 
-
     }
 
     GlobalParams::power_configuration = power_config["Energy"].as<PowerConfig>();
@@ -166,6 +176,7 @@ void showHelp(char selfname[])
          << "\t-buffer_tt N\tSet the depth of hub buffers to tile [flits]" << endl
          << "\t-buffer_ft N\tSet the depth of hub buffers to tile [flits]" << endl
          << "\t-buffer_antenna N\tSet the depth of hub antenna buffers (RX/TX) [flits]" << endl
+	 << "\t-vc N\tNumber of virtual channels" << endl
          << "\t-winoc enable radio hub wireless transmission" << endl
          << "\t-wirxsleep enable radio hub wireless power manager" << endl
          << "\t-size Nmin Nmax\tSet the minimum and maximum packet size [flits]" << endl
@@ -205,6 +216,7 @@ void showHelp(char selfname[])
          << "\t-show_buf_stats\tShow buffers statistics" << endl
          << "\t-volume N\tStop the simulation when either the maximum number of cycles has been reached or N flits have" << endl
          << "\t\t\tbeen delivered" << endl
+         << "\t-asciimonitor\tShow status of the network while running (experimental)" << endl
          << "\t-sim N\t\tRun for the specified simulation time [cycles]" << endl
          << endl
          << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <maurizio.palesi@unikore.it>" << endl
@@ -222,6 +234,7 @@ void showConfig()
          << "- mesh_dim_x = " << GlobalParams::mesh_dim_x << endl
          << "- mesh_dim_y = " << GlobalParams::mesh_dim_y << endl
          << "- buffer_depth = " << GlobalParams::buffer_depth << endl
+         << "- n_virtual_channels = " << GlobalParams::n_virtual_channels << endl
          << "- max_packet_size = " << GlobalParams::max_packet_size << endl
          << "- routing_algorithm = " << GlobalParams::routing_algorithm << endl
       // << "- routing_table_filename = " << GlobalParams::routing_table_filename << endl
@@ -309,6 +322,10 @@ void checkConfiguration()
 	cerr << "Error: simulation time must be positive" << endl;
 	exit(1);
     }
+    if (GlobalParams::n_virtual_channels > MAX_VIRTUAL_CHANNELS) {
+	cerr << "Error: number of virtual channels must be less than " << MAX_VIRTUAL_CHANNELS <<endl;
+	exit(1);
+    }
 
     if (GlobalParams::stats_warm_up_time >
 	GlobalParams::simulation_time) {
@@ -324,6 +341,37 @@ void checkConfiguration()
     }
 
 
+    if (GlobalParams::n_virtual_channels>1 && GlobalParams::selection_strategy.compare("NOP")==0)
+    {
+	cerr << "Error: NoP selection strategy can be used only with a single virtual channel" << endl;
+	exit(1);
+    }
+
+    if (GlobalParams::n_virtual_channels>1 && GlobalParams::selection_strategy.compare("BUFFER_LEVEL")==0)
+    {
+	cerr << "Error: Buffer level selection strategy can be used only with a single virtual channel" << endl;
+	exit(1);
+    }
+    if (GlobalParams::n_virtual_channels>MAX_VIRTUAL_CHANNELS) 
+    {
+	cerr << "Error: cannot use more than " << MAX_VIRTUAL_CHANNELS << " virtual channels." << endl
+	     << "If you need more vc please modify the MAX_VIRTUAL_CHANNELS definition in " << endl
+	     << "GlobalParams.h and compile again " << endl;
+	exit(1);
+    }
+    if (GlobalParams::n_virtual_channels>1 && GlobalParams::use_powermanager)
+    {
+	cerr << "Error: Power manager (-wirxsleep) option only supports a single virtual channel" << endl;
+	exit(1);
+    }
+
+    if (GlobalParams::ascii_monitor)
+    {
+#ifdef DEBUG
+	cerr << "-ascii_monitor option need DEBUG flag to be disabled in Makefile " << endl;
+	exit(1);
+#endif
+    }
 }
 
 void parseCmdLine(int arg_num, char *arg_vet[])
@@ -355,6 +403,8 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		setBufferFromTile(atoi(arg_vet[++i]));
 	    else if (!strcmp(arg_vet[i], "-buffer_antenna"))
 		setBufferAntenna(atoi(arg_vet[++i]));
+	    else if (!strcmp(arg_vet[i], "-vc"))
+		GlobalParams::n_virtual_channels = (atoi(arg_vet[++i]));
 	    else if (!strcmp(arg_vet[i], "-flit"))
 		GlobalParams::flit_size = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-winoc")) 
@@ -384,8 +434,10 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 	    } 
 	    else if (!strcmp(arg_vet[i], "-pir")) 
 	    {
+		
 		GlobalParams::packet_injection_rate = atof(arg_vet[++i]);
-		char *distribution = arg_vet[++i];
+		char *distribution = arg_vet[i+1<arg_num?++i:i];
+		
 		if (!strcmp(distribution, "poisson"))
 		    GlobalParams::probability_of_retransmission = GlobalParams::packet_injection_rate;
 		else if (!strcmp(distribution, "burst")) 
@@ -457,6 +509,8 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		    atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-sim"))
 		GlobalParams::simulation_time = atoi(arg_vet[++i]);
+	    else if (!strcmp(arg_vet[i], "-asciimonitor")) 
+		GlobalParams::ascii_monitor = true;
 	    else if (!strcmp(arg_vet[i], "-config") || !strcmp(arg_vet[i], "-power"))
 		// -config is managed from configure function
 		// i++ skips the configuration file name 

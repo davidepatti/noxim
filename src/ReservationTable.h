@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2010 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -17,6 +17,23 @@
 
 using namespace std;
 
+
+struct TReservation
+{
+    int input;
+    int vc;
+    inline bool operator ==(const TReservation & r) const
+    {
+	return (r.input==input && r.vc == vc);
+    }
+};
+
+typedef struct RTEntry
+{
+    vector<TReservation> reservations;
+    int index;
+} TRTEntry;
+
 class ReservationTable {
   public:
 
@@ -24,29 +41,35 @@ class ReservationTable {
 
     inline string name() const {return "ReservationTable";};
 
-
-    // check if port_out is reservable
-    bool isAvailable(const int port_out);
+    // check if the input/vc/output is a
+    int checkReservation(const TReservation r, const int port_out);
 
     // Connects port_in with port_out. Asserts if port_out is reserved
-    void reserve(const int port_in, const int port_out);
+    void reserve(const TReservation r, const int port_out);
 
     // Releases port_out connection. 
     // Asserts if port_out is not reserved or not valid
-    void release(const int port_out);
+    void release(const TReservation r, const int port_out);
 
-    // Returns the output port connected to port_in.
-    int getOutputPort(const int port_in);
+    // Returns the pairs of output port and virtual channel reserved by port_in
+    vector<pair<int,int> > getReservations(const int port_int);
 
-    // Makes output port no longer available for reservation/release
-    void invalidate(const int port_out);
+    // update the index of the reservation having highest priority in the current cycle
+    void updateIndex();
 
+    // check whether port_out has no reservations
+    bool isNotReserved(const int port_out);
+
+    void setSize(const int n_outputs);
+
+    void print();
 
   private:
 
+     TRTEntry *rtable;	// reservation vector: rtable[i] gives a RTEntry containing the set of input/VC 
+			// which reserved output port
 
-     map<int,int> rtable;	// reservation vector: rtable[i] gives the input
-    // port whose output port 'i' is connected to
+     int n_outputs;
 };
 
 #endif

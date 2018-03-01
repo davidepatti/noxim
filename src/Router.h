@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2010 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -43,10 +43,12 @@ SC_MODULE(Router)
     sc_in <Flit> flit_rx[DIRECTIONS + 2];	  // The input channels 
     sc_in <bool> req_rx[DIRECTIONS + 2];	  // The requests associated with the input channels
     sc_out <bool> ack_rx[DIRECTIONS + 2];	  // The outgoing ack signals associated with the input channels
+    sc_out <TBufferFullStatus> buffer_full_status_rx[DIRECTIONS+2];
 
     sc_out <Flit> flit_tx[DIRECTIONS + 2];   // The output channels
     sc_out <bool> req_tx[DIRECTIONS + 2];	  // The requests associated with the output channels
     sc_in <bool> ack_tx[DIRECTIONS + 2];	  // The outgoing ack signals associated with the output channels
+    sc_in <TBufferFullStatus> buffer_full_status_tx[DIRECTIONS+2];
 
     sc_out <int> free_slots[DIRECTIONS + 1];
     sc_in <int> free_slots_neighbor[DIRECTIONS + 1];
@@ -57,20 +59,16 @@ SC_MODULE(Router)
 
     // Registers
 
-    /*
-       Coord position;                     // Router position inside the mesh
-     */
     int local_id;		                // Unique ID
     int routing_type;		                // Type of routing algorithm
     int selection_type;
-    Buffer buffer[DIRECTIONS + 2];	        // Buffer for each input channel 
+    BufferBank buffer[DIRECTIONS + 2];		// buffer[direction][virtual_channel] 
     bool current_level_rx[DIRECTIONS + 2];	// Current level for Alternating Bit Protocol (ABP)
     bool current_level_tx[DIRECTIONS + 2];	// Current level for Alternating Bit Protocol (ABP)
     Stats stats;		                // Statistics
     Power power;
-    LocalRoutingTable routing_table;	// Routing table
-    ReservationTable reservation_table;	// Switch reservation table
-    int start_from_port;	                // Port from which to start the reservation cycle
+    LocalRoutingTable routing_table;		// Routing table
+    ReservationTable reservation_table;		// Switch reservation table
     unsigned long routed_flits;
     RoutingAlgorithm * routingAlgorithm; 
     SelectionStrategy * selectionStrategy; 
@@ -86,7 +84,6 @@ SC_MODULE(Router)
 		   GlobalRoutingTable & grt);
 
     unsigned long getRoutedFlits();	// Returns the number of routed flits 
-    unsigned int getFlitsCount();	// Returns the number of flits into the router
 
     // Constructor
 
@@ -131,6 +128,9 @@ SC_MODULE(Router)
     int NoPScore(const NoP_data & nop_data, const vector <int> & nop_channels) const;
     int reflexDirection(int direction) const;
     int getNeighborId(int _id, int direction) const;
+   
+    int start_from_port;	     // Port from which to start the reservation cycle
+    int start_from_vc[DIRECTIONS+2]; // VC from which to start the reservation cycle for the specific port
 
   public:
     unsigned int local_drained;

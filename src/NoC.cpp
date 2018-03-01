@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2015 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -10,12 +10,16 @@
 
 #include "NoC.h"
 
+using namespace std;
+
 void NoC::buildMesh()
 {
+
 
     token_ring = new TokenRing("tokenring");
     token_ring->clock(clock);
     token_ring->reset(reset);
+
 
     char channel_name[16];
     for (map<int, ChannelConfig>::iterator it = GlobalParams::channel_configuration.begin();
@@ -33,6 +37,7 @@ void NoC::buildMesh()
             ++it)
     {
         int hub_id = it->first;
+	//LOG << " hub id " <<  hub_id;
         HubConfig hub_config = it->second;
 
         sprintf(hub_name, "Hub_%d", hub_id);
@@ -79,11 +84,6 @@ void NoC::buildMesh()
 	
 	int no_channels = hub_config.txChannels.size();
 
-	if (no_channels > 1)
-	{
-	    cerr << " WARNING: Power model currently not supporting multi-channel per hub, using default_tx_energy" << endl;
-	}
-
 	int data_rate_gbs;
 	
 	if (no_channels > 0) {
@@ -92,19 +92,17 @@ void NoC::buildMesh()
 	else
 	    data_rate_gbs = NOT_VALID;
 
-
-	// TODO: update power model (configureHub to support different
-	// tx/tx buffer depth
-	assert(GlobalParams::hub_configuration[hub_id].rxBufferSize==GlobalParams::hub_configuration[hub_id].txBufferSize);
+	// TODO: update power model (configureHub to support different tx/tx buffer depth in the power breakdown
+	// Currently, an averaged value is used when accounting in Power class methods
 	
 	hub[hub_id]->power.configureHub(GlobalParams::flit_size,
 		                        GlobalParams::hub_configuration[hub_id].toTileBufferSize,
 		                        GlobalParams::hub_configuration[hub_id].fromTileBufferSize,
 					GlobalParams::flit_size,
 					GlobalParams::hub_configuration[hub_id].rxBufferSize,
+					GlobalParams::hub_configuration[hub_id].txBufferSize,
 					GlobalParams::flit_size,
 					data_rate_gbs);
-
     }
 
 
@@ -125,6 +123,7 @@ void NoC::buildMesh()
 
     req = new sc_signal_NSWEH<bool>*[dimX];
     ack = new sc_signal_NSWEH<bool>*[dimX];
+    buffer_full_status = new sc_signal_NSWEH<TBufferFullStatus>*[dimX];
     flit = new sc_signal_NSWEH<Flit>*[dimX];
 
     free_slots = new sc_signal_NSWE<int>*[dimX];
@@ -133,6 +132,7 @@ void NoC::buildMesh()
     for (int i=0; i < dimX; i++) {
         req[i] = new sc_signal_NSWEH<bool>[dimY];
         ack[i] = new sc_signal_NSWEH<bool>[dimY];
+	buffer_full_status[i] = new sc_signal_NSWEH<TBufferFullStatus>[dimY];
         flit[i] = new sc_signal_NSWEH<Flit>[dimY];
 
         free_slots[i] = new sc_signal_NSWE<int>[dimY];
@@ -183,46 +183,56 @@ void NoC::buildMesh()
 	    t[i][j]->req_rx[DIRECTION_NORTH] (req[i][j].south);
 	    t[i][j]->flit_rx[DIRECTION_NORTH] (flit[i][j].south);
 	    t[i][j]->ack_rx[DIRECTION_NORTH] (ack[i][j].north);
+	    t[i][j]->buffer_full_status_rx[DIRECTION_NORTH] (buffer_full_status[i][j].north);
 
 	    t[i][j]->req_rx[DIRECTION_EAST] (req[i + 1][j].west);
 	    t[i][j]->flit_rx[DIRECTION_EAST] (flit[i + 1][j].west);
 	    t[i][j]->ack_rx[DIRECTION_EAST] (ack[i + 1][j].east);
+	    t[i][j]->buffer_full_status_rx[DIRECTION_EAST] (buffer_full_status[i+1][j].east);
 
 	    t[i][j]->req_rx[DIRECTION_SOUTH] (req[i][j + 1].north);
 	    t[i][j]->flit_rx[DIRECTION_SOUTH] (flit[i][j + 1].north);
 	    t[i][j]->ack_rx[DIRECTION_SOUTH] (ack[i][j + 1].south);
+	    t[i][j]->buffer_full_status_rx[DIRECTION_SOUTH] (buffer_full_status[i][j+1].south);
 
 	    t[i][j]->req_rx[DIRECTION_WEST] (req[i][j].east);
 	    t[i][j]->flit_rx[DIRECTION_WEST] (flit[i][j].east);
 	    t[i][j]->ack_rx[DIRECTION_WEST] (ack[i][j].west);
+	    t[i][j]->buffer_full_status_rx[DIRECTION_WEST] (buffer_full_status[i][j].west);
 
 	    // Map Tx signals
 	    t[i][j]->req_tx[DIRECTION_NORTH] (req[i][j].north);
 	    t[i][j]->flit_tx[DIRECTION_NORTH] (flit[i][j].north);
 	    t[i][j]->ack_tx[DIRECTION_NORTH] (ack[i][j].south);
+	    t[i][j]->buffer_full_status_tx[DIRECTION_NORTH] (buffer_full_status[i][j].south);
 
 	    t[i][j]->req_tx[DIRECTION_EAST] (req[i + 1][j].east);
 	    t[i][j]->flit_tx[DIRECTION_EAST] (flit[i + 1][j].east);
 	    t[i][j]->ack_tx[DIRECTION_EAST] (ack[i + 1][j].west);
+	    t[i][j]->buffer_full_status_tx[DIRECTION_EAST] (buffer_full_status[i + 1][j].west);
 
 	    t[i][j]->req_tx[DIRECTION_SOUTH] (req[i][j + 1].south);
 	    t[i][j]->flit_tx[DIRECTION_SOUTH] (flit[i][j + 1].south);
 	    t[i][j]->ack_tx[DIRECTION_SOUTH] (ack[i][j + 1].north);
+	    t[i][j]->buffer_full_status_tx[DIRECTION_SOUTH] (buffer_full_status[i][j + 1].north);
 
 	    t[i][j]->req_tx[DIRECTION_WEST] (req[i][j].west);
 	    t[i][j]->flit_tx[DIRECTION_WEST] (flit[i][j].west);
 	    t[i][j]->ack_tx[DIRECTION_WEST] (ack[i][j].east);
+	    t[i][j]->buffer_full_status_tx[DIRECTION_WEST] (buffer_full_status[i][j].east);
 
 	    // TODO: check if hub signal is always required
 	    // signals/port when tile receives(rx) from hub
 	    t[i][j]->hub_req_rx(req[i][j].from_hub);
 	    t[i][j]->hub_flit_rx(flit[i][j].from_hub);
 	    t[i][j]->hub_ack_rx(ack[i][j].to_hub);
+	    t[i][j]->hub_buffer_full_status_rx(buffer_full_status[i][j].to_hub);
 
 	    // signals/port when tile transmits(tx) to hub
 	    t[i][j]->hub_req_tx(req[i][j].to_hub); // 7, sc_out
 	    t[i][j]->hub_flit_tx(flit[i][j].to_hub);
 	    t[i][j]->hub_ack_tx(ack[i][j].from_hub);
+	    t[i][j]->hub_buffer_full_status_tx(buffer_full_status[i][j].from_hub);
 
         // TODO: Review port index. Connect each Hub to all its Channels 
         map<int, int>::iterator it = GlobalParams::hub_for_tile.find(tile_id);
@@ -239,10 +249,12 @@ void NoC::buildMesh()
             hub[hub_id]->req_rx[port](req[i][j].to_hub);
             hub[hub_id]->flit_rx[port](flit[i][j].to_hub);
             hub[hub_id]->ack_rx[port](ack[i][j].from_hub);
+            hub[hub_id]->buffer_full_status_rx[port](buffer_full_status[i][j].from_hub);
 
             hub[hub_id]->flit_tx[port](flit[i][j].from_hub);
             hub[hub_id]->req_tx[port](req[i][j].from_hub);
             hub[hub_id]->ack_tx[port](ack[i][j].to_hub);
+            hub[hub_id]->buffer_full_status_tx[port](buffer_full_status[i][j].to_hub);
         }
 
         // Map buffer level signals (analogy with req_tx/rx port mapping)
@@ -280,7 +292,9 @@ void NoC::buildMesh()
 	tmp_NoP.channel_status_neighbor[i].available = false;
     }
 
+
     // Clear signals for borderline nodes
+
     for (int i = 0; i <= GlobalParams::mesh_dim_x; i++) {
 	req[i][0].south = 0;
 	ack[i][0].north = 0;
@@ -308,17 +322,6 @@ void NoC::buildMesh()
 	nop_data[GlobalParams::mesh_dim_x][j].west.write(tmp_NoP);
 
     }
-    
-
-    // invalidate reservation table entries for non-exhistent channels
-    for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
-	t[i][0]->r->reservation_table.invalidate(DIRECTION_NORTH);
-	t[i][GlobalParams::mesh_dim_y - 1]->r->reservation_table.invalidate(DIRECTION_SOUTH);
-    }
-    for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
-	t[0][j]->r->reservation_table.invalidate(DIRECTION_WEST);
-	t[GlobalParams::mesh_dim_x - 1][j]->r->reservation_table.invalidate(DIRECTION_EAST);
-    }
 }
 
 Tile *NoC::searchNode(const int id) const
@@ -330,3 +333,30 @@ Tile *NoC::searchNode(const int id) const
 
     return NULL;
 }
+
+void NoC::asciiMonitor()
+{ 
+    //cout << sc_time_stamp().to_double()/GlobalParams::clock_period_ps << endl;
+    system("clear");
+    //
+    // asciishow proof-of-concept #1 free slots
+   
+    for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
+    {
+	for (int s = 0; s<3; s++)
+	{
+	    for (int i = 0; i < GlobalParams::mesh_dim_x; i++)
+	    {
+		if (s==0)
+		    std::printf("|  %d  ",t[i][j]->r->buffer[s][0].getCurrentFreeSlots());
+		else
+		    if (s==1)
+			std::printf("|%d   %d",t[i][j]->r->buffer[s][0].getCurrentFreeSlots(),t[i][j]->r->buffer[3][0].getCurrentFreeSlots());
+		    else
+			std::printf("|__%d__",t[i][j]->r->buffer[2][0].getCurrentFreeSlots());
+	    }
+	    cout << endl;
+	}
+    }
+}
+

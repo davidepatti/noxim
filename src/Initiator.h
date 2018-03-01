@@ -1,3 +1,13 @@
+/*
+ * Noxim - the NoC Simulator
+ *
+ * (C) 2005-2018 by the University of Catania
+ * For the complete list of authors refer to file ../doc/AUTHORS.txt
+ * For the license applied to these sources refer to file ../doc/LICENSE.txt
+ *
+ * This file contains the declaration of the global params needed by Noxim
+ * to forward configuration to every sub-block
+ */
 #ifndef __NOXIMTLMINITIATOR_H__
 #define __NOXIMTLMINITIATOR_H__
 
@@ -31,7 +41,10 @@ struct Initiator: sc_module
   Initiator(sc_module_name nm,Hub* h): sc_module(nm),hub(h), socket("socket")
   {
 
+      int c;
       if (GlobalParams::use_winoc) SC_THREAD(thread_process);
+      sscanf(nm,"init_%d",&c);
+      _channel_id = c;
   }
 
   void thread_process();
@@ -44,6 +57,9 @@ struct Initiator: sc_module
 
   Buffer buffer_tx;
   Flit flit_payload; 
+
+    private: 
+  int _channel_id;
 };
 
 #endif

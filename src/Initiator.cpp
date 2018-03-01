@@ -1,3 +1,12 @@
+/*
+ * Noxim - the NoC Simulator
+ *
+ * (C) 2005-2018 by the University of Catania
+ * For the complete list of authors refer to file ../doc/AUTHORS.txt
+ * For the license applied to these sources refer to file ../doc/LICENSE.txt
+ *
+ * This file contains the implementation of the buffer
+ */
 #include "Hub.h"
 #include "Initiator.h"
 
@@ -10,7 +19,6 @@
 
       while (1)
       {
-
 	  LOG << " *** waiting for transmissions" << endl;
 
 	  wait(start_request_event);
@@ -41,14 +49,25 @@
 	  hub->power.wirelessTx(hub->local_id,destHub,GlobalParams::flit_size);
 
 	  // Initiator obliged to check response status and delay
-	  if ( !trans->is_response_error() )
+	  if (!trans->is_response_error() )
 	  {
 	      buffer_tx.Pop();
 	      hub->power.antennaBufferPop();
+
+	      if (flit_payload.flit_type == FLIT_TYPE_HEAD) 
+		  hub->transmission_in_progress[_channel_id] = true;
+
+	      if (flit_payload.flit_type == FLIT_TYPE_TAIL)
+	      {
+		  LOG << "*** [Ch"<< _channel_id <<"] tail flit sent " << flit_payload << ", releasing token" << endl;
+		  hub->flag[_channel_id]->write(RELEASE_CHANNEL);
+		  // TODO: vector for multiple channel
+		  hub->transmission_in_progress[_channel_id] = false;
+	      }
 	  }
 	  else
 	  {
-		LOG << " WARNING: incomplete transaction " << endl;
+	      LOG << " WARNING: incomplete transaction " << endl;
 	  }
 
 	  //check_transaction( *trans );

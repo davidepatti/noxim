@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2010 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -38,7 +38,8 @@ class Power {
 	              int buffer_to_tile_depth, 
 	              int buffer_from_tile_depth, 
 		      int buffer_item_size, 
-		      int antenna_buffer_depth, 
+		      int antenna_buffer_rx_depth, 
+		      int antenna_buffer_tx_depth, 
 		      int antenna_buffer_item_size, 
 		      int data_rate_gbs);
 

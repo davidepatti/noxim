@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2010 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -51,6 +51,7 @@ SC_MODULE(NoC)
     // Signals
     sc_signal_NSWEH<bool> **req;
     sc_signal_NSWEH<bool> **ack;
+    sc_signal_NSWEH<TBufferFullStatus> **buffer_full_status;
     sc_signal_NSWEH<Flit> **flit;
     sc_signal_NSWE<int> **free_slots;
 
@@ -74,9 +75,15 @@ SC_MODULE(NoC)
 
     SC_CTOR(NoC) {
 
-
 	// Build the Mesh
 	buildMesh();
+
+	if (GlobalParams::ascii_monitor)
+	{
+	    SC_METHOD(asciiMonitor);
+	    sensitive << clock.pos();
+	}
+
     }
 
     // Support methods
@@ -85,6 +92,7 @@ SC_MODULE(NoC)
   private:
 
     void buildMesh();
+    void asciiMonitor();
 };
 
 //Hub * dd;

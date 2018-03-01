@@ -1,0 +1,836 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ANTENNA_BUFFER_FRONT_PWR_D	DataStructs.h	/^    ANTENNA_BUFFER_FRONT_PWR_D,$/;"	e	enum:__anon8
+ANTENNA_BUFFER_POP_PWR_D	DataStructs.h	/^    ANTENNA_BUFFER_POP_PWR_D,$/;"	e	enum:__anon8
+ANTENNA_BUFFER_PUSH_PWR_D	DataStructs.h	/^    ANTENNA_BUFFER_PUSH_PWR_D,$/;"	e	enum:__anon8
+ANTENNA_BUFFER_PWR_S	DataStructs.h	/^    ANTENNA_BUFFER_PWR_S,$/;"	e	enum:__anon9
+AdmissibleOutputs	GlobalRoutingTable.h	/^typedef set < LinkId > AdmissibleOutputs;$/;"	t
+BUFFER_FROM_TILE_FRONT_PWR_D	DataStructs.h	/^    BUFFER_FROM_TILE_FRONT_PWR_D,$/;"	e	enum:__anon8
+BUFFER_FROM_TILE_POP_PWR_D	DataStructs.h	/^    BUFFER_FROM_TILE_POP_PWR_D,$/;"	e	enum:__anon8
+BUFFER_FROM_TILE_PUSH_PWR_D	DataStructs.h	/^    BUFFER_FROM_TILE_PUSH_PWR_D,$/;"	e	enum:__anon8
+BUFFER_FROM_TILE_PWR_S	DataStructs.h	/^    BUFFER_FROM_TILE_PWR_S,$/;"	e	enum:__anon9
+BUFFER_FRONT_PWR_D	DataStructs.h	/^    BUFFER_FRONT_PWR_D,$/;"	e	enum:__anon8
+BUFFER_POP_PWR_D	DataStructs.h	/^    BUFFER_POP_PWR_D,$/;"	e	enum:__anon8
+BUFFER_PUSH_PWR_D	DataStructs.h	/^    BUFFER_PUSH_PWR_D,$/;"	e	enum:__anon8
+BUFFER_ROUTER_PWR_S	DataStructs.h	/^    BUFFER_ROUTER_PWR_S,$/;"	e	enum:__anon9
+BUFFER_TO_TILE_FRONT_PWR_D	DataStructs.h	/^    BUFFER_TO_TILE_FRONT_PWR_D,$/;"	e	enum:__anon8
+BUFFER_TO_TILE_POP_PWR_D	DataStructs.h	/^    BUFFER_TO_TILE_POP_PWR_D,$/;"	e	enum:__anon8
+BUFFER_TO_TILE_PUSH_PWR_D	DataStructs.h	/^    BUFFER_TO_TILE_PUSH_PWR_D,$/;"	e	enum:__anon8
+BUFFER_TO_TILE_PWR_S	DataStructs.h	/^    BUFFER_TO_TILE_PWR_S,$/;"	e	enum:__anon9
+Buffer	Buffer.cpp	/^Buffer::Buffer()$/;"	f	class:Buffer
+Buffer	Buffer.h	/^class Buffer {$/;"	c
+BufferBank	Buffer.h	/^typedef Buffer BufferBank[MAX_VIRTUAL_CHANNELS];$/;"	t
+BufferPowerConfig	GlobalParams.h	/^} BufferPowerConfig;$/;"	t	typeref:struct:__anon3
+COLUMN_AOC	GlobalRoutingTable.h	/^#define COLUMN_AOC /;"	d
+CONFIG_FILENAME	GlobalParams.h	/^#define CONFIG_FILENAME /;"	d
+CROSSBAR_PWR_D	DataStructs.h	/^    CROSSBAR_PWR_D,$/;"	e	enum:__anon8
+CROSSBAR_PWR_S	DataStructs.h	/^    CROSSBAR_PWR_S,$/;"	e	enum:__anon9
+CXX	Makefile	/^CXX      := g++$/;"	m
+CXXFLAGS	Makefile	/^CXXFLAGS := $(OPT) $(OTHER) $(DEBUG)$/;"	m
+Channel	Channel.h	/^  Channel(sc_module_name nm, int id)$/;"	f	struct:Channel
+Channel	Channel.h	/^struct Channel: sc_module$/;"	s
+ChannelConfig	GlobalParams.h	/^} ChannelConfig;$/;"	t	typeref:struct:__anon1
+ChannelStatus	DataStructs.h	/^struct ChannelStatus {$/;"	s
+CommHistory	Stats.h	/^struct CommHistory {$/;"	s
+Communication	GlobalTrafficTable.h	/^struct Communication {$/;"	s
+Coord	DataStructs.h	/^class Coord {$/;"	c
+DEBUG	Makefile	/^DEBUG    := #-g -DDEBUG$/;"	m
+DEFAULT_VC	GlobalParams.h	/^#define DEFAULT_VC /;"	d
+DIRECTIONS	GlobalParams.h	/^#define DIRECTIONS /;"	d
+DIRECTION_EAST	GlobalParams.h	/^#define DIRECTION_EAST /;"	d
+DIRECTION_HUB	GlobalParams.h	/^#define DIRECTION_HUB /;"	d
+DIRECTION_LOCAL	GlobalParams.h	/^#define DIRECTION_LOCAL /;"	d
+DIRECTION_NORTH	GlobalParams.h	/^#define DIRECTION_NORTH /;"	d
+DIRECTION_SOUTH	GlobalParams.h	/^#define DIRECTION_SOUTH /;"	d
+DIRECTION_WEST	GlobalParams.h	/^#define DIRECTION_WEST /;"	d
+DIRECTION_WIRELESS	GlobalParams.h	/^#define DIRECTION_WIRELESS /;"	d
+Disable	Buffer.cpp	/^void Buffer::Disable()$/;"	f	class:Buffer
+Drop	Buffer.cpp	/^void Buffer::Drop(const Flit & flit) const$/;"	f	class:Buffer
+Empty	Buffer.cpp	/^void Buffer::Empty() const$/;"	f	class:Buffer
+FLIT_TYPE_BODY	DataStructs.h	/^    FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL$/;"	e	enum:FlitType
+FLIT_TYPE_HEAD	DataStructs.h	/^    FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL$/;"	e	enum:FlitType
+FLIT_TYPE_TAIL	DataStructs.h	/^    FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL$/;"	e	enum:FlitType
+Flit	DataStructs.h	/^struct Flit {$/;"	s
+FlitType	DataStructs.h	/^enum FlitType {$/;"	g
+Front	Buffer.cpp	/^Flit Buffer::Front() const$/;"	f	class:Buffer
+GetMaxBufferSize	Buffer.cpp	/^unsigned int Buffer::GetMaxBufferSize() const$/;"	f	class:Buffer
+GlobalParams	GlobalParams.h	/^struct GlobalParams {$/;"	s
+GlobalRoutingTable	GlobalRoutingTable.cpp	/^GlobalRoutingTable::GlobalRoutingTable()$/;"	f	class:GlobalRoutingTable
+GlobalRoutingTable	GlobalRoutingTable.h	/^class GlobalRoutingTable {$/;"	c
+GlobalStats	GlobalStats.cpp	/^GlobalStats::GlobalStats(const NoC * _noc)$/;"	f	class:GlobalStats
+GlobalStats	GlobalStats.h	/^class GlobalStats {$/;"	c
+GlobalTrafficTable	GlobalTrafficTable.cpp	/^GlobalTrafficTable::GlobalTrafficTable()$/;"	f	class:GlobalTrafficTable
+GlobalTrafficTable	GlobalTrafficTable.h	/^class GlobalTrafficTable {$/;"	c
+HOLD_CHANNEL	GlobalParams.h	/^#define HOLD_CHANNEL /;"	d
+HubConfig	GlobalParams.h	/^} HubConfig;$/;"	t	typeref:struct:__anon2
+HubPowerConfig	GlobalParams.h	/^} HubPowerConfig;$/;"	t	typeref:struct:__anon5
+INCDIR	Makefile	/^INCDIR := -I$(SRCDIR) -isystem $(SYSTEMC)\/include -I$(YAML)\/include$/;"	m
+Initiator	Initiator.h	/^  Initiator(sc_module_name nm,Hub* h): sc_module(nm),hub(h), socket("socket")$/;"	f	struct:Initiator
+Initiator	Initiator.h	/^struct Initiator: sc_module$/;"	s
+IsEmpty	Buffer.cpp	/^bool Buffer::IsEmpty() const$/;"	f	class:Buffer
+IsFull	Buffer.cpp	/^bool Buffer::IsFull() const$/;"	f	class:Buffer
+LIBDIR	Makefile	/^LIBDIR := -L$(SRCDIR) -L$(SYSTEMC_LIBS) -L$(YAML)\/lib$/;"	m
+LIBS	Makefile	/^LIBS := -lsystemc -lm -lyaml-cpp $/;"	m
+LINK_R2H_PWR_D	DataStructs.h	/^    LINK_R2H_PWR_D,$/;"	e	enum:__anon8
+LINK_R2H_PWR_S	DataStructs.h	/^    LINK_R2H_PWR_S,$/;"	e	enum:__anon9
+LINK_R2R_PWR_D	DataStructs.h	/^    LINK_R2R_PWR_D,$/;"	e	enum:__anon8
+LOG	Utils.h	/^#define LOG /;"	d
+LOG	Utils.h	/^static onullstream LOG;$/;"	v
+LinkBitLinePowerConfig	GlobalParams.h	/^typedef map<double, pair <double, double> > LinkBitLinePowerConfig;$/;"	t
+LinkId	GlobalRoutingTable.h	/^typedef pair < int, int >LinkId;$/;"	t
+LocalRoutingTable	LocalRoutingTable.cpp	/^LocalRoutingTable::LocalRoutingTable()$/;"	f	class:LocalRoutingTable
+LocalRoutingTable	LocalRoutingTable.h	/^class LocalRoutingTable {$/;"	c
+MAX_VIRTUAL_CHANNELS	GlobalParams.h	/^#define MAX_VIRTUAL_CHANNELS	/;"	d
+MEM_SIZE	Target.h	/^#define MEM_SIZE /;"	d
+MODULE	Makefile	/^MODULE := noxim$/;"	m
+NI_PWR_D	DataStructs.h	/^    NI_PWR_D,$/;"	e	enum:__anon8
+NI_PWR_S	DataStructs.h	/^    NI_PWR_S,$/;"	e	enum:__anon9
+NOT_RESERVED	GlobalParams.h	/^#define NOT_RESERVED /;"	d
+NOT_VALID	GlobalParams.h	/^#define NOT_VALID /;"	d
+NO_BREAKDOWN_ENTRIES_D	DataStructs.h	/^    NO_BREAKDOWN_ENTRIES_D$/;"	e	enum:__anon8
+NO_BREAKDOWN_ENTRIES_S	DataStructs.h	/^    NO_BREAKDOWN_ENTRIES_S$/;"	e	enum:__anon9
+NoPScore	Router.cpp	/^int Router::NoPScore(const NoP_data & nop_data,$/;"	f	class:Router
+NoP_data	DataStructs.h	/^struct NoP_data {$/;"	s
+NoP_report	Router.cpp	/^void Router::NoP_report() const$/;"	f	class:Router
+OBJDIR	Makefile	/^OBJDIR  := .\/build$/;"	m
+OBJS	Makefile	/^OBJS := $(subst $(SRCDIR),$(OBJDIR),$(SRCS:.cpp=.o))$/;"	m
+OPT	Makefile	/^OPT      := -O3$/;"	m
+OTHER	Makefile	/^OTHER    := -Wall -DSC_NO_WRITE_CHECK# -Wno-deprecated$/;"	m
+POWER_CONFIG_FILENAME	GlobalParams.h	/^#define POWER_CONFIG_FILENAME /;"	d
+Packet	DataStructs.h	/^    Packet() { }$/;"	f	struct:Packet
+Packet	DataStructs.h	/^    Packet(const int s, const int d, const int vc, const double ts, const int sz) {$/;"	f	struct:Packet
+Packet	DataStructs.h	/^struct Packet {$/;"	s
+Payload	DataStructs.h	/^struct Payload {$/;"	s
+Pop	Buffer.cpp	/^Flit Buffer::Pop()$/;"	f	class:Buffer
+Power	Power.cpp	/^Power::Power()$/;"	f	class:Power
+Power	Power.h	/^class Power {$/;"	c
+PowerBreakdown	DataStructs.h	/^} PowerBreakdown;$/;"	t	typeref:struct:__anon10
+PowerBreakdownEntry	DataStructs.h	/^} PowerBreakdownEntry;$/;"	t	typeref:struct:__anon7
+PowerConfig	GlobalParams.h	/^} PowerConfig;$/;"	t	typeref:struct:__anon6
+Print	Buffer.cpp	/^void Buffer::Print()$/;"	f	class:Buffer
+Push	Buffer.cpp	/^void Buffer::Push(const Flit & flit)$/;"	f	class:Buffer
+RELEASE_CHANNEL	GlobalParams.h	/^#define RELEASE_CHANNEL /;"	d
+ROUTING_DYAD	GlobalParams.h	/^#define ROUTING_DYAD /;"	d
+ROUTING_PWR_D	DataStructs.h	/^    ROUTING_PWR_D,$/;"	e	enum:__anon8
+ROUTING_PWR_S	DataStructs.h	/^    ROUTING_PWR_S,$/;"	e	enum:__anon9
+ROUTING_TABLE_BASED	GlobalParams.h	/^#define ROUTING_TABLE_BASED /;"	d
+RTEntry	ReservationTable.h	/^typedef struct RTEntry$/;"	s
+RT_ALREADY	GlobalParams.h	/^#define RT_ALREADY /;"	d
+RT_AVAILABLE	GlobalParams.h	/^#define RT_AVAILABLE /;"	d
+RT_OUTVC_BUSY	GlobalParams.h	/^#define RT_OUTVC_BUSY /;"	d
+ReservationTable	ReservationTable.cpp	/^ReservationTable::ReservationTable()$/;"	f	class:ReservationTable
+ReservationTable	ReservationTable.h	/^class ReservationTable {$/;"	c
+RouteData	DataStructs.h	/^struct RouteData {$/;"	s
+RouterPowerConfig	GlobalParams.h	/^} RouterPowerConfig;$/;"	t	typeref:struct:__anon4
+RoutingAlgorithm	routingAlgorithms/RoutingAlgorithm.h	/^class RoutingAlgorithm$/;"	c
+RoutingAlgorithms	routingAlgorithms/RoutingAlgorithms.h	/^class RoutingAlgorithms {$/;"	c
+RoutingAlgorithmsMap	routingAlgorithms/RoutingAlgorithms.h	/^typedef map<string, RoutingAlgorithm * > RoutingAlgorithmsMap;$/;"	t
+RoutingAlgorithmsRegister	routingAlgorithms/RoutingAlgorithms.h	/^	RoutingAlgorithmsRegister(const string & routingAlgorithmName, RoutingAlgorithm * routingAlgorithm) {$/;"	f	struct:RoutingAlgorithmsRegister
+RoutingAlgorithmsRegister	routingAlgorithms/RoutingAlgorithms.h	/^struct RoutingAlgorithmsRegister : RoutingAlgorithms {$/;"	s
+RoutingTableLink	GlobalRoutingTable.h	/^typedef map < int, AdmissibleOutputs > RoutingTableLink;$/;"	t
+RoutingTableNoC	GlobalRoutingTable.h	/^typedef map < int, RoutingTableNode > RoutingTableNoC;$/;"	t
+RoutingTableNode	GlobalRoutingTable.h	/^typedef map < LinkId, RoutingTableLink > RoutingTableNode;$/;"	t
+Routing_DYAD	routingAlgorithms/Routing_DYAD.h	/^		Routing_DYAD(){};$/;"	f	class:Routing_DYAD
+Routing_DYAD	routingAlgorithms/Routing_DYAD.h	/^class Routing_DYAD : RoutingAlgorithm {$/;"	c
+Routing_NEGATIVE_FIRST	routingAlgorithms/Routing_NEGATIVE_FIRST.h	/^		Routing_NEGATIVE_FIRST(){};$/;"	f	class:Routing_NEGATIVE_FIRST
+Routing_NEGATIVE_FIRST	routingAlgorithms/Routing_NEGATIVE_FIRST.h	/^class Routing_NEGATIVE_FIRST : RoutingAlgorithm {$/;"	c
+Routing_NORTH_LAST	routingAlgorithms/Routing_NORTH_LAST.h	/^		Routing_NORTH_LAST(){};$/;"	f	class:Routing_NORTH_LAST
+Routing_NORTH_LAST	routingAlgorithms/Routing_NORTH_LAST.h	/^class Routing_NORTH_LAST : RoutingAlgorithm {$/;"	c
+Routing_ODD_EVEN	routingAlgorithms/Routing_ODD_EVEN.h	/^		Routing_ODD_EVEN(){};$/;"	f	class:Routing_ODD_EVEN
+Routing_ODD_EVEN	routingAlgorithms/Routing_ODD_EVEN.h	/^class Routing_ODD_EVEN : RoutingAlgorithm {$/;"	c
+Routing_TABLE_BASED	routingAlgorithms/Routing_TABLE_BASED.h	/^		Routing_TABLE_BASED(){};$/;"	f	class:Routing_TABLE_BASED
+Routing_TABLE_BASED	routingAlgorithms/Routing_TABLE_BASED.h	/^class Routing_TABLE_BASED : RoutingAlgorithm {$/;"	c
+Routing_WEST_FIRST	routingAlgorithms/Routing_WEST_FIRST.h	/^		Routing_WEST_FIRST(){};$/;"	f	class:Routing_WEST_FIRST
+Routing_WEST_FIRST	routingAlgorithms/Routing_WEST_FIRST.h	/^class Routing_WEST_FIRST : RoutingAlgorithm {$/;"	c
+Routing_XY	routingAlgorithms/Routing_XY.h	/^		Routing_XY(){};$/;"	f	class:Routing_XY
+Routing_XY	routingAlgorithms/Routing_XY.h	/^class Routing_XY : RoutingAlgorithm {$/;"	c
+SC_MODULE	Hub.h	/^SC_MODULE(Hub)$/;"	f
+SC_MODULE	NoC.h	/^SC_MODULE(NoC)$/;"	f
+SC_MODULE	ProcessingElement.h	/^SC_MODULE(ProcessingElement)$/;"	f
+SC_MODULE	Router.h	/^SC_MODULE(Router)$/;"	f
+SC_MODULE	Tile.h	/^SC_MODULE(Tile)$/;"	f
+SC_MODULE	TokenRing.h	/^SC_MODULE(TokenRing)$/;"	f
+SELECTION_PWR_D	DataStructs.h	/^    SELECTION_PWR_D,$/;"	e	enum:__anon8
+SELECTION_PWR_S	DataStructs.h	/^    SELECTION_PWR_S,$/;"	e	enum:__anon9
+SPACE	Makefile	/^SPACE := $(subst ,, )$/;"	m
+SRCDIR	Makefile	/^SRCDIR  := ..\/src$/;"	m
+SRCS	Makefile	/^SRCS := $(wildcard $(SRCDIR)\/*.cpp) $(wildcard $(addsuffix *.cpp,$(SUBDIRS)))$/;"	m
+SUBDIRS	Makefile	/^SUBDIRS := $(filter %\/,$(wildcard $(SRCDIR)\/*\/))$/;"	m
+SYSTEMC	Makefile	/^SYSTEMC := \/usr\/local\/systemc-2.3.1$/;"	m
+SYSTEMC_LIBS	Makefile	/^SYSTEMC_LIBS := $(wildcard $(SYSTEMC)\/lib-*)$/;"	m
+SaveOccupancyAndTime	Buffer.cpp	/^void Buffer::SaveOccupancyAndTime()$/;"	f	class:Buffer
+SelectionStrategies	selectionStrategies/SelectionStrategies.h	/^class SelectionStrategies {$/;"	c
+SelectionStrategiesMap	selectionStrategies/SelectionStrategies.h	/^typedef map<string, SelectionStrategy* > SelectionStrategiesMap;$/;"	t
+SelectionStrategiesRegister	selectionStrategies/SelectionStrategies.h	/^	SelectionStrategiesRegister(const string & selectionStrategyName, SelectionStrategy * selectionStrategy) {$/;"	f	struct:SelectionStrategiesRegister
+SelectionStrategiesRegister	selectionStrategies/SelectionStrategies.h	/^struct SelectionStrategiesRegister : SelectionStrategies {$/;"	s
+SelectionStrategy	selectionStrategies/SelectionStrategy.h	/^class SelectionStrategy$/;"	c
+Selection_BUFFER_LEVEL	selectionStrategies/Selection_BUFFER_LEVEL.h	/^		Selection_BUFFER_LEVEL(){};$/;"	f	class:Selection_BUFFER_LEVEL
+Selection_BUFFER_LEVEL	selectionStrategies/Selection_BUFFER_LEVEL.h	/^class Selection_BUFFER_LEVEL : SelectionStrategy {$/;"	c
+Selection_NOP	selectionStrategies/Selection_NOP.h	/^		Selection_NOP(){};$/;"	f	class:Selection_NOP
+Selection_NOP	selectionStrategies/Selection_NOP.h	/^class Selection_NOP : SelectionStrategy {$/;"	c
+Selection_RANDOM	selectionStrategies/Selection_RANDOM.h	/^		Selection_RANDOM(){};$/;"	f	class:Selection_RANDOM
+Selection_RANDOM	selectionStrategies/Selection_RANDOM.h	/^class Selection_RANDOM : SelectionStrategy {$/;"	c
+SetMaxBufferSize	Buffer.cpp	/^void Buffer::SetMaxBufferSize(const unsigned int bms)$/;"	f	class:Buffer
+ShowBuffersStats	Router.cpp	/^void Router::ShowBuffersStats(std::ostream & out)$/;"	f	class:Router
+ShowStats	Buffer.cpp	/^void Buffer::ShowStats(std::ostream & out)$/;"	f	class:Buffer
+Size	Buffer.cpp	/^unsigned int Buffer::Size() const$/;"	f	class:Buffer
+Stats	Stats.h	/^    Stats() {$/;"	f	class:Stats
+Stats	Stats.h	/^class Stats {$/;"	c
+TBufferFullStatus	DataStructs.h	/^    TBufferFullStatus()$/;"	f	struct:TBufferFullStatus
+TBufferFullStatus	DataStructs.h	/^struct TBufferFullStatus {$/;"	s
+TOKEN_HOLD	GlobalParams.h	/^#define TOKEN_HOLD /;"	d
+TOKEN_MAX_HOLD	GlobalParams.h	/^#define TOKEN_MAX_HOLD /;"	d
+TOKEN_PACKET	GlobalParams.h	/^#define TOKEN_PACKET /;"	d
+TRAFFIC_BIT_REVERSAL	GlobalParams.h	/^#define TRAFFIC_BIT_REVERSAL /;"	d
+TRAFFIC_BUTTERFLY	GlobalParams.h	/^#define TRAFFIC_BUTTERFLY /;"	d
+TRAFFIC_HOTSPOT	GlobalParams.h	/^#define TRAFFIC_HOTSPOT /;"	d
+TRAFFIC_LOCAL	GlobalParams.h	/^#define TRAFFIC_LOCAL	/;"	d
+TRAFFIC_RANDOM	GlobalParams.h	/^#define TRAFFIC_RANDOM /;"	d
+TRAFFIC_SHUFFLE	GlobalParams.h	/^#define TRAFFIC_SHUFFLE /;"	d
+TRAFFIC_TABLE_BASED	GlobalParams.h	/^#define TRAFFIC_TABLE_BASED /;"	d
+TRAFFIC_TRANSPOSE1	GlobalParams.h	/^#define TRAFFIC_TRANSPOSE1 /;"	d
+TRAFFIC_TRANSPOSE2	GlobalParams.h	/^#define TRAFFIC_TRANSPOSE2 /;"	d
+TRAFFIC_ULOCAL	GlobalParams.h	/^#define TRAFFIC_ULOCAL	/;"	d
+TRANSCEIVER_RX_PWR_BIASING	DataStructs.h	/^    TRANSCEIVER_RX_PWR_BIASING,$/;"	e	enum:__anon9
+TRANSCEIVER_RX_PWR_S	DataStructs.h	/^    TRANSCEIVER_RX_PWR_S,$/;"	e	enum:__anon9
+TRANSCEIVER_TX_PWR_BIASING	DataStructs.h	/^    TRANSCEIVER_TX_PWR_BIASING,$/;"	e	enum:__anon9
+TRANSCEIVER_TX_PWR_S	DataStructs.h	/^    TRANSCEIVER_TX_PWR_S,$/;"	e	enum:__anon9
+TRTEntry	ReservationTable.h	/^} TRTEntry;$/;"	t	typeref:struct:RTEntry
+TReservation	ReservationTable.h	/^struct TReservation$/;"	s
+Target	Target.h	/^  Target(sc_module_name nm, int id, Hub* h): sc_module(nm), hub(h), socket("socket")$/;"	f	struct:Target
+Target	Target.h	/^struct Target: sc_module$/;"	s
+UpdateMeanOccupancy	Buffer.cpp	/^void Buffer::UpdateMeanOccupancy()$/;"	f	class:Buffer
+VERBOSE_HIGH	GlobalParams.h	/^#define VERBOSE_HIGH /;"	d
+VERBOSE_LOW	GlobalParams.h	/^#define VERBOSE_LOW /;"	d
+VERBOSE_MEDIUM	GlobalParams.h	/^#define VERBOSE_MEDIUM /;"	d
+VERBOSE_OFF	GlobalParams.h	/^#define VERBOSE_OFF /;"	d
+VPATH	Makefile	/^VPATH := $(SRCDIR):$(subst $(SPACE),:,$(SUBDIRS))$/;"	m
+W2J	Power.cpp	/^#define W2J(/;"	d	file:
+WIRELESS_DYNAMIC_RX_PWR	DataStructs.h	/^    WIRELESS_DYNAMIC_RX_PWR,$/;"	e	enum:__anon8
+WIRELESS_SNOOPING	DataStructs.h	/^    WIRELESS_SNOOPING,$/;"	e	enum:__anon8
+WIRELESS_TX	DataStructs.h	/^    WIRELESS_TX,$/;"	e	enum:__anon8
+YAML	ConfigurationManager.h	/^namespace YAML {$/;"	n
+YAML	Makefile	/^YAML    := \/opt\/local$/;"	m
+_DATASTRUCS_H__	DataStructs.h	/^#define _DATASTRUCS_H__$/;"	d
+__BUS_H__	Channel.h	/^#define __BUS_H__$/;"	d
+__MM_H__	MM.h	/^#define __MM_H__$/;"	d
+__NOXIMBUFFER_H__	Buffer.h	/^#define __NOXIMBUFFER_H__$/;"	d
+__NOXIMCONFIGURATIONMANAGER_H__	ConfigurationManager.h	/^#define __NOXIMCONFIGURATIONMANAGER_H__$/;"	d
+__NOXIMGLOBALPARAMS_H__	GlobalParams.h	/^#define __NOXIMGLOBALPARAMS_H__ /;"	d
+__NOXIMGLOBALROUTINGTABLE_H__	GlobalRoutingTable.h	/^#define __NOXIMGLOBALROUTINGTABLE_H__$/;"	d
+__NOXIMGLOBALSTATS_H__	GlobalStats.h	/^#define __NOXIMGLOBALSTATS_H__$/;"	d
+__NOXIMGLOBALTRAFFIC_TABLE_H__	GlobalTrafficTable.h	/^#define __NOXIMGLOBALTRAFFIC_TABLE_H__$/;"	d
+__NOXIMHUB_H__	Hub.h	/^#define __NOXIMHUB_H__$/;"	d
+__NOXIMLOCALROUTINGTABLE_H__	LocalRoutingTable.h	/^#define __NOXIMLOCALROUTINGTABLE_H__$/;"	d
+__NOXIMNOC_H__	NoC.h	/^#define __NOXIMNOC_H__$/;"	d
+__NOXIMPOWER_H__	Power.h	/^#define __NOXIMPOWER_H__$/;"	d
+__NOXIMPROCESSINGELEMENT_H__	ProcessingElement.h	/^#define __NOXIMPROCESSINGELEMENT_H__$/;"	d
+__NOXIMRESERVATIONTABLE_H__	ReservationTable.h	/^#define __NOXIMRESERVATIONTABLE_H__$/;"	d
+__NOXIMROUTER_H__	Router.h	/^#define __NOXIMROUTER_H__$/;"	d
+__NOXIMROUTINGALGORITHMS_H__	routingAlgorithms/RoutingAlgorithms.h	/^#define __NOXIMROUTINGALGORITHMS_H__$/;"	d
+__NOXIMROUTINGALGORITHM_H__	routingAlgorithms/RoutingAlgorithm.h	/^#define __NOXIMROUTINGALGORITHM_H__$/;"	d
+__NOXIMROUTING_DYAD_H__	routingAlgorithms/Routing_DYAD.h	/^#define __NOXIMROUTING_DYAD_H__$/;"	d
+__NOXIMROUTING_NEGATIVE_FIRST_H__	routingAlgorithms/Routing_NEGATIVE_FIRST.h	/^#define __NOXIMROUTING_NEGATIVE_FIRST_H__$/;"	d
+__NOXIMROUTING_NORTH_LAST_H__	routingAlgorithms/Routing_NORTH_LAST.h	/^#define __NOXIMROUTING_NORTH_LAST_H__$/;"	d
+__NOXIMROUTING_ODD_EVEN_H__	routingAlgorithms/Routing_ODD_EVEN.h	/^#define __NOXIMROUTING_ODD_EVEN_H__$/;"	d
+__NOXIMROUTING_TABLE_BASED_H__	routingAlgorithms/Routing_TABLE_BASED.h	/^#define __NOXIMROUTING_TABLE_BASED_H__$/;"	d
+__NOXIMROUTING_WEST_FIRST_H__	routingAlgorithms/Routing_WEST_FIRST.h	/^#define __NOXIMROUTING_WEST_FIRST_H__$/;"	d
+__NOXIMROUTING_XY_H__	routingAlgorithms/Routing_XY.h	/^#define __NOXIMROUTING_XY_H__$/;"	d
+__NOXIMSELECTIONSTRATEGIES_H__	selectionStrategies/SelectionStrategies.h	/^#define __NOXIMSELECTIONSTRATEGIES_H__$/;"	d
+__NOXIMSELECTIONSTRATEGY_H__	selectionStrategies/SelectionStrategy.h	/^#define __NOXIMSELECTIONSTRATEGY_H__$/;"	d
+__NOXIMSELECTION_BUFFER_LEVEL_H__	selectionStrategies/Selection_BUFFER_LEVEL.h	/^#define __NOXIMSELECTION_BUFFER_LEVEL_H__$/;"	d
+__NOXIMSELECTION_NOP_H__	selectionStrategies/Selection_NOP.h	/^#define __NOXIMSELECTION_NOP_H__$/;"	d
+__NOXIMSELECTION_RANDOM_H__	selectionStrategies/Selection_RANDOM.h	/^#define __NOXIMSELECTION_RANDOM_H__$/;"	d
+__NOXIMSTATS_H__	Stats.h	/^#define __NOXIMSTATS_H__$/;"	d
+__NOXIMTILE_H__	Tile.h	/^#define __NOXIMTILE_H__$/;"	d
+__NOXIMTLMINITIATOR_H__	Initiator.h	/^#define __NOXIMTLMINITIATOR_H__$/;"	d
+__NOXIMTLMTARGET_H__	Target.h	/^#define __NOXIMTLMTARGET_H__$/;"	d
+__TOKENRING_H__	TokenRing.h	/^#define __TOKENRING_H__$/;"	d
+__UTILS_H__	Utils.h	/^#define __UTILS_H__$/;"	d
+access	MM.h	/^  struct access$/;"	s	class:mm
+accountWirelessRxPower	Channel.cpp	/^void Channel::accountWirelessRxPower()$/;"	f	class:Channel
+addHub	Channel.cpp	/^void Channel::addHub(Hub* h)$/;"	f	class:Channel
+admissibleOutputsSet2Vector	GlobalRoutingTable.cpp	/^    int >admissibleOutputsSet2Vector(const AdmissibleOutputs & ao)$/;"	f
+allocate	MM.cpp	/^mm::gp_t* mm::allocate()$/;"	f	class:mm
+antennaBufferFront	Power.cpp	/^void Power::antennaBufferFront()$/;"	f	class:Power
+antennaBufferPop	Power.cpp	/^void Power::antennaBufferPop()$/;"	f	class:Power
+antennaBufferPush	Power.cpp	/^void Power::antennaBufferPush()$/;"	f	class:Power
+antennaToTileProcess	Hub.cpp	/^void Hub::antennaToTileProcess()$/;"	f	class:Hub
+antenna_buffer_front_pwr_d	Power.h	/^    double antenna_buffer_front_pwr_d;$/;"	m	class:Power
+antenna_buffer_pop_pwr_d	Power.h	/^    double antenna_buffer_pop_pwr_d;$/;"	m	class:Power
+antenna_buffer_push_pwr_d	Power.h	/^    double antenna_buffer_push_pwr_d;$/;"	m	class:Power
+antenna_buffer_pwr_s	Power.h	/^    double antenna_buffer_pwr_s;$/;"	m	class:Power
+apply	selectionStrategies/Selection_BUFFER_LEVEL.cpp	/^int Selection_BUFFER_LEVEL::apply(Router * router, const vector < int >&directions, const RouteData & route_data){$/;"	f	class:Selection_BUFFER_LEVEL
+apply	selectionStrategies/Selection_NOP.cpp	/^int Selection_NOP::apply(Router * router, const vector < int >&directions, const RouteData & route_data) {$/;"	f	class:Selection_NOP
+apply	selectionStrategies/Selection_RANDOM.cpp	/^int Selection_RANDOM::apply(Router * router, const vector < int >&directions, const RouteData & route_data){$/;"	f	class:Selection_RANDOM
+attachHub	TokenRing.cpp	/^void TokenRing::attachHub(int channel, int hub, sc_in<int>* hub_token_holder_port, sc_in<int>* hub_token_expiration_port, sc_inout<int>* hub_flag_port)$/;"	f	class:TokenRing
+attachedNodes	GlobalParams.h	/^    vector<int> attachedNodes;$/;"	m	struct:__anon2
+attenuation2power	Power.cpp	/^double Power::attenuation2power(double attenuation)$/;"	f	class:Power
+attenuation_map	Power.h	/^    map< pair<int, int> , double>  attenuation_map;$/;"	m	class:Power
+available	DataStructs.h	/^    bool available;		\/\/ $/;"	m	struct:ChannelStatus
+b_transport	Channel.cpp	/^void Channel::b_transport( int id, tlm::tlm_generic_payload& trans, sc_time& delay )$/;"	f	class:Channel
+b_transport	Target.cpp	/^void Target::b_transport( tlm::tlm_generic_payload& trans, sc_time& delay )$/;"	f	class:Target
+basic_nullbuf	Utils.h	/^class basic_nullbuf: public std::basic_streambuf<cT, traits> {$/;"	c
+basic_onullstream	Utils.h	/^    basic_onullstream():$/;"	f	class:basic_onullstream
+basic_onullstream	Utils.h	/^class basic_onullstream: public std::basic_ostream<cT, traits> {$/;"	c
+ber	GlobalParams.h	/^    pair<double, double> ber;$/;"	m	struct:__anon1
+biasingRx	Power.cpp	/^void Power::biasingRx()$/;"	f	class:Power
+biasingTx	Power.cpp	/^void Power::biasingTx()$/;"	f	class:Power
+breakdown	DataStructs.h	/^    PowerBreakdownEntry breakdown[NO_BREAKDOWN_ENTRIES_D+NO_BREAKDOWN_ENTRIES_S];$/;"	m	struct:__anon10
+buffer	Buffer.h	/^    queue < Flit > buffer;$/;"	m	class:Buffer
+bufferFromTileFront	Power.cpp	/^void Power::bufferFromTileFront()$/;"	f	class:Power
+bufferFromTilePop	Power.cpp	/^void Power::bufferFromTilePop()$/;"	f	class:Power
+bufferFromTilePush	Power.cpp	/^void Power::bufferFromTilePush()$/;"	f	class:Power
+bufferPowerConfig	GlobalParams.h	/^    BufferPowerConfig bufferPowerConfig;$/;"	m	struct:__anon6
+bufferRouterFront	Power.cpp	/^void Power::bufferRouterFront()$/;"	f	class:Power
+bufferRouterPop	Power.cpp	/^void Power::bufferRouterPop()$/;"	f	class:Power
+bufferRouterPush	Power.cpp	/^void Power::bufferRouterPush()$/;"	f	class:Power
+bufferToTileFront	Power.cpp	/^void Power::bufferToTileFront()$/;"	f	class:Power
+bufferToTilePop	Power.cpp	/^void Power::bufferToTilePop()$/;"	f	class:Power
+bufferToTilePush	Power.cpp	/^void Power::bufferToTilePush()$/;"	f	class:Power
+buffer_depth	GlobalParams.cpp	/^int GlobalParams::buffer_depth;$/;"	m	class:GlobalParams	file:
+buffer_depth	GlobalParams.h	/^    static int buffer_depth;$/;"	m	struct:GlobalParams
+buffer_from_tile_front_pwr_d	Power.h	/^    double buffer_from_tile_front_pwr_d;$/;"	m	class:Power
+buffer_from_tile_pop_pwr_d	Power.h	/^    double buffer_from_tile_pop_pwr_d;$/;"	m	class:Power
+buffer_from_tile_push_pwr_d	Power.h	/^    double buffer_from_tile_push_pwr_d;$/;"	m	class:Power
+buffer_from_tile_pwr_s	Power.h	/^    double buffer_from_tile_pwr_s;$/;"	m	class:Power
+buffer_router_front_pwr_d	Power.h	/^    double buffer_router_front_pwr_d;$/;"	m	class:Power
+buffer_router_pop_pwr_d	Power.h	/^    double buffer_router_pop_pwr_d;$/;"	m	class:Power
+buffer_router_push_pwr_d	Power.h	/^    double buffer_router_push_pwr_d;$/;"	m	class:Power
+buffer_router_pwr_s	Power.h	/^    double buffer_router_pwr_s;$/;"	m	class:Power
+buffer_rx	Target.h	/^  Buffer buffer_rx;$/;"	m	struct:Target
+buffer_to_tile_front_pwr_d	Power.h	/^    double buffer_to_tile_front_pwr_d;$/;"	m	class:Power
+buffer_to_tile_pop_pwr_d	Power.h	/^    double buffer_to_tile_pop_pwr_d;$/;"	m	class:Power
+buffer_to_tile_push_pwr_d	Power.h	/^    double buffer_to_tile_push_pwr_d;$/;"	m	class:Power
+buffer_to_tile_pwr_s	Power.h	/^    double buffer_to_tile_pwr_s;$/;"	m	class:Power
+buffer_tx	Initiator.h	/^  Buffer buffer_tx;$/;"	m	struct:Initiator
+buildMesh	NoC.cpp	/^void NoC::buildMesh()$/;"	f	class:NoC
+canShot	ProcessingElement.cpp	/^bool ProcessingElement::canShot(Packet & packet)$/;"	f	class:ProcessingElement
+cc_flit_transmission_delay_ps	Channel.h	/^      int cc_flit_transmission_delay_ps; \/\/ clock compliant$/;"	m	struct:Channel
+channel_configuration	GlobalParams.cpp	/^map<int, ChannelConfig> GlobalParams::channel_configuration;$/;"	m	class:GlobalParams	file:
+channel_configuration	GlobalParams.h	/^    static map<int, ChannelConfig> channel_configuration;$/;"	m	struct:GlobalParams
+channel_status_neighbor	DataStructs.h	/^    ChannelStatus channel_status_neighbor[DIRECTIONS];$/;"	m	struct:NoP_data
+checkConfiguration	ConfigurationManager.cpp	/^void checkConfiguration()$/;"	f
+checkReservation	ReservationTable.cpp	/^int ReservationTable::checkReservation(const TReservation r, const int port_out)$/;"	f	class:ReservationTable
+chist	Stats.h	/^    vector < CommHistory > chist;$/;"	m	class:Stats
+clock_period_ps	GlobalParams.cpp	/^int GlobalParams::clock_period_ps;$/;"	m	class:GlobalParams	file:
+clock_period_ps	GlobalParams.h	/^    static int clock_period_ps;$/;"	m	struct:GlobalParams
+compose_address	Channel.h	/^  inline sc_dt::uint64 compose_address( unsigned int target_nr, sc_dt::uint64 address)$/;"	f	struct:Channel
+config	ConfigurationManager.cpp	/^YAML::Node config;$/;"	v
+config_filename	GlobalParams.cpp	/^string GlobalParams::config_filename;$/;"	m	class:GlobalParams	file:
+config_filename	GlobalParams.h	/^    static string config_filename;$/;"	m	struct:GlobalParams
+configure	ConfigurationManager.cpp	/^void configure(int arg_num, char *arg_vet[]) {$/;"	f
+configure	LocalRoutingTable.cpp	/^void LocalRoutingTable::configure(GlobalRoutingTable & rtable,$/;"	f	class:LocalRoutingTable
+configure	Router.cpp	/^void Router::configure(const int _id,$/;"	f	class:Router
+configure	Stats.cpp	/^void Stats::configure(const int node_id, const double _warm_up_time)$/;"	f	class:Stats
+configureHub	Power.cpp	/^void Power::configureHub(int link_width,$/;"	f	class:Power
+configureRouter	Power.cpp	/^void Power::configureRouter(int link_width,$/;"	f	class:Power
+convert	ConfigurationManager.h	/^    struct convert<BufferPowerConfig> {$/;"	s	namespace:YAML
+convert	ConfigurationManager.h	/^    struct convert<ChannelConfig> {$/;"	s	namespace:YAML
+convert	ConfigurationManager.h	/^    struct convert<HubConfig> {$/;"	s	namespace:YAML
+convert	ConfigurationManager.h	/^    struct convert<HubPowerConfig> {$/;"	s	namespace:YAML
+convert	ConfigurationManager.h	/^    struct convert<LinkBitLinePowerConfig> {$/;"	s	namespace:YAML
+convert	ConfigurationManager.h	/^    struct convert<PowerConfig> {$/;"	s	namespace:YAML
+convert	ConfigurationManager.h	/^    struct convert<RouterPowerConfig> {$/;"	s	namespace:YAML
+coord2Id	Utils.h	/^inline int coord2Id(const Coord & coord)$/;"	f
+crossBar	Power.cpp	/^void Power::crossBar()$/;"	f	class:Power
+crossbar_pm	GlobalParams.h	/^    map<pair<double, double>, pair<double, double> > crossbar_pm;$/;"	m	struct:__anon4
+crossbar_pwr_d	Power.h	/^    double crossbar_pwr_d;$/;"	m	class:Power
+crossbar_pwr_s	Power.h	/^    double crossbar_pwr_s;$/;"	m	class:Power
+current_id	DataStructs.h	/^    int current_id;$/;"	m	struct:RouteData
+data	DataStructs.h	/^    sc_uint<32> data;	\/\/ Bus for the data to be exchanged$/;"	m	struct:Payload
+dataRate	GlobalParams.h	/^    int dataRate;$/;"	m	struct:__anon1
+deadlockCheck	Buffer.cpp	/^void Buffer::deadlockCheck()$/;"	f	class:Buffer
+deadlockFree	Buffer.cpp	/^bool Buffer::deadlockFree()$/;"	f	class:Buffer
+deadlock_detected	Buffer.h	/^    bool deadlock_detected;$/;"	m	class:Buffer
+decode	ConfigurationManager.h	/^        static bool decode(const Node& node, BufferPowerConfig& bufferPowerConfig) {$/;"	f	struct:YAML::convert
+decode	ConfigurationManager.h	/^        static bool decode(const Node& node, ChannelConfig& channelConfig) {$/;"	f	struct:YAML::convert
+decode	ConfigurationManager.h	/^        static bool decode(const Node& node, HubConfig& hubConfig) {$/;"	f	struct:YAML::convert
+decode	ConfigurationManager.h	/^        static bool decode(const Node& node, HubPowerConfig& hubPowerConfig) {$/;"	f	struct:YAML::convert
+decode	ConfigurationManager.h	/^        static bool decode(const Node& node, LinkBitLinePowerConfig& linkBitLinePowerConfig) {$/;"	f	struct:YAML::convert
+decode	ConfigurationManager.h	/^        static bool decode(const Node& node, PowerConfig& powerConfig) {$/;"	f	struct:YAML::convert
+decode	ConfigurationManager.h	/^        static bool decode(const Node& node, RouterPowerConfig& routerPowerConfig) {$/;"	f	struct:YAML::convert
+decode_address	Channel.h	/^  inline unsigned int decode_address( sc_dt::uint64 address, sc_dt::uint64& masked_address )$/;"	f	struct:Channel
+default_channel_configuration	GlobalParams.cpp	/^ChannelConfig GlobalParams::default_channel_configuration;$/;"	m	class:GlobalParams	file:
+default_channel_configuration	GlobalParams.h	/^    static ChannelConfig default_channel_configuration;$/;"	m	struct:GlobalParams
+default_hub_configuration	GlobalParams.cpp	/^HubConfig GlobalParams::default_hub_configuration;$/;"	m	class:GlobalParams	file:
+default_hub_configuration	GlobalParams.h	/^    static HubConfig default_hub_configuration;$/;"	m	struct:GlobalParams
+default_tx_energy	GlobalParams.h	/^    double default_tx_energy;$/;"	m	struct:__anon5
+default_tx_energy	Power.h	/^    double default_tx_energy;$/;"	m	class:Power
+delays	Stats.h	/^     vector < double >delays;$/;"	m	struct:CommHistory
+detailed	GlobalParams.cpp	/^bool GlobalParams::detailed;$/;"	m	class:GlobalParams	file:
+detailed	GlobalParams.h	/^    static bool detailed;$/;"	m	struct:GlobalParams
+dir_in	DataStructs.h	/^    int dir_in;			\/\/ direction from which the packet comes from$/;"	m	struct:RouteData
+direction2ILinkId	GlobalRoutingTable.cpp	/^LinkId direction2ILinkId(const int node_id, const int dir)$/;"	f
+drained_total	GlobalStats.h	/^    unsigned int drained_total;$/;"	m	class:GlobalStats
+drained_volume	Main.cpp	/^unsigned int drained_volume;$/;"	v
+dst	GlobalTrafficTable.h	/^  int dst;			\/\/ ID of the destination node (PE)$/;"	m	struct:Communication
+dst_id	DataStructs.h	/^    int dst_id;$/;"	m	struct:Flit
+dst_id	DataStructs.h	/^    int dst_id;$/;"	m	struct:Packet
+dst_id	DataStructs.h	/^    int dst_id;$/;"	m	struct:RouteData
+dyad_threshold	GlobalParams.cpp	/^double GlobalParams::dyad_threshold;$/;"	m	class:GlobalParams	file:
+dyad_threshold	GlobalParams.h	/^    static double dyad_threshold;$/;"	m	struct:GlobalParams
+east	NoC.h	/^    sc_signal<T> east;$/;"	m	struct:sc_signal_NSWE
+east	NoC.h	/^    sc_signal<T> east;$/;"	m	struct:sc_signal_NSWEH
+empties	MM.h	/^  access* empties;$/;"	m	class:mm
+encode	ConfigurationManager.h	/^        static Node encode(const ChannelConfig& channelConfig) {$/;"	f	struct:YAML::convert
+encode	ConfigurationManager.h	/^        static Node encode(const HubConfig& hubConfig) {$/;"	f	struct:YAML::convert
+end_request_event	Initiator.h	/^  sc_event end_request_event;$/;"	m	struct:Initiator
+findRandomDestination	ProcessingElement.cpp	/^int ProcessingElement::findRandomDestination(int id, int hops)$/;"	f	class:ProcessingElement
+fixRanges	ProcessingElement.cpp	/^void ProcessingElement::fixRanges(const Coord src,$/;"	f	class:ProcessingElement
+flit_left	DataStructs.h	/^    int flit_left;		\/\/ Number of remaining flits inside the packet$/;"	m	struct:Packet
+flit_payload	Initiator.h	/^  Flit flit_payload; $/;"	m	struct:Initiator
+flit_size	GlobalParams.cpp	/^int GlobalParams::flit_size;$/;"	m	class:GlobalParams	file:
+flit_size	GlobalParams.h	/^    static int flit_size;$/;"	m	struct:GlobalParams
+flit_transmission_cycles	Channel.h	/^      int flit_transmission_cycles;$/;"	m	struct:Channel
+flit_type	DataStructs.h	/^    FlitType flit_type;	\/\/ The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)$/;"	m	struct:Flit
+free	MM.cpp	/^void mm::free(gp_t* trans)$/;"	f	class:mm
+free_list	MM.h	/^  access* free_list;$/;"	m	class:mm
+free_slots	DataStructs.h	/^    int free_slots;		\/\/ occupied buffer slots$/;"	m	struct:ChannelStatus
+fromTileBufferSize	GlobalParams.h	/^    int fromTileBufferSize;$/;"	m	struct:__anon2
+from_hub	NoC.h	/^    sc_signal<T> from_hub;$/;"	m	struct:sc_signal_NSWEH
+front	GlobalParams.h	/^    map<pair <int, int>, double> front;$/;"	m	struct:__anon3
+full_cycles_counter	Buffer.h	/^    int full_cycles_counter;$/;"	m	class:Buffer
+get	routingAlgorithms/RoutingAlgorithms.cpp	/^RoutingAlgorithm * RoutingAlgorithms::get(const string & routingAlgorithmName) {$/;"	f	class:RoutingAlgorithms
+get	selectionStrategies/SelectionStrategies.cpp	/^SelectionStrategy * SelectionStrategies::get(const string & selectionStrategyName) {$/;"	f	class:SelectionStrategies
+getActiveThroughput	GlobalStats.cpp	/^double GlobalStats::getActiveThroughput()$/;"	f	class:GlobalStats
+getAdmissibleOutputs	LocalRoutingTable.cpp	/^getAdmissibleOutputs(const LinkId & in_link, const int destination_id)$/;"	f	class:LocalRoutingTable
+getAdmissibleOutputs	LocalRoutingTable.cpp	/^getAdmissibleOutputs(const int in_direction, const int destination_id)$/;"	f	class:LocalRoutingTable
+getAggregatedThroughput	GlobalStats.cpp	/^double GlobalStats::getAggregatedThroughput()$/;"	f	class:GlobalStats
+getAverageDelay	GlobalStats.cpp	/^double GlobalStats::getAverageDelay()$/;"	f	class:GlobalStats
+getAverageDelay	GlobalStats.cpp	/^double GlobalStats::getAverageDelay(const int src_id,$/;"	f	class:GlobalStats
+getAverageDelay	Stats.cpp	/^double Stats::getAverageDelay()$/;"	f	class:Stats
+getAverageDelay	Stats.cpp	/^double Stats::getAverageDelay(const int src_id)$/;"	f	class:Stats
+getAverageThroughput	GlobalStats.cpp	/^double GlobalStats::getAverageThroughput(const int src_id, const int dst_id)$/;"	f	class:GlobalStats
+getAverageThroughput	Stats.cpp	/^double Stats::getAverageThroughput()$/;"	f	class:Stats
+getAverageThroughput	Stats.cpp	/^double Stats::getAverageThroughput(const int src_id)$/;"	f	class:Stats
+getBit	ProcessingElement.cpp	/^int ProcessingElement::getBit(int x, int w)$/;"	f	class:ProcessingElement
+getCommunicationEnergy	Stats.cpp	/^double Stats::getCommunicationEnergy(int src_id, int dst_id)$/;"	f	class:Stats
+getCumulativePirPor	GlobalTrafficTable.cpp	/^double GlobalTrafficTable::getCumulativePirPor(const int src_id,$/;"	f	class:GlobalTrafficTable
+getCurrentFreeSlots	Buffer.cpp	/^unsigned int Buffer::getCurrentFreeSlots() const$/;"	f	class:Buffer
+getCurrentNoPData	Router.cpp	/^NoP_data Router::getCurrentNoPData()$/;"	f	class:Router
+getDynamicPower	GlobalStats.cpp	/^double GlobalStats::getDynamicPower()$/;"	f	class:GlobalStats
+getDynamicPower	Power.cpp	/^double Power::getDynamicPower()$/;"	f	class:Power
+getDynamicPowerBreakDown	Power.h	/^    PowerBreakdown* getDynamicPowerBreakDown(){ return &power_dynamic;}$/;"	f	class:Power
+getFlitTransmissionCycles	Channel.h	/^  int getFlitTransmissionCycles() { return flit_transmission_cycles;}$/;"	f	struct:Channel
+getInstance	routingAlgorithms/Routing_DYAD.cpp	/^Routing_DYAD * Routing_DYAD::getInstance() {$/;"	f	class:Routing_DYAD
+getInstance	routingAlgorithms/Routing_NEGATIVE_FIRST.cpp	/^Routing_NEGATIVE_FIRST * Routing_NEGATIVE_FIRST::getInstance() {$/;"	f	class:Routing_NEGATIVE_FIRST
+getInstance	routingAlgorithms/Routing_NORTH_LAST.cpp	/^Routing_NORTH_LAST * Routing_NORTH_LAST::getInstance() {$/;"	f	class:Routing_NORTH_LAST
+getInstance	routingAlgorithms/Routing_ODD_EVEN.cpp	/^Routing_ODD_EVEN * Routing_ODD_EVEN::getInstance() {$/;"	f	class:Routing_ODD_EVEN
+getInstance	routingAlgorithms/Routing_TABLE_BASED.cpp	/^Routing_TABLE_BASED * Routing_TABLE_BASED::getInstance() {$/;"	f	class:Routing_TABLE_BASED
+getInstance	routingAlgorithms/Routing_WEST_FIRST.cpp	/^Routing_WEST_FIRST * Routing_WEST_FIRST::getInstance() {$/;"	f	class:Routing_WEST_FIRST
+getInstance	routingAlgorithms/Routing_XY.cpp	/^Routing_XY * Routing_XY::getInstance() {$/;"	f	class:Routing_XY
+getInstance	selectionStrategies/Selection_BUFFER_LEVEL.cpp	/^Selection_BUFFER_LEVEL * Selection_BUFFER_LEVEL::getInstance() {$/;"	f	class:Selection_BUFFER_LEVEL
+getInstance	selectionStrategies/Selection_NOP.cpp	/^Selection_NOP * Selection_NOP::getInstance() {$/;"	f	class:Selection_NOP
+getInstance	selectionStrategies/Selection_RANDOM.cpp	/^Selection_RANDOM * Selection_RANDOM::getInstance() {$/;"	f	class:Selection_RANDOM
+getLabel	Buffer.cpp	/^string Buffer::getLabel() const$/;"	f	class:Buffer
+getMaxDelay	GlobalStats.cpp	/^double GlobalStats::getMaxDelay()$/;"	f	class:GlobalStats
+getMaxDelay	GlobalStats.cpp	/^double GlobalStats::getMaxDelay(const int node_id)$/;"	f	class:GlobalStats
+getMaxDelay	GlobalStats.cpp	/^double GlobalStats::getMaxDelay(const int src_id, const int dst_id)$/;"	f	class:GlobalStats
+getMaxDelay	Stats.cpp	/^double Stats::getMaxDelay()$/;"	f	class:Stats
+getMaxDelay	Stats.cpp	/^double Stats::getMaxDelay(const int src_id)$/;"	f	class:Stats
+getMaxDelayMtx	GlobalStats.cpp	/^vector < vector < double > > GlobalStats::getMaxDelayMtx()$/;"	f	class:GlobalStats
+getNeighborId	Router.cpp	/^int Router::getNeighborId(int _id, int direction) const$/;"	f	class:Router
+getNodeRoutingTable	GlobalRoutingTable.cpp	/^getNodeRoutingTable(const int node_id)$/;"	f	class:GlobalRoutingTable
+getRandomSize	ProcessingElement.cpp	/^int ProcessingElement::getRandomSize()$/;"	f	class:ProcessingElement
+getReceivedFlits	GlobalStats.cpp	/^unsigned int GlobalStats::getReceivedFlits()$/;"	f	class:GlobalStats
+getReceivedFlits	Stats.cpp	/^unsigned int Stats::getReceivedFlits()$/;"	f	class:Stats
+getReceivedPackets	GlobalStats.cpp	/^unsigned int GlobalStats::getReceivedPackets()$/;"	f	class:GlobalStats
+getReceivedPackets	Stats.cpp	/^unsigned int Stats::getReceivedPackets()$/;"	f	class:Stats
+getReservations	ReservationTable.cpp	/^vector<pair<int,int> > ReservationTable::getReservations(const int port_in)$/;"	f	class:ReservationTable
+getRoutedFlits	Router.cpp	/^unsigned long Router::getRoutedFlits()$/;"	f	class:Router
+getRoutedFlitsMtx	GlobalStats.cpp	/^vector < vector < unsigned long > > GlobalStats::getRoutedFlitsMtx()$/;"	f	class:GlobalStats
+getRoutingAlgorithmsMap	routingAlgorithms/RoutingAlgorithms.cpp	/^RoutingAlgorithmsMap * RoutingAlgorithms::getRoutingAlgorithmsMap() {$/;"	f	class:RoutingAlgorithms
+getSelectionStrategiesMap	selectionStrategies/SelectionStrategies.cpp	/^SelectionStrategiesMap * SelectionStrategies::getSelectionStrategiesMap() {$/;"	f	class:SelectionStrategies
+getStaticPower	GlobalStats.cpp	/^double GlobalStats::getStaticPower()$/;"	f	class:GlobalStats
+getStaticPower	Power.cpp	/^double Power::getStaticPower()$/;"	f	class:Power
+getStaticPowerBreakDown	Power.h	/^    PowerBreakdown* getStaticPowerBreakDown(){ return &power_static;}$/;"	f	class:Power
+getThroughput	GlobalStats.cpp	/^double GlobalStats::getThroughput()$/;"	f	class:GlobalStats
+getTotalCommunications	Stats.cpp	/^unsigned int Stats::getTotalCommunications()$/;"	f	class:Stats
+getTotalPower	GlobalStats.h	/^    double getTotalPower() { return getDynamicPower()+getStaticPower(); }$/;"	f	class:GlobalStats
+getTotalPower	Power.h	/^    double getTotalPower() {$/;"	f	class:Power
+getWirelessPackets	GlobalStats.cpp	/^unsigned int GlobalStats::getWirelessPackets()$/;"	f	class:GlobalStats
+get_direct_mem_ptr	Channel.cpp	/^  bool Channel::get_direct_mem_ptr(int id,$/;"	f	class:Channel
+gp_t	MM.h	/^  typedef tlm::tlm_generic_payload gp_t;$/;"	t	class:mm
+hasRadioHub	Utils.h	/^inline bool hasRadioHub(int id)$/;"	f
+hold_time	Buffer.h	/^    double hold_time, last_event, hold_time_sum;$/;"	m	class:Buffer
+hold_time_sum	Buffer.h	/^    double hold_time, last_event, hold_time_sum;$/;"	m	class:Buffer
+hop_no	DataStructs.h	/^    int hop_no;			\/\/ Current number of hops from source to destination$/;"	m	struct:Flit
+hotspots	GlobalParams.cpp	/^vector <pair <int, double> > GlobalParams::hotspots;$/;"	m	class:GlobalParams	file:
+hotspots	GlobalParams.h	/^    static vector <pair <int, double> > hotspots;$/;"	m	struct:GlobalParams
+hub	Initiator.h	/^  Hub * hub;$/;"	m	struct:Initiator
+hub	Target.h	/^  Hub* hub;$/;"	m	struct:Target
+hubPowerConfig	GlobalParams.h	/^    HubPowerConfig hubPowerConfig;$/;"	m	struct:__anon6
+hub_configuration	GlobalParams.cpp	/^map<int, HubConfig> GlobalParams::hub_configuration;$/;"	m	class:GlobalParams	file:
+hub_configuration	GlobalParams.h	/^    static map<int, HubConfig> hub_configuration;$/;"	m	struct:GlobalParams
+hub_for_tile	GlobalParams.cpp	/^map<int, int> GlobalParams::hub_for_tile;$/;"	m	class:GlobalParams	file:
+hub_for_tile	GlobalParams.h	/^    static map<int, int> hub_for_tile;$/;"	m	struct:GlobalParams
+hubs	Channel.h	/^    vector<Hub*> hubs;$/;"	m	struct:Channel
+hubs_id	Channel.h	/^    vector<int> hubs_id;$/;"	m	struct:Channel
+i_to_string	Utils.h	/^template<typename T> std::string i_to_string(const T& t){$/;"	f
+id	Stats.h	/^    int id;$/;"	m	class:Stats
+id2Coord	Utils.h	/^inline Coord id2Coord(int id)$/;"	f
+inCongestion	Router.cpp	/^bool Router::inCongestion()$/;"	f	class:Router
+index	ReservationTable.h	/^    int index;$/;"	m	struct:RTEntry
+initPowerBreakdown	Power.cpp	/^void Power::initPowerBreakdown()$/;"	f	class:Power
+initPowerBreakdownEntry	Power.cpp	/^void Power::initPowerBreakdownEntry(PowerBreakdownEntry* pbe,string label)$/;"	f	class:Power
+init_socket	Channel.h	/^  tlm_utils::multi_passthrough_initiator_socket<Channel> init_socket;$/;"	m	struct:Channel
+input	ReservationTable.h	/^    int input;$/;"	m	struct:TReservation
+invalidate_direct_mem_ptr	Channel.cpp	/^  void Channel::invalidate_direct_mem_ptr(int id,$/;"	f	class:Channel
+isNotReserved	ReservationTable.cpp	/^bool ReservationTable::isNotReserved(const int port_out)$/;"	f	class:ReservationTable
+isSleeping	Power.cpp	/^bool Power::isSleeping()$/;"	f	class:Power
+isValid	GlobalRoutingTable.h	/^    bool isValid() {$/;"	f	class:GlobalRoutingTable
+label	Buffer.h	/^    string label;$/;"	m	class:Buffer
+label	DataStructs.h	/^    string label;$/;"	m	struct:__anon7
+last_event	Buffer.h	/^    double hold_time, last_event, hold_time_sum;$/;"	m	class:Buffer
+last_front_flit_seq	Buffer.h	/^    int last_front_flit_seq;$/;"	m	class:Buffer
+last_received_flit_time	Stats.h	/^    double last_received_flit_time;$/;"	m	struct:CommHistory
+leakage	GlobalParams.h	/^    map<pair <int, int>, double> leakage;$/;"	m	struct:__anon3
+leakageAntennaBuffer	Power.cpp	/^void Power::leakageAntennaBuffer()$/;"	f	class:Power
+leakageBufferFromTile	Power.cpp	/^void Power::leakageBufferFromTile()$/;"	f	class:Power
+leakageBufferRouter	Power.cpp	/^void Power::leakageBufferRouter()$/;"	f	class:Power
+leakageBufferToTile	Power.cpp	/^void Power::leakageBufferToTile()$/;"	f	class:Power
+leakageLinkRouter2Hub	Power.cpp	/^void Power::leakageLinkRouter2Hub()$/;"	f	class:Power
+leakageLinkRouter2Router	Power.cpp	/^void Power::leakageLinkRouter2Router()$/;"	f	class:Power
+leakageRouter	Power.cpp	/^void Power::leakageRouter()$/;"	f	class:Power
+leakageTransceiverRx	Power.cpp	/^void Power::leakageTransceiverRx()$/;"	f	class:Power
+leakageTransceiverTx	Power.cpp	/^void Power::leakageTransceiverTx()$/;"	f	class:Power
+linkBitLinePowerConfig	GlobalParams.h	/^    LinkBitLinePowerConfig linkBitLinePowerConfig;$/;"	m	struct:__anon6
+link_r2h_pwr_d	Power.h	/^    double link_r2h_pwr_d;$/;"	m	class:Power
+link_r2h_pwr_s	Power.h	/^    double link_r2h_pwr_s;$/;"	m	class:Power
+link_r2r_pwr_d	Power.h	/^    double link_r2r_pwr_d;$/;"	m	class:Power
+link_r2r_pwr_s	Power.h	/^    double link_r2r_pwr_s;$/;"	m	class:Power
+load	GlobalRoutingTable.cpp	/^bool GlobalRoutingTable::load(const char *fname)$/;"	f	class:GlobalRoutingTable
+load	GlobalTrafficTable.cpp	/^bool GlobalTrafficTable::load(const char *fname)$/;"	f	class:GlobalTrafficTable
+loadConfiguration	ConfigurationManager.cpp	/^void loadConfiguration() {$/;"	f
+local_id	Channel.h	/^  int local_id; \/\/ Unique ID$/;"	m	struct:Channel
+local_id	Target.h	/^  int local_id;$/;"	m	struct:Target
+locality	GlobalParams.cpp	/^double GlobalParams::locality;$/;"	m	class:GlobalParams	file:
+locality	GlobalParams.h	/^    static double locality;$/;"	m	struct:GlobalParams
+log2ceil	ProcessingElement.cpp	/^inline double ProcessingElement::log2ceil(double x)$/;"	f	class:ProcessingElement
+m_id_map	Channel.h	/^  std::map <tlm::tlm_generic_payload*, unsigned int> m_id_map;$/;"	m	struct:Channel
+m_sbuf	Utils.h	/^    basic_nullbuf<cT, traits> m_sbuf;$/;"	m	class:basic_onullstream
+macPolicy	GlobalParams.h	/^    vector<string> macPolicy;$/;"	m	struct:__anon1
+make	DataStructs.h	/^    void make(const int s, const int d, const int vc, const double ts, const int sz) {$/;"	f	struct:Packet
+mask	DataStructs.h	/^    bool mask[MAX_VIRTUAL_CHANNELS];$/;"	m	struct:TBufferFullStatus
+max_buffer_size	Buffer.h	/^    unsigned int max_buffer_size;$/;"	m	class:Buffer
+max_occupancy	Buffer.h	/^    unsigned int max_occupancy;$/;"	m	class:Buffer
+max_packet_size	GlobalParams.cpp	/^int GlobalParams::max_packet_size;$/;"	m	class:GlobalParams	file:
+max_packet_size	GlobalParams.h	/^    static int max_packet_size;$/;"	m	struct:GlobalParams
+max_volume_to_be_drained	GlobalParams.cpp	/^unsigned int GlobalParams::max_volume_to_be_drained;$/;"	m	class:GlobalParams	file:
+max_volume_to_be_drained	GlobalParams.h	/^    static unsigned int max_volume_to_be_drained;$/;"	m	struct:GlobalParams
+mean_occupancy	Buffer.h	/^    double mean_occupancy;$/;"	m	class:Buffer
+mem	Target.h	/^  int mem[MEM_SIZE];$/;"	m	struct:Target
+mesh_dim_x	GlobalParams.cpp	/^int GlobalParams::mesh_dim_x;$/;"	m	class:GlobalParams	file:
+mesh_dim_x	GlobalParams.h	/^    static int mesh_dim_x;$/;"	m	struct:GlobalParams
+mesh_dim_y	GlobalParams.cpp	/^int GlobalParams::mesh_dim_y;$/;"	m	class:GlobalParams	file:
+mesh_dim_y	GlobalParams.h	/^    static int mesh_dim_y;$/;"	m	struct:GlobalParams
+min_packet_size	GlobalParams.cpp	/^int GlobalParams::min_packet_size;$/;"	m	class:GlobalParams	file:
+min_packet_size	GlobalParams.h	/^    static int min_packet_size;$/;"	m	struct:GlobalParams
+mm	MM.h	/^  mm() : free_list(0), empties(0) {}$/;"	f	class:mm
+mm	MM.h	/^class mm: public tlm::tlm_mm_interface$/;"	c
+n	Main.cpp	/^NoC *n;$/;"	v
+n_outputs	ReservationTable.h	/^     int n_outputs;$/;"	m	class:ReservationTable
+n_trans	Target.h	/^  int   n_trans;$/;"	m	struct:Target
+n_virtual_channels	GlobalParams.cpp	/^int GlobalParams::n_virtual_channels;$/;"	m	class:GlobalParams	file:
+n_virtual_channels	GlobalParams.h	/^    static int n_virtual_channels;$/;"	m	struct:GlobalParams
+name	ReservationTable.h	/^    inline string name() const {return "ReservationTable";};$/;"	f	class:ReservationTable
+name	routingAlgorithms/Routing_ODD_EVEN.h	/^        inline string name() { return "Routing_ODD_EVEN";};$/;"	f	class:Routing_ODD_EVEN
+name	routingAlgorithms/Routing_TABLE_BASED.h	/^        inline string name() { return "Routing_TABLE_BASED";};$/;"	f	class:Routing_TABLE_BASED
+networkInterface	Power.cpp	/^void Power::networkInterface()$/;"	f	class:Power
+network_interface	GlobalParams.h	/^    map<int, pair<double, double> > network_interface;$/;"	m	struct:__anon4
+next	MM.h	/^    access* next;$/;"	m	struct:mm::access
+nextFlit	ProcessingElement.cpp	/^Flit ProcessingElement::nextFlit()$/;"	f	class:ProcessingElement
+ni_pwr_d	Power.h	/^    double ni_pwr_d;$/;"	m	class:Power
+ni_pwr_s	Power.h	/^    double ni_pwr_s;$/;"	m	class:Power
+noc	GlobalStats.h	/^    const NoC *noc;$/;"	m	class:GlobalStats
+node_id	LocalRoutingTable.h	/^    int node_id;$/;"	m	class:LocalRoutingTable
+north	NoC.h	/^    sc_signal<T> north;$/;"	m	struct:sc_signal_NSWE
+north	NoC.h	/^    sc_signal<T> north;$/;"	m	struct:sc_signal_NSWEH
+oLinkId2Direction	GlobalRoutingTable.cpp	/^int oLinkId2Direction(const LinkId & out_link)$/;"	f
+occurrencesAsSource	GlobalTrafficTable.cpp	/^int GlobalTrafficTable::occurrencesAsSource(const int src_id)$/;"	f	class:GlobalTrafficTable
+odd_even	routingAlgorithms/Routing_DYAD.cpp	/^RoutingAlgorithm * Routing_DYAD::odd_even = 0;$/;"	m	class:Routing_DYAD	file:
+odd_even	routingAlgorithms/Routing_DYAD.h	/^        static RoutingAlgorithm * odd_even;$/;"	m	class:Routing_DYAD
+onullstream	Utils.h	/^typedef basic_onullstream<char> onullstream;$/;"	t
+operator <<	Utils.h	/^inline ostream & operator <<(ostream & os, const Coord & coord)$/;"	f
+operator <<	Utils.h	/^inline ostream & operator <<(ostream & os, const Flit & flit)$/;"	f
+operator <<	Utils.h	/^inline ostream & operator <<(ostream & os, const NoP_data & NoP_data)$/;"	f
+operator <<	Utils.h	/^inline ostream & operator <<(ostream & os, const TBufferFullStatus & bfs)$/;"	f
+operator <<	Utils.h	/^inline ostream & operator <<(ostream & os,$/;"	f
+operator ==	DataStructs.h	/^    inline bool operator ==(const ChannelStatus & bs) const {$/;"	f	struct:ChannelStatus
+operator ==	DataStructs.h	/^    inline bool operator ==(const Coord & coord) const {$/;"	f	class:Coord
+operator ==	DataStructs.h	/^    inline bool operator ==(const Flit & flit) const {$/;"	f	struct:Flit
+operator ==	DataStructs.h	/^    inline bool operator ==(const NoP_data & nop_data) const {$/;"	f	struct:NoP_data
+operator ==	DataStructs.h	/^    inline bool operator ==(const Payload & payload) const {$/;"	f	struct:Payload
+operator ==	DataStructs.h	/^    inline bool operator ==(const TBufferFullStatus & bfs) const {$/;"	f	struct:TBufferFullStatus
+operator ==	ReservationTable.h	/^    inline bool operator ==(const TReservation & r) const$/;"	f	struct:TReservation
+overflow	Utils.h	/^    typename traits::int_type overflow(typename traits::int_type c)$/;"	f	class:basic_nullbuf
+packet_injection_rate	GlobalParams.cpp	/^double GlobalParams::packet_injection_rate;$/;"	m	class:GlobalParams	file:
+packet_injection_rate	GlobalParams.h	/^    static double packet_injection_rate;$/;"	m	struct:GlobalParams
+parseCmdLine	ConfigurationManager.cpp	/^void parseCmdLine(int arg_num, char *arg_vet[])$/;"	f
+payload	DataStructs.h	/^    Payload payload;	\/\/ Optional payload$/;"	m	struct:Flit
+perCycleUpdate	Router.cpp	/^void Router::perCycleUpdate()$/;"	f	class:Router
+perCycleUpdate	selectionStrategies/Selection_BUFFER_LEVEL.cpp	/^void Selection_BUFFER_LEVEL::perCycleUpdate(Router * router) {$/;"	f	class:Selection_BUFFER_LEVEL
+perCycleUpdate	selectionStrategies/Selection_NOP.cpp	/^void Selection_NOP::perCycleUpdate(Router * router) {$/;"	f	class:Selection_NOP
+perCycleUpdate	selectionStrategies/Selection_RANDOM.cpp	/^void Selection_RANDOM::perCycleUpdate(Router * router){ }$/;"	f	class:Selection_RANDOM
+pir	GlobalTrafficTable.h	/^  double pir;			\/\/ Packet Injection Rate for the link$/;"	m	struct:Communication
+pop	GlobalParams.h	/^    map<pair <int, int>, double> pop;$/;"	m	struct:__anon3
+por	GlobalTrafficTable.h	/^  double por;			\/\/ Probability Of Retransmission for the link$/;"	m	struct:Communication
+power	Channel.h	/^  Power power;$/;"	m	struct:Channel
+powerManager	Channel.cpp	/^void Channel::powerManager(unsigned int hub_dst_index, tlm::tlm_generic_payload& trans)$/;"	f	class:Channel
+power_config	ConfigurationManager.cpp	/^YAML::Node power_config;$/;"	v
+power_config_filename	GlobalParams.cpp	/^string GlobalParams::power_config_filename;$/;"	m	class:GlobalParams	file:
+power_config_filename	GlobalParams.h	/^    static string power_config_filename;$/;"	m	struct:GlobalParams
+power_configuration	GlobalParams.cpp	/^PowerConfig GlobalParams::power_configuration;$/;"	m	class:GlobalParams	file:
+power_configuration	GlobalParams.h	/^    static PowerConfig power_configuration;$/;"	m	struct:GlobalParams
+power_dynamic	Power.h	/^    PowerBreakdown power_dynamic;$/;"	m	class:Power
+power_static	Power.h	/^    PowerBreakdown power_static;$/;"	m	class:Power
+prev	MM.h	/^    access* prev;$/;"	m	struct:mm::access
+previous_occupancy	Buffer.h	/^    int    previous_occupancy;$/;"	m	class:Buffer
+print	ReservationTable.cpp	/^void ReservationTable::print()$/;"	f	class:ReservationTable
+printBreakDown	Power.cpp	/^void Power::printBreakDown(std::ostream & out)$/;"	f	class:Power
+printMap	Utils.h	/^inline void printMap(string label, const map<string,double> & m,std::ostream & out)$/;"	f
+probability_of_retransmission	GlobalParams.cpp	/^double GlobalParams::probability_of_retransmission;$/;"	m	class:GlobalParams	file:
+probability_of_retransmission	GlobalParams.h	/^    static double probability_of_retransmission;$/;"	m	struct:GlobalParams
+process	Router.cpp	/^void Router::process()$/;"	f	class:Router
+push	GlobalParams.h	/^    map<pair <int, int>, double> push;$/;"	m	struct:__anon3
+r2hLink	Power.cpp	/^void Power::r2hLink()$/;"	f	class:Power
+r2h_link_length	GlobalParams.cpp	/^double GlobalParams::r2h_link_length;$/;"	m	class:GlobalParams	file:
+r2h_link_length	GlobalParams.h	/^    static double r2h_link_length;$/;"	m	struct:GlobalParams
+r2rLink	Power.cpp	/^void Power::r2rLink()$/;"	f	class:Power
+r2r_link_length	GlobalParams.cpp	/^double GlobalParams::r2r_link_length;$/;"	m	class:GlobalParams	file:
+r2r_link_length	GlobalParams.h	/^    static double r2r_link_length;$/;"	m	struct:GlobalParams
+randInt	ProcessingElement.cpp	/^int ProcessingElement::randInt(int min, int max)$/;"	f	class:ProcessingElement
+receivedFlit	Stats.cpp	/^void Stats::receivedFlit(const double arrival_time,$/;"	f	class:Stats
+reflexDirection	Router.cpp	/^int Router::reflexDirection(int direction) const$/;"	f	class:Router
+release	ReservationTable.cpp	/^void ReservationTable::release(const TReservation r, const int port_out)$/;"	f	class:ReservationTable
+reservations	ReservationTable.h	/^    vector<TReservation> reservations;$/;"	m	struct:RTEntry
+reserve	ReservationTable.cpp	/^void ReservationTable::reserve(const TReservation r, const int port_out)$/;"	f	class:ReservationTable
+reset_time	GlobalParams.cpp	/^int GlobalParams::reset_time;$/;"	m	class:GlobalParams	file:
+reset_time	GlobalParams.h	/^    static int reset_time;$/;"	m	struct:GlobalParams
+response_in_progress	Target.h	/^  bool  response_in_progress;$/;"	m	struct:Target
+rnd_generator_seed	GlobalParams.cpp	/^int GlobalParams::rnd_generator_seed;$/;"	m	class:GlobalParams	file:
+rnd_generator_seed	GlobalParams.h	/^    static int rnd_generator_seed;$/;"	m	struct:GlobalParams
+roulette	ProcessingElement.cpp	/^int roulette()$/;"	f
+route	Hub.cpp	/^int Hub::route(Flit& f)$/;"	f	class:Hub
+route	Router.cpp	/^int Router::route(const RouteData & route_data)$/;"	f	class:Router
+route	routingAlgorithms/Routing_DYAD.cpp	/^vector<int> Routing_DYAD::route(Router * router, const RouteData & routeData)$/;"	f	class:Routing_DYAD
+route	routingAlgorithms/Routing_NEGATIVE_FIRST.cpp	/^vector<int> Routing_NEGATIVE_FIRST::route(Router * router, const RouteData & routeData)$/;"	f	class:Routing_NEGATIVE_FIRST
+route	routingAlgorithms/Routing_NORTH_LAST.cpp	/^vector<int> Routing_NORTH_LAST::route(Router * router, const RouteData & routeData)$/;"	f	class:Routing_NORTH_LAST
+route	routingAlgorithms/Routing_ODD_EVEN.cpp	/^vector<int> Routing_ODD_EVEN::route(Router * router, const RouteData & routeData)$/;"	f	class:Routing_ODD_EVEN
+route	routingAlgorithms/Routing_TABLE_BASED.cpp	/^vector<int> Routing_TABLE_BASED::route(Router * router, const RouteData & routeData)$/;"	f	class:Routing_TABLE_BASED
+route	routingAlgorithms/Routing_WEST_FIRST.cpp	/^vector<int> Routing_WEST_FIRST::route(Router * router, const RouteData & routeData)$/;"	f	class:Routing_WEST_FIRST
+route	routingAlgorithms/Routing_XY.cpp	/^vector<int> Routing_XY::route(Router * router, const RouteData & routeData)$/;"	f	class:Routing_XY
+routerPowerConfig	GlobalParams.h	/^    RouterPowerConfig routerPowerConfig;$/;"	m	struct:__anon6
+routing	Power.cpp	/^void Power::routing()$/;"	f	class:Power
+routingAlgorithmsMap	routingAlgorithms/RoutingAlgorithms.cpp	/^RoutingAlgorithmsMap * RoutingAlgorithms::routingAlgorithmsMap = 0;$/;"	m	class:RoutingAlgorithms	file:
+routingAlgorithmsMap	routingAlgorithms/RoutingAlgorithms.h	/^		static RoutingAlgorithmsMap * routingAlgorithmsMap;$/;"	m	class:RoutingAlgorithms
+routingAlgorithmsRegister	routingAlgorithms/Routing_DYAD.h	/^		static RoutingAlgorithmsRegister routingAlgorithmsRegister;$/;"	m	class:Routing_DYAD
+routingAlgorithmsRegister	routingAlgorithms/Routing_NEGATIVE_FIRST.h	/^		static RoutingAlgorithmsRegister routingAlgorithmsRegister;$/;"	m	class:Routing_NEGATIVE_FIRST
+routingAlgorithmsRegister	routingAlgorithms/Routing_NORTH_LAST.h	/^		static RoutingAlgorithmsRegister routingAlgorithmsRegister;$/;"	m	class:Routing_NORTH_LAST
+routingAlgorithmsRegister	routingAlgorithms/Routing_ODD_EVEN.h	/^		static RoutingAlgorithmsRegister routingAlgorithmsRegister;$/;"	m	class:Routing_ODD_EVEN
+routingAlgorithmsRegister	routingAlgorithms/Routing_TABLE_BASED.h	/^		static RoutingAlgorithmsRegister routingAlgorithmsRegister;$/;"	m	class:Routing_TABLE_BASED
+routingAlgorithmsRegister	routingAlgorithms/Routing_WEST_FIRST.h	/^		static RoutingAlgorithmsRegister routingAlgorithmsRegister;$/;"	m	class:Routing_WEST_FIRST
+routingAlgorithmsRegister	routingAlgorithms/Routing_XY.h	/^		static RoutingAlgorithmsRegister routingAlgorithmsRegister;$/;"	m	class:Routing_XY
+routingFunction	Router.cpp	/^vector < int > Router::routingFunction(const RouteData & route_data)$/;"	f	class:Router
+routing_DYAD	routingAlgorithms/Routing_DYAD.cpp	/^Routing_DYAD * Routing_DYAD::routing_DYAD = 0;$/;"	m	class:Routing_DYAD	file:
+routing_DYAD	routingAlgorithms/Routing_DYAD.h	/^		static Routing_DYAD * routing_DYAD;$/;"	m	class:Routing_DYAD
+routing_NEGATIVE_FIRST	routingAlgorithms/Routing_NEGATIVE_FIRST.cpp	/^Routing_NEGATIVE_FIRST * Routing_NEGATIVE_FIRST::routing_NEGATIVE_FIRST = 0;$/;"	m	class:Routing_NEGATIVE_FIRST	file:
+routing_NEGATIVE_FIRST	routingAlgorithms/Routing_NEGATIVE_FIRST.h	/^		static Routing_NEGATIVE_FIRST * routing_NEGATIVE_FIRST;$/;"	m	class:Routing_NEGATIVE_FIRST
+routing_NORTH_LAST	routingAlgorithms/Routing_NORTH_LAST.cpp	/^Routing_NORTH_LAST * Routing_NORTH_LAST::routing_NORTH_LAST = 0;$/;"	m	class:Routing_NORTH_LAST	file:
+routing_NORTH_LAST	routingAlgorithms/Routing_NORTH_LAST.h	/^		static Routing_NORTH_LAST * routing_NORTH_LAST;$/;"	m	class:Routing_NORTH_LAST
+routing_ODD_EVEN	routingAlgorithms/Routing_ODD_EVEN.cpp	/^Routing_ODD_EVEN * Routing_ODD_EVEN::routing_ODD_EVEN = 0;$/;"	m	class:Routing_ODD_EVEN	file:
+routing_ODD_EVEN	routingAlgorithms/Routing_ODD_EVEN.h	/^		static Routing_ODD_EVEN * routing_ODD_EVEN;$/;"	m	class:Routing_ODD_EVEN
+routing_TABLE_BASED	routingAlgorithms/Routing_TABLE_BASED.cpp	/^Routing_TABLE_BASED * Routing_TABLE_BASED::routing_TABLE_BASED = 0;$/;"	m	class:Routing_TABLE_BASED	file:
+routing_TABLE_BASED	routingAlgorithms/Routing_TABLE_BASED.h	/^		static Routing_TABLE_BASED * routing_TABLE_BASED;$/;"	m	class:Routing_TABLE_BASED
+routing_WEST_FIRST	routingAlgorithms/Routing_WEST_FIRST.cpp	/^Routing_WEST_FIRST * Routing_WEST_FIRST::routing_WEST_FIRST = 0;$/;"	m	class:Routing_WEST_FIRST	file:
+routing_WEST_FIRST	routingAlgorithms/Routing_WEST_FIRST.h	/^		static Routing_WEST_FIRST * routing_WEST_FIRST;$/;"	m	class:Routing_WEST_FIRST
+routing_XY	routingAlgorithms/Routing_XY.cpp	/^Routing_XY * Routing_XY::routing_XY = 0;$/;"	m	class:Routing_XY	file:
+routing_XY	routingAlgorithms/Routing_XY.h	/^		static Routing_XY * routing_XY;$/;"	m	class:Routing_XY
+routing_algorithm	GlobalParams.cpp	/^string GlobalParams::routing_algorithm;$/;"	m	class:GlobalParams	file:
+routing_algorithm	GlobalParams.h	/^    static string routing_algorithm;$/;"	m	struct:GlobalParams
+routing_algorithm_pm	GlobalParams.h	/^    map<string, pair<double, double> > routing_algorithm_pm;$/;"	m	struct:__anon4
+routing_pwr_d	Power.h	/^    double routing_pwr_d;$/;"	m	class:Power
+routing_pwr_s	Power.h	/^    double routing_pwr_s;$/;"	m	class:Power
+routing_table_filename	GlobalParams.cpp	/^string GlobalParams::routing_table_filename;$/;"	m	class:GlobalParams	file:
+routing_table_filename	GlobalParams.h	/^    static string routing_table_filename;$/;"	m	struct:GlobalParams
+rt_noc	GlobalRoutingTable.h	/^     RoutingTableNoC rt_noc;$/;"	m	class:GlobalRoutingTable
+rt_node	LocalRoutingTable.h	/^     RoutingTableNode rt_node;$/;"	m	class:LocalRoutingTable
+rtable	ReservationTable.h	/^     TRTEntry *rtable;	\/\/ reservation vector: rtable[i] gives a RTEntry containing the set of input\/VC $/;"	m	class:ReservationTable
+rxBufferSize	GlobalParams.h	/^    int rxBufferSize;$/;"	m	struct:__anon2
+rxChannels	GlobalParams.h	/^    vector<int> rxChannels;$/;"	m	struct:__anon2
+rxPowerManager	Hub.cpp	/^void Hub::rxPowerManager()$/;"	f	class:Hub
+rxProcess	ProcessingElement.cpp	/^void ProcessingElement::rxProcess()$/;"	f	class:ProcessingElement
+rxProcess	Router.cpp	/^void Router::rxProcess()$/;"	f	class:Router
+rxSleep	Power.cpp	/^void Power::rxSleep(int cycles)$/;"	f	class:Power
+rx_dynamic	GlobalParams.h	/^    double rx_dynamic;$/;"	m	struct:__anon5
+rx_snooping	GlobalParams.h	/^    double rx_snooping;$/;"	m	struct:__anon5
+sameRadioHub	Utils.h	/^inline bool sameRadioHub(int id1, int id2)$/;"	f
+sc_main	Main.cpp	/^int sc_main(int arg_num, char *arg_vet[])$/;"	f
+sc_signal_NSWE	NoC.h	/^struct sc_signal_NSWE$/;"	s
+sc_signal_NSWEH	NoC.h	/^struct sc_signal_NSWEH$/;"	s
+sc_trace	Utils.h	/^inline void sc_trace(sc_trace_file * &tf, const ChannelStatus & bs, string & name)$/;"	f
+sc_trace	Utils.h	/^inline void sc_trace(sc_trace_file * &tf, const Flit & flit, string & name)$/;"	f
+sc_trace	Utils.h	/^inline void sc_trace(sc_trace_file * &tf, const NoP_data & NoP_data, string & name)$/;"	f
+sc_trace	Utils.h	/^inline void sc_trace(sc_trace_file * &tf, const TBufferFullStatus & bfs, string & name)$/;"	f
+searchCommHistory	Stats.cpp	/^int Stats::searchCommHistory(int src_id)$/;"	f	class:Stats
+searchNode	NoC.cpp	/^Tile *NoC::searchNode(const int id) const$/;"	f	class:NoC
+selectChannel	Utils.h	/^inline int selectChannel(int src_hub, int dst_hub)$/;"	f
+selection	Power.cpp	/^void Power::selection()$/;"	f	class:Power
+selectionFunction	Router.cpp	/^int Router::selectionFunction(const vector < int >&directions,$/;"	f	class:Router
+selectionStrategiesMap	selectionStrategies/SelectionStrategies.cpp	/^SelectionStrategiesMap * SelectionStrategies::selectionStrategiesMap = 0;$/;"	m	class:SelectionStrategies	file:
+selectionStrategiesMap	selectionStrategies/SelectionStrategies.h	/^		static SelectionStrategiesMap * selectionStrategiesMap;$/;"	m	class:SelectionStrategies
+selectionStrategiesRegister	selectionStrategies/Selection_BUFFER_LEVEL.h	/^		static SelectionStrategiesRegister selectionStrategiesRegister;$/;"	m	class:Selection_BUFFER_LEVEL
+selectionStrategiesRegister	selectionStrategies/Selection_NOP.h	/^		static SelectionStrategiesRegister selectionStrategiesRegister;$/;"	m	class:Selection_NOP
+selectionStrategiesRegister	selectionStrategies/Selection_RANDOM.h	/^		static SelectionStrategiesRegister selectionStrategiesRegister;$/;"	m	class:Selection_RANDOM
+selection_BUFFER_LEVEL	selectionStrategies/Selection_BUFFER_LEVEL.cpp	/^Selection_BUFFER_LEVEL * Selection_BUFFER_LEVEL::selection_BUFFER_LEVEL = 0;$/;"	m	class:Selection_BUFFER_LEVEL	file:
+selection_BUFFER_LEVEL	selectionStrategies/Selection_BUFFER_LEVEL.h	/^		static Selection_BUFFER_LEVEL * selection_BUFFER_LEVEL;$/;"	m	class:Selection_BUFFER_LEVEL
+selection_NOP	selectionStrategies/Selection_NOP.cpp	/^Selection_NOP * Selection_NOP::selection_NOP = 0;$/;"	m	class:Selection_NOP	file:
+selection_NOP	selectionStrategies/Selection_NOP.h	/^		static Selection_NOP * selection_NOP;$/;"	m	class:Selection_NOP
+selection_RANDOM	selectionStrategies/Selection_RANDOM.cpp	/^Selection_RANDOM * Selection_RANDOM::selection_RANDOM = 0;$/;"	m	class:Selection_RANDOM	file:
+selection_RANDOM	selectionStrategies/Selection_RANDOM.h	/^		static Selection_RANDOM * selection_RANDOM;$/;"	m	class:Selection_RANDOM
+selection_pwr_d	Power.h	/^    double selection_pwr_d;$/;"	m	class:Power
+selection_pwr_s	Power.h	/^    double selection_pwr_s;$/;"	m	class:Power
+selection_strategy	GlobalParams.cpp	/^string GlobalParams::selection_strategy;$/;"	m	class:GlobalParams	file:
+selection_strategy	GlobalParams.h	/^    static string selection_strategy;$/;"	m	struct:GlobalParams
+selection_strategy_pm	GlobalParams.h	/^    map<string, pair<double, double> > selection_strategy_pm;$/;"	m	struct:__anon4
+sender_id	DataStructs.h	/^    int sender_id;$/;"	m	struct:NoP_data
+sequence_length	DataStructs.h	/^    int sequence_length;$/;"	m	struct:Flit
+sequence_no	DataStructs.h	/^    int sequence_no;		\/\/ The sequence number of the flit inside the packet$/;"	m	struct:Flit
+setBit	ProcessingElement.cpp	/^void ProcessingElement::setBit(int &x, int w, int v)$/;"	f	class:ProcessingElement
+setBufferAntenna	ConfigurationManager.cpp	/^void setBufferAntenna(int depth)$/;"	f
+setBufferFromTile	ConfigurationManager.cpp	/^void setBufferFromTile(int depth)$/;"	f
+setBufferToTile	ConfigurationManager.cpp	/^void setBufferToTile(int depth)$/;"	f
+setLabel	Buffer.cpp	/^void Buffer::setLabel(string l)$/;"	f	class:Buffer
+setSize	ReservationTable.cpp	/^void ReservationTable::setSize(const int n_outputs)$/;"	f	class:ReservationTable
+showBufferStats	GlobalStats.cpp	/^void GlobalStats::showBufferStats(std::ostream & out)$/;"	f	class:GlobalStats
+showConfig	ConfigurationManager.cpp	/^void showConfig()$/;"	f
+showHelp	ConfigurationManager.cpp	/^void showHelp(char selfname[])$/;"	f
+showPowerBreakDown	GlobalStats.cpp	/^void GlobalStats::showPowerBreakDown(std::ostream & out)$/;"	f	class:GlobalStats
+showPowerManagerStats	GlobalStats.cpp	/^void GlobalStats::showPowerManagerStats(std::ostream & out)$/;"	f	class:GlobalStats
+showStats	GlobalStats.cpp	/^void GlobalStats::showStats(std::ostream & out, bool detailed)$/;"	f	class:GlobalStats
+showStats	Stats.cpp	/^void Stats::showStats(int curr_node, std::ostream & out, bool header)$/;"	f	class:Stats
+show_buffer_stats	GlobalParams.cpp	/^bool GlobalParams::show_buffer_stats;$/;"	m	class:GlobalParams	file:
+show_buffer_stats	GlobalParams.h	/^    static bool show_buffer_stats;$/;"	m	struct:GlobalParams
+signalHandler	Main.cpp	/^void signalHandler( int signum )$/;"	f
+simulation_time	GlobalParams.cpp	/^int GlobalParams::simulation_time;$/;"	m	class:GlobalParams	file:
+simulation_time	GlobalParams.h	/^    static int simulation_time;$/;"	m	struct:GlobalParams
+size	DataStructs.h	/^    int size;$/;"	m	struct:Packet
+size	DataStructs.h	/^    int size;$/;"	m	struct:__anon10
+sleep_end_cycle	Power.h	/^    int sleep_end_cycle;$/;"	m	class:Power
+socket	Initiator.h	/^  tlm_utils::simple_initiator_socket<Initiator> socket;$/;"	m	struct:Initiator
+socket	Target.h	/^  tlm_utils::simple_target_socket<Target> socket;$/;"	m	struct:Target
+south	NoC.h	/^    sc_signal<T> south;$/;"	m	struct:sc_signal_NSWE
+south	NoC.h	/^    sc_signal<T> south;$/;"	m	struct:sc_signal_NSWEH
+src	GlobalTrafficTable.h	/^  int src;			\/\/ ID of the source node (PE)$/;"	m	struct:Communication
+src_id	DataStructs.h	/^    int src_id;$/;"	m	struct:Flit
+src_id	DataStructs.h	/^    int src_id;$/;"	m	struct:Packet
+src_id	DataStructs.h	/^    int src_id;$/;"	m	struct:RouteData
+src_id	Stats.h	/^    int src_id;$/;"	m	struct:CommHistory
+start_request_event	Initiator.h	/^  sc_event start_request_event;$/;"	m	struct:Initiator
+stats_warm_up_time	GlobalParams.cpp	/^int GlobalParams::stats_warm_up_time;$/;"	m	class:GlobalParams	file:
+stats_warm_up_time	GlobalParams.h	/^    static int stats_warm_up_time;$/;"	m	struct:GlobalParams
+t_off	GlobalTrafficTable.h	/^  int t_off;			\/\/ Time (in cycles) at which activity ends$/;"	m	struct:Communication
+t_on	GlobalTrafficTable.h	/^  int t_on;			\/\/ Time (in cycles) at which activity begins$/;"	m	struct:Communication
+t_period	GlobalTrafficTable.h	/^  int t_period;		        \/\/ Period after which activity starts again$/;"	m	struct:Communication
+targ_socket	Channel.h	/^  tlm_utils::multi_passthrough_target_socket<Channel>    targ_socket;$/;"	m	struct:Channel
+thread_process	Initiator.cpp	/^  void Initiator::thread_process()$/;"	f	class:Initiator
+tile2Hub	Utils.h	/^inline int tile2Hub(int id)$/;"	f
+tile2Port	Hub.cpp	/^int Hub::tile2Port(int id)$/;"	f	class:Hub
+tileToAntennaProcess	Hub.cpp	/^void Hub::tileToAntennaProcess()$/;"	f	class:Hub
+timestamp	DataStructs.h	/^    double timestamp;		\/\/ SC timestamp at packet generation$/;"	m	struct:Packet
+timestamp	DataStructs.h	/^    double timestamp;		\/\/ Unix timestamp at packet generation$/;"	m	struct:Flit
+toTileBufferSize	GlobalParams.h	/^    int toTileBufferSize;$/;"	m	struct:__anon2
+to_hub	NoC.h	/^    sc_signal<T> to_hub;$/;"	m	struct:sc_signal_NSWEH
+total_power_s	Power.h	/^    double total_power_s;$/;"	m	class:Power
+total_received_flits	Stats.h	/^    unsigned int total_received_flits;$/;"	m	struct:CommHistory
+trace_filename	GlobalParams.cpp	/^string GlobalParams::trace_filename;$/;"	m	class:GlobalParams	file:
+trace_filename	GlobalParams.h	/^    static string trace_filename;$/;"	m	struct:GlobalParams
+trace_mode	GlobalParams.cpp	/^int GlobalParams::trace_mode;$/;"	m	class:GlobalParams	file:
+trace_mode	GlobalParams.h	/^    static int trace_mode;$/;"	m	struct:GlobalParams
+trafficBitReversal	ProcessingElement.cpp	/^Packet ProcessingElement::trafficBitReversal()$/;"	f	class:ProcessingElement
+trafficButterfly	ProcessingElement.cpp	/^Packet ProcessingElement::trafficButterfly()$/;"	f	class:ProcessingElement
+trafficLocal	ProcessingElement.cpp	/^Packet ProcessingElement::trafficLocal()$/;"	f	class:ProcessingElement
+trafficRandom	ProcessingElement.cpp	/^Packet ProcessingElement::trafficRandom()$/;"	f	class:ProcessingElement
+trafficShuffle	ProcessingElement.cpp	/^Packet ProcessingElement::trafficShuffle()$/;"	f	class:ProcessingElement
+trafficTest	ProcessingElement.cpp	/^Packet ProcessingElement::trafficTest()$/;"	f	class:ProcessingElement
+trafficTranspose1	ProcessingElement.cpp	/^Packet ProcessingElement::trafficTranspose1()$/;"	f	class:ProcessingElement
+trafficTranspose2	ProcessingElement.cpp	/^Packet ProcessingElement::trafficTranspose2()$/;"	f	class:ProcessingElement
+trafficULocal	ProcessingElement.cpp	/^Packet ProcessingElement::trafficULocal()$/;"	f	class:ProcessingElement
+traffic_distribution	GlobalParams.cpp	/^string GlobalParams::traffic_distribution;$/;"	m	class:GlobalParams	file:
+traffic_distribution	GlobalParams.h	/^    static string traffic_distribution;$/;"	m	struct:GlobalParams
+traffic_table	GlobalTrafficTable.h	/^     vector < Communication > traffic_table;$/;"	m	class:GlobalTrafficTable
+traffic_table_filename	GlobalParams.cpp	/^string GlobalParams::traffic_table_filename;$/;"	m	class:GlobalParams	file:
+traffic_table_filename	GlobalParams.h	/^    static string traffic_table_filename;$/;"	m	struct:GlobalParams
+trans	MM.h	/^    gp_t* trans;$/;"	m	struct:mm::access
+transceiver_biasing	GlobalParams.h	/^    pair<double, double> transceiver_biasing;$/;"	m	struct:__anon5
+transceiver_leakage	GlobalParams.h	/^    pair<double, double> transceiver_leakage;$/;"	m	struct:__anon5
+transceiver_rx_pwr_biasing	Power.h	/^    double transceiver_rx_pwr_biasing;$/;"	m	class:Power
+transceiver_rx_pwr_s	Power.h	/^    double transceiver_rx_pwr_s;$/;"	m	class:Power
+transceiver_tx_pwr_biasing	Power.h	/^    double transceiver_tx_pwr_biasing;$/;"	m	class:Power
+transceiver_tx_pwr_s	Power.h	/^    double transceiver_tx_pwr_s;$/;"	m	class:Power
+transmitter_attenuation_map	GlobalParams.h	/^    map<pair <int, int>, double> transmitter_attenuation_map;$/;"	m	struct:__anon5
+transport_dbg	Channel.cpp	/^  unsigned int Channel::transport_dbg(int id, tlm::tlm_generic_payload& trans)$/;"	f	class:Channel
+true_buffer	Buffer.h	/^    bool true_buffer;$/;"	m	class:Buffer
+txBufferSize	GlobalParams.h	/^    int txBufferSize;$/;"	m	struct:__anon2
+txChannels	GlobalParams.h	/^    vector<int> txChannels;$/;"	m	struct:__anon2
+txPowerManager	Hub.cpp	/^void Hub::txPowerManager()$/;"	f	class:Hub
+txProcess	ProcessingElement.cpp	/^void ProcessingElement::txProcess()$/;"	f	class:ProcessingElement
+txProcess	Router.cpp	/^void Router::txProcess()$/;"	f	class:Router
+txRadioProcessTokenHold	Hub.cpp	/^void Hub::txRadioProcessTokenHold(int channel)$/;"	f	class:Hub
+txRadioProcessTokenMaxHold	Hub.cpp	/^void Hub::txRadioProcessTokenMaxHold(int channel)$/;"	f	class:Hub
+txRadioProcessTokenPacket	Hub.cpp	/^void Hub::txRadioProcessTokenPacket(int channel)$/;"	f	class:Hub
+updateIndex	ReservationTable.cpp	/^void ReservationTable::updateIndex()$/;"	f	class:ReservationTable
+updatePowerBreakDown	GlobalStats.cpp	/^void GlobalStats::updatePowerBreakDown(map<string,double> &dst,PowerBreakdown* src)$/;"	f	class:GlobalStats
+updateRxPower	Hub.cpp	/^void Hub::updateRxPower()$/;"	f	class:Hub
+updateTokenHold	TokenRing.cpp	/^void TokenRing::updateTokenHold(int channel)$/;"	f	class:TokenRing
+updateTokenMaxHold	TokenRing.cpp	/^void TokenRing::updateTokenMaxHold(int channel)$/;"	f	class:TokenRing
+updateTokenPacket	TokenRing.cpp	/^void TokenRing::updateTokenPacket(int channel)$/;"	f	class:TokenRing
+updateTokens	TokenRing.cpp	/^void TokenRing::updateTokens()$/;"	f	class:TokenRing
+updateTxPower	Hub.cpp	/^void Hub::updateTxPower()$/;"	f	class:Hub
+use_low_voltage_path	DataStructs.h	/^    bool use_low_voltage_path;$/;"	m	struct:Flit
+use_low_voltage_path	DataStructs.h	/^    bool use_low_voltage_path;$/;"	m	struct:Packet
+use_powermanager	GlobalParams.cpp	/^bool GlobalParams::use_powermanager;$/;"	m	class:GlobalParams	file:
+use_powermanager	GlobalParams.h	/^    static bool use_powermanager;$/;"	m	struct:GlobalParams
+use_winoc	GlobalParams.cpp	/^bool GlobalParams::use_winoc;$/;"	m	class:GlobalParams	file:
+use_winoc	GlobalParams.h	/^    static bool use_winoc;$/;"	m	struct:GlobalParams
+valid	GlobalRoutingTable.h	/^    bool valid;$/;"	m	class:GlobalRoutingTable
+value	DataStructs.h	/^    double value;$/;"	m	struct:__anon7
+vc	ReservationTable.h	/^    int vc;$/;"	m	struct:TReservation
+vc_id	DataStructs.h	/^    int vc_id; \/\/ Virtual Channel$/;"	m	struct:Flit
+vc_id	DataStructs.h	/^    int vc_id;$/;"	m	struct:Packet
+vc_id	DataStructs.h	/^    int vc_id;$/;"	m	struct:RouteData
+verbose_mode	GlobalParams.cpp	/^string GlobalParams::verbose_mode;$/;"	m	class:GlobalParams	file:
+verbose_mode	GlobalParams.h	/^    static string verbose_mode;$/;"	m	struct:GlobalParams
+warm_up_time	Stats.h	/^    double warm_up_time;$/;"	m	class:Stats
+west	NoC.h	/^    sc_signal<T> west;$/;"	m	struct:sc_signal_NSWE
+west	NoC.h	/^    sc_signal<T> west;$/;"	m	struct:sc_signal_NSWEH
+wirelessDynamicRx	Power.cpp	/^void Power::wirelessDynamicRx()$/;"	f	class:Power
+wirelessSnooping	Power.cpp	/^void Power::wirelessSnooping()$/;"	f	class:Power
+wirelessTx	Power.cpp	/^void Power::wirelessTx(int src,int dst,int length)$/;"	f	class:Power
+wireless_rx_pwr	Power.h	/^    double wireless_rx_pwr;$/;"	m	class:Power
+wireless_snooping	Power.h	/^    double wireless_snooping;$/;"	m	class:Power
+wonullstream	Utils.h	/^typedef basic_onullstream<wchar_t> wonullstream;$/;"	t
+x	DataStructs.h	/^    int x;			\/\/ X coordinate$/;"	m	class:Coord
+xy	routingAlgorithms/Routing_NEGATIVE_FIRST.cpp	/^RoutingAlgorithm * Routing_NEGATIVE_FIRST::xy = 0;$/;"	m	class:Routing_NEGATIVE_FIRST	file:
+xy	routingAlgorithms/Routing_NEGATIVE_FIRST.h	/^        static RoutingAlgorithm * xy;$/;"	m	class:Routing_NEGATIVE_FIRST
+xy	routingAlgorithms/Routing_NORTH_LAST.cpp	/^RoutingAlgorithm * Routing_NORTH_LAST::xy = 0;$/;"	m	class:Routing_NORTH_LAST	file:
+xy	routingAlgorithms/Routing_NORTH_LAST.h	/^        static RoutingAlgorithm * xy;$/;"	m	class:Routing_NORTH_LAST
+xy	routingAlgorithms/Routing_WEST_FIRST.cpp	/^RoutingAlgorithm * Routing_WEST_FIRST::xy = 0;$/;"	m	class:Routing_WEST_FIRST	file:
+xy	routingAlgorithms/Routing_WEST_FIRST.h	/^        static RoutingAlgorithm * xy;$/;"	m	class:Routing_WEST_FIRST
+y	DataStructs.h	/^    int y;			\/\/ Y coordinate$/;"	m	class:Coord
+~Buffer	Buffer.h	/^    virtual ~ Buffer() {$/;"	f	class:Buffer
+~Routing_DYAD	routingAlgorithms/Routing_DYAD.h	/^		~Routing_DYAD(){};$/;"	f	class:Routing_DYAD
+~Routing_NEGATIVE_FIRST	routingAlgorithms/Routing_NEGATIVE_FIRST.h	/^		~Routing_NEGATIVE_FIRST(){};$/;"	f	class:Routing_NEGATIVE_FIRST
+~Routing_NORTH_LAST	routingAlgorithms/Routing_NORTH_LAST.h	/^		~Routing_NORTH_LAST(){};$/;"	f	class:Routing_NORTH_LAST
+~Routing_ODD_EVEN	routingAlgorithms/Routing_ODD_EVEN.h	/^		~Routing_ODD_EVEN(){};$/;"	f	class:Routing_ODD_EVEN
+~Routing_TABLE_BASED	routingAlgorithms/Routing_TABLE_BASED.h	/^		~Routing_TABLE_BASED(){};$/;"	f	class:Routing_TABLE_BASED
+~Routing_WEST_FIRST	routingAlgorithms/Routing_WEST_FIRST.h	/^		~Routing_WEST_FIRST(){};$/;"	f	class:Routing_WEST_FIRST
+~Routing_XY	routingAlgorithms/Routing_XY.h	/^		~Routing_XY(){};$/;"	f	class:Routing_XY
+~Selection_BUFFER_LEVEL	selectionStrategies/Selection_BUFFER_LEVEL.h	/^		~Selection_BUFFER_LEVEL(){};$/;"	f	class:Selection_BUFFER_LEVEL
+~Selection_NOP	selectionStrategies/Selection_NOP.h	/^		~Selection_NOP(){};$/;"	f	class:Selection_NOP
+~Selection_RANDOM	selectionStrategies/Selection_RANDOM.h	/^		~Selection_RANDOM(){};$/;"	f	class:Selection_RANDOM

@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2015 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -64,6 +64,7 @@ Flit ProcessingElement::nextFlit()
 
     flit.src_id = packet.src_id;
     flit.dst_id = packet.dst_id;
+    flit.vc_id = packet.vc_id;
     flit.timestamp = packet.timestamp;
     flit.sequence_no = packet.size - packet.flit_left;
     flit.sequence_length = packet.size;
@@ -148,8 +149,8 @@ bool ProcessingElement::canShot(Packet & packet)
 	if (shot) {
 	    for (unsigned int i = 0; i < dst_prob.size(); i++) {
 		if (prob < dst_prob[i].second) {
-		    packet.make(local_id, dst_prob[i].first, now,
-				getRandomSize());
+                    int vc = randInt(0,GlobalParams::n_virtual_channels-1);
+		    packet.make(local_id, dst_prob[i].first, vc, now, getRandomSize());
 		    break;
 		}
 	    }
@@ -297,6 +298,7 @@ Packet ProcessingElement::trafficRandom()
 
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
+    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
 
     return p;
 }
@@ -309,6 +311,7 @@ Packet ProcessingElement::trafficTest()
 
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
+    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
 
     return p;
 }
@@ -327,6 +330,7 @@ Packet ProcessingElement::trafficTranspose1()
     fixRanges(src, dst);
     p.dst_id = coord2Id(dst);
 
+    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
@@ -347,6 +351,7 @@ Packet ProcessingElement::trafficTranspose2()
     fixRanges(src, dst);
     p.dst_id = coord2Id(dst);
 
+    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
@@ -414,6 +419,7 @@ Packet ProcessingElement::trafficShuffle()
     p.src_id = local_id;
     p.dst_id = dnode;
 
+    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
@@ -438,6 +444,7 @@ Packet ProcessingElement::trafficButterfly()
     p.src_id = local_id;
     p.dst_id = dnode;
 
+    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 

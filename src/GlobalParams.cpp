@@ -1,7 +1,7 @@
 /*
  * Noxim - the NoC Simulator
  *
- * (C) 2005-2015 by the University of Catania
+ * (C) 2005-2018 by the University of Catania
  * For the complete list of authors refer to file ../doc/AUTHORS.txt
  * For the license applied to these sources refer to file ../doc/LICENSE.txt
  *
@@ -33,6 +33,7 @@ string GlobalParams::config_filename;
 string GlobalParams::power_config_filename;
 int GlobalParams::clock_period_ps;
 int GlobalParams::simulation_time;
+int GlobalParams::n_virtual_channels;
 int GlobalParams::reset_time;
 int GlobalParams::stats_warm_up_time;
 int GlobalParams::rnd_generator_seed;
@@ -42,6 +43,7 @@ unsigned int GlobalParams::max_volume_to_be_drained;
 vector <pair <int, double> > GlobalParams::hotspots;
 bool GlobalParams::show_buffer_stats;
 bool GlobalParams::use_winoc;
+bool GlobalParams::ascii_monitor;
 bool GlobalParams::use_powermanager;
 ChannelConfig GlobalParams::default_channel_configuration;
 map<int, ChannelConfig> GlobalParams::channel_configuration;
