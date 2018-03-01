@@ -75,15 +75,12 @@ SC_MODULE(NoC)
 
     SC_CTOR(NoC) {
 
-
 	// Build the Mesh
 	buildMesh();
 
-	GlobalParams::show_ascii = true;
-
-	if (GlobalParams::show_ascii)
+	if (GlobalParams::ascii_monitor)
 	{
-	    SC_METHOD(showAscii);
+	    SC_METHOD(asciiMonitor);
 	    sensitive << clock.pos();
 	}
 
@@ -95,7 +92,7 @@ SC_MODULE(NoC)
   private:
 
     void buildMesh();
-    void showAscii();
+    void asciiMonitor();
 };
 
 //Hub * dd;

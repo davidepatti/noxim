@@ -216,6 +216,7 @@ void showHelp(char selfname[])
          << "\t-show_buf_stats\tShow buffers statistics" << endl
          << "\t-volume N\tStop the simulation when either the maximum number of cycles has been reached or N flits have" << endl
          << "\t\t\tbeen delivered" << endl
+         << "\t-asciimonitor\tShow status of the network while running (experimental)" << endl
          << "\t-sim N\t\tRun for the specified simulation time [cycles]" << endl
          << endl
          << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <maurizio.palesi@unikore.it>" << endl
@@ -363,6 +364,14 @@ void checkConfiguration()
 	cerr << "Error: Power manager (-wirxsleep) option only supports a single virtual channel" << endl;
 	exit(1);
     }
+
+    if (GlobalParams::ascii_monitor)
+    {
+#ifdef DEBUG
+	cerr << "-ascii_monitor option need DEBUG flag to be disabled in Makefile " << endl;
+	exit(1);
+#endif
+    }
 }
 
 void parseCmdLine(int arg_num, char *arg_vet[])
@@ -500,6 +509,8 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		    atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-sim"))
 		GlobalParams::simulation_time = atoi(arg_vet[++i]);
+	    else if (!strcmp(arg_vet[i], "-asciimonitor")) 
+		GlobalParams::ascii_monitor = true;
 	    else if (!strcmp(arg_vet[i], "-config") || !strcmp(arg_vet[i], "-power"))
 		// -config is managed from configure function
 		// i++ skips the configuration file name 

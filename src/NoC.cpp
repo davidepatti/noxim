@@ -340,7 +340,7 @@ Tile *NoC::searchNode(const int id) const
     return NULL;
 }
 
-void NoC::showAscii()
+void NoC::asciiMonitor()
 { 
     //cout << sc_time_stamp().to_double()/GlobalParams::clock_period_ps << endl;
     system("clear");
