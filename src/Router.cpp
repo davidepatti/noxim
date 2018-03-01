@@ -266,8 +266,11 @@ void Router::perCycleUpdate()
 	power.leakageRouter();
 	for (int i = 0; i < DIRECTIONS + 1; i++)
 	{
-	    power.leakageBufferRouter();
-	    power.leakageLinkRouter2Router();
+	    for (int vc=0;vc<GlobalParams::n_virtual_channels;vc++)
+	    {
+		power.leakageBufferRouter();
+		power.leakageLinkRouter2Router();
+	    }
 	}
 
 	power.leakageLinkRouter2Hub();

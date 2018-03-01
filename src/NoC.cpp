@@ -84,11 +84,6 @@ void NoC::buildMesh()
 	
 	int no_channels = hub_config.txChannels.size();
 
-	if (no_channels > 1)
-	{
-	    cerr << " WARNING: Power model currently not supporting multi-channel per hub, using default_tx_energy" << endl;
-	}
-
 	int data_rate_gbs;
 	
 	if (no_channels > 0) {
@@ -108,7 +103,6 @@ void NoC::buildMesh()
 					GlobalParams::hub_configuration[hub_id].txBufferSize,
 					GlobalParams::flit_size,
 					data_rate_gbs);
-
     }
 
 

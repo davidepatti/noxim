@@ -89,14 +89,12 @@ void Hub::updateRxPower()
 	power.biasingRx();
 
 	for (unsigned int i=0;i<rxChannels.size();i++)
-	{
-	    power.leakageAntennaBuffer();
-	}
+	    for (int vc=0;vc<GlobalParams::n_virtual_channels;vc++)
+		power.leakageAntennaBuffer();
 
 	for (int i = 0; i < num_ports; i++) 
-	{
-	    power.leakageBufferToTile();
-	}
+	    for (int vc=0;vc<GlobalParams::n_virtual_channels;vc++)
+		power.leakageBufferToTile();
     }    
 }
 
@@ -137,7 +135,8 @@ void Hub::updateTxPower()
     else
     {
 	for (unsigned int i=0;i<txChannels.size();i++)
-	    power.leakageAntennaBuffer();
+	    for (int vc=0;vc<GlobalParams::n_virtual_channels;vc++)
+		power.leakageAntennaBuffer();
 
 	power.leakageTransceiverTx();
 	power.biasingTx();
@@ -146,7 +145,8 @@ void Hub::updateTxPower()
     // mandatory
     power.leakageLinkRouter2Hub();
     for (int i = 0; i < num_ports; i++) 
-	power.leakageBufferFromTile();
+	    for (int vc=0;vc<GlobalParams::n_virtual_channels;vc++)
+		power.leakageBufferFromTile();
 }
 
 
