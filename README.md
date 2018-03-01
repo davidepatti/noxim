@@ -10,12 +10,10 @@ it can be downloaded under GPL license terms.
 Vincenzo Catania, Andrea Mineo, Salvatore Monteleone, Maurizio Palesi, and Davide Patti. 2016. Cycle-Accurate Network on Chip Simulation with Noxim. ACM Transactions on Modeling and Computer Simulation. Volume 27 Issue 1, November 2016. DOI: https://doi.org/10.1145/2953878
 
 
-
 What's New ? 
 ------------
 **[March 2018]** Long awaited Virtual Channels and Multiple radio-channels are finally in master version
 
-Details:
   * Support for virtual channels for improved traffic management
   * Support for multiple radio-frequency channels for each Radio-Hub
   * New yaml examples (please update yours, since format is slightly different)
@@ -42,13 +40,6 @@ If you are working on Ubuntu, you can install noxim and all the dependencies wit
 Or, to get just the latest master sources, you can run:
 
     git clone https://github.com/davidepatti/noxim.git
-
-For further information please refer to the following files contained in the "doc" directory:
-
-  * INSTALL.txt: instructions to install the tool
-  * MANUAL.txt: explanation of the arguments that can be passed to the simulator
-  * AUTHORS.txt: authors of the tool
-  * LICENSE.txt: license under which you are allowed to use the source files
 
 Noxim has a command line interface for defining several parameters of a NoC. In particular the
 user can customize the network size, buffer size, packet size distribution, routing algorithm,
