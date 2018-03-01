@@ -1,7 +1,7 @@
 ##### LIBRARIES CONFIGURATION #####
 
-SYSTEMC := /usr/local/systemc-2.3.1
-YAML    := /opt/local
+SYSTEMC := libs/systemc-2.3.1
+YAML    := libs/yaml-cpp
 
 
 ##### DIRECTORIES #####
@@ -22,8 +22,8 @@ MODULE := noxim
 
 CXX      := g++
 OPT      := -O3
-DEBUG    := -g -DDEBUG
-OTHER    := -Wall -DSC_NO_WRITE_CHECK# -Wno-deprecated
+DEBUG    := # -g -DDEBUG
+OTHER    := -Wall -DSC_NO_WRITE_CHECK --std=c++11 # -Wno-deprecated
 CXXFLAGS := $(OPT) $(OTHER) $(DEBUG)
 
 INCDIR := -I$(SRCDIR) -isystem $(SYSTEMC)/include -I$(YAML)/include
