@@ -29,7 +29,7 @@ What's New ?
   * Modular plugin-like addition of Routing/Selection strategies
   * Optional accurate logs for deep debugging (see DEBUG in Makefile)
 
-Quick Start
+Installation & Quick Start
 -----------
 
 If you are working on Ubuntu, you can install noxim and all the dependencies with the following command:
