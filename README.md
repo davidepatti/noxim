@@ -9,6 +9,10 @@ it can be downloaded under GPL license terms.
 
 Vincenzo Catania, Andrea Mineo, Salvatore Monteleone, Maurizio Palesi, and Davide Patti. 2016. Cycle-Accurate Network on Chip Simulation with Noxim. ACM Transactions on Modeling and Computer Simulation. Volume 27 Issue 1, November 2016. DOI: https://doi.org/10.1145/2953878
 
+Registration
+------------
+To receive information about new Noxim features, updates and events, please register here:
+[Registration Form](https://docs.google.com/forms/d/e/1FAIpQLSfJnYQZwxC4gr4jUc-nuwuGp0MDBA-0N_TVf8hqV1DIa325Dg/viewform?c=0&w=1)
 
 What's New ? 
 ------------
