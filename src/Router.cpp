@@ -143,6 +143,10 @@ void Router::txProcess()
 		      {
 			  LOG << " RT_OUTVC_BUSY reservation direction " << o << " for flit " << flit << endl;
 		      }
+		      else if (rt_status == RT_ALREADY_OTHER_OUT)
+		      {
+			  LOG  << "RT_ALREADY_OTHER_OUT: another output previously reserved for the same flit " << endl;
+		      }
 		      else assert(false); // no meaningful status here
 		    }
 		}
