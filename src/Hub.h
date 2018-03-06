@@ -195,6 +195,8 @@ SC_MODULE(Hub)
 
     void rxPowerManager();
     void txPowerManager();
+
+    int selectChannel(int src, int dst) const ;
 };
 
 #endif

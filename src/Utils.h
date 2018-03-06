@@ -216,28 +216,6 @@ inline int tile2Hub(int id)
     return it->second;
 }
 
-inline int selectChannel(int src_hub, int dst_hub)
-{  
-    
-    vector<int> & first = GlobalParams::hub_configuration[src_hub].txChannels;
-    vector<int> & second = GlobalParams::hub_configuration[dst_hub].rxChannels;
-
-    vector<int> intersection;
-
-	for (unsigned int i=0;i<first.size();i++)
-    {
-	for (unsigned int j=0;j<second.size();j++)
-	{
-	    if (first[i] ==second[j])
-		intersection.push_back(first[i]);
-	}
-    }
-
-    if (intersection.size()==0) return NOT_VALID;
-
-    return intersection[rand()%intersection.size()];
-
-}
 
 inline void printMap(string label, const map<string,double> & m,std::ostream & out)
 {
