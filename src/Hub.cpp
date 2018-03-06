@@ -625,3 +625,45 @@ void Hub::tileToAntennaProcess()
     updateTxPower();
 }
 
+int Hub::selectChannel(int src_hub, int dst_hub) const
+{  
+    vector<int> & first = GlobalParams::hub_configuration[src_hub].txChannels;
+    vector<int> & second = GlobalParams::hub_configuration[dst_hub].rxChannels;
+
+    vector<int> intersection;
+
+    for (unsigned int i=0;i<first.size();i++)
+    {
+	for (unsigned int j=0;j<second.size();j++)
+	{
+	    if (first[i] ==second[j])
+		intersection.push_back(first[i]);
+	}
+    }
+
+    if (intersection.size()==0) return NOT_VALID;
+
+    if (GlobalParams::channel_selection==CHSEL_RANDOM)
+	return intersection[rand()%intersection.size()];
+    else
+	if (GlobalParams::channel_selection==CHSEL_FIRST_FREE)
+	{
+	    int start_channel = rand()%intersection.size();
+	    int k;
+
+	    for (int i=0;i<intersection.size();i++)
+	    {
+		k = (start_channel+i)%intersection.size();
+		 
+		if (!transmission_in_progress[intersection[k]])
+		{
+		    cout << "Found free channel " << intersection[k] << " on (src,dest) (" << src_hub << "," << dst_hub << ") " << endl;
+		    return intersection[k];
+		}
+	    }
+	    cout << "All channel busy, applying random selection " << endl;
+	    return intersection[rand()%intersection.size()];
+	}
+
+    return NOT_VALID;
+}

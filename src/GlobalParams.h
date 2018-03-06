@@ -51,6 +51,10 @@ using namespace std;
 #define ROUTING_TABLE_BASED    "TABLE_BASED"
 
 
+// Channel selection 
+#define CHSEL_RANDOM 0
+#define CHSEL_FIRST_FREE 1
+
 // Traffic distribution
 #define TRAFFIC_RANDOM         "TRAFFIC_RANDOM"
 #define TRAFFIC_TRANSPOSE1     "TRAFFIC_TRANSPOSE1"
@@ -160,7 +164,6 @@ struct GlobalParams {
     static unsigned int max_volume_to_be_drained;
     static bool show_buffer_stats;
     static bool use_winoc;
-    static bool ascii_monitor;
     static bool use_powermanager;
     static ChannelConfig default_channel_configuration;
     static map<int, ChannelConfig> channel_configuration;
@@ -168,6 +171,9 @@ struct GlobalParams {
     static map<int, HubConfig> hub_configuration;
     static map<int, int> hub_for_tile;
     static PowerConfig power_configuration;
+    // out of yaml configuration
+    static bool ascii_monitor;
+    static int channel_selection;
 };
 
 #endif

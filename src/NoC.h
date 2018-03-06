@@ -77,6 +77,10 @@ SC_MODULE(NoC)
 
 	// Build the Mesh
 	buildMesh();
+	
+	GlobalParams::channel_selection = CHSEL_RANDOM;
+	// out of yaml configuration (experimental features)
+	//GlobalParams::channel_selection = CHSEL_FIRST_FREE;
 
 	if (GlobalParams::ascii_monitor)
 	{
