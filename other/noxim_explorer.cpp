@@ -29,8 +29,8 @@ using namespace std;
 #define RPACKETS_LABEL       "% Total received packets:"
 #define RFLITS_LABEL         "% Total received flits:"
 #define AVG_DELAY_LABEL      "% Global average delay (cycles):"
-#define AVG_THROUGHPUT_LABEL "% Global average throughput (flits/cycle):"
-#define THROUGHPUT_LABEL     "% Throughput (flits/cycle/IP):"
+#define AVG_THROUGHPUT_LABEL "% Network throughput (flits/cycle):"
+#define THROUGHPUT_LABEL     "% Average IP throughput (flits/cycle/IP):"
 #define MAX_DELAY_LABEL      "% Max delay (cycles):"
 #define TOTAL_ENERGY_LABEL   "% Total energy (J):"
 
