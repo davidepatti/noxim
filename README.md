@@ -7,7 +7,11 @@ it can be downloaded under GPL license terms.
 
 **If you use Noxim in your research, we would appreciate the following citation in any publications to which it has contributed:**
 
-Vincenzo Catania, Andrea Mineo, Salvatore Monteleone, Maurizio Palesi, and Davide Patti. 2016. Cycle-Accurate Network on Chip Simulation with Noxim. ACM Transactions on Modeling and Computer Simulation. Volume 27 Issue 1, November 2016. DOI: https://doi.org/10.1145/2953878
+Catania, V., Mineo, A., Monteleone, S., Palesi, M., Patti, D.
+Improving energy efficiency in wireless network-on-chip architectures
+(2017) ACM Journal on Emerging Technologies in Computing Systems, 14 (1)
+
+[paper reference on Scopus](https://www.scopus.com/inward/record.uri?eid=2-s2.0-85040309279&doi=10.1145%2f3138807&partnerID=40&md5=1a9c807853329ad6985a1cdb1e68c223)
 
 Registration
 ------------
