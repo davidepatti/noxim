@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -e
+
 export GIT_SSL_NO_VERIFY=1
 
 sudo apt-get update
