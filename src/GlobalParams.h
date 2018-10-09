@@ -136,7 +136,6 @@ struct GlobalParams {
     static string trace_filename;
     static int mesh_dim_x;
     static int mesh_dim_y;
-    static int butterfly_tiles;
     static double r2r_link_length;
     static double r2h_link_length;
     static int buffer_depth;

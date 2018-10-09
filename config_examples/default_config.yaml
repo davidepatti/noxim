@@ -7,7 +7,6 @@
 # X and Y mesh sizes
 mesh_dim_x: 4
 mesh_dim_y: 4
-butterfly_tiles: 16
 # number of flits for each router buffer
 buffer_depth: 4
 # size of flits, in bits

@@ -15,9 +15,6 @@ int GlobalParams::trace_mode;
 string GlobalParams::trace_filename;
 int GlobalParams::mesh_dim_x;
 int GlobalParams::mesh_dim_y;
-
-int GlobalParams::butterfly_tiles;
-
 double GlobalParams::r2r_link_length;
 double GlobalParams::r2h_link_length;
 int GlobalParams::buffer_depth;
