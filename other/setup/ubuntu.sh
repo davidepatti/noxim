@@ -5,7 +5,7 @@ set -e
 export GIT_SSL_NO_VERIFY=1
 
 sudo apt-get update
-sudo apt-get -y install build-essential linux-headers-$(uname -r) wget tar libboost-dev cmake 
+sudo apt-get -y install build-essential linux-headers-generic wget tar libboost-dev cmake
 
 if [ $(dpkg -s git 2>/dev/null | grep "ok installed" | wc -l) -eq 0 ]
 then 
