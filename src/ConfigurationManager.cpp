@@ -42,6 +42,10 @@ void loadConfiguration() {
     GlobalParams::trace_filename = config["trace_filename"].as<string>();
     GlobalParams::mesh_dim_x = config["mesh_dim_x"].as<int>();
     GlobalParams::mesh_dim_y = config["mesh_dim_y"].as<int>();
+	//butterflyParams
+    GlobalParams::butterfly_tiles = config["butterfly_tiles"].as<int>();
+	cout<<GlobalParams::butterfly_tiles;
+
     GlobalParams::r2r_link_length = config["r2r_link_length"].as<double>();
     GlobalParams::r2h_link_length = config["r2h_link_length"].as<double>();
     GlobalParams::buffer_depth = config["buffer_depth"].as<int>();
@@ -260,6 +264,11 @@ void checkConfiguration()
 	exit(1);
     }
 
+    if (GlobalParams::butterfly_tiles <= 1) {
+	cerr << "Error: butterfly_tiles must be greater than 1" << endl;
+	exit(1);
+    }
+
     if (GlobalParams::buffer_depth < 1) {
 	cerr << "Error: buffer must be >= 1" << endl;
 	exit(1);
@@ -395,6 +404,10 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::mesh_dim_x = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-dimy"))
 		GlobalParams::mesh_dim_y = atoi(arg_vet[++i]);
+
+	    else if (!strcmp(arg_vet[i], "-bfly"))
+		GlobalParams::butterfly_tiles = atoi(arg_vet[++i]);
+
 	    else if (!strcmp(arg_vet[i], "-buffer"))
 		GlobalParams::buffer_depth = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-buffer_tt"))
