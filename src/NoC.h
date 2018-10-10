@@ -96,7 +96,10 @@ SC_MODULE(NoC)
   private:
 
     void buildMesh();
+    void buildButterfly();
+    void buildCommon();
     void asciiMonitor();
+    int * hub_connected_ports;
 };
 
 //Hub * dd;

@@ -19,7 +19,7 @@ void NoC::buildButterfly()
     buildCommon();
 
     int stg = log2(GlobalParams::butterfly_tiles);
-    int sw = GlobalParams::bufferfly_tiles/2; //sw: switch number in each stage
+    int sw = GlobalParams::butterfly_tiles/2; //sw: switch number in each stage
     
     // Initialize signals
     int dimX = sw;
@@ -127,18 +127,16 @@ void NoC::buildButterfly()
 
 	    // TODO: check if hub signal is always required
 	    // signals/port when tile receives(rx) from hub
-	 for (int k=0; k < 2; k++) {	
-	    t[i][j]->hub_req_rx[k](req[i][j].from_hub[k]);
-	    t[i][j]->hub_flit_rx[k](flit[i][j].from_hub[k]);
-	    t[i][j]->hub_ack_rx[k](ack[i][j].to_hub[k]);
-	    t[i][j]->hub_buffer_full_status_rx[k](buffer_full_status[i][j].to_hub[k]);
+	    t[i][j]->hub_req_rx(req[i][j].from_hub);
+	    t[i][j]->hub_flit_rx(flit[i][j].from_hub);
+	    t[i][j]->hub_ack_rx(ack[i][j].to_hub);
+	    t[i][j]->hub_buffer_full_status_rx(buffer_full_status[i][j].to_hub);
 
 	    // signals/port when tile transmits(tx) to hub
-	    t[i][j]->hub_req_tx[k](req[i][j].to_hub[k]); // 7, sc_out
-	    t[i][j]->hub_flit_tx[k](flit[i][j].to_hub[k]);
-	    t[i][j]->hub_ack_tx[k](ack[i][j].from_hub[k]);
-	    t[i][j]->hub_buffer_full_status_tx[k](buffer_full_status[i][j].from_hub[k]);
-	}
+	    t[i][j]->hub_req_tx(req[i][j].to_hub); // 7, sc_out
+	    t[i][j]->hub_flit_tx(flit[i][j].to_hub);
+	    t[i][j]->hub_ack_tx(ack[i][j].from_hub);
+	    t[i][j]->hub_buffer_full_status_tx(buffer_full_status[i][j].from_hub);
 
         // TODO: Review port index. Connect each Hub to all its Channels 
         map<int, int>::iterator it = GlobalParams::hub_for_tile.find(tile_id);
@@ -152,17 +150,15 @@ void NoC::buildButterfly()
 
             hub[hub_id]->tile2port_mapping[t[i][j]->local_id] = port;
 
-		 for (int k=0; k < 2; k++) {
-            hub[hub_id]->req_rx[port](req[i][j].to_hub[k]);
-            hub[hub_id]->flit_rx[port](flit[i][j].to_hub[k]);
-            hub[hub_id]->ack_rx[port](ack[i][j].from_hub[k]);
-            hub[hub_id]->buffer_full_status_rx[port](buffer_full_status[i][j].from_hub[k]);
+            hub[hub_id]->req_rx[port](req[i][j].to_hub);
+            hub[hub_id]->flit_rx[port](flit[i][j].to_hub);
+            hub[hub_id]->ack_rx[port](ack[i][j].from_hub);
+            hub[hub_id]->buffer_full_status_rx[port](buffer_full_status[i][j].from_hub);
 
-            hub[hub_id]->flit_tx[port](flit[i][j].from_hub[k]);
-            hub[hub_id]->req_tx[port](req[i][j].from_hub[k]);
-            hub[hub_id]->ack_tx[port](ack[i][j].to_hub[k]);
-            hub[hub_id]->buffer_full_status_tx[port](buffer_full_status[i][j].to_hub[k]);
-		}
+            hub[hub_id]->flit_tx[port](flit[i][j].from_hub);
+            hub[hub_id]->req_tx[port](req[i][j].from_hub);
+            hub[hub_id]->ack_tx[port](ack[i][j].to_hub);
+            hub[hub_id]->buffer_full_status_tx[port](buffer_full_status[i][j].to_hub);
         }
 
         // Map buffer level signals (analogy with req_tx/rx port mapping)
@@ -233,7 +229,7 @@ void NoC::buildButterfly()
 }
 void NoC::buildCommon()
 {
-token_ring = new TokenRing("tokenring");
+    token_ring = new TokenRing("tokenring");
     token_ring->clock(clock);
     token_ring->reset(reset);
 
@@ -332,7 +328,7 @@ token_ring = new TokenRing("tokenring");
 	assert(gttable.load(GlobalParams::traffic_table_filename.c_str()));
 
     // Var to track Hub connected ports
-    int * hub_connected_ports = (int *) calloc(GlobalParams::hub_configuration.size(), sizeof(int));
+    hub_connected_ports = (int *) calloc(GlobalParams::hub_configuration.size(), sizeof(int));
 }
 void NoC::buildMesh()
 {
@@ -447,18 +443,16 @@ void NoC::buildMesh()
 
 	    // TODO: check if hub signal is always required
 	    // signals/port when tile receives(rx) from hub
-	 for (int k=0; k < 2; k++) {	
-	    t[i][j]->hub_req_rx[k](req[i][j].from_hub[k]);
-	    t[i][j]->hub_flit_rx[k](flit[i][j].from_hub[k]);
-	    t[i][j]->hub_ack_rx[k](ack[i][j].to_hub[k]);
-	    t[i][j]->hub_buffer_full_status_rx[k](buffer_full_status[i][j].to_hub[k]);
+	    t[i][j]->hub_req_rx(req[i][j].from_hub);
+	    t[i][j]->hub_flit_rx(flit[i][j].from_hub);
+	    t[i][j]->hub_ack_rx(ack[i][j].to_hub);
+	    t[i][j]->hub_buffer_full_status_rx(buffer_full_status[i][j].to_hub);
 
 	    // signals/port when tile transmits(tx) to hub
-	    t[i][j]->hub_req_tx[k](req[i][j].to_hub[k]); // 7, sc_out
-	    t[i][j]->hub_flit_tx[k](flit[i][j].to_hub[k]);
-	    t[i][j]->hub_ack_tx[k](ack[i][j].from_hub[k]);
-	    t[i][j]->hub_buffer_full_status_tx[k](buffer_full_status[i][j].from_hub[k]);
-	}
+	    t[i][j]->hub_req_tx(req[i][j].to_hub); // 7, sc_out
+	    t[i][j]->hub_flit_tx(flit[i][j].to_hub);
+	    t[i][j]->hub_ack_tx(ack[i][j].from_hub);
+	    t[i][j]->hub_buffer_full_status_tx(buffer_full_status[i][j].from_hub);
 
         // TODO: Review port index. Connect each Hub to all its Channels 
         map<int, int>::iterator it = GlobalParams::hub_for_tile.find(tile_id);
@@ -472,17 +466,15 @@ void NoC::buildMesh()
 
             hub[hub_id]->tile2port_mapping[t[i][j]->local_id] = port;
 
-		 for (int k=0; k < 2; k++) {
-            hub[hub_id]->req_rx[port](req[i][j].to_hub[k]);
-            hub[hub_id]->flit_rx[port](flit[i][j].to_hub[k]);
-            hub[hub_id]->ack_rx[port](ack[i][j].from_hub[k]);
-            hub[hub_id]->buffer_full_status_rx[port](buffer_full_status[i][j].from_hub[k]);
+            hub[hub_id]->req_rx[port](req[i][j].to_hub);
+            hub[hub_id]->flit_rx[port](flit[i][j].to_hub);
+            hub[hub_id]->ack_rx[port](ack[i][j].from_hub);
+            hub[hub_id]->buffer_full_status_rx[port](buffer_full_status[i][j].from_hub);
 
-            hub[hub_id]->flit_tx[port](flit[i][j].from_hub[k]);
-            hub[hub_id]->req_tx[port](req[i][j].from_hub[k]);
-            hub[hub_id]->ack_tx[port](ack[i][j].to_hub[k]);
-            hub[hub_id]->buffer_full_status_tx[port](buffer_full_status[i][j].to_hub[k]);
-		}
+            hub[hub_id]->flit_tx[port](flit[i][j].from_hub);
+            hub[hub_id]->req_tx[port](req[i][j].from_hub);
+            hub[hub_id]->ack_tx[port](ack[i][j].to_hub);
+            hub[hub_id]->buffer_full_status_tx[port](buffer_full_status[i][j].to_hub);
         }
 
         // Map buffer level signals (analogy with req_tx/rx port mapping)
