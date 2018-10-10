@@ -12,6 +12,11 @@
 
 using namespace std;
 
+inline int toggleKthBit(int n, int k) 
+{ 
+    return (n ^ (1 << (k-1))); 
+} 
+
 
 void NoC::buildButterfly()
 {
@@ -21,7 +26,9 @@ void NoC::buildButterfly()
     int stg = log2(GlobalParams::butterfly_tiles);
     int sw = GlobalParams::butterfly_tiles/2; //sw: switch number in each stage
     
-    // Initialize signals
+    int d = 1; //starting dir is changed at first iteration
+
+    // Dimensions of the butterfly switch block network
     int dimX = sw;
     int dimY = stg;
 
@@ -30,9 +37,12 @@ void NoC::buildButterfly()
     buffer_full_status = new sc_signal_NSWEH<TBufferFullStatus>*[dimX];
     flit = new sc_signal_NSWEH<Flit>*[dimX];
 
+    // not used in butterfly
     free_slots = new sc_signal_NSWE<int>*[dimX];
     nop_data = new sc_signal_NSWE<NoP_data>*[dimX];
 
+    // instantiation of the signal matrix
+    // For each row (dimX) create a vector of DimY (columns)
     for (int i=0; i < dimX; i++) {
         req[i] = new sc_signal_NSWEH<bool>[dimY];
         ack[i] = new sc_signal_NSWEH<bool>[dimY];
@@ -43,6 +53,7 @@ void NoC::buildButterfly()
         nop_data[i] = new sc_signal_NSWE<NoP_data>[dimY];
     }
 
+    // instantiation of the Switches tiles matrix
     t = new Tile**[GlobalParams::mesh_dim_x];
     for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
     	t[i] = new Tile*[GlobalParams::mesh_dim_y];
@@ -58,7 +69,7 @@ void NoC::buildButterfly()
 	    tile_coord.x = i;
 	    tile_coord.y = j;
 	    int tile_id = coord2Id(tile_coord);
-	    sprintf(tile_name, "Tile[%02d][%02d]_(#%d)", i, j, tile_id);
+	    sprintf(tile_name, "Switch[%02d][%02d]_(#%d)", i, j, tile_id);
 	    t[i][j] = new Tile(tile_name, tile_id);
 
 	    // Tell to the router its coordinates
@@ -83,6 +94,7 @@ void NoC::buildButterfly()
 	    t[i][j]->clock(clock);
 	    t[i][j]->reset(reset);
 
+	    /* BFLY: disabled for implementing new mapping scheme
 	    // Map Rx signals
 	    t[i][j]->req_rx[DIRECTION_NORTH] (req[i][j].south);
 	    t[i][j]->flit_rx[DIRECTION_NORTH] (flit[i][j].south);
@@ -125,8 +137,9 @@ void NoC::buildButterfly()
 	    t[i][j]->ack_tx[DIRECTION_WEST] (ack[i][j].east);
 	    t[i][j]->buffer_full_status_tx[DIRECTION_WEST] (buffer_full_status[i][j].east);
 
-	    // TODO: check if hub signal is always required
-	    // signals/port when tile receives(rx) from hub
+	    */
+
+	    // BFLY: hub connections work as usual
 	    t[i][j]->hub_req_rx(req[i][j].from_hub);
 	    t[i][j]->hub_flit_rx(flit[i][j].from_hub);
 	    t[i][j]->hub_ack_rx(ack[i][j].to_hub);
@@ -184,8 +197,23 @@ void NoC::buildButterfly()
 	    t[i][j]->NoP_data_in[DIRECTION_WEST] (nop_data[i][j].east);
 
 	}
-    }
+    } // original double for loop
 
+    //****outputs*****
+    for (int i = 1; i < stg ; i++) //stg
+    {
+	for (int j = 0; j < sw ; j++) //sw 
+	{
+	    int m = toggleKthBit(j, stg-i); // m: var to flipping bit
+	    int r = sw/(pow(2,i)); // change every r
+	    int x = j%r;
+
+	    if (x==0) d = 1-d;
+	    cout << "The switch sw(" << i << "," << j << ") get connected to the direction " << d << d << " of Node: sw(" << i-1 << "," << j << 		")and sw(" << i-1 << "," << m << ")" << "\n";
+
+	    //cout << "sw n." << i << " is connected in dir " << d << endl;
+	}
+    }
     // dummy NoP_data structure
     NoP_data tmp_NoP;
 
@@ -199,6 +227,10 @@ void NoC::buildButterfly()
 
     // Clear signals for borderline nodes
 
+    // BFLY: change to adapt to the new butterfly topology
+    // Border switches have valid connections
+    // TODO: add not valid borders for Tiles that are not switches at the edge
+    /*
     for (int i = 0; i <= GlobalParams::mesh_dim_x; i++) {
 	req[i][0].south = 0;
 	ack[i][0].north = 0;
@@ -226,6 +258,7 @@ void NoC::buildButterfly()
 	nop_data[GlobalParams::mesh_dim_x][j].west.write(tmp_NoP);
 
     }
+    */
 }
 void NoC::buildCommon()
 {
