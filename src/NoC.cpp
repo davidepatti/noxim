@@ -93,6 +93,9 @@ void NoC::buildButterfly()
 	    // Map clock and reset
 	    t[i][j]->clock(clock);
 	    t[i][j]->reset(reset);
+	   
+
+
 
 	    /* BFLY: disabled for implementing new mapping scheme
 	    // Map Rx signals
@@ -210,6 +213,19 @@ void NoC::buildButterfly()
 
 	    if (x==0) d = 1-d;
 	    cout << "The switch sw(" << i << "," << j << ") get connected to the direction " << d << d << " of Node: sw(" << i-1 << "," << j << 		")and sw(" << i-1 << "," << m << ")" << "\n";
+
+	    // sw(1,0) connected to dir 0 of sw(0,0) -> dir 3
+	    
+	    /*
+	    // - the wire signal is the same
+	    t[1][0]->flit_rx[3](flit[0][0].north);
+	    t[0][0]->flit_tx[0](flit[0][0].north);
+
+
+	    // sw(1,0) connected to dir 0 of sw(0,2) -> dir 2
+	    t[1][0]->flit_rx[2](flit[0][2].north);
+	    t[0][2]->flit_tx[0](flit[0][2].north);
+	    */
 
 	    //cout << "sw n." << i << " is connected in dir " << d << endl;
 	}
