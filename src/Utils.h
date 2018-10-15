@@ -190,6 +190,16 @@ inline int coord2Id(const Coord & coord)
     return id;
 }
 
+//Butterfly Core Coord2Id 
+/*inline int coord2Id_bf(const Coord & coord)
+{
+    int id = coord.y ;
+
+    assert(id < GlobalParams::butterfly_tiles);
+
+    return id;
+}
+*/
 inline bool sameRadioHub(int id1, int id2)
 {
     map<int, int>::iterator it1 = GlobalParams::hub_for_tile.find(id1); 

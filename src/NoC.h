@@ -48,15 +48,23 @@ SC_MODULE(NoC)
     sc_in_clk clock;		// The input clock for the NoC
     sc_in < bool > reset;	// The reset signal for the NoC
 
-    // Signals
+    // Signals mesh/switchBlocButterfly
     sc_signal_NSWEH<bool> **req;
     sc_signal_NSWEH<bool> **ack;
     sc_signal_NSWEH<TBufferFullStatus> **buffer_full_status;
     sc_signal_NSWEH<Flit> **flit;
     sc_signal_NSWE<int> **free_slots;
 
+    // Signals core butterfly
+    /*sc_signal_NSWEH<bool> *req_bf;
+    sc_signal_NSWEH<bool> *ack_bf;
+    sc_signal_NSWEH<TBufferFullStatus> *buffer_full_status_bf;
+    sc_signal_NSWEH<Flit> *flit_bf;
+    sc_signal_NSWE<int> *free_slots_bf;*/
+
     // NoP
     sc_signal_NSWE<NoP_data> **nop_data;
+   // sc_signal_NSWE<NoP_data> *nop_data_bf;
 
     // Matrix of tiles
     Tile ***t;
