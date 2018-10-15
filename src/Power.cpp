@@ -208,7 +208,7 @@ void Power::configureHub(int link_width,
 
     // TX
     // Joule
-    default_tx_energy = (GlobalParams::power_configuration.hubPowerConfig.default_tx_energy / (10e9*data_rate_gbs) )* antenna_buffer_item_size;
+    default_tx_energy = (GlobalParams::power_configuration.hubPowerConfig.default_tx_energy / (1e9*data_rate_gbs) )* antenna_buffer_item_size;
 
     // RX Dynamic
     wireless_rx_pwr = antenna_buffer_item_size * GlobalParams::power_configuration.hubPowerConfig.rx_dynamic;
