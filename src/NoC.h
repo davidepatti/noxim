@@ -55,16 +55,8 @@ SC_MODULE(NoC)
     sc_signal_NSWEH<Flit> **flit;
     sc_signal_NSWE<int> **free_slots;
 
-    // Signals core butterfly
-    /*sc_signal_NSWEH<bool> *req_bf;
-    sc_signal_NSWEH<bool> *ack_bf;
-    sc_signal_NSWEH<TBufferFullStatus> *buffer_full_status_bf;
-    sc_signal_NSWEH<Flit> *flit_bf;
-    sc_signal_NSWE<int> *free_slots_bf;*/
-
     // NoP
     sc_signal_NSWE<NoP_data> **nop_data;
-   // sc_signal_NSWE<NoP_data> *nop_data_bf;
 
     // Matrix of tiles
     Tile ***t;
@@ -84,8 +76,11 @@ SC_MODULE(NoC)
 
     SC_CTOR(NoC) {
 
-	// Build the Mesh
-	buildMesh();
+	if (GlobalParams::butterfly_tiles == 0)
+	    // Build the Mesh
+	    buildMesh();
+	else
+	    buildButterfly();
 	
 	GlobalParams::channel_selection = CHSEL_RANDOM;
 	// out of yaml configuration (experimental features)

@@ -22,6 +22,7 @@ void NoC::buildButterfly()
 {
 
     buildCommon();
+    assert(false);
     //-----------------------------
     // --- 1- Switch bloc ---
     //-----------------------------
@@ -97,53 +98,6 @@ void NoC::buildButterfly()
 	    t[i][j]->clock(clock);
 	    t[i][j]->reset(reset);
 	   
-
-
-
-	    /* BFLY: disabled for implementing new mapping scheme
-	    // Map Rx signals
-	    t[i][j]->req_rx[DIRECTION_NORTH] (req[i][j].south);
-	    t[i][j]->flit_rx[DIRECTION_NORTH] (flit[i][j].south);
-	    t[i][j]->ack_rx[DIRECTION_NORTH] (ack[i][j].north);
-	    t[i][j]->buffer_full_status_rx[DIRECTION_NORTH] (buffer_full_status[i][j].north);
-
-	    t[i][j]->req_rx[DIRECTION_EAST] (req[i + 1][j].west);
-	    t[i][j]->flit_rx[DIRECTION_EAST] (flit[i + 1][j].west);
-	    t[i][j]->ack_rx[DIRECTION_EAST] (ack[i + 1][j].east);
-	    t[i][j]->buffer_full_status_rx[DIRECTION_EAST] (buffer_full_status[i+1][j].east);
-
-	    t[i][j]->req_rx[DIRECTION_SOUTH] (req[i][j + 1].north);
-	    t[i][j]->flit_rx[DIRECTION_SOUTH] (flit[i][j + 1].north);
-	    t[i][j]->ack_rx[DIRECTION_SOUTH] (ack[i][j + 1].south);
-	    t[i][j]->buffer_full_status_rx[DIRECTION_SOUTH] (buffer_full_status[i][j+1].south);
-
-	    t[i][j]->req_rx[DIRECTION_WEST] (req[i][j].east);
-	    t[i][j]->flit_rx[DIRECTION_WEST] (flit[i][j].east);
-	    t[i][j]->ack_rx[DIRECTION_WEST] (ack[i][j].west);
-	    t[i][j]->buffer_full_status_rx[DIRECTION_WEST] (buffer_full_status[i][j].west);
-
-	    // Map Tx signals
-	    t[i][j]->req_tx[DIRECTION_NORTH] (req[i][j].north);
-	    t[i][j]->flit_tx[DIRECTION_NORTH] (flit[i][j].north);
-	    t[i][j]->ack_tx[DIRECTION_NORTH] (ack[i][j].south);
-	    t[i][j]->buffer_full_status_tx[DIRECTION_NORTH] (buffer_full_status[i][j].south);
-
-	    t[i][j]->req_tx[DIRECTION_EAST] (req[i + 1][j].east);
-	    t[i][j]->flit_tx[DIRECTION_EAST] (flit[i + 1][j].east);
-	    t[i][j]->ack_tx[DIRECTION_EAST] (ack[i + 1][j].west);
-	    t[i][j]->buffer_full_status_tx[DIRECTION_EAST] (buffer_full_status[i + 1][j].west);
-
-	    t[i][j]->req_tx[DIRECTION_SOUTH] (req[i][j + 1].south);
-	    t[i][j]->flit_tx[DIRECTION_SOUTH] (flit[i][j + 1].south);
-	    t[i][j]->ack_tx[DIRECTION_SOUTH] (ack[i][j + 1].north);
-	    t[i][j]->buffer_full_status_tx[DIRECTION_SOUTH] (buffer_full_status[i][j + 1].north);
-
-	    t[i][j]->req_tx[DIRECTION_WEST] (req[i][j].west);
-	    t[i][j]->flit_tx[DIRECTION_WEST] (flit[i][j].west);
-	    t[i][j]->ack_tx[DIRECTION_WEST] (ack[i][j].east);
-	    t[i][j]->buffer_full_status_tx[DIRECTION_WEST] (buffer_full_status[i][j].east);
-
-	    */
 
 	    // BFLY: hub connections work as usual
 	    t[i][j]->hub_req_rx(req[i][j].from_hub);
