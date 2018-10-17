@@ -68,6 +68,7 @@ SC_MODULE(NoC)
 
     // Matrix of tiles
     Tile ***t;
+    Tile ** core;
 
     map<int, Hub*> hub;
     map<int, Channel*> channel;

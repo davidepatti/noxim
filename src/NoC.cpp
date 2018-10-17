@@ -226,13 +226,13 @@ void NoC::buildButterfly()
 		t[i-1][j]->flit_tx[d](flit[i-1][j].north);
 		t[i-1][j]->req_tx[d](req[i-1][j].north);
 		t[i-1][j]->ack_tx[d](ack[i-1][j].west);
-		t[i-1][j]->buffer_full_status_ack_tx[d](buffer_full_status[i-1][j].west);
+		t[i-1][j]->buffer_full_status_tx[d](buffer_full_status[i-1][j].west);
 
 
 		t[i][j]->flit_rx[2](flit[i-1][m].north);
 		t[i][j]->req_rx[2](req[i-1][m].north);
 		t[i][j]->ack_rx[2](ack[i-1][m].south);
-		t[i][j]->buffer_full_status_ack_rx[2](buffer_full_status_ack[i-1][m].south);
+		t[i][j]->buffer_full_status_rx[2](buffer_full_status[i-1][m].south);
 
 		t[i-1][m]->flit_tx[d](flit[i-1][m].north);
 		t[i-1][m]->req_tx[d](req[i-1][m].north);
@@ -298,7 +298,7 @@ void NoC::buildButterfly()
         
     // instantiation of the Cores (we have only one row)
    
-	core = new Tile[n];
+	core = new Tile*[n];
 
     // Create the Core bloc 
 	
@@ -402,10 +402,10 @@ void NoC::buildButterfly()
 		t[stg-1][i]->ack_tx[1](ack[stg-1][i].east);
 		t[stg-1][i]->buffer_full_status_tx[1](buffer_full_status[stg-1][i].east);
 
-		core[(ii*2)+1]->flit_rx[1](flit[stg-1][i].east);
-		core[(ii*2)+1]->req_rx[1](req[stg-1][i].east);	
-		core[(ii*2)+1]->ack_rx[1](ack[stg-1][i].east); 
-		core[(ii*2)+1]->buffer_full_status_rx[1](buffer_full_status[stg-1][i].east);    
+		core[(i*2)+1]->flit_rx[1](flit[stg-1][i].east);
+		core[(i*2)+1]->req_rx[1](req[stg-1][i].east);	
+		core[(i*2)+1]->ack_rx[1](ack[stg-1][i].east); 
+		core[(i*2)+1]->buffer_full_status_rx[1](buffer_full_status[stg-1][i].east);    
 	 }
      
 //--- ---------------------------------- ---
