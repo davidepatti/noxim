@@ -264,8 +264,8 @@ void checkConfiguration()
 	exit(1);
     }
 
-    if (GlobalParams::butterfly_tiles <= 1) {
-	cerr << "Error: butterfly_tiles must be greater than 1" << endl;
+    if (GlobalParams::butterfly_tiles < 0) {
+	cerr << "Error: butterfly_tiles must be >= 0 " << endl;
 	exit(1);
     }
 
