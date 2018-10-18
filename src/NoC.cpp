@@ -336,22 +336,42 @@ void NoC::buildButterfly()
 		t[0][i]->req_rx[3](req[0][3].west);
 		t[0][i]->ack_rx[3](ack[0][3].west);
 		t[0][i]->buffer_full_status_rx[3](buffer_full_status[0][3].west);
+		//tx is not required in butterfly
+		t[0][i]->flit_tx[3](flit[0][3].west); 
+		t[0][i]->req_tx[3](req[0][3].west);
+		t[0][i]->ack_tx[3](ack[0][3].west);
+		t[0][i]->buffer_full_status_tx[3](buffer_full_status[0][3].west);
 		
 		core[i*2]->flit_tx[0](flit[0][3].west);
 		core[i*2]->req_tx[0](req[0][3].west);
 		core[i*2]->ack_tx[0](ack[0][3].west);
 		core[i*2]->buffer_full_status_tx[0](buffer_full_status[0][3].west);
+		//rx is not required in butterfly
+		core[i*2]->flit_rx[0](flit[0][3].west);
+		core[i*2]->req_rx[0](req[0][3].west);
+		core[i*2]->ack_rx[0](ack[0][3].west);
+		core[i*2]->buffer_full_status_rx[0](buffer_full_status[0][3].west);
 
 
 		t[0][i]->flit_rx[2](flit[0][2].south); // ack .south
 		t[0][i]->req_rx[2](req[0][2].south);
 		t[0][i]->ack_rx[2](ack[0][2].south); 
 		t[0][i]->buffer_full_status_rx[2](buffer_full_status[0][2].south);
+		//tx is not required in butterfly
+		t[0][i]->flit_tx[2](flit[0][2].south); 
+		t[0][i]->req_tx[2](req[0][2].south);
+		t[0][i]->ack_tx[2](ack[0][2].south); 
+		t[0][i]->buffer_full_status_tx[2](buffer_full_status[0][2].south);
 				
 		core[(i*2)+1]->flit_tx[0](flit[0][2].south);
 		core[(i*2)+1]->req_tx[0](req[0][2].south);
 		core[(i*2)+1]->ack_tx[0](ack[0][2].south);
 		core[(i*2)+1]->buffer_full_status_tx[0](buffer_full_status[0][2].south);
+		//rx is not required in butterfly
+		core[(i*2)+1]->flit_rx[0](flit[0][2].south);
+		core[(i*2)+1]->req_rx[0](req[0][2].south);
+		core[(i*2)+1]->ack_rx[0](ack[0][2].south);
+		core[(i*2)+1]->buffer_full_status_rx[0](buffer_full_status[0][2].south);
 	 }
 
 	for (int i = 0; i < sw ; i++) 		
@@ -360,25 +380,45 @@ void NoC::buildButterfly()
 		t[stg-1][i]->req_tx[0](req[stg-1][i].north);
 		t[stg-1][i]->ack_tx[0](ack[stg-1][i].east);
 		t[stg-1][i]->buffer_full_status_tx[0](buffer_full_status[stg-1][i].east);
+		//rx is not required in butterfly
+		t[stg-1][i]->flit_rx[0](flit[stg-1][i].north); // ack .east
+		t[stg-1][i]->req_rx[0](req[stg-1][i].north);
+		t[stg-1][i]->ack_rx[0](ack[stg-1][i].east);
+		t[stg-1][i]->buffer_full_status_rx[0](buffer_full_status[stg-1][i].east);
+
 
 		core[i*2]->flit_rx[1](flit[stg-1][i].north);
 		core[i*2]->req_rx[1](req[stg-1][i].north);
 		core[i*2]->ack_rx[1](ack[stg-1][i].east);
 		core[i*2]->buffer_full_status_rx[1](buffer_full_status[stg-1][i].east);
+		//tx is not required in butterfly
+		core[i*2]->flit_tx[1](flit[stg-1][i].north);
+		core[i*2]->req_tx[1](req[stg-1][i].north);
+		core[i*2]->ack_tx[1](ack[stg-1][i].east);
+		core[i*2]->buffer_full_status_tx[1](buffer_full_status[stg-1][i].east);
 
 
 		t[stg-1][i]->flit_tx[1](flit[stg-1][i].east);  // ack .east
 		t[stg-1][i]->req_tx[1](req[stg-1][i].east);
 		t[stg-1][i]->ack_tx[1](ack[stg-1][i].east);
 		t[stg-1][i]->buffer_full_status_tx[1](buffer_full_status[stg-1][i].east);
+		//rx is not required in butterfly
+		t[stg-1][i]->flit_rx[1](flit[stg-1][i].east);  // ack .east
+		t[stg-1][i]->req_rx[1](req[stg-1][i].east);
+		t[stg-1][i]->ack_rx[1](ack[stg-1][i].east);
+		t[stg-1][i]->buffer_full_status_rx[1](buffer_full_status[stg-1][i].east);
 
 		core[(i*2)+1]->flit_rx[1](flit[stg-1][i].east);
 		core[(i*2)+1]->req_rx[1](req[stg-1][i].east);	
 		core[(i*2)+1]->ack_rx[1](ack[stg-1][i].east); 
-		core[(i*2)+1]->buffer_full_status_rx[1](buffer_full_status[stg-1][i].east);    
+		core[(i*2)+1]->buffer_full_status_rx[1](buffer_full_status[stg-1][i].east);   
+		//tx is not required in butterfly 
+		core[(i*2)+1]->flit_tx[1](flit[stg-1][i].east);
+		core[(i*2)+1]->req_tx[1](req[stg-1][i].east);	
+		core[(i*2)+1]->ack_tx[1](ack[stg-1][i].east); 
+		core[(i*2)+1]->buffer_full_status_tx[1](buffer_full_status[stg-1][i].east); 
 	 }// ---------------------------------end mapping code-----------------
-   
-
+  
 //--- ---------------------------------- ---
 
     // dummy NoP_data structure
