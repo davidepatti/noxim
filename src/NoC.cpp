@@ -149,7 +149,7 @@ void NoC::buildMesh()
     for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
 	for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
 	    // Create the single Tile with a proper name
-	    char tile_name[20];
+	    char tile_name[30];
 	    Coord tile_coord;
 	    tile_coord.x = i;
 	    tile_coord.y = j;
