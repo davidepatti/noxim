@@ -44,7 +44,7 @@ void loadConfiguration() {
     GlobalParams::mesh_dim_y = config["mesh_dim_y"].as<int>();
 	//butterflyParams
     GlobalParams::butterfly_tiles = config["butterfly_tiles"].as<int>();
-	cout<<GlobalParams::butterfly_tiles;
+	//cout<<GlobalParams::butterfly_tiles;
 
     GlobalParams::r2r_link_length = config["r2r_link_length"].as<double>();
     GlobalParams::r2h_link_length = config["r2h_link_length"].as<double>();

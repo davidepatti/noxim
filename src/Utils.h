@@ -183,23 +183,22 @@ inline Coord id2Coord(int id)
 
 inline int coord2Id(const Coord & coord)
 {
-    int id = (coord.y * GlobalParams::mesh_dim_x) + coord.x;
-
-    assert(id < GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y);
+    int id;
+    if (GlobalParams::butterfly_tiles == 0)
+	    {
+	    id = (coord.y * GlobalParams::mesh_dim_x) + coord.x;
+	    assert(id < GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y);
+	    }
+	else
+	    {
+	    id = (coord.x * (GlobalParams::butterfly_tiles/2)) + coord.y;
+	    assert(id < (GlobalParams::butterfly_tiles/2) * log2(GlobalParams::butterfly_tiles));
+	    }
+    
 
     return id;
 }
 
-//Butterfly Core Coord2Id 
-/*inline int coord2Id_bf(const Coord & coord)
-{
-    int id = coord.y ;
-
-    assert(id < GlobalParams::butterfly_tiles);
-
-    return id;
-}
-*/
 inline bool sameRadioHub(int id1, int id2)
 {
     map<int, int>::iterator it1 = GlobalParams::hub_for_tile.find(id1); 
