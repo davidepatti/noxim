@@ -27,6 +27,7 @@ void NoC::buildButterfly()
     // --- 1- Switch bloc ---
     //-----------------------------
 
+    bool Switch = true;
     int stg = log2(GlobalParams::butterfly_tiles);
     int sw = GlobalParams::butterfly_tiles/2; //sw: switch number in each stage
     
@@ -75,12 +76,12 @@ void NoC::buildButterfly()
 	    Coord tile_coord;
 	    tile_coord.x = i;
 	    tile_coord.y = j;
-	    int tile_id = coord2Id(tile_coord); 
+	    int tile_id = coord2Id(tile_coord); cout<< "tile_id "<< tile_id<< endl;
 	    sprintf(tile_name, "Switch[%02d][%02d]_(#%d)", i, j, tile_id);
 	    t[i][j] = new Tile(tile_name, tile_id);
 
-	 //  cout << "switch  " << i <<  " " << j << "   has an Id = " << tile_id <<  endl;
-
+		//cout << "switch  " << i <<  " " << j << "   has an Id = " << tile_id <<  endl;
+	    SwitchOnly = true;
 	    // Tell to the router its coordinates
 	    t[i][j]->r->configure(j * dimX + i,
 				  GlobalParams::stats_warm_up_time,
@@ -97,7 +98,7 @@ void NoC::buildButterfly()
 	    // Tell to the PE its coordinates
 	    t[i][j]->pe->local_id = j * dimX + i;
 	    t[i][j]->pe->traffic_table = &gttable;	// Needed to choose destination
-	    t[i][j]->pe->never_transmit = (gttable.occurrencesAsSource(t[i][j]->pe->local_id) == 0);
+	    t[i][j]->pe->never_transmit = true;
 
 	    // Map clock and reset
 	    t[i][j]->clock(clock);
@@ -145,14 +146,21 @@ void NoC::buildButterfly()
  
     //---- Switching bloc connection ---- sw2sw mapping ---
 
+    // declaration of dummy signals used for the useless Tx and Rx connection in Butterfly 
+    sc_signal<bool> *bool_dummy_signal= new sc_signal<bool>;
+    sc_signal<int> *int_dummy_signal= new sc_signal<int>;
+    sc_signal<Flit> *flit_dummy_signal= new sc_signal<Flit>;
+    sc_signal<NoP_data> *nop_data_dummy_signal = new sc_signal<NoP_data>;
+    sc_signal<TBufferFullStatus> *tbufferfullstatus_dummy_signal = new sc_signal<TBufferFullStatus>;
+
     for (int i = 1; i < stg ; i++) 		//stg
     {
 	for (int j = 0; j < sw ; j++) 		//sw 
-	{   cout << "switch  " << i <<  " " << j << endl; 
-	    int m = toggleKthBit(j, stg-i); cout << "m =  " << m << endl;    // m: var to flipping bit
+	{   
+	    int m = toggleKthBit(j, stg-i);    // m: var to flipping bit
 	    int r = sw/(pow(2,i));  	       // change every r
 	    int x = j%r; 
- //if ( i==1 & j==1) assert(false);
+
 	    if (x==0) d = 1-d;
 	    if (d==0)
 		{
@@ -161,10 +169,10 @@ void NoC::buildButterfly()
 		t[i][j]->ack_rx[3](ack[i-1][j].west);
 		t[i][j]->buffer_full_status_rx[3](buffer_full_status[i-1][j].west);
 		//tx signals not required for butterfly
-		t[i][j]->flit_tx[3](flit[i-1][j].north);
-		t[i][j]->req_tx[3](req[i-1][j].north);
-		t[i][j]->ack_tx[3](ack[i-1][j].west);
-		t[i][j]->buffer_full_status_tx[3](buffer_full_status[i-1][j].west);
+		t[i][j]->flit_tx[3](*flit_dummy_signal);
+		t[i][j]->req_tx[3](*bool_dummy_signal);
+		t[i][j]->ack_tx[3](*bool_dummy_signal);
+		t[i][j]->buffer_full_status_tx[3](*tbufferfullstatus_dummy_signal);
 
 
 		t[i-1][j]->flit_tx[d](flit[i-1][j].north);
@@ -172,10 +180,10 @@ void NoC::buildButterfly()
 		t[i-1][j]->ack_tx[d](ack[i-1][j].west);
 		t[i-1][j]->buffer_full_status_tx[d](buffer_full_status[i-1][j].west);
 		//tx signals not required for butterfly
-		t[i-1][j]->flit_rx[d](flit[i-1][j].north);
-		t[i-1][j]->req_rx[d](req[i-1][j].north);
-		t[i-1][j]->ack_rx[d](ack[i-1][j].west);
-		t[i-1][j]->buffer_full_status_rx[d](buffer_full_status[i-1][j].west);
+		t[i-1][j]->flit_rx[d](*flit_dummy_signal);
+		t[i-1][j]->req_rx[d](*bool_dummy_signal);
+		t[i-1][j]->ack_rx[d](*bool_dummy_signal);
+		t[i-1][j]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
 
 
 		t[i][j]->flit_rx[2](flit[i-1][m].north);
@@ -183,10 +191,10 @@ void NoC::buildButterfly()
 		t[i][j]->ack_rx[2](ack[i-1][m].south);
 		t[i][j]->buffer_full_status_rx[2](buffer_full_status[i-1][m].south);
 		//tx signals not required for butterfly
-		t[i][j]->flit_tx[2](flit[i-1][m].north);
-		t[i][j]->req_tx[2](req[i-1][m].north);
-		t[i][j]->ack_tx[2](ack[i-1][m].south);
-		t[i][j]->buffer_full_status_tx[2](buffer_full_status[i-1][m].south);
+		t[i][j]->flit_tx[2](*flit_dummy_signal);
+		t[i][j]->req_tx[2](*bool_dummy_signal);
+		t[i][j]->ack_tx[2](*bool_dummy_signal);
+		t[i][j]->buffer_full_status_tx[2](*tbufferfullstatus_dummy_signal);
 
 
 		t[i-1][m]->flit_tx[d](flit[i-1][m].north);
@@ -194,10 +202,10 @@ void NoC::buildButterfly()
 		t[i-1][m]->ack_tx[d](ack[i-1][m].south);
 		t[i-1][m]->buffer_full_status_tx[d](buffer_full_status[i-1][m].south);
 		//tx signals not required for butterfly
-		t[i-1][m]->flit_rx[d](flit[i-1][m].north);
-		t[i-1][m]->req_rx[d](req[i-1][m].north);
-		t[i-1][m]->ack_rx[d](ack[i-1][m].south);
-		t[i-1][m]->buffer_full_status_rx[d](buffer_full_status[i-1][m].south);
+		t[i-1][m]->flit_rx[d](*flit_dummy_signal);
+		t[i-1][m]->req_rx[d](*bool_dummy_signal);
+		t[i-1][m]->ack_rx[d](*bool_dummy_signal);
+		t[i-1][m]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
 		} 
 	    else 
 		{
@@ -206,40 +214,40 @@ void NoC::buildButterfly()
 		t[i][j]->ack_rx[3](ack[i-1][j].south);
 		t[i][j]->buffer_full_status_rx[3](buffer_full_status[i-1][j].south);
 		//tx signals not required for butterfly
-		t[i][j]->flit_tx[3](flit[i-1][j].east);
-		t[i][j]->req_tx[3](req[i-1][j].east);
-		t[i][j]->ack_tx[3](ack[i-1][j].south);
-		t[i][j]->buffer_full_status_tx[3](buffer_full_status[i-1][j].south);
+		t[i][j]->flit_tx[3](*flit_dummy_signal);
+		t[i][j]->req_tx[3](*bool_dummy_signal);
+		t[i][j]->ack_tx[3](*bool_dummy_signal);
+		t[i][j]->buffer_full_status_tx[3](*tbufferfullstatus_dummy_signal);
 
 		t[i-1][j]->flit_tx[d](flit[i-1][j].east);
 		t[i-1][j]->req_tx[d](req[i-1][j].east);
 		t[i-1][j]->ack_tx[d](ack[i-1][j].south);
 		t[i-1][j]->buffer_full_status_tx[d](buffer_full_status[i-1][j].south);
 		//rx signals not required for butterfly
-		t[i-1][j]->flit_rx[d](flit[i-1][j].east);
-		t[i-1][j]->req_rx[d](req[i-1][j].east);
-		t[i-1][j]->ack_rx[d](ack[i-1][j].south);
-		t[i-1][j]->buffer_full_status_rx[d](buffer_full_status[i-1][j].south);
+		t[i-1][j]->flit_rx[d](*flit_dummy_signal);
+		t[i-1][j]->req_rx[d](*bool_dummy_signal);
+		t[i-1][j]->ack_rx[d](*bool_dummy_signal);
+		t[i-1][j]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
 
 		t[i][j]->flit_rx[2](flit[i-1][m].east);
 		t[i][j]->req_rx[2](req[i-1][m].east);
 		t[i][j]->ack_rx[2](ack[i-1][m].west);
 		t[i][j]->buffer_full_status_rx[2](buffer_full_status[i-1][m].west);
 		//tx signals not required for butterfly
-		t[i][j]->flit_tx[2](flit[i-1][m].east);
-		t[i][j]->req_tx[2](req[i-1][m].east);
-		t[i][j]->ack_tx[2](ack[i-1][m].west);
-		t[i][j]->buffer_full_status_tx[2](buffer_full_status[i-1][m].west);
+		t[i][j]->flit_tx[2](*flit_dummy_signal);
+		t[i][j]->req_tx[2](*bool_dummy_signal);
+		t[i][j]->ack_tx[2](*bool_dummy_signal);
+		t[i][j]->buffer_full_status_tx[2](*tbufferfullstatus_dummy_signal);
 
 		t[i-1][m]->flit_tx[d](flit[i-1][m].east);
 		t[i-1][m]->req_tx[d](req[i-1][m].east);
 		t[i-1][m]->ack_tx[d](ack[i-1][m].west);
 		t[i-1][m]->buffer_full_status_tx[d](buffer_full_status[i-1][m].west);
 		//rx signals not required for butterfly
-		t[i-1][m]->flit_rx[d](flit[i-1][m].east);
-		t[i-1][m]->req_rx[d](req[i-1][m].east);
-		t[i-1][m]->ack_rx[d](ack[i-1][m].west);
-		t[i-1][m]->buffer_full_status_rx[d](buffer_full_status[i-1][m].west);
+		t[i-1][m]->flit_rx[d](*flit_dummy_signal);
+		t[i-1][m]->req_rx[d](*bool_dummy_signal);
+		t[i-1][m]->ack_rx[d](*bool_dummy_signal);
+		t[i-1][m]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
 		}
 
 	    // sw(1,0) connected to dir 0 of sw(0,0) -> dir 3
@@ -254,7 +262,7 @@ void NoC::buildButterfly()
 	    */
 	}
     }
-
+   
 
     //-----------------------------
     // --- 2- Cores bloc ---
@@ -263,9 +271,7 @@ void NoC::buildButterfly()
     //---- Cores instantiation ----
 
     int n = GlobalParams::butterfly_tiles; //n: nombre of Cores = tiles with 2 directions(0 & 1)
-
-    // Dimensions of the butterfly Cores : dimX=1 & dimY=n
-        
+    // Dimensions of the butterfly Cores : dimX=1 & dimY=n    
     // instantiation of the Cores (we have only one row)
    
 	core = new Tile*[n];
@@ -275,16 +281,15 @@ void NoC::buildButterfly()
 	for (int i = 0; i < n; i++) { 
 	    // Create the single core with a proper name
 	    char core_name[20];
-	   // Coord core_coord;
-	   //core_coord.x = i;
-	   //core_coord.y = i;
-	   //int core_id = coord2Id_bf(core_coord);
-	    int core_id = (sw*stg)+i;
-	    sprintf(core_name, "Core_(#%d)", core_id); cout<< "core_id = "<< core_id << endl;
+	   
+	    int core_id = (sw*stg)+i; //cout<< "core_id = "<< core_id << endl;
+	    sprintf(core_name, "Core_(#%d)", core_id); //cout<< "core_id = "<< core_id << endl;
 	    core[i] = new Tile(core_name, core_id);
+	        
+	    SwitchOnly = false;
 
 	    // Tell to the Core router its coordinates
-	    core[i]->r->configure( i,
+	    core[i]->r->configure( core_id,
 				  GlobalParams::stats_warm_up_time,
 				  GlobalParams::buffer_depth,
 				  grtable);
@@ -297,9 +302,9 @@ void NoC::buildButterfly()
 
 
 	    // Tell to the PE its coordinates
-	    core[i]->pe->local_id =  i;
+	    core[i]->pe->local_id = core_id;
 	    core[i]->pe->traffic_table = &gttable;	// Needed to choose destination
-	    core[i]->pe->never_transmit = (gttable.occurrencesAsSource(core[i]->pe->local_id) == 0);
+	    core[i]->pe->never_transmit = false;
 
 	    // Map clock and reset
 	    core[i]->clock(clock);
@@ -329,62 +334,63 @@ void NoC::buildButterfly()
 	    t[2][0]->flit_tx[1](flit[2][0].east);
 	    core[1]->flit_rx[1](flit[2][0].east);
 	    */
-
-	for (int i = 0; i < sw ; i++) 		
+	
+	
+	for (int i = 0; i < sw ; i++) 		//First stage
    	 {	
-		t[0][i]->flit_rx[3](flit[0][3].west); // ack .west
-		t[0][i]->req_rx[3](req[0][3].west);
-		t[0][i]->ack_rx[3](ack[0][3].west);
-		t[0][i]->buffer_full_status_rx[3](buffer_full_status[0][3].west);
+		t[0][i]->flit_rx[3](flit[0][i].west); // ack .west
+		t[0][i]->req_rx[3](req[0][i].west);
+		t[0][i]->ack_rx[3](ack[0][i].west);
+		t[0][i]->buffer_full_status_rx[3](buffer_full_status[0][i].west);
 		//tx is not required in butterfly
-		t[0][i]->flit_tx[3](flit[0][3].west); 
-		t[0][i]->req_tx[3](req[0][3].west);
-		t[0][i]->ack_tx[3](ack[0][3].west);
-		t[0][i]->buffer_full_status_tx[3](buffer_full_status[0][3].west);
+		t[0][i]->flit_tx[3](*flit_dummy_signal); 
+		t[0][i]->req_tx[3](*bool_dummy_signal);
+		t[0][i]->ack_tx[3](*bool_dummy_signal);
+		t[0][i]->buffer_full_status_tx[3](*tbufferfullstatus_dummy_signal);
 		
-		core[i*2]->flit_tx[0](flit[0][3].west);
-		core[i*2]->req_tx[0](req[0][3].west);
-		core[i*2]->ack_tx[0](ack[0][3].west);
-		core[i*2]->buffer_full_status_tx[0](buffer_full_status[0][3].west);
+		core[i*2]->flit_tx[0](flit[0][i].west);
+		core[i*2]->req_tx[0](req[0][i].west);
+		core[i*2]->ack_tx[0](ack[0][i].west);
+		core[i*2]->buffer_full_status_tx[0](buffer_full_status[0][i].west);
 		//rx is not required in butterfly
-		core[i*2]->flit_rx[0](flit[0][3].west);
-		core[i*2]->req_rx[0](req[0][3].west);
-		core[i*2]->ack_rx[0](ack[0][3].west);
-		core[i*2]->buffer_full_status_rx[0](buffer_full_status[0][3].west);
+		core[i*2]->flit_rx[0](*flit_dummy_signal);
+		core[i*2]->req_rx[0](*bool_dummy_signal);
+		core[i*2]->ack_rx[0](*bool_dummy_signal);
+		core[i*2]->buffer_full_status_rx[0](*tbufferfullstatus_dummy_signal);
 
 
-		t[0][i]->flit_rx[2](flit[0][2].south); // ack .south
-		t[0][i]->req_rx[2](req[0][2].south);
-		t[0][i]->ack_rx[2](ack[0][2].south); 
-		t[0][i]->buffer_full_status_rx[2](buffer_full_status[0][2].south);
+		t[0][i]->flit_rx[2](flit[0][i].south); // ack .south
+		t[0][i]->req_rx[2](req[0][i].south);
+		t[0][i]->ack_rx[2](ack[0][i].south); 
+		t[0][i]->buffer_full_status_rx[2](buffer_full_status[0][i].south);
 		//tx is not required in butterfly
-		t[0][i]->flit_tx[2](flit[0][2].south); 
-		t[0][i]->req_tx[2](req[0][2].south);
-		t[0][i]->ack_tx[2](ack[0][2].south); 
-		t[0][i]->buffer_full_status_tx[2](buffer_full_status[0][2].south);
+		t[0][i]->flit_tx[2](*flit_dummy_signal); 
+		t[0][i]->req_tx[2](*bool_dummy_signal);
+		t[0][i]->ack_tx[2](*bool_dummy_signal); 
+		t[0][i]->buffer_full_status_tx[2](*tbufferfullstatus_dummy_signal);
 				
-		core[(i*2)+1]->flit_tx[0](flit[0][2].south);
-		core[(i*2)+1]->req_tx[0](req[0][2].south);
-		core[(i*2)+1]->ack_tx[0](ack[0][2].south);
-		core[(i*2)+1]->buffer_full_status_tx[0](buffer_full_status[0][2].south);
+		core[(i*2)+1]->flit_tx[0](flit[0][i].south);
+		core[(i*2)+1]->req_tx[0](req[0][i].south);
+		core[(i*2)+1]->ack_tx[0](ack[0][i].south);
+		core[(i*2)+1]->buffer_full_status_tx[0](buffer_full_status[0][i].south);
 		//rx is not required in butterfly
-		core[(i*2)+1]->flit_rx[0](flit[0][2].south);
-		core[(i*2)+1]->req_rx[0](req[0][2].south);
-		core[(i*2)+1]->ack_rx[0](ack[0][2].south);
-		core[(i*2)+1]->buffer_full_status_rx[0](buffer_full_status[0][2].south);
+		core[(i*2)+1]->flit_rx[0](*flit_dummy_signal);
+		core[(i*2)+1]->req_rx[0](*bool_dummy_signal);
+		core[(i*2)+1]->ack_rx[0](*bool_dummy_signal);
+		core[(i*2)+1]->buffer_full_status_rx[0](*tbufferfullstatus_dummy_signal);
 	 }
 
-	for (int i = 0; i < sw ; i++) 		
+	for (int i = 0; i < sw ; i++) 			//Last stage	
    	 {	
 		t[stg-1][i]->flit_tx[0](flit[stg-1][i].north); // ack .east
 		t[stg-1][i]->req_tx[0](req[stg-1][i].north);
 		t[stg-1][i]->ack_tx[0](ack[stg-1][i].east);
 		t[stg-1][i]->buffer_full_status_tx[0](buffer_full_status[stg-1][i].east);
 		//rx is not required in butterfly
-		t[stg-1][i]->flit_rx[0](flit[stg-1][i].north); // ack .east
-		t[stg-1][i]->req_rx[0](req[stg-1][i].north);
-		t[stg-1][i]->ack_rx[0](ack[stg-1][i].east);
-		t[stg-1][i]->buffer_full_status_rx[0](buffer_full_status[stg-1][i].east);
+		t[stg-1][i]->flit_rx[0](*flit_dummy_signal); // ack .east
+		t[stg-1][i]->req_rx[0](*bool_dummy_signal);
+		t[stg-1][i]->ack_rx[0](*bool_dummy_signal);
+		t[stg-1][i]->buffer_full_status_rx[0](*tbufferfullstatus_dummy_signal);
 
 
 		core[i*2]->flit_rx[1](flit[stg-1][i].north);
@@ -392,10 +398,10 @@ void NoC::buildButterfly()
 		core[i*2]->ack_rx[1](ack[stg-1][i].east);
 		core[i*2]->buffer_full_status_rx[1](buffer_full_status[stg-1][i].east);
 		//tx is not required in butterfly
-		core[i*2]->flit_tx[1](flit[stg-1][i].north);
-		core[i*2]->req_tx[1](req[stg-1][i].north);
-		core[i*2]->ack_tx[1](ack[stg-1][i].east);
-		core[i*2]->buffer_full_status_tx[1](buffer_full_status[stg-1][i].east);
+		core[i*2]->flit_tx[1](*flit_dummy_signal);
+		core[i*2]->req_tx[1](*bool_dummy_signal);
+		core[i*2]->ack_tx[1](*bool_dummy_signal);
+		core[i*2]->buffer_full_status_tx[1](*tbufferfullstatus_dummy_signal);
 
 
 		t[stg-1][i]->flit_tx[1](flit[stg-1][i].east);  // ack .east
@@ -403,22 +409,80 @@ void NoC::buildButterfly()
 		t[stg-1][i]->ack_tx[1](ack[stg-1][i].east);
 		t[stg-1][i]->buffer_full_status_tx[1](buffer_full_status[stg-1][i].east);
 		//rx is not required in butterfly
-		t[stg-1][i]->flit_rx[1](flit[stg-1][i].east);  // ack .east
-		t[stg-1][i]->req_rx[1](req[stg-1][i].east);
-		t[stg-1][i]->ack_rx[1](ack[stg-1][i].east);
-		t[stg-1][i]->buffer_full_status_rx[1](buffer_full_status[stg-1][i].east);
+		t[stg-1][i]->flit_rx[1](*flit_dummy_signal);  // ack .east
+		t[stg-1][i]->req_rx[1](*bool_dummy_signal);
+		t[stg-1][i]->ack_rx[1](*bool_dummy_signal);
+		t[stg-1][i]->buffer_full_status_rx[1](*tbufferfullstatus_dummy_signal);
 
 		core[(i*2)+1]->flit_rx[1](flit[stg-1][i].east);
 		core[(i*2)+1]->req_rx[1](req[stg-1][i].east);	
 		core[(i*2)+1]->ack_rx[1](ack[stg-1][i].east); 
 		core[(i*2)+1]->buffer_full_status_rx[1](buffer_full_status[stg-1][i].east);   
 		//tx is not required in butterfly 
-		core[(i*2)+1]->flit_tx[1](flit[stg-1][i].east);
-		core[(i*2)+1]->req_tx[1](req[stg-1][i].east);	
-		core[(i*2)+1]->ack_tx[1](ack[stg-1][i].east); 
-		core[(i*2)+1]->buffer_full_status_tx[1](buffer_full_status[stg-1][i].east); 
+		core[(i*2)+1]->flit_tx[1](*flit_dummy_signal);
+		core[(i*2)+1]->req_tx[1](*bool_dummy_signal);	
+		core[(i*2)+1]->ack_tx[1](*bool_dummy_signal); 
+		core[(i*2)+1]->buffer_full_status_tx[1](*tbufferfullstatus_dummy_signal); 
 	 }// ---------------------------------end mapping code-----------------
-  
+  	
+	
+    // Just bind all remaining ports (otherwise SystemC will complain)...
+
+    // the declaration of dummy signal is on the top
+
+    // ... for cores
+    
+    for (int c = 0; c < n; c++)
+    {
+    	// directions 2 and 3 are not used for cores( not switches)
+        for (int k = 0; k < DIRECTIONS; k++)
+        {
+            core[c]->NoP_data_in[k](*nop_data_dummy_signal);
+            core[c]->NoP_data_out[k](*nop_data_dummy_signal);
+            core[c]->free_slots_neighbor[k](*int_dummy_signal);
+            core[c]->free_slots[k](*int_dummy_signal);
+        }
+
+        for (int k = 2; k < DIRECTIONS; k++)
+        {
+            core[c]->flit_tx[k](*flit_dummy_signal);
+            core[c]->req_tx[k](*bool_dummy_signal);
+            core[c]->ack_tx[k](*bool_dummy_signal);
+            core[c]->buffer_full_status_tx[k](*tbufferfullstatus_dummy_signal);
+
+            core[c]->flit_rx[k](*flit_dummy_signal);
+            core[c]->req_rx[k](*bool_dummy_signal);
+            core[c]->ack_rx[k](*bool_dummy_signal);
+            core[c]->buffer_full_status_rx[k](*tbufferfullstatus_dummy_signal);
+        }
+
+        core[c]->hub_flit_tx(*flit_dummy_signal);
+        core[c]->hub_req_tx(*bool_dummy_signal);
+        core[c]->hub_ack_tx(*bool_dummy_signal);
+        core[c]->hub_buffer_full_status_tx(*tbufferfullstatus_dummy_signal);
+
+        core[c]->hub_flit_rx(*flit_dummy_signal);
+        core[c]->hub_req_rx(*bool_dummy_signal);
+        core[c]->hub_ack_rx(*bool_dummy_signal);
+        core[c]->hub_buffer_full_status_rx(*tbufferfullstatus_dummy_signal);
+    }
+    
+    // ... and for switches
+
+    for (int i = 0; i < stg ; i++) 		//stg
+    {
+	    for (int j = 0; j < sw ; j++) 		//sw 
+	    {
+            for (int k = 0; k < DIRECTIONS; k++)
+            {
+                t[i][j]->NoP_data_in[k](*nop_data_dummy_signal);
+                t[i][j]->NoP_data_out[k](*nop_data_dummy_signal);
+                t[i][j]->free_slots_neighbor[k](*int_dummy_signal);
+                t[i][j]->free_slots[k](*int_dummy_signal);
+            }
+        }
+    }
+
 //--- ---------------------------------- ---
 
     // dummy NoP_data structure

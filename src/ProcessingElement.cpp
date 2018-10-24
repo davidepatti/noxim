@@ -87,6 +87,7 @@ Flit ProcessingElement::nextFlit()
 
 bool ProcessingElement::canShot(Packet & packet)
 {
+    if(never_transmit) return false;
     /* DEADLOCK TEST 
 	double current_time = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
 
@@ -269,12 +270,19 @@ Packet ProcessingElement::trafficRandom()
     p.src_id = local_id;
     double rnd = rand() / (double) RAND_MAX;
     double range_start = 0.0;
+    int max_id;
 
-    int max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) - 1;
+    if (GlobalParams::butterfly_tiles == 0)
+         max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) - 1; //Mesh 
+    else    //Butterfly
+         max_id = ((log2(GlobalParams::butterfly_tiles))*(GlobalParams::butterfly_tiles/2))+ GlobalParams::butterfly_tiles; 
 
     // Random destination distribution
     do {
-	p.dst_id = randInt(0, max_id);
+        if (GlobalParams::butterfly_tiles == 0) //Mesh
+            p.dst_id = randInt(0, max_id);
+        else //Butterfly
+	        p.dst_id = randInt((log2(GlobalParams::butterfly_tiles))*(GlobalParams::butterfly_tiles/2 ), max_id);
 
 	// check for hotspot destination
 	for (size_t i = 0; i < GlobalParams::hotspots.size(); i++) {

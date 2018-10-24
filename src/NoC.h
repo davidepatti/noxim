@@ -44,6 +44,7 @@ struct sc_signal_NSWEH
 
 SC_MODULE(NoC)
 {
+    public: bool SwitchOnly; //true if the tile are switch only 
     // I/O Ports
     sc_in_clk clock;		// The input clock for the NoC
     sc_in < bool > reset;	// The reset signal for the NoC

@@ -170,14 +170,24 @@ inline void sc_trace(sc_trace_file * &tf, const ChannelStatus & bs, string & nam
 
 inline Coord id2Coord(int id)
 {
-    Coord coord;
+    Coord coord; cout<< " id="<< id << endl;
+    if (GlobalParams::butterfly_tiles == 0)
+        {
+        coord.x = id % GlobalParams::mesh_dim_x;
+        coord.y = id / GlobalParams::mesh_dim_x;
 
-    coord.x = id % GlobalParams::mesh_dim_x;
-    coord.y = id / GlobalParams::mesh_dim_x;
+        assert(coord.x < GlobalParams::mesh_dim_x);
+        assert(coord.y < GlobalParams::mesh_dim_y);
+        }
+    else
+        { 
+        coord.x = id % (int)(log2(GlobalParams::butterfly_tiles));
+        coord.y = id / (int)(log2(GlobalParams::butterfly_tiles));
+        cout << "x=" << coord.x << " y=" << coord.y << endl;
+        assert(coord.x < log2(GlobalParams::butterfly_tiles));
+        assert(coord.y < GlobalParams::butterfly_tiles/2);
 
-    assert(coord.x < GlobalParams::mesh_dim_x);
-    assert(coord.y < GlobalParams::mesh_dim_y);
-
+        }
     return coord;
 }
 
@@ -239,6 +249,14 @@ template<typename T> std::string i_to_string(const T& t){
          std::stringstream s;
 	 s << t;
          return s.str();
+}
+
+
+inline bool YouAreSwitch(int id)
+{
+    if (id < (GlobalParams::butterfly_tiles/2) * log2(GlobalParams::butterfly_tiles))
+    return true;
+    else return false;
 }
 
 #endif

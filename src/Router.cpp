@@ -62,9 +62,14 @@ void Router::rxProcess()
 		}
 
 		else 
-		    // should not happen with the new TBufferFullStatus control signals
+		{
+			 // should not happen with the new TBufferFullStatus control signals
+		    
 		    // except for flit coming from local PE, which don't use it 
+		    LOG << " Flit BFLY " << received_flit << " buffer full Input[" << i << "][" << vc <<"]" << endl;
 		    assert(i== DIRECTION_LOCAL);
+		}
+		   
 	    }
 	    ack_rx[i].write(current_level_rx[i]);
 
@@ -114,6 +119,7 @@ void Router::txProcess()
 		      // prepare data for routing
 		      RouteData route_data;
 		      route_data.current_id = local_id;
+		      LOG<< "current_id= "<< route_data.current_id <<" for sending " << flit << endl;
 		      route_data.src_id = flit.src_id;
 		      route_data.dst_id = flit.dst_id;
 		      route_data.dir_in = i;
@@ -430,7 +436,7 @@ int Router::reflexDirection(int direction) const
 
 int Router::getNeighborId(int _id, int direction) const
 {
-    Coord my_coord = id2Coord(_id);
+    Coord my_coord = id2Coord(_id); 
 
     switch (direction) {
     case DIRECTION_NORTH:
