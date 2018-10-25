@@ -30,7 +30,7 @@ void Router::rxProcess()
 	local_drained = 0;
     } 
     else 
-    {
+    { //if (local_id==10) LOG<<"*RX*****local_id="<<local_id<<"__ack_rx[3]= "<<ack_rx[3].read()<<endl;
 	// This process simply sees a flow of incoming flits. All arbitration
 	// and wormhole related issues are addressed in the txProcess()
 
@@ -38,41 +38,46 @@ void Router::rxProcess()
 	    // To accept a new flit, the following conditions must match:
 	    // 1) there is an incoming request
 	    // 2) there is a free slot in the input buffer of direction i
-
+		//LOG<<"****RX****DIRECTION ="<<i<<  endl;
+		//LOG<<"_current_level_rx="<<current_level_rx[i]<<"_req_rx= "<<req_rx[i].read()<<"_ack="<<ack_rx[i].read()<< endl;
 	    if (req_rx[i].read() == 1 - current_level_rx[i])
-	    {
-		Flit received_flit = flit_rx[i].read();
-		int vc = received_flit.vc_id;
+	    { 
+	    	Flit received_flit = flit_rx[i].read();
+	    	//LOG<<"request opposite to the current_level, reading flit "<<received_flit<<endl;
+	    	
+			int vc = received_flit.vc_id;
 
-		if (!buffer[i][vc].IsFull()) 
-		{
-		    // Store the incoming flit in the circular buffer
-		    buffer[i][vc].Push(received_flit);
+			if (!buffer[i][vc].IsFull()) 
+			{
 
-		    LOG << " Flit " << received_flit << " collected from Input[" << i << "][" << vc <<"]" << endl;
+		    	// Store the incoming flit in the circular buffer
+		   	 	buffer[i][vc].Push(received_flit);
 
-		    power.bufferRouterPush();
+		    	LOG << " Flit " << received_flit << " collected from Input[" << i << "][" << vc <<"]" << endl;
 
-		    // Negate the old value for Alternating Bit Protocol (ABP)
-		    current_level_rx[i] = 1 - current_level_rx[i];
+		    	power.bufferRouterPush();
 
-		    // if a new flit is injected from local PE
-		    if (received_flit.src_id == local_id)
-		      power.networkInterface();
+		    	// Negate the old value for Alternating Bit Protocol (ABP)
+		    	//LOG<<"INVERTING CL FROM "<< current_level_rx[i]<< " TO "<<  1 - current_level_rx[i]<<endl;
+		    	current_level_rx[i] = 1 - current_level_rx[i];
+
+		    	// if a new flit is injected from local PE
+		    	if (received_flit.src_id == local_id)
+		      	power.networkInterface();
 		}
 
 		else 
 		{
-			 // should not happen with the new TBufferFullStatus control signals
-		    
+			// should not happen with the new TBufferFullStatus control signals    
 		    // except for flit coming from local PE, which don't use it 
-		    LOG << " Flit BFLY " << received_flit << " buffer full Input[" << i << "][" << vc <<"]" << endl;
+		   // LOG << " Flit BFLY " << received_flit << " buffer full Input[" << i << "][" << vc <<"]" << endl;
 		    assert(i== DIRECTION_LOCAL);
 		}
 		   
 	    }
 	    ack_rx[i].write(current_level_rx[i]);
-
+	    //if (local_id==10 && i==3) LOG<<"writing current_level "<< current_level_rx[i]<< " to ack_rx "<<endl;
+	    //LOG<<"END __cl_rx="<<current_level_rx[i]<<"_req_Rx="<<req_rx[i].read()<< " _ack= "<<ack_rx[i].read()<<  endl;
 	    // updates the mask of VCs to prevent incoming data on full buffers
 	    TBufferFullStatus bfs;
 	    for (int vc=0;vc<GlobalParams::n_virtual_channels;vc++)
@@ -95,7 +100,7 @@ void Router::txProcess()
 	}
     } 
   else 
-    {
+    { 
       // 1st phase: Reservation
       for (int j = 0; j < DIRECTIONS + 2; j++) 
 	{
@@ -119,7 +124,7 @@ void Router::txProcess()
 		      // prepare data for routing
 		      RouteData route_data;
 		      route_data.current_id = local_id;
-		      LOG<< "current_id= "<< route_data.current_id <<" for sending " << flit << endl;
+		      //LOG<< "current_id= "<< route_data.current_id <<" for sending " << flit << endl;
 		      route_data.src_id = flit.src_id;
 		      route_data.dst_id = flit.dst_id;
 		      route_data.dir_in = i;
@@ -163,23 +168,27 @@ void Router::txProcess()
       start_from_port = (start_from_port + 1) % (DIRECTIONS + 2);
 
       // 2nd phase: Forwarding
+      //if (local_id==6) LOG<<"*TX*****local_id="<<local_id<<"__ack_tx[0]= "<<ack_tx[0].read()<<endl;
       for (int i = 0; i < DIRECTIONS + 2; i++) 
-      {
+      { 
 	  vector<pair<int,int> > reservations = reservation_table.getReservations(i);
 	  
 	  if (reservations.size()!=0)
 	  {
+
 	      int rnd_idx = rand()%reservations.size();
 
 	      int o = reservations[rnd_idx].first;
 	      int vc = reservations[rnd_idx].second;
-
+	     // LOG<< "found reservation from input= " << i << "_to output= "<<o<<endl;
 	      // can happen
 	      if (!buffer[i][vc].IsEmpty())  
 	      {
 		  // power contribution already computed in 1st phase
 		  Flit flit = buffer[i][vc].Front();
-
+		  //LOG<< "*****TX***Direction= "<<i<< "************"<<endl;
+		  //LOG<<"_cl_tx="<<current_level_tx[o]<<"req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
+		  
 		  if ( (current_level_tx[o] == ack_tx[o].read()) &&
 		       (buffer_full_status_tx[o].read().mask[vc] == false) ) 
 		  {
@@ -226,9 +235,11 @@ void Router::txProcess()
 		      else if (i != DIRECTION_LOCAL) // not generated locally
 			  routed_flits++;
 		      /* End Power & Stats ------------------------------------------------- */
+			 //LOG<<"END_OK_cl_tx="<<current_level_tx[o]<<"_req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
 		  }
 		  else
 		  {
+		  	//LOG<<"END_NO_cl_tx="<<current_level_tx[o]<<"_req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
 		      LOG << " APB cannot forward Input[" << i << "][" << vc << "] forward to Output[" << o << "], flit: " << flit << endl;
 		      /*
 		      if (flit.flit_type == FLIT_TYPE_HEAD)
@@ -236,7 +247,8 @@ void Router::txProcess()
 			  */
 		  }
 	      }
-	  } // if not reserved
+	  } // if not reserved 
+	 // else LOG<<"we have no reservation for direction "<<i<< endl;
       } // for loop directions
 
       if ((int)(sc_time_stamp().to_double() / GlobalParams::clock_period_ps)%2==0)

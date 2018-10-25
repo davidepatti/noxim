@@ -169,8 +169,8 @@ inline void sc_trace(sc_trace_file * &tf, const ChannelStatus & bs, string & nam
 // Misc common functions
 
 inline Coord id2Coord(int id)
-{
-    Coord coord; cout<< " id="<< id << endl;
+{   cout << " id = "<< id << endl;
+    Coord coord; 
     if (GlobalParams::butterfly_tiles == 0)
         {
         coord.x = id % GlobalParams::mesh_dim_x;
@@ -181,11 +181,11 @@ inline Coord id2Coord(int id)
         }
     else
         { 
-        coord.x = id % (int)(log2(GlobalParams::butterfly_tiles));
-        coord.y = id / (int)(log2(GlobalParams::butterfly_tiles));
-        cout << "x=" << coord.x << " y=" << coord.y << endl;
+        coord.x = id / (int)(GlobalParams::butterfly_tiles/2);
+        coord.y = id % (int)(GlobalParams::butterfly_tiles/2);
+        cout <<"x = " << coord.x<< " and y =" << coord.y << endl;
         assert(coord.x < log2(GlobalParams::butterfly_tiles));
-        assert(coord.y < GlobalParams::butterfly_tiles/2);
+        assert(coord.y < (GlobalParams::butterfly_tiles/2));
 
         }
     return coord;

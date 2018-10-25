@@ -53,28 +53,49 @@ for (int i = 1; i < stg ; i++) //stg
 	if (x==0) d = 1-d;
 	
 	if (d==0)
-	{
-	 cout << "t[" << i << "][" << j << "] -> flit_rx [3](flit[" << i-1 << "][" << j << "].north)"<< "\n";
-	 cout << "t[" << i << "][" << j << "] -> req_rx [3](flit[" << i-1 << "][" << j << "].north)"<< "\n"; 
-	 cout << "t[" << i << "][" << j << "] -> ack_rx [3](flit[" << i-1 << "][" << j << "].west)"<< "\n \n \n";
+	{ if (i%2==0) //stage od
+	 {
+	 	cout << "t[" << i << "][" << j << "] -> flit_rx [3](flit[" << i << "][" << j << "].west)"<< "\n";
+	 	cout << "t[" << i << "][" << j << "] -> req_rx [3](flit[" << i << "][" << j << "].west)"<< "\n"; 
+	 	cout << "t[" << i << "][" << j << "] -> ack_rx [3](flit[" << i << "][" << j << "].west)"<< "\n \n \n";
 
-	 cout << "t[" << i-1 << "][" << j << "] -> flit_tx ["<< d <<"](flit[" << i-1 << "][" << j << "].north)" << "\n";
-	 cout << "t[" << i-1 << "][" << j << "] -> req_tx ["<< d <<"](flit[" << i-1 << "][" << j << "].north)" << "\n";
-	 cout << "t[" << i-1 << "][" << j << "] -> ack_tx ["<< d <<"](flit[" << i-1 << "][" << j << "].west)"<< "\n \n \n";
+	 	cout << "t[" << i-1 << "][" << j << "] -> flit_tx ["<< d <<"](flit[" << i << "][" << j << "].west)" << "\n";
+	 	cout << "t[" << i-1 << "][" << j << "] -> req_tx ["<< d <<"](flit[" << i << "][" << j << "].west)" << "\n";
+	 	cout << "t[" << i-1 << "][" << j << "] -> ack_tx ["<< d <<"](flit[" << i << "][" << j << "].west)"<< "\n \n \n";
 
-	 cout << "t[" << i << "][" << j << "] -> flit_rx [2](flit[" << i-1 << "][" << m << "].north)" << "\n";
-	 cout << "t[" << i << "][" << j << "] -> req_rx [2](flit[" << i-1 << "][" << m << "].north)"<< "\n";
-	 cout << "t[" << i << "][" << j << "] -> ack_rx [2](flit[" << i-1 << "][" << m << "].south)"<< "\n \n \n";
+	 	cout << "t[" << i << "][" << j << "] -> flit_rx [2](flit[" << i << "][" << j << "].south)" << "\n";
+	 	cout << "t[" << i << "][" << j << "] -> req_rx [2](flit[" << i << "][" << j << "].south)"<< "\n";
+	 	cout << "t[" << i << "][" << j << "] -> ack_rx [2](flit[" << i << "][" << j << "].south)"<< "\n \n \n";
 
-	 cout << "t[" << i-1 << "][" << m << "] -> flit_tx ["<< d <<"](flit[" << i-1 << "][" << m << "].north)"<< "\n";
-	 cout << "t[" << i-1 << "][" << m << "] -> req_tx ["<< d <<"](flit[" << i-1 << "][" << m << "].north)"<< "\n";
-	 cout << "t[" << i-1 << "][" << m << "] -> ack_tx ["<< d <<"](flit[" << i-1 << "][" << m << "].south)"<< "\n \n \n";
+	 	cout << "t[" << i-1 << "][" << m << "] -> flit_tx ["<< d <<"](flit[" << i << "][" << j << "].south)"<< "\n";
+	 	cout << "t[" << i-1 << "][" << m << "] -> req_tx ["<< d <<"](flit[" << i << "][" << j << "].south)"<< "\n";
+	 	cout << "t[" << i-1 << "][" << m << "] -> ack_tx ["<< d <<"](flit[" << i << "][" << j << "].south)"<< "\n \n \n";
+	}
+	 /*else 
+	 {
+
+	 	cout << "t[" << i << "][" << j << "] -> flit_rx [3](flit[" << i-1 << "][" << j << "].north)"<< "\n";
+	 	cout << "t[" << i << "][" << j << "] -> req_rx [3](flit[" << i-1 << "][" << j << "].north)"<< "\n"; 
+	 	cout << "t[" << i << "][" << j << "] -> ack_rx [3](flit[" << i-1 << "][" << j << "].west)"<< "\n \n \n";
+
+	 	cout << "t[" << i-1 << "][" << j << "] -> flit_tx ["<< d <<"](flit[" << i-1 << "][" << j << "].north)" << "\n";
+	 	cout << "t[" << i-1 << "][" << j << "] -> req_tx ["<< d <<"](flit[" << i-1 << "][" << j << "].north)" << "\n";
+	 	cout << "t[" << i-1 << "][" << j << "] -> ack_tx ["<< d <<"](flit[" << i-1 << "][" << j << "].west)"<< "\n \n \n";
+
+	 	cout << "t[" << i << "][" << j << "] -> flit_rx [2](flit[" << i-1 << "][" << m << "].north)" << "\n";
+	 	cout << "t[" << i << "][" << j << "] -> req_rx [2](flit[" << i-1 << "][" << m << "].north)"<< "\n";
+	 	cout << "t[" << i << "][" << j << "] -> ack_rx [2](flit[" << i-1 << "][" << m << "].south)"<< "\n \n \n";
+
+	 	cout << "t[" << i-1 << "][" << m << "] -> flit_tx ["<< d <<"](flit[" << i-1 << "][" << m << "].north)"<< "\n";
+	 	cout << "t[" << i-1 << "][" << m << "] -> req_tx ["<< d <<"](flit[" << i-1 << "][" << m << "].north)"<< "\n";
+	 	cout << "t[" << i-1 << "][" << m << "] -> ack_tx ["<< d <<"](flit[" << i-1 << "][" << m << "].south)"<< "\n \n \n";
+	 }
 	}
 	else
 	{
-	cout << "t[" << i << "][" << j << "] -> flit_rx [3](flit[" << i-1 << "][" << j << "].east)"<< "\n"; 
-	cout << "t[" << i << "][" << j << "] -> req_rx [3](flit[" << i-1 << "][" << j << "].east)"<< "\n";
-	cout << "t[" << i << "][" << j << "] -> ack_rx [3](flit[" << i-1 << "][" << j << "].south)"<< "\n \n \n";
+	cout << "t[" << i << "][" << j << "] -> flit_rx [2](flit[" << i-1 << "][" << j << "].east)"<< "\n"; 
+	cout << "t[" << i << "][" << j << "] -> req_rx [2](flit[" << i-1 << "][" << j << "].east)"<< "\n";
+	cout << "t[" << i << "][" << j << "] -> ack_rx [2](flit[" << i-1 << "][" << j << "].south)"<< "\n \n \n";
 	
 
 	
@@ -83,19 +104,19 @@ for (int i = 1; i < stg ; i++) //stg
 	cout << "t[" << i-1 << "][" << j << "] -> ack_tx ["<< d <<"](flit[" << i-1 << "][" << j << "].south)"<< "\n \n \n";
 
 
-	cout << "t[" << i << "][" << j << "] -> flit_rx [2](flit[" << i-1 << "][" << m << "].east)" << "\n";
-	cout << "t[" << i << "][" << j << "] -> req_rx [2](flit[" << i-1 << "][" << m << "].east)" << "\n";
-	cout << "t[" << i << "][" << j << "] -> req_rx [2](flit[" << i-1 << "][" << m << "].west)" << "\n \n \n";
+	cout << "t[" << i << "][" << j << "] -> flit_rx [3](flit[" << i-1 << "][" << m << "].east)" << "\n";
+	cout << "t[" << i << "][" << j << "] -> req_rx [3](flit[" << i-1 << "][" << m << "].east)" << "\n";
+	cout << "t[" << i << "][" << j << "] -> req_rx [3](flit[" << i-1 << "][" << m << "].west)" << "\n \n \n";
 
 
 	cout << "t[" << i-1 << "][" << m << "] -> flit_tx ["<< d <<"](flit[" << i-1 << "][" << m << "].east)"<< "\n";
 	cout << "t[" << i-1 << "][" << m << "] -> req_tx ["<< d <<"](flit[" << i-1 << "][" << m << "].east)"<< "\n";
 	cout << "t[" << i-1 << "][" << m << "] -> req_tx ["<< d <<"](flit[" << i-1 << "][" << m << "].west)"<< "\n \n \n";
-	}
+	}*/
 
 	}
 }
-
+}
 return 0; 
 
 }

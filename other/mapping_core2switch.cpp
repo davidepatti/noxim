@@ -38,16 +38,16 @@ int main(int argc, char* argv[]) {
 	  for (int i = 0; i < sw ; i++) 		
    	   {    // t : means switch	
 	   
-		cout << "t[" << 0 << "][" << i << "] -> flit_rx[3](flit[" << 0<< "][" << 3 << "].west)"<< "\n";
+		cout << "t[" << 0 << "][" << i << "] -> flit_rx[3](flit[" << 0<< "][" << i << "].west)"<< "\n";
 		//t[0][i]->flit_rx[3](flit[0][3].west);
 
-		cout << "core[" << i*2 << "]" << " -> flit_tx[0](flit[" << 0<< "][" << 3 << "].west)"<< "\n";
+		cout << "core[" << i*2 << "]" << " -> flit_tx[0](flit[" << 0<< "][" << i << "].west)"<< "\n";
 		//core[sw*2]->flit_tx[0](flit[0][3].west);
 
-		cout << "t[" << 0 << "][" << i << "] -> flit_rx[2](flit[" << 0<< "][" << 2 << "].south)"<< "\n";
+		cout << "t[" << 0 << "][" << i << "] -> flit_rx[2](flit[" << 0<< "][" << i << "].south)"<< "\n";
 		//t[0][i]->flit_rx[2](flit[0][2].south);
 
-		cout << "core[" << (i*2)+1 << "]" << " -> flit_tx[0](flit[" << 0<< "][" << 2 << "].south)"<< "\n\n\n";
+		cout << "core[" << (i*2)+1 << "]" << " -> flit_tx[0](flit[" << 0<< "][" << i << "].south)"<< "\n\n\n";
 		//core[(sw*2)+1]->flit_tx[0](flit[0][2].south);
 	    }
 

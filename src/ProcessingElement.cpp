@@ -88,6 +88,7 @@ Flit ProcessingElement::nextFlit()
 bool ProcessingElement::canShot(Packet & packet)
 {
     if(never_transmit) return false;
+    if(local_id!=16) return false;
     /* DEADLOCK TEST 
 	double current_time = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
 

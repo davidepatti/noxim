@@ -76,14 +76,14 @@ void NoC::buildButterfly()
 	    Coord tile_coord;
 	    tile_coord.x = i;
 	    tile_coord.y = j;
-	    int tile_id = coord2Id(tile_coord); cout<< "tile_id "<< tile_id<< endl;
-	    sprintf(tile_name, "Switch[%02d][%02d]_(#%d)", i, j, tile_id);
+	    int tile_id = coord2Id(tile_coord); 
+	    sprintf(tile_name, "Switch[%d][%d]_(#%d)", i, j, tile_id);cout<<"tile_name=" <<tile_name<< " i=" <<i << " j=" << j<< " tile_id "<< tile_id<< endl;
 	    t[i][j] = new Tile(tile_name, tile_id);
 
 		//cout << "switch  " << i <<  " " << j << "   has an Id = " << tile_id <<  endl;
 	    SwitchOnly = true;
 	    // Tell to the router its coordinates
-	    t[i][j]->r->configure(j * dimX + i,
+	    t[i][j]->r->configure(tile_id,
 				  GlobalParams::stats_warm_up_time,
 				  GlobalParams::buffer_depth,
 				  grtable);
@@ -96,7 +96,7 @@ void NoC::buildButterfly()
 
 
 	    // Tell to the PE its coordinates
-	    t[i][j]->pe->local_id = j * dimX + i;
+	    t[i][j]->pe->local_id = tile_id;
 	    t[i][j]->pe->traffic_table = &gttable;	// Needed to choose destination
 	    t[i][j]->pe->never_transmit = true;
 
@@ -164,91 +164,196 @@ void NoC::buildButterfly()
 	    if (x==0) d = 1-d;
 	    if (d==0)
 		{
-		t[i][j]->flit_rx[3](flit[i-1][j].north);
-		t[i][j]->req_rx[3](req[i-1][j].north);
-		t[i][j]->ack_rx[3](ack[i-1][j].west);
-		t[i][j]->buffer_full_status_rx[3](buffer_full_status[i-1][j].west);
-		//tx signals not required for butterfly
-		t[i][j]->flit_tx[3](*flit_dummy_signal);
-		t[i][j]->req_tx[3](*bool_dummy_signal);
-		t[i][j]->ack_tx[3](*bool_dummy_signal);
-		t[i][j]->buffer_full_status_tx[3](*tbufferfullstatus_dummy_signal);
+			if (i%2==0) //stage even
+	 		{
+	 			//*** Direction 3 ****
+			 	t[i][j]->flit_rx[3](flit[i][j].west);
+				t[i][j]->req_rx[3](req[i][j].west);
+				t[i][j]->ack_rx[3](ack[i][j].west);
+				t[i][j]->buffer_full_status_rx[3](buffer_full_status[i][j].west);
+				//tx signals not required for butterfly
+				t[i][j]->flit_tx[3](*flit_dummy_signal);
+				t[i][j]->req_tx[3](*bool_dummy_signal);
+				t[i][j]->ack_tx[3](*bool_dummy_signal);
+				t[i][j]->buffer_full_status_tx[3](*tbufferfullstatus_dummy_signal);
 
 
-		t[i-1][j]->flit_tx[d](flit[i-1][j].north);
-		t[i-1][j]->req_tx[d](req[i-1][j].north);
-		t[i-1][j]->ack_tx[d](ack[i-1][j].west);
-		t[i-1][j]->buffer_full_status_tx[d](buffer_full_status[i-1][j].west);
-		//tx signals not required for butterfly
-		t[i-1][j]->flit_rx[d](*flit_dummy_signal);
-		t[i-1][j]->req_rx[d](*bool_dummy_signal);
-		t[i-1][j]->ack_rx[d](*bool_dummy_signal);
-		t[i-1][j]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
+				t[i-1][j]->flit_tx[d](flit[i][j].west);
+				t[i-1][j]->req_tx[d](req[i][j].west);
+				t[i-1][j]->ack_tx[d](ack[i][j].west);
+				t[i-1][j]->buffer_full_status_tx[d](buffer_full_status[i-1][j].west);
+				//tx signals not required for butterfly
+				t[i-1][j]->flit_rx[d](*flit_dummy_signal);
+				t[i-1][j]->req_rx[d](*bool_dummy_signal);
+				t[i-1][j]->ack_rx[d](*bool_dummy_signal);
+				t[i-1][j]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
+
+			 	
+				//*** Direction 2 ****
+			 	t[i][j]->flit_rx[2](flit[i-1][j].south);
+				t[i][j]->req_rx[2](req[i-1][j].south);
+				t[i][j]->ack_rx[2](ack[i-1][j].south);
+				t[i][j]->buffer_full_status_rx[2](buffer_full_status[i-1][j].south);
+				//tx signals not required for butterfly
+				t[i][j]->flit_tx[2](*flit_dummy_signal);
+				t[i][j]->req_tx[2](*bool_dummy_signal);
+				t[i][j]->ack_tx[2](*bool_dummy_signal);
+				t[i][j]->buffer_full_status_tx[2](*tbufferfullstatus_dummy_signal);
 
 
-		t[i][j]->flit_rx[2](flit[i-1][m].north);
-		t[i][j]->req_rx[2](req[i-1][m].north);
-		t[i][j]->ack_rx[2](ack[i-1][m].south);
-		t[i][j]->buffer_full_status_rx[2](buffer_full_status[i-1][m].south);
-		//tx signals not required for butterfly
-		t[i][j]->flit_tx[2](*flit_dummy_signal);
-		t[i][j]->req_tx[2](*bool_dummy_signal);
-		t[i][j]->ack_tx[2](*bool_dummy_signal);
-		t[i][j]->buffer_full_status_tx[2](*tbufferfullstatus_dummy_signal);
+				t[i-1][m]->flit_tx[d](flit[i-1][m].south);
+				t[i-1][m]->req_tx[d](req[i-1][m].south);
+				t[i-1][m]->ack_tx[d](ack[i-1][m].south);
+				t[i-1][m]->buffer_full_status_tx[d](buffer_full_status[i-1][m].south);
+				//tx signals not required for butterfly
+				t[i-1][m]->flit_rx[d](*flit_dummy_signal);
+				t[i-1][m]->req_rx[d](*bool_dummy_signal);
+				t[i-1][m]->ack_rx[d](*bool_dummy_signal);
+				t[i-1][m]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
+			}
+		
+			else 
+	 		{
+
+	 			t[i][j]->flit_rx[3](flit[i-1][j].north);
+				t[i][j]->req_rx[3](req[i-1][j].north);
+				t[i][j]->ack_rx[3](ack[i-1][j].north);
+				t[i][j]->buffer_full_status_rx[3](buffer_full_status[i-1][j].north);
+				//tx signals not required for butterfly
+				t[i][j]->flit_tx[3](*flit_dummy_signal);
+				t[i][j]->req_tx[3](*bool_dummy_signal);
+				t[i][j]->ack_tx[3](*bool_dummy_signal);
+				t[i][j]->buffer_full_status_tx[3](*tbufferfullstatus_dummy_signal);
 
 
-		t[i-1][m]->flit_tx[d](flit[i-1][m].north);
-		t[i-1][m]->req_tx[d](req[i-1][m].north);
-		t[i-1][m]->ack_tx[d](ack[i-1][m].south);
-		t[i-1][m]->buffer_full_status_tx[d](buffer_full_status[i-1][m].south);
-		//tx signals not required for butterfly
-		t[i-1][m]->flit_rx[d](*flit_dummy_signal);
-		t[i-1][m]->req_rx[d](*bool_dummy_signal);
-		t[i-1][m]->ack_rx[d](*bool_dummy_signal);
-		t[i-1][m]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
+				t[i-1][j]->flit_tx[d](flit[i-1][j].north);
+				t[i-1][j]->req_tx[d](req[i-1][j].north);
+				t[i-1][j]->ack_tx[d](ack[i-1][j].north);
+				t[i-1][j]->buffer_full_status_tx[d](buffer_full_status[i-1][j].north);
+				//tx signals not required for butterfly
+				t[i-1][j]->flit_rx[d](*flit_dummy_signal);
+				t[i-1][j]->req_rx[d](*bool_dummy_signal);
+				t[i-1][j]->ack_rx[d](*bool_dummy_signal);
+				t[i-1][j]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
+
+
+				//*** Direction 2 ****
+			 	t[i][j]->flit_rx[2](flit[i-1][m].north);
+				t[i][j]->req_rx[2](req[i-1][m].north);
+				t[i][j]->ack_rx[2](ack[i-1][m].north);
+				t[i][j]->buffer_full_status_rx[2](buffer_full_status[i-1][m].north);
+				//tx signals not required for butterfly
+				t[i][j]->flit_tx[2](*flit_dummy_signal);
+				t[i][j]->req_tx[2](*bool_dummy_signal);
+				t[i][j]->ack_tx[2](*bool_dummy_signal);
+				t[i][j]->buffer_full_status_tx[2](*tbufferfullstatus_dummy_signal);
+
+
+				t[i-1][m]->flit_tx[d](flit[i-1][m].north);
+				t[i-1][m]->req_tx[d](req[i-1][m].north);
+				t[i-1][m]->ack_tx[d](ack[i-1][m].north);
+				t[i-1][m]->buffer_full_status_tx[d](buffer_full_status[i-1][m].north);
+				//tx signals not required for butterfly
+				t[i-1][m]->flit_rx[d](*flit_dummy_signal);
+				t[i-1][m]->req_rx[d](*bool_dummy_signal);
+				t[i-1][m]->ack_rx[d](*bool_dummy_signal);
+				t[i-1][m]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
+	 		}
+		
 		} 
 	    else 
-		{
-		t[i][j]->flit_rx[3](flit[i-1][j].east);
-		t[i][j]->req_rx[3](req[i-1][j].east);
-		t[i][j]->ack_rx[3](ack[i-1][j].south);
-		t[i][j]->buffer_full_status_rx[3](buffer_full_status[i-1][j].south);
-		//tx signals not required for butterfly
-		t[i][j]->flit_tx[3](*flit_dummy_signal);
-		t[i][j]->req_tx[3](*bool_dummy_signal);
-		t[i][j]->ack_tx[3](*bool_dummy_signal);
-		t[i][j]->buffer_full_status_tx[3](*tbufferfullstatus_dummy_signal);
+		{ if (i%2==0) //stage even
+			{
+				//*****Direction 2 *****
+				t[i][j]->flit_rx[2](flit[i][j].south);
+				t[i][j]->req_rx[2](req[i][j].south);
+				t[i][j]->ack_rx[2](ack[i][j].south);
+				t[i][j]->buffer_full_status_rx[2](buffer_full_status[i][j].south);
+				//tx signals not required for butterfly
+				t[i][j]->flit_tx[2](*flit_dummy_signal);
+				t[i][j]->req_tx[2](*bool_dummy_signal);
+				t[i][j]->ack_tx[2](*bool_dummy_signal);
+				t[i][j]->buffer_full_status_tx[2](*tbufferfullstatus_dummy_signal);
 
-		t[i-1][j]->flit_tx[d](flit[i-1][j].east);
-		t[i-1][j]->req_tx[d](req[i-1][j].east);
-		t[i-1][j]->ack_tx[d](ack[i-1][j].south);
-		t[i-1][j]->buffer_full_status_tx[d](buffer_full_status[i-1][j].south);
-		//rx signals not required for butterfly
-		t[i-1][j]->flit_rx[d](*flit_dummy_signal);
-		t[i-1][j]->req_rx[d](*bool_dummy_signal);
-		t[i-1][j]->ack_rx[d](*bool_dummy_signal);
-		t[i-1][j]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
+				t[i-1][j]->flit_tx[d](flit[i][j].south);
+				t[i-1][j]->req_tx[d](req[i][j].south);
+				t[i-1][j]->ack_tx[d](ack[i][j].south);
+				t[i-1][j]->buffer_full_status_tx[d](buffer_full_status[i][j].south);
+				//rx signals not required for butterfly
+				t[i-1][j]->flit_rx[d](*flit_dummy_signal);
+				t[i-1][j]->req_rx[d](*bool_dummy_signal);
+				t[i-1][j]->ack_rx[d](*bool_dummy_signal);
+				t[i-1][j]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
+			 
+			 //*****Direction 3 *****
 
-		t[i][j]->flit_rx[2](flit[i-1][m].east);
-		t[i][j]->req_rx[2](req[i-1][m].east);
-		t[i][j]->ack_rx[2](ack[i-1][m].west);
-		t[i][j]->buffer_full_status_rx[2](buffer_full_status[i-1][m].west);
-		//tx signals not required for butterfly
-		t[i][j]->flit_tx[2](*flit_dummy_signal);
-		t[i][j]->req_tx[2](*bool_dummy_signal);
-		t[i][j]->ack_tx[2](*bool_dummy_signal);
-		t[i][j]->buffer_full_status_tx[2](*tbufferfullstatus_dummy_signal);
+				t[i][j]->flit_rx[3](flit[i][j].west);
+				t[i][j]->req_rx[3](req[i][j].west);
+				t[i][j]->ack_rx[3](ack[i][j].west);
+				t[i][j]->buffer_full_status_rx[3](buffer_full_status[i][j].west);
+				//tx signals not required for butterfly
+				t[i][j]->flit_tx[3](*flit_dummy_signal);
+				t[i][j]->req_tx[3](*bool_dummy_signal);
+				t[i][j]->ack_tx[3](*bool_dummy_signal);
+				t[i][j]->buffer_full_status_tx[3](*tbufferfullstatus_dummy_signal);
 
-		t[i-1][m]->flit_tx[d](flit[i-1][m].east);
-		t[i-1][m]->req_tx[d](req[i-1][m].east);
-		t[i-1][m]->ack_tx[d](ack[i-1][m].west);
-		t[i-1][m]->buffer_full_status_tx[d](buffer_full_status[i-1][m].west);
-		//rx signals not required for butterfly
-		t[i-1][m]->flit_rx[d](*flit_dummy_signal);
-		t[i-1][m]->req_rx[d](*bool_dummy_signal);
-		t[i-1][m]->ack_rx[d](*bool_dummy_signal);
-		t[i-1][m]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
+				t[i-1][m]->flit_tx[d](flit[i][j].west);
+				t[i-1][m]->req_tx[d](req[i][j].west);
+				t[i-1][m]->ack_tx[d](ack[i][j].west);
+				t[i-1][m]->buffer_full_status_tx[d](buffer_full_status[i][j].west);
+				//rx signals not required for butterfly
+				t[i-1][m]->flit_rx[d](*flit_dummy_signal);
+				t[i-1][m]->req_rx[d](*bool_dummy_signal);
+				t[i-1][m]->ack_rx[d](*bool_dummy_signal);
+				t[i-1][m]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
+			}
+			else
+			{
+				//*****Direction 2 *****
+				t[i][j]->flit_rx[2](flit[i-1][j].east);
+				t[i][j]->req_rx[2](req[i-1][j].east);
+				t[i][j]->ack_rx[2](ack[i-1][j].east);
+				t[i][j]->buffer_full_status_rx[2](buffer_full_status[i-1][j].east);
+				//tx signals not required for butterfly
+				t[i][j]->flit_tx[2](*flit_dummy_signal);
+				t[i][j]->req_tx[2](*bool_dummy_signal);
+				t[i][j]->ack_tx[2](*bool_dummy_signal);
+				t[i][j]->buffer_full_status_tx[2](*tbufferfullstatus_dummy_signal);
+
+				t[i-1][j]->flit_tx[d](flit[i-1][j].east);
+				t[i-1][j]->req_tx[d](req[i-1][j].east);
+				t[i-1][j]->ack_tx[d](ack[i-1][j].east);
+				t[i-1][j]->buffer_full_status_tx[d](buffer_full_status[i-1][j].east);
+				//rx signals not required for butterfly
+				t[i-1][j]->flit_rx[d](*flit_dummy_signal);
+				t[i-1][j]->req_rx[d](*bool_dummy_signal);
+				t[i-1][j]->ack_rx[d](*bool_dummy_signal);
+				t[i-1][j]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
+	
+				//*****Direction 3 ****
+				t[i][j]->flit_rx[3](flit[i-1][m].east);
+				t[i][j]->req_rx[3](req[i-1][m].east);
+				t[i][j]->ack_rx[3](ack[i-1][m].east);
+				t[i][j]->buffer_full_status_rx[3](buffer_full_status[i-1][m].east);
+				//tx signals not required for butterfly
+				t[i][j]->flit_tx[3](*flit_dummy_signal);
+				t[i][j]->req_tx[3](*bool_dummy_signal);
+				t[i][j]->ack_tx[3](*bool_dummy_signal);
+				t[i][j]->buffer_full_status_tx[3](*tbufferfullstatus_dummy_signal);
+
+				t[i-1][m]->flit_tx[d](flit[i-1][m].east);
+				t[i-1][m]->req_tx[d](req[i-1][m].east);
+				t[i-1][m]->ack_tx[d](ack[i-1][m].east);
+				t[i-1][m]->buffer_full_status_tx[d](buffer_full_status[i-1][m].east);
+				//rx signals not required for butterfly
+				t[i-1][m]->flit_rx[d](*flit_dummy_signal);
+				t[i-1][m]->req_rx[d](*bool_dummy_signal);
+				t[i-1][m]->ack_rx[d](*bool_dummy_signal);
+				t[i-1][m]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
+			}
+
 		}
+			
 
 	    // sw(1,0) connected to dir 0 of sw(0,0) -> dir 3
 	    /*
