@@ -276,7 +276,7 @@ Packet ProcessingElement::trafficRandom()
     if (GlobalParams::butterfly_tiles == 0)
          max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) - 1; //Mesh 
     else    //Butterfly
-         max_id = ((log2(GlobalParams::butterfly_tiles))*(GlobalParams::butterfly_tiles/2))+ GlobalParams::butterfly_tiles; 
+         max_id = ((log2(GlobalParams::butterfly_tiles))*(GlobalParams::butterfly_tiles/2))+ GlobalParams::butterfly_tiles-1; 
 
     // Random destination distribution
     do {

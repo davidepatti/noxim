@@ -489,8 +489,8 @@ void NoC::buildButterfly()
    	 {	
 		t[stg-1][i]->flit_tx[0](flit[stg-1][i].north); // ack .east
 		t[stg-1][i]->req_tx[0](req[stg-1][i].north);
-		t[stg-1][i]->ack_tx[0](ack[stg-1][i].east);
-		t[stg-1][i]->buffer_full_status_tx[0](buffer_full_status[stg-1][i].east);
+		t[stg-1][i]->ack_tx[0](ack[stg-1][i].north);
+		t[stg-1][i]->buffer_full_status_tx[0](buffer_full_status[stg-1][i].north);
 		//rx is not required in butterfly
 		t[stg-1][i]->flit_rx[0](*flit_dummy_signal); // ack .east
 		t[stg-1][i]->req_rx[0](*bool_dummy_signal);
@@ -500,8 +500,8 @@ void NoC::buildButterfly()
 
 		core[i*2]->flit_rx[1](flit[stg-1][i].north);
 		core[i*2]->req_rx[1](req[stg-1][i].north);
-		core[i*2]->ack_rx[1](ack[stg-1][i].east);
-		core[i*2]->buffer_full_status_rx[1](buffer_full_status[stg-1][i].east);
+		core[i*2]->ack_rx[1](ack[stg-1][i].north);
+		core[i*2]->buffer_full_status_rx[1](buffer_full_status[stg-1][i].north);
 		//tx is not required in butterfly
 		core[i*2]->flit_tx[1](*flit_dummy_signal);
 		core[i*2]->req_tx[1](*bool_dummy_signal);
