@@ -15,9 +15,9 @@ GlobalStats::GlobalStats(const NoC * _noc)
 {
     noc = _noc;
 
-#ifdef TESTING
+	#ifdef TESTING
     drained_total = 0;
-#endif
+	#endif
 }
 
 double GlobalStats::getAverageDelay()
@@ -25,18 +25,41 @@ double GlobalStats::getAverageDelay()
     unsigned int total_packets = 0;
     double avg_delay = 0.0;
 
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
-	    unsigned int received_packets =
-		noc->t[x][y]->r->stats.getReceivedPackets();
+    if (GlobalParams::butterfly_tiles == 0) //mech
+        {
+        	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+			for (int x = 0; x < GlobalParams::mesh_dim_x; x++) 
+			{
+	    		unsigned int received_packets =
+				noc->t[x][y]->r->stats.getReceivedPackets();
 
-	    if (received_packets) {
-		avg_delay +=
-		    received_packets *
-		    noc->t[x][y]->r->stats.getAverageDelay();
-		total_packets += received_packets;
-	    }
-	}
+	    		if (received_packets) 
+	    		{
+					avg_delay +=
+		   		 	received_packets *
+		    		noc->t[x][y]->r->stats.getAverageDelay();
+					total_packets += received_packets;
+	    		}
+			}
+        }
+    else
+        { 
+        	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+        	{
+        		unsigned int received_packets =
+				noc->core[y]->r->stats.getReceivedPackets();
+
+	    		if (received_packets) 
+	    		{
+					avg_delay +=
+		   		 	received_packets *
+		    		noc->core[y]->r->stats.getAverageDelay();
+					total_packets += received_packets;
+	    		}
+        	}
+
+        }
+    
 
     avg_delay /= (double) total_packets;
 
@@ -59,31 +82,61 @@ double GlobalStats::getMaxDelay()
 {
     double maxd = -1.0;
 
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
-	    Coord coord;
-	    coord.x = x;
-	    coord.y = y;
-	    int node_id = coord2Id(coord);
-	    double d = getMaxDelay(node_id);
-	    if (d > maxd)
-		maxd = d;
-	}
+    if (GlobalParams::butterfly_tiles == 0) //mech
+    {
+    	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+		for (int x = 0; x < GlobalParams::mesh_dim_x; x++) 
+		{
+		    Coord coord;
+		    coord.x = x;
+		    coord.y = y;
+		    int node_id = coord2Id(coord);
+		    double d = getMaxDelay(node_id);
+		    if (d > maxd)
+			maxd = d;
+		}
+
+    }
+    else
+    {
+    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+		{
+		    int node_id = ((GlobalParams::butterfly_tiles/2) * log2(GlobalParams::butterfly_tiles))+y;
+		    double d = getMaxDelay(node_id);
+		    if (d > maxd)
+			maxd = d;
+		}
+    }
 
     return maxd;
 }
 
 double GlobalStats::getMaxDelay(const int node_id)
 {
-    Coord coord = id2Coord(node_id);
+	if (GlobalParams::butterfly_tiles == 0) //mech
+    {
+    	Coord coord = id2Coord(node_id);
 
-    unsigned int received_packets =
-	noc->t[coord.x][coord.y]->r->stats.getReceivedPackets();
+    	unsigned int received_packets =
+		noc->t[coord.x][coord.y]->r->stats.getReceivedPackets();
 
-    if (received_packets)
-	return noc->t[coord.x][coord.y]->r->stats.getMaxDelay();
+	    if (received_packets)
+		return noc->t[coord.x][coord.y]->r->stats.getMaxDelay();
+	    else
+		return -1.0;
+    }
     else
-	return -1.0;
+    {
+    	// index of core is obtained removing the number of total switches from the id
+    	int i = node_id-((GlobalParams::butterfly_tiles/2) * log2(GlobalParams::butterfly_tiles));
+    	unsigned int received_packets =
+		noc->core[i]->r->stats.getReceivedPackets();
+		 if (received_packets)
+		return noc->core[i]->r->stats.getMaxDelay();
+	    else
+		return -1.0;
+    }
+    
 }
 
 double GlobalStats::getMaxDelay(const int src_id, const int dst_id)
@@ -99,18 +152,21 @@ vector < vector < double > > GlobalStats::getMaxDelayMtx()
 {
     vector < vector < double > > mtx;
 
-    mtx.resize(GlobalParams::mesh_dim_y);
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	mtx[y].resize(GlobalParams::mesh_dim_x);
+    assert(GlobalParams::butterfly_tiles == 0); 
+    
+    	mtx.resize(GlobalParams::mesh_dim_y);
+		for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+		mtx[y].resize(GlobalParams::mesh_dim_x);
 
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
-	    Coord coord;
-	    coord.x = x;
-	    coord.y = y;
-	    int id = coord2Id(coord);
-	    mtx[y][x] = getMaxDelay(id);
-	}
+		for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+		for (int x = 0; x < GlobalParams::mesh_dim_x; x++) 
+		{
+		    Coord coord;
+		    coord.x = x;
+		    coord.y = y;
+		    int id = coord2Id(coord);
+		    mtx[y][x] = getMaxDelay(id);
+		}
 
     return mtx;
 }
@@ -159,9 +215,17 @@ unsigned int GlobalStats::getReceivedPackets()
 {
     unsigned int n = 0;
 
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+    if (GlobalParams::butterfly_tiles == 0) //mech
+    {
+    	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
 	    n += noc->t[x][y]->r->stats.getReceivedPackets();
+    }
+    else
+    {
+    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+	    n += noc->core[y]->r->stats.getReceivedPackets();
+    }
 
     return n;
 }
@@ -169,24 +233,43 @@ unsigned int GlobalStats::getReceivedPackets()
 unsigned int GlobalStats::getReceivedFlits()
 {
     unsigned int n = 0;
-
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
+    if (GlobalParams::butterfly_tiles == 0) //mech
+    {
+    	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+		for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
 	    n += noc->t[x][y]->r->stats.getReceivedFlits();
-#ifdef TESTING
+		#ifdef TESTING
 	    drained_total += noc->t[x][y]->r->local_drained;
-#endif
+		#endif
 	}
+    }
+    else
+    {
+    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+	    {
+	    n += noc->core[y]->r->stats.getReceivedFlits();
+		#ifdef TESTING
+	    drained_total += noc->core[y]->r->local_drained;
+		#endif
+        }
+    }
 
     return n;
 }
 
 double GlobalStats::getThroughput()
 {
-
-    int number_of_ip = GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y;
-
-    return (double)getAggregatedThroughput()/(double)(number_of_ip);
+	if (GlobalParams::butterfly_tiles == 0) //mech
+    {
+    	int number_of_ip = GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y;
+    	return (double)getAggregatedThroughput()/(double)(number_of_ip);
+    }
+    else
+    {
+    	int number_of_ip = GlobalParams::butterfly_tiles;
+   		return (double)getAggregatedThroughput()/(double)(number_of_ip);
+    }
+ 
 }
 
 // Only accounting IP that received at least one flit
@@ -195,19 +278,34 @@ double GlobalStats::getActiveThroughput()
     int total_cycles =
 	GlobalParams::simulation_time -
 	GlobalParams::stats_warm_up_time;
-
-
-    unsigned int n = 0;
+	unsigned int n = 0;
     unsigned int trf = 0;
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
-	    unsigned int rf = noc->t[x][y]->r->stats.getReceivedFlits();
+    unsigned int rf ;
+	if (GlobalParams::butterfly_tiles == 0) //mesh
+    {
+    	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+		for (int x = 0; x < GlobalParams::mesh_dim_x; x++) 
+		{
+		    rf = noc->t[x][y]->r->stats.getReceivedFlits();
 
-	    if (rf != 0)
-		n++;
+		    if (rf != 0)
+			n++;
 
-	    trf += rf;
-	}
+		    trf += rf;
+		}
+    }
+    else
+    {
+    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+		{
+		    rf = noc->core[y]->r->stats.getReceivedFlits();
+
+		    if (rf != 0)
+			n++;
+
+		    trf += rf;
+		}
+    }
 
     return (double) trf / (double) (total_cycles * n);
 
@@ -217,15 +315,17 @@ vector < vector < unsigned long > > GlobalStats::getRoutedFlitsMtx()
 {
 
     vector < vector < unsigned long > > mtx;
-
-    mtx.resize(GlobalParams::mesh_dim_y);
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	mtx[y].resize(GlobalParams::mesh_dim_x);
-
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+    assert (GlobalParams::butterfly_tiles == 0); 
+   
+    	mtx.resize(GlobalParams::mesh_dim_y);
+	    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+		mtx[y].resize(GlobalParams::mesh_dim_x);
+		
+	    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
 	    mtx[y][x] = noc->t[x][y]->r->getRoutedFlits();
-
+    
+    
     return mtx;
 }
 
@@ -253,9 +353,18 @@ double GlobalStats::getDynamicPower()
     double power = 0.0;
 
     // Electric noc
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
-	    power += noc->t[x][y]->r->power.getDynamicPower();
+    if (GlobalParams::butterfly_tiles == 0) //mech
+    {
+    	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+    		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+    			power += noc->t[x][y]->r->power.getDynamicPower();
+    }
+    else
+    {
+    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+	    power += noc->core[y]->r->power.getDynamicPower();
+    }
+    
 
     // Wireless noc
     for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();
@@ -276,9 +385,17 @@ double GlobalStats::getStaticPower()
 {
     double power = 0.0;
 
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+    if (GlobalParams::butterfly_tiles == 0) //mech
+    {
+    	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
 	    power += noc->t[x][y]->r->power.getStaticPower();
+    }
+    else
+    {
+    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+	    power += noc->core[y]->r->power.getStaticPower();
+    }
 
     // Wireless noc
     for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();
@@ -297,47 +414,50 @@ double GlobalStats::getStaticPower()
 
 void GlobalStats::showStats(std::ostream & out, bool detailed)
 {
-    if (detailed) {
-	out << endl << "detailed = [" << endl;
-	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
-		noc->t[x][y]->r->stats.showStats(y * GlobalParams:: mesh_dim_x + x, out, true);
-	out << "];" << endl;
+    if (detailed) 
+    {
+    	assert (GlobalParams::butterfly_tiles == 0); 
+		out << endl << "detailed = [" << endl;
 
-	// show MaxDelay matrix
-	vector < vector < double > > md_mtx = getMaxDelayMtx();
+		for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+			noc->t[x][y]->r->stats.showStats(y * GlobalParams:: mesh_dim_x + x, out, true);
+		out << "];" << endl;
 
-	out << endl << "max_delay = [" << endl;
-	for (unsigned int y = 0; y < md_mtx.size(); y++) {
-	    out << "   ";
-	    for (unsigned int x = 0; x < md_mtx[y].size(); x++)
-		out << setw(6) << md_mtx[y][x];
-	    out << endl;
-	}
-	out << "];" << endl;
+		// show MaxDelay matrix
+		vector < vector < double > > md_mtx = getMaxDelayMtx();
 
-	// show RoutedFlits matrix
-	vector < vector < unsigned long > > rf_mtx = getRoutedFlitsMtx();
+		out << endl << "max_delay = [" << endl;
+		for (unsigned int y = 0; y < md_mtx.size(); y++) 
+		{
+		    out << "   ";
+		    for (unsigned int x = 0; x < md_mtx[y].size(); x++)
+			out << setw(6) << md_mtx[y][x];
+		    out << endl;
+		}
+		out << "];" << endl;
 
-	out << endl << "routed_flits = [" << endl;
-	for (unsigned int y = 0; y < rf_mtx.size(); y++) {
-	    out << "   ";
-	    for (unsigned int x = 0; x < rf_mtx[y].size(); x++)
-		out << setw(10) << rf_mtx[y][x];
-	    out << endl;
-	}
-	out << "];" << endl;
+		// show RoutedFlits matrix
+		vector < vector < unsigned long > > rf_mtx = getRoutedFlitsMtx();
 
-	showPowerBreakDown(out);
-	showPowerManagerStats(out);
+		out << endl << "routed_flits = [" << endl;
+		for (unsigned int y = 0; y < rf_mtx.size(); y++) 
+		{
+		    out << "   ";
+		    for (unsigned int x = 0; x < rf_mtx[y].size(); x++)
+			out << setw(10) << rf_mtx[y][x];
+		    out << endl;
+		}
+		out << "];" << endl;
+
+		showPowerBreakDown(out);
+		showPowerManagerStats(out);
     }
 
-    int total_cycles = GlobalParams::simulation_time - GlobalParams::stats_warm_up_time;
+    //int total_cycles = GlobalParams::simulation_time - GlobalParams::stats_warm_up_time;
     out << "% Total received packets: " << getReceivedPackets() << endl;
     out << "% Total received flits: " << getReceivedFlits() << endl;
-    out << "% Received/Ideal flits Ratio: " << getReceivedFlits()
-	/ (GlobalParams::packet_injection_rate * (GlobalParams::min_packet_size +
-		GlobalParams::max_packet_size)/2 * total_cycles * GlobalParams::mesh_dim_y * GlobalParams::mesh_dim_x) << endl;
+    out << "% Received/Ideal flits Ratio: " << getReceivedIdealFlitRatio() << endl;
     out << "% Average wireless utilization: " << getWirelessPackets()/(double)getReceivedPackets() << endl;
     out << "% Global average delay (cycles): " << getAverageDelay() << endl;
     out << "% Max delay (cycles): " << getMaxDelay() << endl;
@@ -356,7 +476,7 @@ void GlobalStats::updatePowerBreakDown(map<string,double> &dst,PowerBreakdown* s
 {
     for (int i=0;i!=src->size;i++)
     {
-	dst[src->breakdown[i].label]+=src->breakdown[i].value;
+		dst[src->breakdown[i].label]+=src->breakdown[i].value;
     }
 }
 
@@ -455,13 +575,25 @@ void GlobalStats::showPowerBreakDown(std::ostream & out)
     map<string,double> power_dynamic;
     map<string,double> power_static;
 
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
-	{
+    if (GlobalParams::butterfly_tiles == 0) //mech
+    {
+    	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+		{
 	    updatePowerBreakDown(power_dynamic, noc->t[x][y]->r->power.getDynamicPowerBreakDown());
-
 	    updatePowerBreakDown(power_static, noc->t[x][y]->r->power.getStaticPowerBreakDown());
-	}
+		}
+    }
+    else
+    {
+    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+		{
+	    updatePowerBreakDown(power_dynamic, noc->core[y]->r->power.getDynamicPowerBreakDown());
+	    updatePowerBreakDown(power_static, noc->core[y]->r->power.getStaticPowerBreakDown());
+		}
+    }
+
+   
 
     for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();
             it != GlobalParams::hub_configuration.end();
@@ -490,11 +622,43 @@ void GlobalStats::showBufferStats(std::ostream & out)
 {
   out << "Router id\tBuffer N\t\tBuffer E\t\tBuffer S\t\tBuffer W\t\tBuffer L" << endl;
   out << "         \tMean\tMax\tMean\tMax\tMean\tMax\tMean\tMax\tMean\tMax" << endl;
-  for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-    for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
-      {
-	out << noc->t[x][y]->r->local_id;
-	noc->t[x][y]->r->ShowBuffersStats(out);
-	out << endl;
-      }
+  
+  if (GlobalParams::butterfly_tiles == 0) //mech
+    {
+    	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+    	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+      	{
+			out << noc->t[x][y]->r->local_id;
+			noc->t[x][y]->r->ShowBuffersStats(out);
+			out << endl;
+     	}
+    }
+    else
+    {
+    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+    	{
+			out << noc->core[y]->r->local_id;
+			noc->core[y]->r->ShowBuffersStats(out);
+			out << endl;
+     	}
+    }
+
+}
+
+double GlobalStats::getReceivedIdealFlitRatio()
+{
+	int total_cycles;
+	total_cycles= GlobalParams::simulation_time - GlobalParams::stats_warm_up_time;
+	double ratio;
+	if (GlobalParams::butterfly_tiles == 0) 
+    {
+	 	ratio = getReceivedFlits() /(GlobalParams::packet_injection_rate * (GlobalParams::min_packet_size +
+		GlobalParams::max_packet_size)/2 * total_cycles * GlobalParams::mesh_dim_y * GlobalParams::mesh_dim_x);
+	}
+	else
+	{
+		ratio = getReceivedFlits() /(GlobalParams::packet_injection_rate * (GlobalParams::min_packet_size +
+		GlobalParams::max_packet_size)/2 * total_cycles * GlobalParams::butterfly_tiles);
+	}
+	return ratio;
 }

@@ -33,7 +33,7 @@ void Router::rxProcess()
     { //if (local_id==10) LOG<<"*RX*****local_id="<<local_id<<"__ack_rx[3]= "<<ack_rx[3].read()<<endl;
 	// This process simply sees a flow of incoming flits. All arbitration
 	// and wormhole related issues are addressed in the txProcess()
-
+	//assert(false);
 	for (int i = 0; i < DIRECTIONS + 2; i++) {
 	    // To accept a new flit, the following conditions must match:
 	    // 1) there is an incoming request

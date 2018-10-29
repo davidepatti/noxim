@@ -75,7 +75,8 @@ SC_MODULE(NoC)
 
     // Constructor
 
-    SC_CTOR(NoC) {
+    SC_CTOR(NoC) 
+    {
 
 	if (GlobalParams::butterfly_tiles == 0)
 	    // Build the Mesh

@@ -87,8 +87,10 @@ Flit ProcessingElement::nextFlit()
 
 bool ProcessingElement::canShot(Packet & packet)
 {
+   // assert(false);
     if(never_transmit) return false;
-    if(local_id!=16) return false;
+   
+    //if(local_id!=16) return false;
     /* DEADLOCK TEST 
 	double current_time = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
 
@@ -297,6 +299,7 @@ Packet ProcessingElement::trafficRandom()
 		range_start += GlobalParams::hotspots[i].second;	// try next
 	}
 #ifdef DEADLOCK_AVOIDANCE
+    assert((GlobalParams::butterfly_tiles == 0));
 	if (p.dst_id%2!=0)
 	{
 	    p.dst_id = (p.dst_id+1)%256;

@@ -77,7 +77,7 @@ void NoC::buildButterfly()
 	    tile_coord.x = i;
 	    tile_coord.y = j;
 	    int tile_id = coord2Id(tile_coord); 
-	    sprintf(tile_name, "Switch[%d][%d]_(#%d)", i, j, tile_id);cout<<"tile_name=" <<tile_name<< " i=" <<i << " j=" << j<< " tile_id "<< tile_id<< endl;
+	    sprintf(tile_name, "Switch[%d][%d]_(#%d)", i, j, tile_id);//cout<<"tile_name=" <<tile_name<< " i=" <<i << " j=" << j<< " tile_id "<< tile_id<< endl;
 	    t[i][j] = new Tile(tile_name, tile_id);
 
 		//cout << "switch  " << i <<  " " << j << "   has an Id = " << tile_id <<  endl;
@@ -634,7 +634,10 @@ void NoC::buildButterfly()
 
     }
     */
+
 }
+
+
 
 void NoC::buildCommon()
 {
@@ -738,6 +741,7 @@ void NoC::buildCommon()
 
     // Var to track Hub connected ports
     hub_connected_ports = (int *) calloc(GlobalParams::hub_configuration.size(), sizeof(int));
+
 }
 void NoC::buildMesh()
 {
@@ -801,8 +805,14 @@ void NoC::buildMesh()
 
 	    // Tell to the PE its coordinates
 	    t[i][j]->pe->local_id = j * GlobalParams::mesh_dim_x + i;
-	    t[i][j]->pe->traffic_table = &gttable;	// Needed to choose destination
-	    t[i][j]->pe->never_transmit = (gttable.occurrencesAsSource(t[i][j]->pe->local_id) == 0);
+	    // Check for traffic table availability
+   		if (GlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
+		{
+			 t[i][j]->pe->traffic_table = &gttable;	// Needed to choose destination
+	   		 t[i][j]->pe->never_transmit = (gttable.occurrencesAsSource(t[i][j]->pe->local_id) == 0);
+		}
+		else
+			t[i][j]->pe->never_transmit = false;
 
 	    // Map clock and reset
 	    t[i][j]->clock(clock);
@@ -951,15 +961,24 @@ void NoC::buildMesh()
 	nop_data[GlobalParams::mesh_dim_x][j].west.write(tmp_NoP);
 
     }
+
 }
 
 Tile *NoC::searchNode(const int id) const
 {
+	if (GlobalParams::butterfly_tiles == 0) 
+    {
     for (int i = 0; i < GlobalParams::mesh_dim_x; i++)
-	for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
-	    if (t[i][j]->r->local_id == id)
-		return t[i][j];
-
+		for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
+	    	if (t[i][j]->r->local_id == id)
+				return t[i][j];
+	}
+	else
+	{
+		for (int i = 0; i < GlobalParams::butterfly_tiles; i++)
+	   	 	if (core[i]->r->local_id == id)
+				return core[i];
+	}
     return NULL;
 }
 

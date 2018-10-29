@@ -104,12 +104,13 @@ int sc_main(int arg_num, char *arg_vet[])
     cout << " Now running for " << GlobalParams:: simulation_time << " cycles..." << endl;
     sc_start(GlobalParams::simulation_time, SC_NS);
 
+
     // Close the simulation
     if (GlobalParams::trace_mode) sc_close_vcd_trace_file(tf);
     cout << "Noxim simulation completed.";
     cout << " (" << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " cycles executed)" << endl;
     cout << endl;
-
+//assert(false);
     // Show statistics
     GlobalStats gs(n);
     gs.showStats(std::cout, GlobalParams::detailed);
