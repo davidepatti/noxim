@@ -22,7 +22,9 @@ MODULE := noxim
 
 CXX      := g++
 OPT      := -O3
-DEBUG    := # -g -DDEBUG
+# to enable logs with LOG macro, uncomment "-g DDEBUG" in the line below
+# and recompile everythin (make clean)
+DEBUG    :=  -g -DDEBUG
 OTHER    := -Wall -DSC_NO_WRITE_CHECK --std=c++11 # -Wno-deprecated
 CXXFLAGS := $(OPT) $(OTHER) $(DEBUG)
 
