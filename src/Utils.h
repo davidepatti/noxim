@@ -172,22 +172,23 @@ inline Coord id2Coord(int id)
 {   
     Coord coord; 
     if (GlobalParams::butterfly_tiles == 0)
-        {
-        coord.x = id % GlobalParams::mesh_dim_x;
-        coord.y = id / GlobalParams::mesh_dim_x;
+    {
+	coord.x = id % GlobalParams::mesh_dim_x;
+	coord.y = id / GlobalParams::mesh_dim_x;
 
-        assert(coord.x < GlobalParams::mesh_dim_x);
-        assert(coord.y < GlobalParams::mesh_dim_y);
-        }
+	assert(coord.x < GlobalParams::mesh_dim_x);
+	assert(coord.y < GlobalParams::mesh_dim_y);
+    }
     else
-        { 
-        coord.x = id / (int)(GlobalParams::butterfly_tiles/2);
-        coord.y = id % (int)(GlobalParams::butterfly_tiles/2);
-       
-        assert(coord.x < log2(GlobalParams::butterfly_tiles));
-        assert(coord.y < (GlobalParams::butterfly_tiles/2));
+    { 
+	id = id - GlobalParams::butterfly_tiles;
+	coord.x = id / (int)(GlobalParams::butterfly_tiles/2);
+	coord.y = id % (int)(GlobalParams::butterfly_tiles/2);
 
-        }
+	assert(coord.x < log2(GlobalParams::butterfly_tiles));
+	assert(coord.y < (GlobalParams::butterfly_tiles/2));
+
+    }
     return coord;
 }
 
@@ -195,16 +196,15 @@ inline int coord2Id(const Coord & coord)
 {
     int id;
     if (GlobalParams::butterfly_tiles == 0)
-	    {
-	    id = (coord.y * GlobalParams::mesh_dim_x) + coord.x;
-	    assert(id < GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y);
-	    }
-	else
-	    { //use only for switch bloc
-	    id = (coord.x * (GlobalParams::butterfly_tiles/2)) + coord.y;
-	    assert(id < (GlobalParams::butterfly_tiles/2) * log2(GlobalParams::butterfly_tiles));
-	    }
-    
+    {
+	id = (coord.y * GlobalParams::mesh_dim_x) + coord.x;
+	assert(id < GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y);
+    }
+    else
+    { //use only for switch bloc
+	id = (coord.x * (GlobalParams::butterfly_tiles/2)) + coord.y + GlobalParams::butterfly_tiles;
+	assert(id > (GlobalParams::butterfly_tiles-1));
+    }
 
     return id;
 }

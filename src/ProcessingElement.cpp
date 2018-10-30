@@ -201,6 +201,8 @@ Packet ProcessingElement::trafficLocal()
 
 int ProcessingElement::findRandomDestination(int id, int hops)
 {
+    assert(GlobalParams::butterfly_tiles==0);
+
     int inc_y = rand()%2?-1:1;
     int inc_x = rand()%2?-1:1;
     
@@ -276,16 +278,13 @@ Packet ProcessingElement::trafficRandom()
     int max_id;
 
     if (GlobalParams::butterfly_tiles == 0)
-         max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) - 1; //Mesh 
+	max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) - 1; //Mesh 
     else    //Butterfly
-         max_id = ((log2(GlobalParams::butterfly_tiles))*(GlobalParams::butterfly_tiles/2))+ GlobalParams::butterfly_tiles-1; 
+	max_id = GlobalParams::butterfly_tiles-1; 
 
     // Random destination distribution
     do {
-        if (GlobalParams::butterfly_tiles == 0) //Mesh
-            p.dst_id = randInt(0, max_id);
-        else //Butterfly
-	        p.dst_id = randInt((log2(GlobalParams::butterfly_tiles))*(GlobalParams::butterfly_tiles/2 ), max_id);
+	p.dst_id = randInt(0, max_id);
 
 	// check for hotspot destination
 	for (size_t i = 0; i < GlobalParams::hotspots.size(); i++) {
@@ -299,7 +298,7 @@ Packet ProcessingElement::trafficRandom()
 		range_start += GlobalParams::hotspots[i].second;	// try next
 	}
 #ifdef DEADLOCK_AVOIDANCE
-    assert((GlobalParams::butterfly_tiles == 0));
+	assert((GlobalParams::butterfly_tiles == 0));
 	if (p.dst_id%2!=0)
 	{
 	    p.dst_id = (p.dst_id+1)%256;
@@ -330,6 +329,7 @@ Packet ProcessingElement::trafficTest()
 
 Packet ProcessingElement::trafficTranspose1()
 {
+    assert(GlobalParams::butterfly_tiles==0);
     Packet p;
     p.src_id = local_id;
     Coord src, dst;
@@ -351,6 +351,7 @@ Packet ProcessingElement::trafficTranspose1()
 
 Packet ProcessingElement::trafficTranspose2()
 {
+    assert(GlobalParams::butterfly_tiles==0);
     Packet p;
     p.src_id = local_id;
     Coord src, dst;

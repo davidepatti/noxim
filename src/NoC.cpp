@@ -27,7 +27,6 @@ void NoC::buildButterfly()
     // --- 1- Switch bloc ---
     //-----------------------------
 
-    bool Switch = true;
     int stg = log2(GlobalParams::butterfly_tiles);
     int sw = GlobalParams::butterfly_tiles/2; //sw: switch number in each stage
     
@@ -81,7 +80,6 @@ void NoC::buildButterfly()
 	    t[i][j] = new Tile(tile_name, tile_id);
 
 		//cout << "switch  " << i <<  " " << j << "   has an Id = " << tile_id <<  endl;
-	    SwitchOnly = true;
 	    // Tell to the router its coordinates
 	    t[i][j]->r->configure(tile_id,
 				  GlobalParams::stats_warm_up_time,
@@ -383,15 +381,14 @@ void NoC::buildButterfly()
 
     // Create the Core bloc 
 	
-	for (int i = 0; i < n; i++) { 
+	for (int i = 0; i < n; i++) 
+	{ 
+	    int core_id = i;
 	    // Create the single core with a proper name
 	    char core_name[20];
 	   
-	    int core_id = (sw*stg)+i; //cout<< "core_id = "<< core_id << endl;
-	    sprintf(core_name, "Core_(#%d)", core_id); //cout<< "core_id = "<< core_id << endl;
+	    sprintf(core_name, "Core_(#%d)",core_id); //cout<< "core_id = "<< core_id << endl;
 	    core[i] = new Tile(core_name, core_id);
-	        
-	    SwitchOnly = false;
 
 	    // Tell to the Core router its coordinates
 	    core[i]->r->configure( core_id,
@@ -966,19 +963,15 @@ void NoC::buildMesh()
 
 Tile *NoC::searchNode(const int id) const
 {
-	if (GlobalParams::butterfly_tiles == 0) 
+    if (GlobalParams::butterfly_tiles == 0) 
     {
-    for (int i = 0; i < GlobalParams::mesh_dim_x; i++)
-		for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
-	    	if (t[i][j]->r->local_id == id)
-				return t[i][j];
-	}
-	else
-	{
-		for (int i = 0; i < GlobalParams::butterfly_tiles; i++)
-	   	 	if (core[i]->r->local_id == id)
-				return core[i];
-	}
+	for (int i = 0; i < GlobalParams::mesh_dim_x; i++)
+	    for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
+		if (t[i][j]->r->local_id == id)
+		    return t[i][j];
+    }
+    else // in butterfly, id equals to the vector index
+	return core[id];
     return NULL;
 }
 
@@ -989,6 +982,11 @@ void NoC::asciiMonitor()
     //
     // asciishow proof-of-concept #1 free slots
    
+    if (GlobalParams::butterfly_tiles)
+    {
+	cout << "Butterfly topology not supported for asciimonitor option!";
+	assert(false);
+    }
     for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
     {
 	for (int s = 0; s<3; s++)

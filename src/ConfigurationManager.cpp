@@ -304,6 +304,14 @@ void checkConfiguration()
 	exit(1);
     }
 
+    if (GlobalParams::butterfly_tiles)
+    {
+	if (GlobalParams::routing_algorithm!="BFLY")
+	{
+	    cerr << "Error: butterfly topology only supported in BFLY routing algorithm " << endl;
+	    exit(1);
+	}
+    }
 
     for (unsigned int i = 0; i < GlobalParams::hotspots.size(); i++) {
 	if (GlobalParams::hotspots[i].first >=

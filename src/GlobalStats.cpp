@@ -101,8 +101,7 @@ double GlobalStats::getMaxDelay()
     {
     	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
 		{
-		    int node_id = ((GlobalParams::butterfly_tiles/2) * log2(GlobalParams::butterfly_tiles))+y;
-		    double d = getMaxDelay(node_id);
+		    double d = getMaxDelay(y);
 		    if (d > maxd)
 			maxd = d;
 		}
@@ -113,7 +112,7 @@ double GlobalStats::getMaxDelay()
 
 double GlobalStats::getMaxDelay(const int node_id)
 {
-	if (GlobalParams::butterfly_tiles == 0) //mech
+	if (GlobalParams::butterfly_tiles == 0) //mesh
     {
     	Coord coord = id2Coord(node_id);
 
@@ -127,12 +126,10 @@ double GlobalStats::getMaxDelay(const int node_id)
     }
     else
     {
-    	// index of core is obtained removing the number of total switches from the id
-    	int i = node_id-((GlobalParams::butterfly_tiles/2) * log2(GlobalParams::butterfly_tiles));
     	unsigned int received_packets =
-		noc->core[i]->r->stats.getReceivedPackets();
+		noc->core[node_id]->r->stats.getReceivedPackets();
 		 if (received_packets)
-		return noc->core[i]->r->stats.getMaxDelay();
+		return noc->core[node_id]->r->stats.getMaxDelay();
 	    else
 		return -1.0;
     }

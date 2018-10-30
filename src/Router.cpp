@@ -448,6 +448,8 @@ int Router::reflexDirection(int direction) const
 
 int Router::getNeighborId(int _id, int direction) const
 {
+    assert(GlobalParams::butterfly_tiles==0);
+
     Coord my_coord = id2Coord(_id); 
 
     switch (direction) {
