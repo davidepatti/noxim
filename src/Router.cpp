@@ -70,7 +70,7 @@ void Router::rxProcess()
 		{
 			// should not happen with the new TBufferFullStatus control signals    
 		    // except for flit coming from local PE, which don't use it 
-		   // LOG << " Flit BFLY " << received_flit << " buffer full Input[" << i << "][" << vc <<"]" << endl;
+		    LOG << " Flit BFLY " << received_flit << " buffer full Input[" << i << "][" << vc <<"]" << endl;
 		    assert(i== DIRECTION_LOCAL);
 		}
 		   

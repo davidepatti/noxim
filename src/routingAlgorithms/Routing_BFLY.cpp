@@ -17,7 +17,7 @@ vector<int> Routing_BFLY::route(Router * router, const RouteData & routeData)
 {
     vector <int> directions;
 
-    int switch_offset = GlobalParams::butterfly_tiles;
+   // int switch_offset = GlobalParams::butterfly_tiles;
 
     // first hop (core->1st stage)
     if (routeData.current_id  < GlobalParams::butterfly_tiles)
@@ -26,9 +26,9 @@ vector<int> Routing_BFLY::route(Router * router, const RouteData & routeData)
     { // for switch bloc
 	int destination = routeData.dst_id;
 	//LOG << "I am switch: " <<routeData.current_id << "  _Going to destination: " <<destination<<endl;
-	int currentStage = id2Coord(routeData.current_id-switch_offset).x;
+	int currentStage = id2Coord(routeData.current_id).x;
 
-	int shift_amount= log2(GlobalParams::butterfly_tiles)-1- currentStage;
+	int shift_amount= log2(GlobalParams::butterfly_tiles)-1-currentStage;
 	int direction = 1 & (destination >> shift_amount);
 
 	// LOG << "I am again switch: " <<routeData.current_id << "  _Going to destination: " <<destination<< "  _Via direction "<<direction <<endl;
