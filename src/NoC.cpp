@@ -405,8 +405,14 @@ void NoC::buildButterfly()
 
 	    // Tell to the PE its coordinates
 	    core[i]->pe->local_id = core_id;
-	    core[i]->pe->traffic_table = &gttable;	// Needed to choose destination
-	    core[i]->pe->never_transmit = false;
+	    // Check for traffic table availability
+   		if (GlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
+		{
+			 core[i]->pe->traffic_table = &gttable;	// Needed to choose destination
+	   		 core[i]->pe->never_transmit = (gttable.occurrencesAsSource(core[i]->pe->local_id) == 0);
+		}
+		else
+			core[i]->pe->never_transmit = false;
 
 	    // Map clock and reset
 	    core[i]->clock(clock);
@@ -802,6 +808,7 @@ void NoC::buildMesh()
 
 	    // Tell to the PE its coordinates
 	    t[i][j]->pe->local_id = j * GlobalParams::mesh_dim_x + i;
+
 	    // Check for traffic table availability
    		if (GlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
 		{

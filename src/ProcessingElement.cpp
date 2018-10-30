@@ -145,8 +145,7 @@ bool ProcessingElement::canShot(Packet & packet)
 	bool use_pir = (transmittedAtPreviousCycle == false);
 	vector < pair < int, double > > dst_prob;
 	double threshold =
-	    traffic_table->getCumulativePirPor(local_id, (int) now,
-					       use_pir, dst_prob);
+	    traffic_table->getCumulativePirPor(local_id, (int) now, use_pir, dst_prob);
 
 	double prob = (double) rand() / RAND_MAX;
 	shot = (prob < threshold);
