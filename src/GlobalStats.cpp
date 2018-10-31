@@ -451,6 +451,25 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 		showPowerManagerStats(out);
     }
 
+#ifdef DEBUG
+
+    if (GlobalParams::butterfly_tiles)
+    {
+	out << "Queue sizes: " ;
+	for (int i=0;i<GlobalParams::butterfly_tiles;i++)
+		out << "PE"<<i << ": " << noc->core[i]->pe->getQueueSize()<< ",";
+	out << endl;
+    }
+    else
+    {
+
+		for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+			out << "PE["<<x << "," << y<< "]" << noc->t[x][y]->pe->getQueueSize()<< ",";
+    }
+	
+#endif
+
     //int total_cycles = GlobalParams::simulation_time - GlobalParams::stats_warm_up_time;
     out << "% Total received packets: " << getReceivedPackets() << endl;
     out << "% Total received flits: " << getReceivedFlits() << endl;

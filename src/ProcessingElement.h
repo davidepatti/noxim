@@ -74,6 +74,7 @@ SC_MODULE(ProcessingElement)
 
     int roulett();
     int findRandomDestination(int local_id,int hops);
+    unsigned int getQueueSize() const;
 
     // Constructor
     SC_CTOR(ProcessingElement) {
