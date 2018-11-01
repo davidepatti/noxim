@@ -453,10 +453,10 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 
 #ifdef DEBUG
 
-    if (GlobalParams::butterfly_tiles)
+    if (GlobalParams::n_delta_tiles)
     {
 	out << "Queue sizes: " ;
-	for (int i=0;i<GlobalParams::butterfly_tiles;i++)
+	for (int i=0;i<GlobalParams::n_delta_tiles;i++)
 		out << "PE"<<i << ": " << noc->core[i]->pe->getQueueSize()<< ",";
 	out << endl;
     }
