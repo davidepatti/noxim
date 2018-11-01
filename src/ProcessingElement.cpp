@@ -482,3 +482,9 @@ int ProcessingElement::getRandomSize()
     return randInt(GlobalParams::min_packet_size,
 		   GlobalParams::max_packet_size);
 }
+
+unsigned int ProcessingElement::getQueueSize() const
+{
+    return packet_queue.size();
+}
+
