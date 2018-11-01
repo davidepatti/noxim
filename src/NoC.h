@@ -78,12 +78,15 @@ SC_MODULE(NoC)
     SC_CTOR(NoC) 
     {
 
-	if (GlobalParams::butterfly_tiles == 0)
+	if (GlobalParams::topology == TOPOLOGY_MESH)
 	    // Build the Mesh
 	    buildMesh();
-	else
+	else if (GlobalParams::topology == TOPOLOGY_BUTTERFLY)
 	    buildButterfly();
-	
+    else {
+        cerr << "ERROR: Topology " << GlobalParams::topology << " is not yet supported." << endl;
+        exit(0);
+    }
 	GlobalParams::channel_selection = CHSEL_RANDOM;
 	// out of yaml configuration (experimental features)
 	//GlobalParams::channel_selection = CHSEL_FIRST_FREE;

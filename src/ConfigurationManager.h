@@ -24,6 +24,12 @@ using namespace std;
 
 void configure(int arg_num, char *arg_vet[]);
 
+template <typename T> 
+T readParam(YAML::Node node, string param, T default_value);
+
+template <typename T> 
+T readParam(YAML::Node node, string param);
+
 namespace YAML {
     template<>
     struct convert<HubConfig> {

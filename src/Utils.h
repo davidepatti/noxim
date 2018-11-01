@@ -171,7 +171,7 @@ inline void sc_trace(sc_trace_file * &tf, const ChannelStatus & bs, string & nam
 inline Coord id2Coord(int id)
 {   
     Coord coord; 
-    if (GlobalParams::butterfly_tiles == 0)
+    if (GlobalParams::n_delta_tiles == 0)
     {
 	coord.x = id % GlobalParams::mesh_dim_x;
 	coord.y = id / GlobalParams::mesh_dim_x;
@@ -181,12 +181,12 @@ inline Coord id2Coord(int id)
     }
     else
     { 
-	id = id - GlobalParams::butterfly_tiles;
-	coord.x = id / (int)(GlobalParams::butterfly_tiles/2);
-	coord.y = id % (int)(GlobalParams::butterfly_tiles/2);
+	id = id - GlobalParams::n_delta_tiles;
+	coord.x = id / (int)(GlobalParams::n_delta_tiles/2);
+	coord.y = id % (int)(GlobalParams::n_delta_tiles/2);
 
-	assert(coord.x < log2(GlobalParams::butterfly_tiles));
-	assert(coord.y < (GlobalParams::butterfly_tiles/2));
+	assert(coord.x < log2(GlobalParams::n_delta_tiles));
+	assert(coord.y < (GlobalParams::n_delta_tiles/2));
 
     }
     return coord;
@@ -195,15 +195,15 @@ inline Coord id2Coord(int id)
 inline int coord2Id(const Coord & coord)
 {
     int id;
-    if (GlobalParams::butterfly_tiles == 0)
+    if (GlobalParams::n_delta_tiles == 0)
     {
 	id = (coord.y * GlobalParams::mesh_dim_x) + coord.x;
 	assert(id < GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y);
     }
     else
     { //use only for switch bloc
-	id = (coord.x * (GlobalParams::butterfly_tiles/2)) + coord.y + GlobalParams::butterfly_tiles;
-	assert(id > (GlobalParams::butterfly_tiles-1));
+	id = (coord.x * (GlobalParams::n_delta_tiles/2)) + coord.y + GlobalParams::n_delta_tiles;
+	assert(id > (GlobalParams::n_delta_tiles-1));
     }
 
     return id;
@@ -254,7 +254,7 @@ template<typename T> std::string i_to_string(const T& t){
 
 inline bool YouAreSwitch(int id)
 {
-    if (id < (GlobalParams::butterfly_tiles/2) * log2(GlobalParams::butterfly_tiles))
+    if (id < (GlobalParams::n_delta_tiles/2) * log2(GlobalParams::n_delta_tiles))
     return true;
     else return false;
 }
