@@ -200,7 +200,7 @@ Packet ProcessingElement::trafficLocal()
 
 int ProcessingElement::findRandomDestination(int id, int hops)
 {
-    assert(GlobalParams::n_delta_tiles==0);
+    assert(GlobalParams::topology == TOPOLOGY_MESH);
 
     int inc_y = rand()%2?-1:1;
     int inc_x = rand()%2?-1:1;
@@ -276,7 +276,7 @@ Packet ProcessingElement::trafficRandom()
     double range_start = 0.0;
     int max_id;
 
-    if (GlobalParams::n_delta_tiles == 0)
+    if (GlobalParams::topology == TOPOLOGY_MESH)
 	max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) - 1; //Mesh 
     else    //Butterfly
 	max_id = GlobalParams::n_delta_tiles-1; 
@@ -297,7 +297,7 @@ Packet ProcessingElement::trafficRandom()
 		range_start += GlobalParams::hotspots[i].second;	// try next
 	}
 #ifdef DEADLOCK_AVOIDANCE
-	assert((GlobalParams::n_delta_tiles == 0));
+	assert((GlobalParams::topology == TOPOLOGY_MESH));
 	if (p.dst_id%2!=0)
 	{
 	    p.dst_id = (p.dst_id+1)%256;
@@ -328,7 +328,7 @@ Packet ProcessingElement::trafficTest()
 
 Packet ProcessingElement::trafficTranspose1()
 {
-    assert(GlobalParams::n_delta_tiles==0);
+    assert(GlobalParams::topology == TOPOLOGY_MESH);
     Packet p;
     p.src_id = local_id;
     Coord src, dst;
@@ -350,7 +350,7 @@ Packet ProcessingElement::trafficTranspose1()
 
 Packet ProcessingElement::trafficTranspose2()
 {
-    assert(GlobalParams::n_delta_tiles==0);
+    assert(GlobalParams::topology == TOPOLOGY_MESH);
     Packet p;
     p.src_id = local_id;
     Coord src, dst;

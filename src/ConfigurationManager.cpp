@@ -327,7 +327,7 @@ void checkConfiguration()
 	exit(1);
     }
 
-    if (GlobalParams::n_delta_tiles)
+    if (GlobalParams::topology == TOPOLOGY_BUTTERFLY)
     {
 	if (GlobalParams::routing_algorithm!="BFLY")
 	{

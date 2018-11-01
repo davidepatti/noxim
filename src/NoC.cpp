@@ -970,7 +970,7 @@ void NoC::buildMesh()
 
 Tile *NoC::searchNode(const int id) const
 {
-    if (GlobalParams::n_delta_tiles == 0) 
+    if (GlobalParams::topology == TOPOLOGY_MESH) 
     {
 	for (int i = 0; i < GlobalParams::mesh_dim_x; i++)
 	    for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
@@ -978,7 +978,7 @@ Tile *NoC::searchNode(const int id) const
 		    return t[i][j];
     }
     else // in butterfly, id equals to the vector index
-	return core[id];
+	    return core[id];
     return NULL;
 }
 
@@ -989,7 +989,7 @@ void NoC::asciiMonitor()
     //
     // asciishow proof-of-concept #1 free slots
    
-    if (GlobalParams::n_delta_tiles)
+    if (GlobalParams::topology == TOPOLOGY_BUTTERFLY)
     {
 	cout << "Butterfly topology not supported for asciimonitor option!";
 	assert(false);
