@@ -82,7 +82,11 @@ SC_MODULE(NoC)
 	    // Build the Mesh
 	    buildMesh();
 	else
+    {
 	    buildButterfly();
+        buildBaseline();
+        buildOmega();
+    }
 	
 	GlobalParams::channel_selection = CHSEL_RANDOM;
 	// out of yaml configuration (experimental features)
@@ -103,6 +107,8 @@ SC_MODULE(NoC)
 
     void buildMesh();
     void buildButterfly();
+    void buildBaseline();
+    void buildOmega();
     void buildCommon();
     void asciiMonitor();
     int * hub_connected_ports;
