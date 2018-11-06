@@ -83,9 +83,9 @@ SC_MODULE(NoC)
 	    buildMesh();
 	else
     {
-	    buildButterfly();
-        buildBaseline();
-        buildOmega();
+	buildButterfly();
+        // buildBaseline();
+        // buildOmega();
     }
 	
 	GlobalParams::channel_selection = CHSEL_RANDOM;

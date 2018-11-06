@@ -644,13 +644,13 @@ void NoC::buildButterfly()
 void NoC::buildBaseline()
 {
 
-	buildCommon();
+    buildCommon();
 
      //-----------------------------
      // --- 1- Switch bloc ---
     //-----------------------------
 
-	int stg = log2(GlobalParams::butterfly_tiles);
+    int stg = log2(GlobalParams::butterfly_tiles);
     int sw = GlobalParams::butterfly_tiles/2; //sw: switch number in each stage
      
     int d = 1; //starting dir is changed at first iteration
