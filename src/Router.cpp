@@ -30,7 +30,8 @@ void Router::rxProcess()
 	local_drained = 0;
     } 
     else 
-    { //if (local_id==10) LOG<<"*RX*****local_id="<<local_id<<"__ack_rx[3]= "<<ack_rx[3].read()<<endl;
+    { 
+	//if (local_id==16) LOG<<"*RX*****local_id= "__ack_rx[3]= "<<ack_rx[3].read()<<endl;
 	// This process simply sees a flow of incoming flits. All arbitration
 	// and wormhole related issues are addressed in the txProcess()
 	//assert(false);
@@ -38,42 +39,44 @@ void Router::rxProcess()
 	    // To accept a new flit, the following conditions must match:
 	    // 1) there is an incoming request
 	    // 2) there is a free slot in the input buffer of direction i
-		//LOG<<"****RX****DIRECTION ="<<i<<  endl;
-		//LOG<<"_current_level_rx="<<current_level_rx[i]<<"_req_rx= "<<req_rx[i].read()<<"_ack="<<ack_rx[i].read()<< endl;
+	    //LOG<<"****RX****DIRECTION ="<<i<<  endl;
+
+	    //if (local_id==16) LOG<<"_current_level_rx="<<current_level_rx[i]<<" req_rx= "<<req_rx[i].read()<<"_ack="<<ack_rx[i].read()<< endl;
+
 	    if (req_rx[i].read() == 1 - current_level_rx[i])
 	    { 
-	    	Flit received_flit = flit_rx[i].read();
-	    	//LOG<<"request opposite to the current_level, reading flit "<<received_flit<<endl;
-	    	
-			int vc = received_flit.vc_id;
+		Flit received_flit = flit_rx[i].read();
+		//LOG<<"request opposite to the current_level, reading flit "<<received_flit<<endl;
 
-			if (!buffer[i][vc].IsFull()) 
-			{
+		int vc = received_flit.vc_id;
 
-		    	// Store the incoming flit in the circular buffer
-		   	 	buffer[i][vc].Push(received_flit);
+		if (!buffer[i][vc].IsFull()) 
+		{
 
-		    	LOG << " Flit " << received_flit << " collected from Input[" << i << "][" << vc <<"]" << endl;
+		    // Store the incoming flit in the circular buffer
+		    buffer[i][vc].Push(received_flit);
+		    //if (local_id==16) buffer[i][vc].Print();
+		    LOG << " Flit " << received_flit << " collected from Input[" << i << "][" << vc <<"]" << endl;
 
-		    	power.bufferRouterPush();
+		    power.bufferRouterPush();
 
-		    	// Negate the old value for Alternating Bit Protocol (ABP)
-		    	//LOG<<"INVERTING CL FROM "<< current_level_rx[i]<< " TO "<<  1 - current_level_rx[i]<<endl;
-		    	current_level_rx[i] = 1 - current_level_rx[i];
+		    // Negate the old value for Alternating Bit Protocol (ABP)
+		    //LOG<<"INVERTING CL FROM "<< current_level_rx[i]<< " TO "<<  1 - current_level_rx[i]<<endl;
+		    current_level_rx[i] = 1 - current_level_rx[i];
 
-		    	// if a new flit is injected from local PE
-		    	if (received_flit.src_id == local_id)
-		      	power.networkInterface();
+		    // if a new flit is injected from local PE
+		    if (received_flit.src_id == local_id)
+			power.networkInterface();
 		}
 
-		else 
+		else  // buffer full
 		{
-			// should not happen with the new TBufferFullStatus control signals    
+		    // should not happen with the new TBufferFullStatus control signals    
 		    // except for flit coming from local PE, which don't use it 
-		    LOG << " Flit BFLY " << received_flit << " buffer full Input[" << i << "][" << vc <<"]" << endl;
+		    LOG << " Flit " << received_flit << " buffer full Input[" << i << "][" << vc <<"]" << endl;
 		    assert(i== DIRECTION_LOCAL);
 		}
-		   
+
 	    }
 	    ack_rx[i].write(current_level_rx[i]);
 	    //if (local_id==10 && i==3) LOG<<"writing current_level "<< current_level_rx[i]<< " to ack_rx "<<endl;
@@ -239,8 +242,11 @@ void Router::txProcess()
 		  }
 		  else
 		  {
+		      LOG << " Cannot forward Input[" << i << "][" << vc << "] to Output[" << o << "], flit: " << flit << endl;
+		      LOG << " **DEBUG APB: current_level_tx: " << current_level_tx[o] << " ack_tx: " << ack_tx[o].read() << endl;
+		      LOG << " **DEBUG buffer_full_status_tx " << buffer_full_status_tx[o].read().mask[vc] << endl;
+
 		  	//LOG<<"END_NO_cl_tx="<<current_level_tx[o]<<"_req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
-		      LOG << " APB cannot forward Input[" << i << "][" << vc << "] forward to Output[" << o << "], flit: " << flit << endl;
 		      /*
 		      if (flit.flit_type == FLIT_TYPE_HEAD)
 			  reservation_table.release(i,flit.vc_id,o);
