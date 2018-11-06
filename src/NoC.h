@@ -59,6 +59,21 @@ SC_MODULE(NoC)
     // NoP
     sc_signal_NSWE<NoP_data> **nop_data;
 
+    //signals for connecting Core2Hub (just to test wioreless in Butterfly)
+    sc_signal<Flit> *flit_from_hub;
+    sc_signal<Flit> *flit_to_hub;
+
+    sc_signal<bool> *req_from_hub;
+    sc_signal<bool> *req_to_hub;
+
+    sc_signal<bool> *ack_from_hub;
+    sc_signal<bool> *ack_to_hub;
+
+    sc_signal<TBufferFullStatus> *buffer_full_status_from_hub;
+    sc_signal<TBufferFullStatus> *buffer_full_status_to_hub;
+
+
+
     // Matrix of tiles
     Tile ***t;
     Tile ** core;
@@ -83,9 +98,9 @@ SC_MODULE(NoC)
 	    buildMesh();
 	else
     {
-	buildButterfly();
-        // buildBaseline();
-        // buildOmega();
+	    buildButterfly();
+        //buildBaseline();
+        //buildOmega();
     }
 	
 	GlobalParams::channel_selection = CHSEL_RANDOM;

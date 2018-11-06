@@ -51,7 +51,7 @@ void NoC::buildButterfly()
     for (int i=0; i < dimX; i++) {
         req[i] = new sc_signal_NSWEH<bool>[dimY];
         ack[i] = new sc_signal_NSWEH<bool>[dimY];
-	buffer_full_status[i] = new sc_signal_NSWEH<TBufferFullStatus>[dimY];
+		buffer_full_status[i] = new sc_signal_NSWEH<TBufferFullStatus>[dimY];
         flit[i] = new sc_signal_NSWEH<Flit>[dimY];
 
         free_slots[i] = new sc_signal_NSWE<int>[dimY];
@@ -380,6 +380,20 @@ void NoC::buildButterfly()
    
 	core = new Tile*[n];
 
+	//signals instantiation for connecting Core2Hub (just to test wioreless in Butterfly)
+	flit_from_hub = new sc_signal<Flit>[n];
+	flit_to_hub = new sc_signal<Flit>[n];
+
+	req_from_hub = new sc_signal<bool>[n];
+	req_to_hub = new sc_signal<bool>[n];
+
+	ack_from_hub = new sc_signal<bool>[n];
+	ack_to_hub = new sc_signal<bool>[n];
+
+	buffer_full_status_from_hub = new sc_signal<TBufferFullStatus>[n];
+	buffer_full_status_to_hub = new sc_signal<TBufferFullStatus>[n];
+
+
     // Create the Core bloc 
 	
 	for (int i = 0; i < n; i++) 
@@ -418,7 +432,40 @@ void NoC::buildButterfly()
 	    // Map clock and reset
 	    core[i]->clock(clock);
 	    core[i]->reset(reset);
-	} //-------------------------------------end core comment---------------------------------
+
+	    // remplace dummy signal down to complete map core2Hub
+
+        // TODO: Review port index. Connect each Hub to all its Channels // connect Hub2Core
+       for (map<int, int>::iterator it1 = GlobalParams::hub_for_tile.begin(); it1 != GlobalParams::hub_for_tile.end(); it1++ )
+        LOG<<"it1 first "<< it1->first<< "second"<< it1->second<<endl;
+        map<int, int>::iterator it = GlobalParams::hub_for_tile.find(core_id);
+        if (it != GlobalParams::hub_for_tile.end())
+        {
+            int hub_id = GlobalParams::hub_for_tile[core_id];
+
+            
+            // The next time that the same HUB is considered, the next
+            // port will be connected
+            int port = hub_connected_ports[hub_id]++;
+            LOG<<"I am hub "<<hub_id<<" connecting to core "<<core_id<<"using port "<<port<<endl;
+            hub[hub_id]->tile2port_mapping[core[i]->local_id] = port;
+
+            hub[hub_id]->req_rx[port](req_to_hub[core_id]);
+            hub[hub_id]->flit_rx[port](flit_to_hub[core_id]);
+            hub[hub_id]->ack_rx[port](ack_from_hub[core_id]);
+            hub[hub_id]->buffer_full_status_rx[port](buffer_full_status_from_hub[core_id]);
+
+            hub[hub_id]->flit_tx[port](flit_from_hub[core_id]);
+            hub[hub_id]->req_tx[port](req_from_hub[core_id]);
+            hub[hub_id]->ack_tx[port](ack_to_hub[core_id]);
+            hub[hub_id]->buffer_full_status_tx[port](buffer_full_status_to_hub[core_id]);
+
+        }
+
+
+
+	} 
+
 	   
 	// ---- Cores mapping---- 
 	// Map RX and Tx (core2switch)
@@ -565,15 +612,26 @@ void NoC::buildButterfly()
             core[c]->buffer_full_status_rx[k](*tbufferfullstatus_dummy_signal);
         }
 
-        core[c]->hub_flit_tx(*flit_dummy_signal);
-        core[c]->hub_req_tx(*bool_dummy_signal);
-        core[c]->hub_ack_tx(*bool_dummy_signal);
-        core[c]->hub_buffer_full_status_tx(*tbufferfullstatus_dummy_signal);
+        core[c]->hub_flit_rx(flit_from_hub[c]);
+        core[c]->hub_req_rx(req_from_hub[c]);
+        core[c]->hub_ack_rx(ack_to_hub[c]);
+        core[c]->hub_buffer_full_status_rx(buffer_full_status_to_hub[c]);
 
-        core[c]->hub_flit_rx(*flit_dummy_signal);
-        core[c]->hub_req_rx(*bool_dummy_signal);
-        core[c]->hub_ack_rx(*bool_dummy_signal);
-        core[c]->hub_buffer_full_status_rx(*tbufferfullstatus_dummy_signal);
+        core[c]->hub_flit_tx(flit_to_hub[c]);
+        core[c]->hub_req_tx(req_to_hub[c]);
+        core[c]->hub_ack_tx(ack_from_hub[c]);
+        core[c]->hub_buffer_full_status_tx(buffer_full_status_from_hub[c]);
+
+        //core[c]->hub_flit_rx(*flit_dummy_signal);
+        //core[c]->hub_req_rx(*bool_dummy_signal);
+        //core[c]->hub_ack_rx(*bool_dummy_signal);
+        //core[c]->hub_buffer_full_status_rx(*tbufferfullstatus_dummy_signal);
+
+        //core[c]->hub_flit_tx(*flit_dummy_signal);
+        //core[c]->hub_req_tx(*bool_dummy_signal);
+       //core[c]->hub_ack_tx(*bool_dummy_signal);
+        //core[c]->hub_buffer_full_status_tx(*tbufferfullstatus_dummy_signal);
+   
     }
     
     // ... and for switches
@@ -776,7 +834,7 @@ void NoC::buildBaseline()
     sc_signal<TBufferFullStatus> *tbufferfullstatus_dummy_signal = new sc_signal<TBufferFullStatus>;
 
     //NOTE: the only difference between Baseline and Butterfly mapping architecture is the first stage connections
-    //First Stage mapping
+    //First Stage Mapping(Stage 1)
     for (int j = 0; j < sw ; j++) //sw 
     {
 		int r = sw/(pow(2,1)); // change every r 	
@@ -795,10 +853,10 @@ void NoC::buildBaseline()
 			t[0][0]->flit_tx[0](flit[0][0].north);
 			*/
 
-			t[1][j]->flit_rx[3](flit[0][j].north);
-			t[1][j]->req_rx[3](req[0][j].north);
-			t[1][j]->ack_rx[3](ack[0][j].north);
-			t[1][j]->buffer_full_status_rx[3](buffer_full_status[0][j].north);
+			t[1][j]->flit_rx[3](flit[0][2*j].north);
+			t[1][j]->req_rx[3](req[0][2*j].north);
+			t[1][j]->ack_rx[3](ack[0][2*j].north);
+			t[1][j]->buffer_full_status_rx[3](buffer_full_status[0][2*j].north);
 			//tx signals not required for butterfly
 			t[1][j]->flit_tx[3](*flit_dummy_signal);
 			t[1][j]->req_tx[3](*bool_dummy_signal);
@@ -806,10 +864,10 @@ void NoC::buildBaseline()
 			t[1][j]->buffer_full_status_tx[3](*tbufferfullstatus_dummy_signal);
 
 
-			t[0][2*j]->flit_tx[d](flit[0][j].north);
-			t[0][2*j]->req_tx[d](req[0][j].north);
-			t[0][2*j]->ack_tx[d](ack[0][j].north);
-			t[0][2*j]->buffer_full_status_tx[d](buffer_full_status[0][j].north);
+			t[0][2*j]->flit_tx[d](flit[0][2*j].north);
+			t[0][2*j]->req_tx[d](req[0][2*j].north);
+			t[0][2*j]->ack_tx[d](ack[0][2*j].north);
+			t[0][2*j]->buffer_full_status_tx[d](buffer_full_status[0][2*j].north);
 			//tx signals not required for butterfly
 			t[0][2*j]->flit_rx[d](*flit_dummy_signal);
 			t[0][2*j]->req_rx[d](*bool_dummy_signal);
@@ -826,20 +884,20 @@ void NoC::buildBaseline()
 			t[0][1]->flit_tx[0](flit[0][1].north);
 			*/
 
-			t[1][j]->flit_rx[2](flit[0][j].north);
-			t[1][j]->req_rx[2](req[0][j].north);
-			t[1][j]->ack_rx[2](ack[0][j].north);
-			t[1][j]->buffer_full_status_rx[2](buffer_full_status[0][j].north);
+			t[1][j]->flit_rx[2](flit[0][2*j+1].north);
+			t[1][j]->req_rx[2](req[0][2*j+1].north);
+			t[1][j]->ack_rx[2](ack[0][2*j+1].north);
+			t[1][j]->buffer_full_status_rx[2](buffer_full_status[0][2*j+1].north);
 			//tx signals not required for butterfly
 			t[1][j]->flit_tx[2](*flit_dummy_signal);
 			t[1][j]->req_tx[2](*bool_dummy_signal);
 			t[1][j]->ack_tx[2](*bool_dummy_signal);
 			t[1][j]->buffer_full_status_tx[2](*tbufferfullstatus_dummy_signal);
 
-			t[0][2*j+1]->flit_tx[d](flit[0][j].north);
-			t[0][2*j+1]->req_tx[d](req[0][j].north);
-			t[0][2*j+1]->ack_tx[d](ack[0][j].north);
-			t[0][2*j+1]->buffer_full_status_tx[d](buffer_full_status[0][j].north);
+			t[0][2*j+1]->flit_tx[d](flit[0][2*j+1].north);
+			t[0][2*j+1]->req_tx[d](req[0][2*j+1].north);
+			t[0][2*j+1]->ack_tx[d](ack[0][2*j+1].north);
+			t[0][2*j+1]->buffer_full_status_tx[d](buffer_full_status[0][2*j+1].north);
 			//tx signals not required for butterfly
 			t[0][2*j+1]->flit_rx[d](*flit_dummy_signal);
 			t[0][2*j+1]->req_rx[d](*bool_dummy_signal);
@@ -863,7 +921,7 @@ void NoC::buildBaseline()
 			t[1][j]->ack_tx[3](*bool_dummy_signal);
 			t[1][j]->buffer_full_status_tx[3](*tbufferfullstatus_dummy_signal);
 
-			t[0][2*(j-r)]->flit_tx[d](flit[0][j-2*(j-r)].east);
+			t[0][2*(j-r)]->flit_tx[d](flit[0][2*(j-r)].east);
 			t[0][2*(j-r)]->req_tx[d](req[0][2*(j-r)].east);
 			t[0][2*(j-r)]->ack_tx[d](ack[0][2*(j-r)].east);
 			t[0][2*(j-r)]->buffer_full_status_tx[d](buffer_full_status[0][2*(j-r)].east);
@@ -912,11 +970,11 @@ void NoC::buildBaseline()
 
 	    if (x==0) d = 1-d;
 	    if (d==0)
-	    {
+		{
 			if (i%2==0) //stage even
-			{
+	 		{
 	 			//*** Direction 3 ****
-				t[i][j]->flit_rx[3](flit[i][j].west);
+			 	t[i][j]->flit_rx[3](flit[i][j].west);
 				t[i][j]->req_rx[3](req[i][j].west);
 				t[i][j]->ack_rx[3](ack[i][j].west);
 				t[i][j]->buffer_full_status_rx[3](buffer_full_status[i][j].west);
@@ -930,19 +988,19 @@ void NoC::buildBaseline()
 				t[i-1][j]->flit_tx[d](flit[i][j].west);
 				t[i-1][j]->req_tx[d](req[i][j].west);
 				t[i-1][j]->ack_tx[d](ack[i][j].west);
-				t[i-1][j]->buffer_full_status_tx[d](buffer_full_status[i-1][j].west);
+				t[i-1][j]->buffer_full_status_tx[d](buffer_full_status[i][j].west);
 				//tx signals not required for butterfly
 				t[i-1][j]->flit_rx[d](*flit_dummy_signal);
 				t[i-1][j]->req_rx[d](*bool_dummy_signal);
 				t[i-1][j]->ack_rx[d](*bool_dummy_signal);
 				t[i-1][j]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
 
-
+			 	
 				//*** Direction 2 ****
-				t[i][j]->flit_rx[2](flit[i-1][j].south);
-				t[i][j]->req_rx[2](req[i-1][j].south);
-				t[i][j]->ack_rx[2](ack[i-1][j].south);
-				t[i][j]->buffer_full_status_rx[2](buffer_full_status[i-1][j].south);
+			 	t[i][j]->flit_rx[2](flit[i][j].south);
+				t[i][j]->req_rx[2](req[i][j].south);
+				t[i][j]->ack_rx[2](ack[i][j].south);
+				t[i][j]->buffer_full_status_rx[2](buffer_full_status[i][j].south);
 				//tx signals not required for butterfly
 				t[i][j]->flit_tx[2](*flit_dummy_signal);
 				t[i][j]->req_tx[2](*bool_dummy_signal);
@@ -950,21 +1008,21 @@ void NoC::buildBaseline()
 				t[i][j]->buffer_full_status_tx[2](*tbufferfullstatus_dummy_signal);
 
 
-				t[i-1][m]->flit_tx[d](flit[i-1][m].south);
-				t[i-1][m]->req_tx[d](req[i-1][m].south);
-				t[i-1][m]->ack_tx[d](ack[i-1][m].south);
-				t[i-1][m]->buffer_full_status_tx[d](buffer_full_status[i-1][m].south);
+				t[i-1][m]->flit_tx[d](flit[i][j].south);
+				t[i-1][m]->req_tx[d](req[i][j].south);
+				t[i-1][m]->ack_tx[d](ack[i][j].south);
+				t[i-1][m]->buffer_full_status_tx[d](buffer_full_status[i][j].south);
 				//tx signals not required for butterfly
 				t[i-1][m]->flit_rx[d](*flit_dummy_signal);
 				t[i-1][m]->req_rx[d](*bool_dummy_signal);
 				t[i-1][m]->ack_rx[d](*bool_dummy_signal);
 				t[i-1][m]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
 			}
-
+		
 			else 
-			{
+	 		{
 
-				t[i][j]->flit_rx[3](flit[i-1][j].north);
+	 			t[i][j]->flit_rx[3](flit[i-1][j].north);
 				t[i][j]->req_rx[3](req[i-1][j].north);
 				t[i][j]->ack_rx[3](ack[i-1][j].north);
 				t[i][j]->buffer_full_status_rx[3](buffer_full_status[i-1][j].north);
@@ -987,7 +1045,7 @@ void NoC::buildBaseline()
 
 
 				//*** Direction 2 ****
-				t[i][j]->flit_rx[2](flit[i-1][m].north);
+			 	t[i][j]->flit_rx[2](flit[i-1][m].north);
 				t[i][j]->req_rx[2](req[i-1][m].north);
 				t[i][j]->ack_rx[2](ack[i-1][m].north);
 				t[i][j]->buffer_full_status_rx[2](buffer_full_status[i-1][m].north);
@@ -1007,11 +1065,12 @@ void NoC::buildBaseline()
 				t[i-1][m]->req_rx[d](*bool_dummy_signal);
 				t[i-1][m]->ack_rx[d](*bool_dummy_signal);
 				t[i-1][m]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
-			}
-
+	 		}
+		
 		} 
-		else 
-		{ if (i%2==0) //stage even
+	    else  // d!=0
+		{ 
+		    if (i%2==0) //stage even
 			{
 				//*****Direction 2 *****
 				t[i][j]->flit_rx[2](flit[i][j].south);
@@ -1033,7 +1092,7 @@ void NoC::buildBaseline()
 				t[i-1][j]->req_rx[d](*bool_dummy_signal);
 				t[i-1][j]->ack_rx[d](*bool_dummy_signal);
 				t[i-1][j]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
-
+			 
 			 //*****Direction 3 *****
 
 				t[i][j]->flit_rx[3](flit[i][j].west);
@@ -1056,7 +1115,7 @@ void NoC::buildBaseline()
 				t[i-1][m]->ack_rx[d](*bool_dummy_signal);
 				t[i-1][m]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
 			}
-			else
+			else // stage not even
 			{
 				//*****Direction 2 *****
 				t[i][j]->flit_rx[2](flit[i-1][j].east);
@@ -1078,7 +1137,7 @@ void NoC::buildBaseline()
 				t[i-1][j]->req_rx[d](*bool_dummy_signal);
 				t[i-1][j]->ack_rx[d](*bool_dummy_signal);
 				t[i-1][j]->buffer_full_status_rx[d](*tbufferfullstatus_dummy_signal);
-
+	
 				//*****Direction 3 ****
 				t[i][j]->flit_rx[3](flit[i-1][m].east);
 				t[i][j]->req_rx[3](req[i-1][m].east);
@@ -1102,18 +1161,6 @@ void NoC::buildBaseline()
 			}
 
 		}
-
-
-	    // sw(1,0) connected to dir 0 of sw(0,0) -> dir 3
-	    /*
-	    // - the wire signal is the same
-	    t[1][0]->flit_rx[3](flit[0][0].north);
-	    t[0][0]->flit_tx[0](flit[0][0].north);
-
-	    // sw(1,0) connected to dir 0 of sw(0,2) -> dir 2
-	    t[1][0]->flit_rx[2](flit[0][2].north);
-	    t[0][2]->flit_tx[0](flit[0][2].north);
-	    */
 	}
 }
 
@@ -1997,8 +2044,12 @@ void NoC::buildCommon()
                 ++iit) 
         {
             GlobalParams::hub_for_tile[*iit] = hub_id;
-        }
+            LOG<<"I am hub "<<hub_id<<" and I amconnecting to "<<*iit<<endl;
+            //assert(false);
 
+        }
+        for (map<int, int>::iterator it1 = GlobalParams::hub_for_tile.begin(); it1 != GlobalParams::hub_for_tile.end(); it1++ )
+        LOG<<"it1 first "<< it1->first<< "second"<< it1->second<<endl;
 
         // Determine, from configuration file, which Hub is connected to which Channel
         for(vector<int>::iterator iit = hub_config.txChannels.begin(); 
