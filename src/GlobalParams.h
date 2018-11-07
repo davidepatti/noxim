@@ -46,6 +46,13 @@ using namespace std;
 // To mark invalid or non exhistent values
 #define NOT_VALID             -1
 
+//Topologies
+#define TOPOLOGY_MESH          "MESH"
+//Delta Networks Topologies
+#define TOPOLOGY_BASELINE      "BASELINE"
+#define TOPOLOGY_BUTTERFLY     "BUTTERFLY"
+#define TOPOLOGY_OMEGA         "OMEGA"
+
 // Routing algorithms
 #define ROUTING_DYAD           "DYAD"
 #define ROUTING_TABLE_BASED    "TABLE_BASED"
@@ -134,9 +141,10 @@ struct GlobalParams {
     static string verbose_mode;
     static int trace_mode;
     static string trace_filename;
+    static string topology;
     static int mesh_dim_x;
     static int mesh_dim_y;
-    static int butterfly_tiles;
+    static int n_delta_tiles;
     static double r2r_link_length;
     static double r2h_link_length;
     static int buffer_depth;

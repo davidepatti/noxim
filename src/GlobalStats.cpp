@@ -25,7 +25,7 @@ double GlobalStats::getAverageDelay()
     unsigned int total_packets = 0;
     double avg_delay = 0.0;
 
-    if (GlobalParams::butterfly_tiles == 0) //mech
+    if (GlobalParams::topology == TOPOLOGY_MESH)
         {
         	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
 			for (int x = 0; x < GlobalParams::mesh_dim_x; x++) 
@@ -44,7 +44,7 @@ double GlobalStats::getAverageDelay()
         }
     else
         { 
-        	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+        	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
         	{
         		unsigned int received_packets =
 				noc->core[y]->r->stats.getReceivedPackets();
@@ -82,7 +82,7 @@ double GlobalStats::getMaxDelay()
 {
     double maxd = -1.0;
 
-    if (GlobalParams::butterfly_tiles == 0) //mech
+    if (GlobalParams::topology == TOPOLOGY_MESH) 
     {
     	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
 		for (int x = 0; x < GlobalParams::mesh_dim_x; x++) 
@@ -99,7 +99,7 @@ double GlobalStats::getMaxDelay()
     }
     else
     {
-    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+    	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 		{
 		    double d = getMaxDelay(y);
 		    if (d > maxd)
@@ -112,7 +112,7 @@ double GlobalStats::getMaxDelay()
 
 double GlobalStats::getMaxDelay(const int node_id)
 {
-	if (GlobalParams::butterfly_tiles == 0) //mesh
+	if (GlobalParams::topology == TOPOLOGY_MESH) //mesh
     {
     	Coord coord = id2Coord(node_id);
 
@@ -149,7 +149,7 @@ vector < vector < double > > GlobalStats::getMaxDelayMtx()
 {
     vector < vector < double > > mtx;
 
-    assert(GlobalParams::butterfly_tiles == 0); 
+    assert(GlobalParams::topology == TOPOLOGY_MESH); 
     
     	mtx.resize(GlobalParams::mesh_dim_y);
 		for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
@@ -212,7 +212,7 @@ unsigned int GlobalStats::getReceivedPackets()
 {
     unsigned int n = 0;
 
-    if (GlobalParams::butterfly_tiles == 0) //mech
+    if (GlobalParams::topology == TOPOLOGY_MESH) 
     {
     	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
 		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
@@ -220,7 +220,7 @@ unsigned int GlobalStats::getReceivedPackets()
     }
     else
     {
-    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+    	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 	    n += noc->core[y]->r->stats.getReceivedPackets();
     }
 
@@ -230,7 +230,7 @@ unsigned int GlobalStats::getReceivedPackets()
 unsigned int GlobalStats::getReceivedFlits()
 {
     unsigned int n = 0;
-    if (GlobalParams::butterfly_tiles == 0) //mech
+    if (GlobalParams::topology == TOPOLOGY_MESH) 
     {
     	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
 		for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
@@ -242,7 +242,7 @@ unsigned int GlobalStats::getReceivedFlits()
     }
     else
     {
-    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+    	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 	    {
 	    n += noc->core[y]->r->stats.getReceivedFlits();
 		#ifdef TESTING
@@ -256,14 +256,14 @@ unsigned int GlobalStats::getReceivedFlits()
 
 double GlobalStats::getThroughput()
 {
-	if (GlobalParams::butterfly_tiles == 0) //mech
+	if (GlobalParams::topology == TOPOLOGY_MESH) 
     {
     	int number_of_ip = GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y;
     	return (double)getAggregatedThroughput()/(double)(number_of_ip);
     }
     else
     {
-    	int number_of_ip = GlobalParams::butterfly_tiles;
+    	int number_of_ip = GlobalParams::n_delta_tiles;
    		return (double)getAggregatedThroughput()/(double)(number_of_ip);
     }
  
@@ -278,7 +278,7 @@ double GlobalStats::getActiveThroughput()
 	unsigned int n = 0;
     unsigned int trf = 0;
     unsigned int rf ;
-	if (GlobalParams::butterfly_tiles == 0) //mesh
+	if (GlobalParams::topology == TOPOLOGY_MESH) //mesh
     {
     	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
 		for (int x = 0; x < GlobalParams::mesh_dim_x; x++) 
@@ -293,7 +293,7 @@ double GlobalStats::getActiveThroughput()
     }
     else
     {
-    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+    	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 		{
 		    rf = noc->core[y]->r->stats.getReceivedFlits();
 
@@ -312,7 +312,7 @@ vector < vector < unsigned long > > GlobalStats::getRoutedFlitsMtx()
 {
 
     vector < vector < unsigned long > > mtx;
-    assert (GlobalParams::butterfly_tiles == 0); 
+    assert (GlobalParams::topology == TOPOLOGY_MESH); 
    
     	mtx.resize(GlobalParams::mesh_dim_y);
 	    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
@@ -350,7 +350,7 @@ double GlobalStats::getDynamicPower()
     double power = 0.0;
 
     // Electric noc
-    if (GlobalParams::butterfly_tiles == 0) //mech
+    if (GlobalParams::topology == TOPOLOGY_MESH) 
     {
     	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
     		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
@@ -358,7 +358,7 @@ double GlobalStats::getDynamicPower()
     }
     else
     {
-    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+    	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 	    power += noc->core[y]->r->power.getDynamicPower();
     }
     
@@ -382,7 +382,7 @@ double GlobalStats::getStaticPower()
 {
     double power = 0.0;
 
-    if (GlobalParams::butterfly_tiles == 0) //mech
+    if (GlobalParams::topology == TOPOLOGY_MESH) 
     {
     	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
 		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
@@ -390,7 +390,7 @@ double GlobalStats::getStaticPower()
     }
     else
     {
-    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+    	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 	    power += noc->core[y]->r->power.getStaticPower();
     }
 
@@ -413,7 +413,7 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 {
     if (detailed) 
     {
-    	assert (GlobalParams::butterfly_tiles == 0); 
+    	assert (GlobalParams::topology == TOPOLOGY_MESH); 
 		out << endl << "detailed = [" << endl;
 
 		for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
@@ -453,11 +453,12 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 
 #ifdef DEBUG
 
-    out << "End of sim PE Packet Queue sizes: " ;
-    if (GlobalParams::butterfly_tiles)
+    if (GlobalParams::topology == TOPOLOGY_BUTTERFLY)
     {
-	for (int i=0;i<GlobalParams::butterfly_tiles;i++)
-	    out << "PE"<<i << ": " << noc->core[i]->pe->getQueueSize()<< ",";
+	out << "Queue sizes: " ;
+	for (int i=0;i<GlobalParams::n_delta_tiles;i++)
+		out << "PE"<<i << ": " << noc->core[i]->pe->getQueueSize()<< ",";
+	out << endl;
     }
     else
     {
@@ -591,7 +592,7 @@ void GlobalStats::showPowerBreakDown(std::ostream & out)
     map<string,double> power_dynamic;
     map<string,double> power_static;
 
-    if (GlobalParams::butterfly_tiles == 0) //mech
+    if (GlobalParams::topology == TOPOLOGY_MESH) 
     {
     	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
 		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
@@ -602,7 +603,7 @@ void GlobalStats::showPowerBreakDown(std::ostream & out)
     }
     else
     {
-    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+    	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 		{
 	    updatePowerBreakDown(power_dynamic, noc->core[y]->r->power.getDynamicPowerBreakDown());
 	    updatePowerBreakDown(power_static, noc->core[y]->r->power.getStaticPowerBreakDown());
@@ -639,7 +640,7 @@ void GlobalStats::showBufferStats(std::ostream & out)
   out << "Router id\tBuffer N\t\tBuffer E\t\tBuffer S\t\tBuffer W\t\tBuffer L" << endl;
   out << "         \tMean\tMax\tMean\tMax\tMean\tMax\tMean\tMax\tMean\tMax" << endl;
   
-  if (GlobalParams::butterfly_tiles == 0) //mech
+  if (GlobalParams::topology == TOPOLOGY_MESH) 
     {
     	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
     	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
@@ -651,7 +652,7 @@ void GlobalStats::showBufferStats(std::ostream & out)
     }
     else
     {
-    	for (int y = 0; y < GlobalParams::butterfly_tiles; y++)
+    	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
     	{
 			out << noc->core[y]->r->local_id;
 			noc->core[y]->r->ShowBuffersStats(out);
@@ -666,7 +667,7 @@ double GlobalStats::getReceivedIdealFlitRatio()
 	int total_cycles;
 	total_cycles= GlobalParams::simulation_time - GlobalParams::stats_warm_up_time;
 	double ratio;
-	if (GlobalParams::butterfly_tiles == 0) 
+	if (GlobalParams::topology == TOPOLOGY_MESH) 
     {
 	 	ratio = getReceivedFlits() /(GlobalParams::packet_injection_rate * (GlobalParams::min_packet_size +
 		GlobalParams::max_packet_size)/2 * total_cycles * GlobalParams::mesh_dim_y * GlobalParams::mesh_dim_x);
@@ -674,7 +675,7 @@ double GlobalStats::getReceivedIdealFlitRatio()
 	else
 	{
 		ratio = getReceivedFlits() /(GlobalParams::packet_injection_rate * (GlobalParams::min_packet_size +
-		GlobalParams::max_packet_size)/2 * total_cycles * GlobalParams::butterfly_tiles);
+		GlobalParams::max_packet_size)/2 * total_cycles * GlobalParams::n_delta_tiles);
 	}
 	return ratio;
 }

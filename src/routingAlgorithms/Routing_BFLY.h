@@ -4,6 +4,7 @@
 #include "RoutingAlgorithm.h"
 #include "RoutingAlgorithms.h"
 #include "../Router.h"
+#define name() "Routing_BFLY"
 
 using namespace std;
 

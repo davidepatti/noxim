@@ -454,7 +454,7 @@ int Router::reflexDirection(int direction) const
 
 int Router::getNeighborId(int _id, int direction) const
 {
-    assert(GlobalParams::butterfly_tiles==0);
+    assert(GlobalParams::topology == TOPOLOGY_MESH);
 
     Coord my_coord = id2Coord(_id); 
 

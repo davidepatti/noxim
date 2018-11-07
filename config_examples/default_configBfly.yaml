@@ -3,11 +3,18 @@
 #
 # NOC & WIRED CONFIGURATION
 #
+# Topologies:
+#   MESH
+#   BUTTERFLY
+#   BASELINE
+#   OMEGA
 #
+#   BUTTERFLY, BASELINE, and OMEGA are Delta Network topologies
+topology: BUTTERFLY
 # X and Y mesh sizes
 mesh_dim_x: 4
 mesh_dim_y: 4
-butterfly_tiles: 8
+n_delta_tiles: 8
 # number of flits for each router buffer
 buffer_depth: 4
 # size of flits, in bits

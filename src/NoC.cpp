@@ -27,15 +27,15 @@ void NoC::buildButterfly()
     // --- 1- Switch bloc ---
     //-----------------------------
 
-    int stg = log2(GlobalParams::butterfly_tiles);
-    int sw = GlobalParams::butterfly_tiles/2; //sw: switch number in each stage
+    int stg = log2(GlobalParams::n_delta_tiles);
+    int sw = GlobalParams::n_delta_tiles/2; //sw: switch number in each stage
     
     int d = 1; //starting dir is changed at first iteration
 
     // Dimensions of the butterfly switch block network
     int dimX = stg;
     int dimY = sw;
-    cout  << "tiles equal : " << GlobalParams::butterfly_tiles << endl;
+    cout  << "tiles equal : " << GlobalParams::n_delta_tiles << endl;
     cout <<"dimX_stg= "<< dimX << "  " << "dimY_sw= " << dimY << endl ;
     req = new sc_signal_NSWEH<bool>*[dimX];
     ack = new sc_signal_NSWEH<bool>*[dimX];
@@ -374,7 +374,7 @@ void NoC::buildButterfly()
 
     //---- Cores instantiation ----
 
-    int n = GlobalParams::butterfly_tiles; //n: nombre of Cores = tiles with 2 directions(0 & 1)
+    int n = GlobalParams::n_delta_tiles; //n: nombre of Cores = tiles with 2 directions(0 & 1)
     // Dimensions of the butterfly Cores : dimX=1 & dimY=n    
     // instantiation of the Cores (we have only one row)
    
@@ -2287,7 +2287,7 @@ void NoC::buildMesh()
 
 Tile *NoC::searchNode(const int id) const
 {
-    if (GlobalParams::butterfly_tiles == 0) 
+    if (GlobalParams::topology == TOPOLOGY_MESH) 
     {
 	for (int i = 0; i < GlobalParams::mesh_dim_x; i++)
 	    for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
@@ -2295,7 +2295,7 @@ Tile *NoC::searchNode(const int id) const
 		    return t[i][j];
     }
     else // in butterfly, id equals to the vector index
-	return core[id];
+	    return core[id];
     return NULL;
 }
 
@@ -2306,7 +2306,7 @@ void NoC::asciiMonitor()
     //
     // asciishow proof-of-concept #1 free slots
    
-    if (GlobalParams::butterfly_tiles)
+    if (GlobalParams::topology == TOPOLOGY_BUTTERFLY)
     {
 	cout << "Butterfly topology not supported for asciimonitor option!";
 	assert(false);
