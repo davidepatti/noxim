@@ -2014,7 +2014,7 @@ void NoC::buildCommon()
             //LOG<<"I am hub "<<hub_id<<" and I amconnecting to "<<*iit<<endl;
 
         }
-        for (map<int, int>::iterator it1 = GlobalParams::hub_for_tile.begin(); it1 != GlobalParams::hub_for_tile.end(); it1++ )
+        //for (map<int, int>::iterator it1 = GlobalParams::hub_for_tile.begin(); it1 != GlobalParams::hub_for_tile.end(); it1++ )
         //LOG<<"it1 first "<< it1->first<< "second"<< it1->second<<endl;
 
         // Determine, from configuration file, which Hub is connected to which Channel
