@@ -363,7 +363,7 @@ void NoC::buildButterfly()
 	    // sw(1,0) connected to dir 0 of sw(0,2) -> dir 2
 	    t[1][0]->flit_rx[2](flit[0][2].north);
 	    t[0][2]->flit_tx[0](flit[0][2].north);
-	     */
+	    */
 	}
     }
 
@@ -491,10 +491,10 @@ void NoC::buildButterfly()
     core[1]->flit_rx[1](flit[2][0].east);
      */
 
-
-    for (int i = 0; i < sw ; i++) 		//First stage
+    // ... First stage
+    for (int i = 0; i < sw ; i++) 		
     {	
-	t[0][i]->flit_rx[3](flit[0][i].west); // ack .west
+	t[0][i]->flit_rx[3](flit[0][i].west); 
 	t[0][i]->req_rx[3](req[0][i].west);
 	t[0][i]->ack_rx[3](ack[0][i].west);
 	t[0][i]->buffer_full_status_rx[3](buffer_full_status[0][i].west);
@@ -515,7 +515,7 @@ void NoC::buildButterfly()
 	core[i*2]->buffer_full_status_rx[0](*tbufferfullstatus_dummy_signal);
 
 
-	t[0][i]->flit_rx[2](flit[0][i].south); // ack .south
+	t[0][i]->flit_rx[2](flit[0][i].south); 
 	t[0][i]->req_rx[2](req[0][i].south);
 	t[0][i]->ack_rx[2](ack[0][i].south); 
 	t[0][i]->buffer_full_status_rx[2](buffer_full_status[0][i].south);
@@ -536,7 +536,8 @@ void NoC::buildButterfly()
 	core[(i*2)+1]->buffer_full_status_rx[0](*tbufferfullstatus_dummy_signal);
     }
 
-    for (int i = 0; i < sw ; i++) 			//Last stage	
+    // ... Last stage
+    for (int i = 0; i < sw ; i++) 				
     {	
 	t[stg-1][i]->flit_tx[0](flit[stg-1][i].north); // ack .east
 	t[stg-1][i]->req_tx[0](req[stg-1][i].north);
@@ -811,7 +812,7 @@ void NoC::buildBaseline()
 	    //*** Direction 3 ****
 
 	    /*
-	       switch sw(1,0) connected to dir 0 of sw(0,0)> dir 3
+	    switch sw(1,0) connected to dir 0 of sw(0,0) -> dir 3
 	       --> The switch sw [1,j] dir d of sw[0,2*j]
 	    // - the wire signal is the same for: req,flit,ack,bfs
 	    t[1][0]->flit_rx[3](flit[0][0].north);
@@ -1181,30 +1182,9 @@ void NoC::buildBaseline()
 	core[i]->reset(reset);
     } 
 
-    // ---- Cores mapping---- 
-    // Map RX and Tx (core2switch)
+    // ---- Cores mapping ---- 
 
-    /* EXPLE:
-       --First Stage--
-    //sw(0,0) connected to core(0) -> dir 3 (NB.the wire signal is the same)
-    t[0][0]->flit_rx[3](flit[0][3].west);
-    core[0]->flit_tx[0](flit[0][3].west);
-
-    //sw(0,0) connected to core(1) -> dir 2
-    t[0][0]->flit_rx[2](flit[0][2].south);
-    core[1]->flit_tx[0](flit[0][2].south);
-
-    --Last Stage--
-    //sw(2,0) connected to core(0) -> dir 0 (NB.the wire signal is the same)
-    t[2][0]->flit_tx[0](flit[2][0].north);
-    core[0]->flit_rx[1](flit[2][0].north);
-
-    //sw(2,0) connected to core(1) -> dir 1
-    t[2][0]->flit_tx[1](flit[2][0].east);
-    core[1]->flit_rx[1](flit[2][0].east);
-     */
-
-    //--First Stage--
+    //...First Stage 
     for (int i = 0; i < sw ; i++) 		
     {	
 	t[0][i]->flit_rx[3](flit[0][i].west); 
@@ -1249,7 +1229,7 @@ void NoC::buildBaseline()
 	core[(i*2)+1]->buffer_full_status_rx[0](*tbufferfullstatus_dummy_signal);
     }
 
-    //--Last Stage--
+    // ... Last Stage
     for (int i = 0; i < sw ; i++) 	
     {	
 	t[stg-1][i]->flit_tx[0](flit[stg-1][i].north); 
@@ -1784,32 +1764,10 @@ void NoC::buildOmega()
 	core[i]->reset(reset);
     } //-------------------------------------end core comment---------------------------------
 
-    // ---- Cores mapping---- 
-    // Map RX and Tx (core2switch)
+    // ---- Cores mapping ---- 
 
-    /* EXPLE:
-    // --First Stage--
-    // sw(0,0) connected to core(0) -> dir 3 (NB.the wire signal is the same)
-    t[0][0]->flit_rx[3](flit[0][3].west);
-    core[0]->flit_tx[0](flit[0][3].west);
-
-    // sw(0,0) connected to core(1) -> dir 2
-    t[0][0]->flit_rx[2](flit[0][2].south);
-    core[1]->flit_tx[0](flit[0][2].south);
-     */
-    /* 
-    // --Last Stage--
-    // sw(2,0) connected to core(0) -> dir 0 (NB.the wire signal is the same)
-    t[2][0]->flit_tx[0](flit[2][0].north);
-    core[0]->flit_rx[1](flit[2][0].north);
-
-    // sw(2,0) connected to core(1) -> dir 1
-    t[2][0]->flit_tx[1](flit[2][0].east);
-    core[1]->flit_rx[1](flit[2][0].east);
-     */
-
-
-    for (int i = 0; i < sw ; i++) 		//First stage
+	// ... First stage
+    for (int i = 0; i < sw ; i++) 		
     {	
 	t[0][i]->flit_rx[3](flit[0][i].west); // ack .west
 	t[0][i]->req_rx[3](req[0][i].west);
@@ -1853,14 +1811,15 @@ void NoC::buildOmega()
 	core[(i*2)+1]->buffer_full_status_rx[0](*tbufferfullstatus_dummy_signal);
     }
 
-    for (int i = 0; i < sw ; i++) 			//Last stage	
+    // ... Last Stage
+    for (int i = 0; i < sw ; i++) 				
     {	
-	t[stg-1][i]->flit_tx[0](flit[stg-1][i].north); // ack .east
+	t[stg-1][i]->flit_tx[0](flit[stg-1][i].north); 
 	t[stg-1][i]->req_tx[0](req[stg-1][i].north);
 	t[stg-1][i]->ack_tx[0](ack[stg-1][i].north);
 	t[stg-1][i]->buffer_full_status_tx[0](buffer_full_status[stg-1][i].north);
 	//rx is not required in delta topologies
-	t[stg-1][i]->flit_rx[0](*flit_dummy_signal); // ack .east
+	t[stg-1][i]->flit_rx[0](*flit_dummy_signal); 
 	t[stg-1][i]->req_rx[0](*bool_dummy_signal);
 	t[stg-1][i]->ack_rx[0](*bool_dummy_signal);
 	t[stg-1][i]->buffer_full_status_rx[0](*tbufferfullstatus_dummy_signal);
@@ -1877,12 +1836,12 @@ void NoC::buildOmega()
 	core[i*2]->buffer_full_status_tx[1](*tbufferfullstatus_dummy_signal);
 
 
-	t[stg-1][i]->flit_tx[1](flit[stg-1][i].east);  // ack .east
+	t[stg-1][i]->flit_tx[1](flit[stg-1][i].east);  
 	t[stg-1][i]->req_tx[1](req[stg-1][i].east);
 	t[stg-1][i]->ack_tx[1](ack[stg-1][i].east);
 	t[stg-1][i]->buffer_full_status_tx[1](buffer_full_status[stg-1][i].east);
 	//rx is not required in delta topologies
-	t[stg-1][i]->flit_rx[1](*flit_dummy_signal);  // ack .east
+	t[stg-1][i]->flit_rx[1](*flit_dummy_signal);  
 	t[stg-1][i]->req_rx[1](*bool_dummy_signal);
 	t[stg-1][i]->ack_rx[1](*bool_dummy_signal);
 	t[stg-1][i]->buffer_full_status_rx[1](*tbufferfullstatus_dummy_signal);

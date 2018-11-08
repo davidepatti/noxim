@@ -93,11 +93,12 @@ SC_MODULE(NoC)
     SC_CTOR(NoC) 
     {
 
+
 	if (GlobalParams::topology == TOPOLOGY_MESH)
 	    // Build the Mesh
 	    buildMesh();
 	else if (GlobalParams::topology == TOPOLOGY_BUTTERFLY)
-	    buildButterfly();
+        buildButterfly(); 
 	else if (GlobalParams::topology == TOPOLOGY_BASELINE)
 	    buildBaseline();
 	else if (GlobalParams::topology == TOPOLOGY_OMEGA)
