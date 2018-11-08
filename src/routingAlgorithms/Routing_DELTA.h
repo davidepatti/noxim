@@ -1,24 +1,24 @@
-#ifndef __NOXIMROUTING_BFLY_H__
-#define __NOXIMROUTING_BFLY_H__
+#ifndef __NOXIMROUTING_DELTA_H__
+#define __NOXIMROUTING_DELTA_H__
 
 #include "RoutingAlgorithm.h"
 #include "RoutingAlgorithms.h"
 #include "../Router.h"
-#define name() "Routing_BFLY"
+#define name() "Routing_DELTA"
 
 using namespace std;
 
-class Routing_BFLY : RoutingAlgorithm {
+class Routing_DELTA : RoutingAlgorithm {
 	public:
 		vector<int> route(Router * router, const RouteData & routeData);
 
-		static Routing_BFLY * getInstance();
+		static Routing_DELTA * getInstance();
 
 	private:
-		Routing_BFLY(){};
-		~Routing_BFLY(){};
+		Routing_DELTA(){};
+		~Routing_DELTA(){};
 
-		static Routing_BFLY * routing_BFLY;
+		static Routing_DELTA * routing_DELTA;
 		static RoutingAlgorithmsRegister routingAlgorithmsRegister;
 };
 

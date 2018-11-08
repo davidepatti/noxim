@@ -27,6 +27,7 @@ n_virtual_channels: 1
 
 # Routing algorithms:
 #   XY
+#   DELTA
 #   WEST_FIRST
 #   NORTH_LAST
 #   NEGATIVE_FIRST
@@ -35,7 +36,7 @@ n_virtual_channels: 1
 #   TABLE_BASED
 # Each of the above labels should match a corresponding
 # implementation in the routingAlgorithms source code directory
-routing_algorithm: BFLY
+routing_algorithm: DELTA
 routing_table_filename: ""
 
 # Routing specific parameters

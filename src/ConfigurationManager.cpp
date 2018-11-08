@@ -60,8 +60,8 @@ void loadConfiguration() {
     if (GlobalParams::topology == TOPOLOGY_BASELINE  ||
         GlobalParams::topology == TOPOLOGY_BUTTERFLY ||
         GlobalParams::topology == TOPOLOGY_OMEGA      ) {
-        GlobalParams::mesh_dim_x = readParam<int>(config, "mesh_dim_x");
-        GlobalParams::mesh_dim_y = readParam<int>(config, "mesh_dim_y");
+        //GlobalParams::mesh_dim_x = readParam<int>(config, "mesh_dim_x");
+        //GlobalParams::mesh_dim_y = readParam<int>(config, "mesh_dim_y");
         GlobalParams::n_delta_tiles = readParam<int>(config, "n_delta_tiles");
     }
 
@@ -277,19 +277,24 @@ void showConfig()
 
 void checkConfiguration()
 {
-    if (GlobalParams::mesh_dim_x <= 1) {
-	cerr << "Error: dimx must be greater than 1" << endl;
-	exit(1);
-    }
+    if (GlobalParams::topology==TOPOLOGY_MESH)
+    {
+	if (GlobalParams::mesh_dim_x <= 1) {
+	    cerr << "Error: dimx must be greater than 1" << endl;
+	    exit(1);
+	}
 
-    if (GlobalParams::mesh_dim_y <= 1) {
-	cerr << "Error: dimy must be greater than 1" << endl;
-	exit(1);
+	if (GlobalParams::mesh_dim_y <= 1) {
+	    cerr << "Error: dimy must be greater than 1" << endl;
+	    exit(1);
+	}
     }
-
-    if (GlobalParams::n_delta_tiles < 0) {
-	cerr << "Error: n_delta_tiles must be >= 0 " << endl;
-	exit(1);
+    else // other delta topologies
+    {
+	if (GlobalParams::n_delta_tiles < 0) {
+	    cerr << "Error: n_delta_tiles must be >= 0 " << endl;
+	    exit(1);
+	}
     }
 
     if (GlobalParams::buffer_depth < 1) {
@@ -329,9 +334,25 @@ void checkConfiguration()
 
     if (GlobalParams::topology == TOPOLOGY_BUTTERFLY)
     {
-	if (GlobalParams::routing_algorithm!="BFLY")
+	if (GlobalParams::routing_algorithm!="DELTA")
 	{
-	    cerr << "Error: butterfly topology only supported in BFLY routing algorithm " << endl;
+	    cerr << "Error: BUTTERFLY topology only supported in DELTA routing algorithm " << endl;
+	    exit(1);
+	}
+    }
+    if (GlobalParams::topology == TOPOLOGY_OMEGA)
+    {
+	if (GlobalParams::routing_algorithm!="DELTA")
+	{
+	    cerr << "Error: OMEGA topology only supported in DELTA routing algorithm " << endl;
+	    exit(1);
+	}
+    }
+    if (GlobalParams::topology == TOPOLOGY_BASELINE)
+    {
+	if (GlobalParams::routing_algorithm!="DELTA")
+	{
+	    cerr << "Error: BASELINE topology only supported in DELTA routing algorithm " << endl;
 	    exit(1);
 	}
     }

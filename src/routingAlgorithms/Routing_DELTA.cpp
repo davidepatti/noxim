@@ -1,19 +1,19 @@
-#include "Routing_BFLY.h"
+#include "Routing_DELTA.h"
 #include "../GlobalParams.h"
 #include "../Utils.h"
 
-RoutingAlgorithmsRegister Routing_BFLY::routingAlgorithmsRegister("BFLY", getInstance());
+RoutingAlgorithmsRegister Routing_DELTA::routingAlgorithmsRegister("DELTA", getInstance());
 
-Routing_BFLY * Routing_BFLY::routing_BFLY = 0;
+Routing_DELTA * Routing_DELTA::routing_DELTA = 0;
 
-Routing_BFLY * Routing_BFLY::getInstance() {
-    if ( routing_BFLY == 0 )
-	routing_BFLY = new Routing_BFLY();
+Routing_DELTA * Routing_DELTA::getInstance() {
+    if ( routing_DELTA == 0 )
+	routing_DELTA = new Routing_DELTA();
 
-    return routing_BFLY;
+    return routing_DELTA;
 }
 
-vector<int> Routing_BFLY::route(Router * router, const RouteData & routeData)
+vector<int> Routing_DELTA::route(Router * router, const RouteData & routeData)
 {
     vector <int> directions;
 

@@ -278,7 +278,7 @@ Packet ProcessingElement::trafficRandom()
 
     if (GlobalParams::topology == TOPOLOGY_MESH)
 	max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) - 1; //Mesh 
-    else    //Butterfly
+    else    // other delta topologies
 	max_id = GlobalParams::n_delta_tiles-1; 
 
     // Random destination distribution
@@ -441,9 +441,7 @@ Packet ProcessingElement::trafficShuffle()
 Packet ProcessingElement::trafficButterfly()
 {
 
-    int nbits =
-	(int)
-	log2ceil((double)
+    int nbits = (int) log2ceil((double)
 		 (GlobalParams::mesh_dim_x *
 		  GlobalParams::mesh_dim_y));
     int dnode = 0;

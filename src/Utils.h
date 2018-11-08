@@ -179,7 +179,7 @@ inline Coord id2Coord(int id)
 	assert(coord.x < GlobalParams::mesh_dim_x);
 	assert(coord.y < GlobalParams::mesh_dim_y);
     }
-    else
+    else // other delta topologies
     { 
 	id = id - GlobalParams::n_delta_tiles;
 	coord.x = id / (int)(GlobalParams::n_delta_tiles/2);
@@ -201,7 +201,7 @@ inline int coord2Id(const Coord & coord)
 	assert(id < GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y);
     }
     else
-    { //use only for switch bloc
+    {   //use only for switch bloc in delta topologies
 	id = (coord.x * (GlobalParams::n_delta_tiles/2)) + coord.y + GlobalParams::n_delta_tiles;
 	assert(id > (GlobalParams::n_delta_tiles-1));
     }

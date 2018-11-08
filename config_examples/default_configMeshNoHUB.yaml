@@ -27,6 +27,7 @@ n_virtual_channels: 1
 
 # Routing algorithms:
 #   XY
+#   DELTA
 #   WEST_FIRST
 #   NORTH_LAST
 #   NEGATIVE_FIRST

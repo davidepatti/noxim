@@ -4,6 +4,14 @@
 # NOC & WIRED CONFIGURATION
 #
 #
+# Topologies:
+#   MESH
+#   BUTTERFLY
+#   BASELINE
+#   OMEGA
+#
+#   BUTTERFLY, BASELINE, and OMEGA are Delta Network topologies
+# topology: MESH
 # X and Y mesh sizes
 mesh_dim_x: 4
 mesh_dim_y: 4
@@ -19,6 +27,7 @@ n_virtual_channels: 1
 
 # Routing algorithms:
 #   XY
+#   DELTA
 #   WEST_FIRST
 #   NORTH_LAST
 #   NEGATIVE_FIRST

@@ -49,7 +49,7 @@ SC_MODULE(NoC)
     sc_in_clk clock;		// The input clock for the NoC
     sc_in < bool > reset;	// The reset signal for the NoC
 
-    // Signals mesh/switchBlocButterfly
+    // Signals mesh and switch bloc in delta topologies
     sc_signal_NSWEH<bool> **req;
     sc_signal_NSWEH<bool> **ack;
     sc_signal_NSWEH<TBufferFullStatus> **buffer_full_status;
@@ -59,7 +59,7 @@ SC_MODULE(NoC)
     // NoP
     sc_signal_NSWE<NoP_data> **nop_data;
 
-    //signals for connecting Core2Hub (just to test wioreless in Butterfly)
+    //signals for connecting Core2Hub (just to test wireless in Butterfly)
     sc_signal<Flit> *flit_from_hub;
     sc_signal<Flit> *flit_to_hub;
 

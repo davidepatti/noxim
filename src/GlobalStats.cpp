@@ -351,21 +351,32 @@ double GlobalStats::getDynamicPower()
     // Electric noc
     if (GlobalParams::topology == TOPOLOGY_MESH) 
     {
-    	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-    		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
-    			power += noc->t[x][y]->r->power.getDynamicPower();
+	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+		power += noc->t[x][y]->r->power.getDynamicPower();
     }
-    else
+    else // other delta topologies
     {
-    	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
+	int stg = log2(GlobalParams::n_delta_tiles);
+	int sw = GlobalParams::n_delta_tiles/2; //sw: switch number in each stage
+	// Dimensions of the delta switch block network
+	int dimX = stg;
+	int dimY = sw;
+
+	// power for delta topologies cores
+	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 	    power += noc->core[y]->r->power.getDynamicPower();
+
+	// power for delta topologies switches 
+	for (int y = 0; y < dimY; y++)
+	    for (int x = 0; x < dimX; x++)
+		power += noc->t[x][y]->r->power.getDynamicPower();
     }
-    
 
     // Wireless noc
     for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();
-            it != GlobalParams::hub_configuration.end();
-            ++it)
+	    it != GlobalParams::hub_configuration.end();
+	    ++it)
     {
 	int hub_id = it->first;
 
@@ -387,8 +398,19 @@ double GlobalStats::getStaticPower()
 		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
 	    power += noc->t[x][y]->r->power.getStaticPower();
     }
-    else
+    else // other delta topologies
     {
+	int stg = log2(GlobalParams::n_delta_tiles);
+	int sw = GlobalParams::n_delta_tiles/2; //sw: switch number in each stage
+	// Dimensions of the delta switch block network
+	int dimX = stg;
+	int dimY = sw;
+	// power for delta topologies switches 
+	for (int y = 0; y < dimY; y++)
+	    for (int x = 0; x < dimX; x++)
+		power += noc->t[x][y]->r->power.getDynamicPower();
+
+	// delta cores
     	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 	    power += noc->core[y]->r->power.getStaticPower();
     }
