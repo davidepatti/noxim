@@ -65,6 +65,7 @@ void NoC::buildButterfly()
     }
 
 
+// assert
     // Create the mesh as a matrix of tiles
     for (int j = 0; j < dimY; j++) {
 	for (int i = 0; i < dimX; i++) {
@@ -115,6 +116,7 @@ void NoC::buildButterfly()
 	    t[i][j]->hub_ack_tx(ack[i][j].from_hub);
 	    t[i][j]->hub_buffer_full_status_tx(buffer_full_status[i][j].from_hub);
 
+    //assert(false);
 	    // TODO: Review port index. Connect each Hub to all its Channels 
 	    map<int, int>::iterator it = GlobalParams::hub_for_tile.find(tile_id);
 	    if (it != GlobalParams::hub_for_tile.end())
@@ -1968,12 +1970,11 @@ void NoC::buildCommon()
                 ++iit) 
         {
             GlobalParams::hub_for_tile[*iit] = hub_id;
-            LOG<<"I am hub "<<hub_id<<" and I amconnecting to "<<*iit<<endl;
-            //assert(false);
+            //LOG<<"I am hub "<<hub_id<<" and I amconnecting to "<<*iit<<endl;
 
         }
-        for (map<int, int>::iterator it1 = GlobalParams::hub_for_tile.begin(); it1 != GlobalParams::hub_for_tile.end(); it1++ )
-        LOG<<"it1 first "<< it1->first<< "second"<< it1->second<<endl;
+        //for (map<int, int>::iterator it1 = GlobalParams::hub_for_tile.begin(); it1 != GlobalParams::hub_for_tile.end(); it1++ )
+        //LOG<<"it1 first "<< it1->first<< "second"<< it1->second<<endl;
 
         // Determine, from configuration file, which Hub is connected to which Channel
         for(vector<int>::iterator iit = hub_config.txChannels.begin(); 

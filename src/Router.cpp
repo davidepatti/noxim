@@ -309,7 +309,7 @@ vector < int > Router::routingFunction(const RouteData & route_data)
 {
     if (GlobalParams::use_winoc)
     {
-    	if (hasRadioHub(local_id)&& hasRadioHub(route_data.dst_id)) LOG<<"local_id="<< local_id <<" hasRadioHub and the destination has also RadioHub"<<endl;
+    	//if (hasRadioHub(local_id)&& hasRadioHub(route_data.dst_id)) LOG<<"local_id="<< local_id <<" hasRadioHub and the destination has also RadioHub"<<endl;
     	//LOG<<"local_id "<<local_id<<"__hasRadioHub"<<endl;
         if (hasRadioHub(local_id) &&
                 hasRadioHub(route_data.dst_id) &&
@@ -416,19 +416,23 @@ void Router::configure(const int _id,
 	start_from_vc[i] = 0;
     }
 
-    int row = _id / GlobalParams::mesh_dim_x;
-    int col = _id % GlobalParams::mesh_dim_x;
 
-    for (int vc = 0; vc<GlobalParams::n_virtual_channels; vc++)
+    if (GlobalParams::topology == TOPOLOGY_MESH)
     {
-	if (row == 0)
-	  buffer[DIRECTION_NORTH][vc].Disable();
-	if (row == GlobalParams::mesh_dim_y-1)
-	  buffer[DIRECTION_SOUTH][vc].Disable();
-	if (col == 0)
-	  buffer[DIRECTION_WEST][vc].Disable();
-	if (col == GlobalParams::mesh_dim_x-1)
-	  buffer[DIRECTION_EAST][vc].Disable();
+	int row = _id / GlobalParams::mesh_dim_x;
+	int col = _id % GlobalParams::mesh_dim_x;
+
+	for (int vc = 0; vc<GlobalParams::n_virtual_channels; vc++)
+	{
+	    if (row == 0)
+	      buffer[DIRECTION_NORTH][vc].Disable();
+	    if (row == GlobalParams::mesh_dim_y-1)
+	      buffer[DIRECTION_SOUTH][vc].Disable();
+	    if (col == 0)
+	      buffer[DIRECTION_WEST][vc].Disable();
+	    if (col == GlobalParams::mesh_dim_x-1)
+	      buffer[DIRECTION_EAST][vc].Disable();
+	}
     }
 
 }
