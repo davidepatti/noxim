@@ -309,7 +309,7 @@ vector < int > Router::routingFunction(const RouteData & route_data)
 {
     if (GlobalParams::use_winoc)
     {
-    	if (hasRadioHub(local_id)&& hasRadioHub(route_data.dst_id)) LOG<<"local_id="<< local_id <<" hasRadioHub and the destination has also RadioHub"<<endl;
+    	//if (hasRadioHub(local_id)&& hasRadioHub(route_data.dst_id)) LOG<<"local_id="<< local_id <<" hasRadioHub and the destination has also RadioHub"<<endl;
     	//LOG<<"local_id "<<local_id<<"__hasRadioHub"<<endl;
         if (hasRadioHub(local_id) &&
                 hasRadioHub(route_data.dst_id) &&
