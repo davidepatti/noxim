@@ -28,7 +28,7 @@
 	  
 	  hub->power.antennaBufferFront();
 
-	  int destHub = tile2Hub(flit_payload.dst_id);
+	  int destHub = tile2Hub(flit_payload.intr_id);
 	  LOG << " *** Starting transmission of " << flit_payload << " to reach HUB_" << destHub <<  endl;
 
 	  trans->set_command(cmd);

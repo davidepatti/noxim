@@ -116,6 +116,7 @@ void Router::txProcess()
 		      route_data.current_id = local_id;
 		      route_data.src_id = flit.src_id;
 		      route_data.dst_id = flit.dst_id;
+		      route_data.intr_id = flit.intr_id;
 		      route_data.dir_in = i;
 		      route_data.vc_id = flit.vc_id;
 

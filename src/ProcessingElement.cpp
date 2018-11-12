@@ -64,6 +64,7 @@ Flit ProcessingElement::nextFlit()
 
     flit.src_id = packet.src_id;
     flit.dst_id = packet.dst_id;
+    flit.intr_id = packet.intr_id; //modif
     flit.vc_id = packet.vc_id;
     flit.timestamp = packet.timestamp;
     flit.sequence_no = packet.size - packet.flit_left;
@@ -187,6 +188,7 @@ Packet ProcessingElement::trafficLocal()
     int i_rnd = rand()%dst_set.size();
 
     p.dst_id = dst_set[i_rnd];
+    p.intr_id =findIntrNode(p.dst_id); //modif
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
@@ -256,6 +258,7 @@ Packet ProcessingElement::trafficULocal()
     int target_hops = roulette();
 
     p.dst_id = findRandomDestination(local_id,target_hops);
+    p.intr_id = findIntrNode(p.dst_id);  //modif
 
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
@@ -275,6 +278,7 @@ Packet ProcessingElement::trafficRandom()
     // Random destination distribution
     do {
 	p.dst_id = randInt(0, max_id);
+    p.intr_id = findIntrNode(p.dst_id);
 
 	// check for hotspot destination
 	for (size_t i = 0; i < GlobalParams::hotspots.size(); i++) {
@@ -282,6 +286,7 @@ Packet ProcessingElement::trafficRandom()
 	    if (rnd >= range_start && rnd < range_start + GlobalParams::hotspots[i].second) {
 		if (local_id != GlobalParams::hotspots[i].first ) {
 		    p.dst_id = GlobalParams::hotspots[i].first;
+            p.intr_id = findIntrNode(p.dst_id); //modif
 		}
 		break;
 	    } else
@@ -291,6 +296,7 @@ Packet ProcessingElement::trafficRandom()
 	if (p.dst_id%2!=0)
 	{
 	    p.dst_id = (p.dst_id+1)%256;
+        p.intr_id = findIntrNode(p.dst_id);//modif
 	}
 #endif
 
@@ -308,6 +314,7 @@ Packet ProcessingElement::trafficTest()
     Packet p;
     p.src_id = local_id;
     p.dst_id = 10;
+    p.intr_id = findIntrNode(p.dst_id);
 
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
@@ -329,6 +336,7 @@ Packet ProcessingElement::trafficTranspose1()
     dst.y = GlobalParams::mesh_dim_y - 1 - src.x;
     fixRanges(src, dst);
     p.dst_id = coord2Id(dst);
+    p.intr_id = findIntrNode(p.dst_id); //modif
 
     p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
@@ -350,6 +358,7 @@ Packet ProcessingElement::trafficTranspose2()
     dst.y = src.x;
     fixRanges(src, dst);
     p.dst_id = coord2Id(dst);
+    p.intr_id = findIntrNode(p.dst_id);
 
     p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
@@ -395,6 +404,7 @@ Packet ProcessingElement::trafficBitReversal()
     Packet p;
     p.src_id = local_id;
     p.dst_id = dnode;
+    p.intr_id = findIntrNode(p.dst_id);
 
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
@@ -418,6 +428,7 @@ Packet ProcessingElement::trafficShuffle()
     Packet p;
     p.src_id = local_id;
     p.dst_id = dnode;
+    p.intr_id = findIntrNode(p.dst_id);
 
     p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
@@ -443,6 +454,7 @@ Packet ProcessingElement::trafficButterfly()
     Packet p;
     p.src_id = local_id;
     p.dst_id = dnode;
+    p.intr_id = findIntrNode(p.dst_id);
 
     p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
@@ -451,8 +463,7 @@ Packet ProcessingElement::trafficButterfly()
     return p;
 }
 
-void ProcessingElement::fixRanges(const Coord src,
-				       Coord & dst)
+void ProcessingElement::fixRanges(const Coord src, Coord & dst)
 {
     // Fix ranges
     if (dst.x < 0)
@@ -469,4 +480,8 @@ int ProcessingElement::getRandomSize()
 {
     return randInt(GlobalParams::min_packet_size,
 		   GlobalParams::max_packet_size);
+}
+int ProcessingElement::findIntrNode(int node)
+{
+    return getClosestNodeAttachedToRadioHubI(node);
 }

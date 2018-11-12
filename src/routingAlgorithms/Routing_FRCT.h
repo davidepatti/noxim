@@ -1,0 +1,31 @@
+#ifndef __NOXIMROUTING_FRCT_H__
+#define __NOXIMROUTING_FRCT_H__
+
+#include "RoutingAlgorithm.h"
+#include "RoutingAlgorithms.h"
+#include "../Router.h"
+
+
+
+using namespace std;
+
+class Routing_FRCT : RoutingAlgorithm {
+	public:
+		vector<int> route(Router * router, const RouteData & routeData);
+
+		static Routing_FRCT * getInstance();
+
+	private:
+		Routing_FRCT(){};
+		~Routing_FRCT(){};
+		bool sameCluster(int node1_id, int node2_id);
+		int getWirelessDistance(int node1_id, int  node2_id);
+		vector<int> wirelessRouting(Coord current, Coord destination);
+		vector<int> wiredRouting(Coord current, Coord destination);
+
+
+		static Routing_FRCT * routing_FRCT;
+		static RoutingAlgorithmsRegister routingAlgorithmsRegister;
+};
+
+#endif

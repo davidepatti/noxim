@@ -231,5 +231,72 @@ template<typename T> std::string i_to_string(const T& t){
 	 s << t;
          return s.str();
 }
+int getWiredDistanceC(Coord node1, Coord node2)
+{
+    return (abs (node1.x - node2.x) + abs (node1.y - node2.y));
+}
+int getWiredDistanceI(int node1_id, int  node2_id)
+{
+    Coord node1 = id2Coord (node1_id);
+    Coord node2 = id2Coord (node2_id);
+
+    return getWiredDistanceC(node1, node2);
+}
+
+Coord getClosestNodeAttachedToRadioHubC(Coord node)
+{
+    int cluster_x = node.x/CLUSTER_WIDTH;
+    int cluster_y = node.y/CLUSTER_HEIGHT;
+
+    Coord routerTop;
+    routerTop.x = cluster_x*CLUSTER_WIDTH;
+    routerTop.y = cluster_y*CLUSTER_HEIGHT;
+    Coord router4;
+    router4.x = routerTop.x + CLUSTER_WIDTH/2;
+    router4.y = routerTop.y + CLUSTER_HEIGHT/2;
+
+    // other router 1 2 3 //
+    Coord router3, router2, router1;
+    router3.x = router4.x;
+    router3.y = router4.y - 1 ;
+
+    router2.x = router4.x - 1 ;
+    router2.y = router4.y;
+
+    router1.x = router4.x - 1 ;
+    router1.y = router4.y - 1 ;
+
+    // distance from node to 4 attached router 
+    int dis1 = getWiredDistanceC(node, router1);
+    int dis2 = getWiredDistanceC(node, router2);
+    int dis3 = getWiredDistanceC(node, router3);
+    int dis4 = getWiredDistanceC(node, router4);
+
+    // Closest distance
+    int min12 = min (dis1, dis2);
+    int min34 = min (dis3, dis4);
+    int win = min (min12, min34);
+
+    // Closest router
+    Coord winner ;
+    if (win == dis1)
+        winner = router1;
+    else if (win == dis2)
+        winner = router2;
+    else if (win == dis3)
+        winner = router3;
+    else 
+        winner = router4;
+
+    return winner;
+
+
+
+}
+
+int getClosestNodeAttachedToRadioHubI(int node)
+{
+    return coord2Id (getClosestNodeAttachedToRadioHubC(id2Coord(node)));
+}
 
 #endif

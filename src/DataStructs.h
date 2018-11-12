@@ -41,6 +41,7 @@ struct Payload {
 struct Packet {
     int src_id;
     int dst_id;
+    int intr_id;
     int vc_id;
     double timestamp;		// SC timestamp at packet generation
     int size;
@@ -57,6 +58,7 @@ struct Packet {
     void make(const int s, const int d, const int vc, const double ts, const int sz) {
 	src_id = s;
 	dst_id = d;
+    intr_id = d; //modif
 	vc_id = vc;
 	timestamp = ts;
 	size = sz;
@@ -70,6 +72,7 @@ struct RouteData {
     int current_id;
     int src_id;
     int dst_id;
+    int intr_id;        // modif
     int dir_in;			// direction from which the packet comes from
     int vc_id;
 };
@@ -120,6 +123,7 @@ struct Flit {
     int src_id;
     int dst_id;
     int vc_id; // Virtual Channel
+    int intr_id; // this node replace the dst_id only for radio Hub 
     FlitType flit_type;	// The flit type (FLIT_TYPE_HEAD, FLIT_TYPE_BODY, FLIT_TYPE_TAIL)
     int sequence_no;		// The sequence number of the flit inside the packet
     int sequence_length;
@@ -130,6 +134,7 @@ struct Flit {
 
     inline bool operator ==(const Flit & flit) const {
 	return (flit.src_id == src_id && flit.dst_id == dst_id
+        && flit.intr_id == intr_id //modif
 		&& flit.flit_type == flit_type
 		&& flit.vc_id == vc_id
 		&& flit.sequence_no == sequence_no

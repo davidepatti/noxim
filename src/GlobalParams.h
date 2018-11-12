@@ -32,6 +32,9 @@ using namespace std;
 #define DIRECTION_HUB           5
 #define DIRECTION_WIRELESS    747
 
+#define CLUSTER_WIDTH 4
+#define CLUSTER_HEIGHT 8
+
 #define MAX_VIRTUAL_CHANNELS	8
 #define DEFAULT_VC 		0
 

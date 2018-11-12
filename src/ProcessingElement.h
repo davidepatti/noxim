@@ -64,7 +64,7 @@ SC_MODULE(ProcessingElement)
     GlobalTrafficTable *traffic_table;	// Reference to the Global traffic Table
     bool never_transmit;	// true if the PE does not transmit any packet 
     //  (valid only for the table based traffic)
-
+    int findIntrNode(int node); //modif
     void fixRanges(const Coord, Coord &);	// Fix the ranges of the destination
     int randInt(int min, int max);	// Extracts a random integer number between min and max
     int getRandomSize();	// Returns a random size in flits for the packet
