@@ -27,7 +27,7 @@ n_virtual_channels: 2
 #   TABLE_BASED
 # Each of the above labels should match a corresponding
 # implementation in the routingAlgorithms source code directory
-routing_algorithm: XY
+routing_algorithm: FRCT
 routing_table_filename: ""
 
 # Routing specific parameters
@@ -401,7 +401,7 @@ use_wirxsleep: false
 #   VERBOSE_LOW
 #   VERBOSE_MEDIUM
 #   VERBOSE_HIGH
-verbose_mode: VERBOSE_HIGH
+verbose_mode: VERBOSE_OFF
 
 # Trace
 trace_mode: false 

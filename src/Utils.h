@@ -231,11 +231,13 @@ template<typename T> std::string i_to_string(const T& t){
 	 s << t;
          return s.str();
 }
-int getWiredDistanceC(Coord node1, Coord node2)
+
+inline int getWiredDistanceC(Coord node1, Coord node2)
 {
     return (abs (node1.x - node2.x) + abs (node1.y - node2.y));
 }
-int getWiredDistanceI(int node1_id, int  node2_id)
+
+inline int getWiredDistanceI(int node1_id, int  node2_id)
 {
     Coord node1 = id2Coord (node1_id);
     Coord node2 = id2Coord (node2_id);
@@ -243,7 +245,7 @@ int getWiredDistanceI(int node1_id, int  node2_id)
     return getWiredDistanceC(node1, node2);
 }
 
-Coord getClosestNodeAttachedToRadioHubC(Coord node)
+inline Coord getClosestNodeAttachedToRadioHubC(Coord node)
 {
     int cluster_x = node.x/CLUSTER_WIDTH;
     int cluster_y = node.y/CLUSTER_HEIGHT;
@@ -294,9 +296,32 @@ Coord getClosestNodeAttachedToRadioHubC(Coord node)
 
 }
 
-int getClosestNodeAttachedToRadioHubI(int node)
+inline int getClosestNodeAttachedToRadioHubI(int node)
 {
     return coord2Id (getClosestNodeAttachedToRadioHubC(id2Coord(node)));
 }
 
+inline bool sameCluster(int node1_id, int node2_id)
+{
+    Coord node1 = id2Coord(node1_id);
+    Coord node2 = id2Coord(node2_id);
+  return (node1.x/CLUSTER_WIDTH == node2.x/CLUSTER_WIDTH && node1.y/CLUSTER_HEIGHT == node2.y/CLUSTER_HEIGHT);
+}
+
+
+
+inline int getWirelessDistance(int node1_id, int node2_id)
+{
+    Coord node1 = id2Coord (node1_id);
+    Coord node2 = id2Coord (node2_id);
+
+    Coord closest_n_attached_rh1 = getClosestNodeAttachedToRadioHubC (node1);
+    Coord closest_n_attached_rh2 = getClosestNodeAttachedToRadioHubC (node2);
+
+    return (getWiredDistanceC(node1, closest_n_attached_rh1) + getWiredDistanceC(node2, closest_n_attached_rh2) + 1);
+
+}
+
+
 #endif
+

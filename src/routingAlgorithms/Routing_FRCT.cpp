@@ -13,6 +13,7 @@ Routing_FRCT * Routing_FRCT::getInstance() {
 
 vector<int> Routing_FRCT::route(Router * router, const RouteData & routeData)
 {
+    cout <<"coucou current_id "<<routeData.current_id<<" source : "<<routeData.src_id<<" dest : "<<routeData.dst_id<<"intrNode : "<<routeData.intr_id<<endl;
     Coord current = id2Coord(routeData.current_id);
     Coord destination = id2Coord(routeData.dst_id);
     
@@ -21,8 +22,9 @@ vector<int> Routing_FRCT::route(Router * router, const RouteData & routeData)
 
     if (routeData.current_id == routeData.dst_id)
     {
-        
-        return vector<int>(DIRECTION_LOCAL);
+        vector<int> dir;
+        dir.push_back(DIRECTION_LOCAL);
+        return dir;
     }
 
 // check SRC and DEST in the same cluster //
@@ -69,35 +71,16 @@ vector<int> Routing_FRCT::wirelessRouting(Coord current, Coord destination)
     Coord closest_n_attached_rh = getClosestNodeAttachedToRadioHubC(current);
 
     if (current == closest_n_attached_rh)
-    {
-        return vector<int>(DIRECTION_WIRELESS);
+    {   
+        vector<int> dir;
+        dir.push_back(DIRECTION_HUB);
+        return dir;
     }
 
 
     return wiredRouting (current, closest_n_attached_rh);
     // return wiredRouting (getClosestNodeAttachedToRadioHub(destination), destination);
     
-
-}
-
-bool Routing_FRCT::sameCluster(int node1_id, int node2_id)
-{
-    Coord node1 = id2Coord(node1_id);
-    Coord node2 = id2Coord(node2_id);
-  return (node1.x/CLUSTER_WIDTH == node2.x/CLUSTER_WIDTH && node1.y/CLUSTER_HEIGHT == node2.y/CLUSTER_HEIGHT);
-}
-
-
-
-int Routing_FRCT::getWirelessDistance(int node1_id, int node2_id)
-{
-    Coord node1 = id2Coord (node1_id);
-    Coord node2 = id2Coord (node2_id);
-
-    Coord closest_n_attached_rh1 = getClosestNodeAttachedToRadioHubC (node1);
-    Coord closest_n_attached_rh2 = getClosestNodeAttachedToRadioHubC (node2);
-
-    return (getWiredDistanceC(node1, closest_n_attached_rh1) + getWiredDistanceC(node2, closest_n_attached_rh2) + 1);
 
 }
 

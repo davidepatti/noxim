@@ -150,8 +150,12 @@ bool ProcessingElement::canShot(Packet & packet)
 	if (shot) {
 	    for (unsigned int i = 0; i < dst_prob.size(); i++) {
 		if (prob < dst_prob[i].second) {
-                    int vc = randInt(0,GlobalParams::n_virtual_channels-1);
+            // modification for vc allocation //
+
+                    //int vc = randInt(0,GlobalParams::n_virtual_channels-1);
+                     int vc = vcAllocate (local_id, dst_prob[i].first);
 		    packet.make(local_id, dst_prob[i].first, vc, now, getRandomSize());
+            packet.intr_id =findIntrNode(dst_prob[i].first);
 		    break;
 		}
 	    }
@@ -304,7 +308,8 @@ Packet ProcessingElement::trafficRandom()
 
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
-    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
+    //p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
+    p.vc_id = vcAllocate(p.src_id, p.dst_id);
 
     return p;
 }
@@ -318,7 +323,8 @@ Packet ProcessingElement::trafficTest()
 
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
-    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
+    p.vc_id = vcAllocate(p.src_id, p.dst_id);
+    //p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
 
     return p;
 }
@@ -338,7 +344,8 @@ Packet ProcessingElement::trafficTranspose1()
     p.dst_id = coord2Id(dst);
     p.intr_id = findIntrNode(p.dst_id); //modif
 
-    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
+    //p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
+    p.vc_id = vcAllocate(p.src_id, p.dst_id);
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
@@ -360,7 +367,8 @@ Packet ProcessingElement::trafficTranspose2()
     p.dst_id = coord2Id(dst);
     p.intr_id = findIntrNode(p.dst_id);
 
-    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
+    //p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
+    p.vc_id = vcAllocate(p.src_id, p.dst_id);
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
@@ -430,7 +438,8 @@ Packet ProcessingElement::trafficShuffle()
     p.dst_id = dnode;
     p.intr_id = findIntrNode(p.dst_id);
 
-    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
+    //p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
+    p.vc_id = vcAllocate(p.src_id, p.dst_id);
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
@@ -456,7 +465,8 @@ Packet ProcessingElement::trafficButterfly()
     p.dst_id = dnode;
     p.intr_id = findIntrNode(p.dst_id);
 
-    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
+    //p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
+    p.vc_id = vcAllocate(p.src_id, p.dst_id);
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
@@ -484,4 +494,26 @@ int ProcessingElement::getRandomSize()
 int ProcessingElement::findIntrNode(int node)
 {
     return getClosestNodeAttachedToRadioHubI(node);
+}
+int ProcessingElement::vcAllocate(int src_id, int dst_id)
+{
+    // check number of vc 
+    assert(GlobalParams::n_virtual_channels ==2);
+    //wired vc=0 , wireless vc=1
+    if (sameCluster(src_id, dst_id))
+    {  
+       return 0;
+        
+    }
+   else 
+    {
+
+        int dist_wired = getWiredDistanceI(src_id, dst_id);
+        int dist_wireless = getWirelessDistance(src_id, dst_id);
+        if (dist_wired < dist_wireless)
+            return 0;
+        else 
+            return 1;
+
+    }
 }

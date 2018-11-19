@@ -18,14 +18,20 @@ int Hub::tile2Port(int id)
 
 int Hub::route(Flit& f)
 {
+	if (f.flit_type == 0)
+		cout <<"coucou hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
 	for (vector<int>::size_type i=0; i< GlobalParams::hub_configuration[local_id].attachedNodes.size();i++)
 	{
 		if (GlobalParams::hub_configuration[local_id].attachedNodes[i]==f.dst_id)
 		{
+			if (f.flit_type == 0)
+			cout<<"**coucou*****hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
 			return tile2Port(f.dst_id);
 		}
 		else if (GlobalParams::hub_configuration[local_id].attachedNodes[i]==f.intr_id)
 		{
+			if (f.flit_type == 0)
+			cout<<"*****coucou******hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
 			return tile2Port(f.intr_id);
 		}
 	}
