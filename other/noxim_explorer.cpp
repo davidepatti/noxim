@@ -70,6 +70,8 @@ struct TSimulationResults
   unsigned int rflits;
 };
 
+map<string, string> topology_cmd;
+
 //---------------------------------------------------------------------------
 
 double GetCurrentTime()
@@ -405,11 +407,29 @@ string ParamValue2Cmd(const pair<string,string>& pv)
       char times;
       iss >> width >> times >> height;
 
+      if (width > 0 && height > 0)
+        {
+          ostringstream oss;
+          oss << "-topology MESH -dimx " << width << " -dimy " << height;
+          cmd = oss.str();
+        }
+      else
+        cmd = "-" + pv.first + " " + pv.second + " " + (pv.second == "MESH" ? topology_cmd.at("MESH") : topology_cmd.at("DELTA"));
+    }
+  else if (pv.first == "dimXY")
+    {
+      istringstream iss(pv.second);
+
+      int  width, height;
+      char times;
+      iss >> width >> times >> height;
+
       ostringstream oss;
       oss << "-dimx " << width << " -dimy " << height;
-
-      cmd = oss.str();
+      topology_cmd.at("MESH") = oss.str();
     }
+  else if (pv.first == "dtiles")
+    topology_cmd.at("DELTA") = "-" + pv.first + " " + pv.second;
   else
     cmd = "-" + pv.first + " " + pv.second;
 
@@ -905,6 +925,10 @@ bool RunSimulations(const string& script_fname,
 
 int main(int argc, char **argv)
 {
+
+  topology_cmd.insert(make_pair("MESH", ""));
+  topology_cmd.insert(make_pair("DELTA", ""));
+  
   if (argc < 2)
     {
       cout << "Usage: " << argv[0] << " <cfg file> [<cfg file>]" << endl;
