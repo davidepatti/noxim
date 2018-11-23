@@ -748,7 +748,8 @@ bool GenMatlabCode(const string& var_name,
        << "end" << endl
        << endl;
 
-  fout << "figure(" << fig_no << ");" << endl
+  fout << "fig" << fig_no << " = figure(" << fig_no << ");" << endl
+       << "set(fig" << fig_no << ",'Name','" << var_name << "');" << endl
        << "hold on;" << endl
        << "plot(" << var_name << "(:,1), " << var_name << "(:,2), symbol);" << endl
        << endl;
