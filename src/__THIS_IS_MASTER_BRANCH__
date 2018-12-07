@@ -1,9 +1,0 @@
-Dear noxim developer,
-be aware when writing directly to the master branch. Should you commit to another branch ?
-
-To show all branches:
-git branch -a
-
-To switch branch:
-git checkout <branch_name>
-
