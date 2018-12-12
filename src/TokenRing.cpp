@@ -99,6 +99,7 @@ void TokenRing::attachHub(int channel, int hub, sc_in<int>* hub_token_holder_por
     // port and connect a signal
     if (!current_token_holder[channel])
     {
+		token_position[channel] = hub;
     	current_token_holder[channel] = new sc_out<int>();
     	current_token_expiration[channel] = new sc_out<int>();
 
