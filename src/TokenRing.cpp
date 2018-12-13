@@ -12,7 +12,7 @@
 
 void TokenRing::updateTokenPacket(int channel)
 {
-	if (flag[channel][token_position[channel]]->read() == RELEASE_CHANNEL)
+	if (flag[channel][rings_mapping[channel][token_position[channel]]]->read() == RELEASE_CHANNEL)
 	{
 	    // number of hubs of the ring
 	    int num_hubs = rings_mapping[channel].size();
@@ -21,7 +21,7 @@ void TokenRing::updateTokenPacket(int channel)
 	    LOG << "*** Token of channel " << channel << " has been assigned to Hub_" <<  rings_mapping[channel][token_position[channel]] << endl;
 
 	    current_token_holder[channel]->write(rings_mapping[channel][token_position[channel]]);
-	    flag[channel][token_position[channel]]->write(HOLD_CHANNEL);
+	    flag[channel][rings_mapping[channel][token_position[channel]]]->write(HOLD_CHANNEL);
 
 	}
 }
@@ -29,7 +29,7 @@ void TokenRing::updateTokenPacket(int channel)
 void TokenRing::updateTokenMaxHold(int channel)
 {
 	if (--token_hold_count[channel] == 0 ||
-		flag[channel][token_position[channel]]->read() == RELEASE_CHANNEL)
+		flag[channel][rings_mapping[channel][token_position[channel]]]->read() == RELEASE_CHANNEL)
 	{
 	    token_hold_count[channel] = atoi(GlobalParams::channel_configuration[channel].macPolicy[1].c_str());
 	    // number of hubs of the ring

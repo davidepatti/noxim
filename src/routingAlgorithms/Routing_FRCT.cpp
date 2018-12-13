@@ -13,7 +13,7 @@ Routing_FRCT * Routing_FRCT::getInstance() {
 
 vector<int> Routing_FRCT::route(Router * router, const RouteData & routeData)
 {
-    cout <<"coucou current_id "<<routeData.current_id<<" source : "<<routeData.src_id<<" dest : "<<routeData.dst_id<<"intrNode : "<<routeData.intr_id<<endl;
+    //cout <<"coucou current_id "<<routeData.current_id<<" source : "<<routeData.src_id<<" dest : "<<routeData.dst_id<<"intrNode : "<<routeData.intr_id<<endl;
     Coord current = id2Coord(routeData.current_id);
     Coord destination = id2Coord(routeData.dst_id);
     

@@ -18,20 +18,26 @@ int Hub::tile2Port(int id)
 
 int Hub::route(Flit& f)
 {
+	/*
 	if (f.flit_type == 0)
-		cout <<"coucou hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
+	cout <<"coucou hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
+	//*/
 	for (vector<int>::size_type i=0; i< GlobalParams::hub_configuration[local_id].attachedNodes.size();i++)
 	{
 		if (GlobalParams::hub_configuration[local_id].attachedNodes[i]==f.dst_id)
 		{
+			/*
 			if (f.flit_type == 0)
 			cout<<"**coucou*****hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
+			//*/
 			return tile2Port(f.dst_id);
 		}
 		else if (GlobalParams::hub_configuration[local_id].attachedNodes[i]==f.intr_id)
 		{
+			/*
 			if (f.flit_type == 0)
 			cout<<"*****coucou******hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
+			//*/
 			return tile2Port(f.intr_id);
 		}
 	}
@@ -526,12 +532,12 @@ void Hub::tileToAntennaProcess()
 
 					LOG << "Checking reservation availability of Channel " << channel << " by Hub port[" << i << "][" << vc << "] for flit " << flit << endl;
 
-					int rt_status = tile2antenna_reservation_table.checkReservation(r,channel);
+					int rt_status = tile2antenna_reservation_table.checkReservation(r,txChannel_mapping.at(channel));
 
 					if (rt_status == RT_AVAILABLE)
 					{
 						LOG << "Reservation of channel " << channel << " from Hub port["<< i << "]["<<vc<<"] by flit " << flit << endl;
-						tile2antenna_reservation_table.reserve(r, channel);
+						tile2antenna_reservation_table.reserve(r, txChannel_mapping.at(channel));
 					}
 					else if (rt_status == RT_ALREADY_SAME)
 					{
@@ -565,7 +571,7 @@ void Hub::tileToAntennaProcess()
 		{
 			int rnd_idx = rand()%reservations.size();
 
-			int o = reservations[rnd_idx].first;
+			int o = reservations[rnd_idx].first >= 0 ? txChannels[reservations[rnd_idx].first] : reservations[rnd_idx].first;
 			int vc = reservations[rnd_idx].second;
 
 			if (!buffer_from_tile[i][vc].IsEmpty())
@@ -590,7 +596,7 @@ void Hub::tileToAntennaProcess()
 							TReservation r;
 							r.input = i;
 							r.vc = vc;
-							tile2antenna_reservation_table.release(r,channel);
+							tile2antenna_reservation_table.release(r,txChannel_mapping.at(channel));
 						}
 
 						LOG << "Flit " << flit << " moved from buffer_from_tile["<<i<<"]["<<vc<<"]  to buffer_tx["<<channel<<"] " << endl;

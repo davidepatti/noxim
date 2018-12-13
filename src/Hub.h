@@ -43,6 +43,7 @@ SC_MODULE(Hub)
 	vector<int> attachedNodes;
 	vector<int> txChannels;
 	vector<int> rxChannels;
+	map<int,int> txChannel_mapping;
 
 	sc_in<Flit>* flit_rx;
 	sc_in<bool>* req_rx;
@@ -138,6 +139,11 @@ SC_MODULE(Hub)
 
 		antenna2tile_reservation_table.setSize(num_ports);
 		tile2antenna_reservation_table.setSize(txChannels.size());
+
+        for(vector<int>::size_type i = 0; i != txChannels.size(); i++) {
+            txChannel_mapping[txChannels[i]] = i;
+        }
+
 
 		flit_rx = new sc_in<Flit>[num_ports];
 		req_rx = new sc_in<bool>[num_ports];
