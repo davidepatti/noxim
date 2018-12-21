@@ -90,6 +90,7 @@ void loadConfiguration() {
     //GlobalParams::hotspots;
     GlobalParams::show_buffer_stats = readParam<bool>(config, "show_buffer_stats");
     GlobalParams::use_winoc = readParam<bool>(config, "use_winoc");
+    GlobalParams::winoc_dst_hops = readParam<int>(config, "winoc_dst_hops",0);
     GlobalParams::use_powermanager = readParam<bool>(config, "use_wirxsleep");
     
 
@@ -201,6 +202,7 @@ void showHelp(char selfname[])
          << "\t-buffer_antenna N\tSet the depth of hub antenna buffers (RX/TX) [flits]" << endl
 	 << "\t-vc N\t\t\tNumber of virtual channels" << endl
          << "\t-winoc\t\t\tEnable radio hub wireless transmission" << endl
+         << "\t-winoc_dst_hops\t\t\tNumbero of hops from the candidate target RadioHub and the final destination" << endl
          << "\t-wirxsleep\t\tEnable radio hub wireless power manager" << endl
          << "\t-size Nmin Nmax\t\tSet the minimum and maximum packet size [flits]" << endl
          << "\t-flit N\t\t\tSet the flit size [bit]" << endl
@@ -474,6 +476,10 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::flit_size = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-winoc")) 
 		GlobalParams::use_winoc = true;
+	    else if (!strcmp(arg_vet[i], "-winoc_dst_hops")) 
+	    {
+            GlobalParams::winoc_dst_hops = atoi(arg_vet[++i]);
+	    }
 	    else if (!strcmp(arg_vet[i], "-wirxsleep")) 
 	    {
 		GlobalParams::use_powermanager = true;
@@ -662,7 +668,8 @@ T readParam(YAML::Node node, string param, T default_value) {
    try {
        return node[param].as<T>();
    } catch(exception &e) {
-       cerr << "WARNING: Cannot read param " << param << ". Using the default value " << default_value << "." << endl;
+       cerr << "WARNING: parameter " << param << " not present in YAML configuration file." << endl;
+       cerr << "Command line value will be use (if specified), otherwise the default value " << default_value << " will be assumed." << endl;
        return default_value;
    }
 }

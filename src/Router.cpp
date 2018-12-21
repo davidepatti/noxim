@@ -305,30 +305,79 @@ void Router::perCycleUpdate()
     }
 }
 
+vector<int> Router::getNextHops(RouteData rd)
+{
+	// annotate the initial nodes
+    int src = rd.src_id;
+	int dst = rd.dst_id;
+
+	vector<int> next;
+
+	int current_src = src;
+	vector<int> next_hops;  // initially is empty
+
+	while (current_src!=dst)
+	{
+		next = routingAlgorithm->route(this, rd);
+	    current_src = next[0];
+		rd.src_id = next[0];
+
+		next_hops.push_back(next[0]);
+
+	}
+
+    return next_hops;
+}
+
+
 vector < int > Router::routingFunction(const RouteData & route_data)
 {
-    if (GlobalParams::use_winoc)
-    {
-    	//if (hasRadioHub(local_id)&& hasRadioHub(route_data.dst_id)) LOG<<"local_id="<< local_id <<" hasRadioHub and the destination has also RadioHub"<<endl;
-    	//LOG<<"local_id "<<local_id<<"__hasRadioHub"<<endl;
-        if (hasRadioHub(local_id) &&
-                hasRadioHub(route_data.dst_id) &&
-                !sameRadioHub(local_id,route_data.dst_id)
-           )
-        {
+	if (GlobalParams::use_winoc)
+	{
+		// When destination D is not directly connected to a radio hub, wireless
+		// communication could still  be used if one of the nodes N in the routing
+		// path is reachable from current node C.
+		// Of course, some further wired hops will be required from N -> D.
+		//
+		// A threshold "winoc_dst_hops" can be specified to determine
+		// the max distance from the intermediate node N and the destination D.
 
-		if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-		    LOG << "Setting direction HUB to reach destination node " << route_data.dst_id << endl;
+		// When zero, it means N=D, i.e., we explicitly ask the destination D to be connected to the
+		// target radio hub
+		if (GlobalParams::winoc_dst_hops==0)
+		{
+			//if (hasRadioHub(local_id)&& hasRadioHub(route_data.dst_id)) LOG<<"local_id="<< local_id <<" hasRadioHub and the destination has also RadioHub"<<endl;
+			//LOG<<"local_id "<<local_id<<"__hasRadioHub"<<endl;
+			if (hasRadioHub(local_id) &&
+				hasRadioHub(route_data.dst_id) &&
+				!sameRadioHub(local_id,route_data.dst_id)
+					)
+			{
+				if (GlobalParams::verbose_mode > VERBOSE_OFF)
+					LOG << "Setting direction HUB to reach destination node " << route_data.dst_id << endl;
 
-		vector<int> dirv;
-		dirv.push_back(DIRECTION_HUB);
-		return dirv;
-        }
-    }
-    if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-	LOG << "Wired routing for dst = " << route_data.dst_id << endl;
+				vector<int> dirv;
+				dirv.push_back(DIRECTION_HUB);
+				return dirv;
+			}
+		}
+		else
+		{
+			if (hasRadioHub(local_id))
+			{
+				// TODO: at the moment, just the set of nexts hops are printed
+				LOG << "NEXT_HOPS:";
+				vector<int> nexthops = getNextHops(route_data);
+				for (int i=0;i<nexthops.size();i++)
+					cout << " HOP["<< i <<"]="<< nexthops[i]<<"->";
+			}
+		}
+	}
+	// TODO: fix all the deprecated verbose mode logs
+	if (GlobalParams::verbose_mode > VERBOSE_OFF)
+		LOG << "Wired routing for dst = " << route_data.dst_id << endl;
 
-    return routingAlgorithm->route(this, route_data);
+	return routingAlgorithm->route(this, route_data);
 }
 
 int Router::route(const RouteData & route_data)

@@ -129,9 +129,11 @@ SC_MODULE(Router)
     int reflexDirection(int direction) const;
     int getNeighborId(int _id, int direction) const;
    
+    vector<int> getNextHops(int src, int dst);
     int start_from_port;	     // Port from which to start the reservation cycle
     int start_from_vc[DIRECTIONS+2]; // VC from which to start the reservation cycle for the specific port
 
+    vector<int> getNextHops(RouteData rd);
   public:
     unsigned int local_drained;
 

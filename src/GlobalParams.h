@@ -173,6 +173,7 @@ struct GlobalParams {
     static unsigned int max_volume_to_be_drained;
     static bool show_buffer_stats;
     static bool use_winoc;
+    static int winoc_dst_hops;
     static bool use_powermanager;
     static ChannelConfig default_channel_configuration;
     static map<int, ChannelConfig> channel_configuration;
