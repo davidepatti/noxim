@@ -334,49 +334,47 @@ vector < int > Router::routingFunction(const RouteData & route_data)
 {
 	if (GlobalParams::use_winoc)
 	{
-		// When destination D is not directly connected to a radio hub, wireless
-		// communication could still  be used if one of the nodes N in the routing
+		// - If the current node C and the destination D are connected to an radiohub, use wireless
+		// - If D is not directly connected to a radio hub, wireless
+		// communication could still  be used if some intermediate node "I" in the routing
 		// path is reachable from current node C.
-		// Of course, some further wired hops will be required from N -> D.
-		//
-		// A threshold "winoc_dst_hops" can be specified to determine
-		// the max distance from the intermediate node N and the destination D.
-
-		// When zero, it means N=D, i.e., we explicitly ask the destination D to be connected to the
+		// - Since further wired hops will be required from I -> D, a threshold "winoc_dst_hops"
+		// can be specified (via command line) to determine the max distance from the intermediate
+		// node I and the destination D.
+		// - NOTE: default threshold is 0, which means I=D, i.e., we explicitly ask the destination D to be connected to the
 		// target radio hub
-		if (GlobalParams::winoc_dst_hops==0)
+		if (hasRadioHub(local_id))
 		{
-			//if (hasRadioHub(local_id)&& hasRadioHub(route_data.dst_id)) LOG<<"local_id="<< local_id <<" hasRadioHub and the destination has also RadioHub"<<endl;
-			//LOG<<"local_id "<<local_id<<"__hasRadioHub"<<endl;
-			if (hasRadioHub(local_id) &&
-				hasRadioHub(route_data.dst_id) &&
-				!sameRadioHub(local_id,route_data.dst_id)
-					)
-			{
-				if (GlobalParams::verbose_mode > VERBOSE_OFF)
-					LOG << "Setting direction HUB to reach destination node " << route_data.dst_id << endl;
+			// destination must be directly connected to a radio-hub
+            if (GlobalParams::winoc_dst_hops==0)
+            {
+                // The only chance is that destination is directly connected to an hub
+                if ( hasRadioHub(route_data.dst_id) &&
+                    !sameRadioHub(local_id,route_data.dst_id) )
+                {
+                    LOG << "Setting direction HUB to reach destination node " << route_data.dst_id << endl;
 
-				vector<int> dirv;
-				dirv.push_back(DIRECTION_HUB);
-				return dirv;
-			}
-		}
-		else
-		{
-			if (hasRadioHub(local_id))
-			{
-				// TODO: at the moment, just the set of nexts hops are printed
-				LOG << "NEXT_HOPS:";
-				vector<int> nexthops = getNextHops(route_data);
-				for (int i=0;i<nexthops.size();i++)
-					cout << " HOP["<< i <<"]="<< nexthops[i]<<"->";
-			}
+                    vector<int> dirv;
+                    dirv.push_back(DIRECTION_HUB);
+                    return dirv;
+                }
+            }
+            else // let's check whether some node in the route has an acceptable distance to the dst
+            {
+                // TODO: for the moment, just print the set of nexts hops to check everything is ok
+                LOG << "NEXT_HOPS:";
+                vector<int> nexthops;
+                nexthops = getNextHops(route_data);
+                for (int i=0;i<nexthops.size();i++)
+                    cout << " HOP["<< i <<"]="<< nexthops[i]<<"->";
+            }
 		}
 	}
 	// TODO: fix all the deprecated verbose mode logs
 	if (GlobalParams::verbose_mode > VERBOSE_OFF)
 		LOG << "Wired routing for dst = " << route_data.dst_id << endl;
 
+	// not wireless direction taken, apply normal routing
 	return routingAlgorithm->route(this, route_data);
 }
 
