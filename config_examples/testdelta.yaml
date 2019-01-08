@@ -1,0 +1,115 @@
+#Simple test file for testing delta with wireless
+# 2 radiohubs are connected to the code node 0 and 7
+
+topology: BUTTERFLY
+#
+n_delta_tiles: 8
+# number of flits for each router buffer
+buffer_depth: 4
+# size of flits, in bits
+flit_size: 32
+# lenght in mm of router to hub connection
+r2h_link_length: 2.0
+# lenght in mm of router to router connection
+r2r_link_length: 1.0
+n_virtual_channels: 1
+
+routing_algorithm: DELTA
+routing_table_filename: ""
+
+dyad_threshold: 0.6
+
+selection_strategy: RANDOM
+
+#
+# WIRELESS CONFIGURATION
+#
+Hubs:
+    defaults:
+    # channels from which Hub can receive/transmit
+        rx_radio_channels: [0]
+        tx_radio_channels: [0]
+    # list of node tiles attached to the hub
+        attached_nodes: []
+    # size of buffers connecting the hub to tiles
+        to_tile_buffer_size: 4
+        from_tile_buffer_size: 4
+    # size of antenna tx/rx
+        rx_buffer_size: 4
+        tx_buffer_size: 4
+
+
+# Trivial example of core2core
+    0:
+      attached_nodes: [0]
+
+    1:
+      attached_nodes: [7]
+
+    #2:
+    #  attached_nodes: [6]
+
+    #3:
+      #attached_nodes: [7]
+
+# Transmission channels configuration
+# each channel modelizes the transmission over a given frequency that
+# can be used by a set of communicating hubs
+RadioChannels:
+    defaults:
+    # data rate in Gb/s affect the number of cycles required for a
+    # flit transmission
+        data_rate: 16
+    # bit error rate (CURRENTLY UNSUPPORTED)
+        ber: [0, 0]
+    # mac policies:
+
+        mac_policy: [TOKEN_PACKET]
+
+
+# SIMULATION PARAMETERS
+#
+clock_period_ps: 1000
+# duration of reset signal assertion, expressed in cycles
+reset_time: 1000
+# overal simulation lenght, expressed in cycles
+simulation_time: 10000
+# collect stats after a given number of cycles
+stats_warm_up_time: 1000
+# power breakdown, nodes communication details
+detailed: false
+# stop after a given amount of load has been processed
+max_volume_to_be_drained: 0
+show_buffer_stats: false
+
+# Winoc
+# enable wireless, when false, all wireless channel configuration is
+# ignored
+use_winoc: false
+# experimental power saving strategy
+use_wirxsleep: false
+
+verbose_mode: VERBOSE_OFF
+
+# Trace
+trace_mode: false
+trace_filename: ""
+
+min_packet_size: 8
+max_packet_size: 8
+packet_injection_rate: 0.01
+probability_of_retransmission: 0.01
+
+# Traffic distribution:
+#   TRAFFIC_RANDOM
+#   TRAFFIC_TRANSPOSE1
+#   TRAFFIC_TRANSPOSE2
+#   TRAFFIC_HOTSPOT
+#   TRAFFIC_TABLE_BASED
+#   TRAFFIC_BIT_REVERSAL
+#   TRAFFIC_SHUFFLE
+#   TRAFFIC_BUTTERFLY
+traffic_distribution: TRAFFIC_RANDOM
+# when traffic table based is specified, use the following
+# configuration file
+traffic_table_filename: "t.txt"
