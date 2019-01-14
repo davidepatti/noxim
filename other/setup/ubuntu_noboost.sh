@@ -23,7 +23,7 @@ cd libs
 
 git clone https://github.com/jbeder/yaml-cpp
 cd yaml-cpp/
-git checkout -b r0.6.0 release-0.6.0
+git checkout -b r0.6.0 yaml-cpp-0.6.0
 mkdir -p lib
 cd lib
 cmake ..
