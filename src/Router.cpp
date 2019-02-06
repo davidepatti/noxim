@@ -364,32 +364,6 @@ vector<int> Router::getNextHops(RouteData rd) {
 	return next_hops;
 
 }
- */
-/*
-vector<int> Router::getNextHops(RouteData rd)
-{
-	// annotate the initial nodes
-    int src = rd.src_id;
-	int dst = rd.dst_id;
-
-	vector<int> next;
-
-	int current_src = src;
-	vector<int> next_hops;  // initially is empty
-
-	while (current_src!=dst)
-	{
-		next = routingAlgorithm->route(this, rd);
-	    current_src = next[0];
-		rd.src_id = next[0];
-
-		next_hops.push_back(next[0]);
-
-	}
-    return next_hops;
-}
- */
-
 
 vector < int > Router::routingFunction(const RouteData & route_data)
 {
@@ -423,11 +397,12 @@ vector < int > Router::routingFunction(const RouteData & route_data)
             else // let's check whether some node in the route has an acceptable distance to the dst
             {
                 // TODO: for the moment, just print the set of nexts hops to check everything is ok
-                LOG << "NEXT_HOPS:";
+                LOG << "NEXT_HOPS (from id " << route_data.src_id << " to " << route_data.dst_id << " >>>> :";
                 vector<int> nexthops;
                 nexthops = getNextHops(route_data);
                 for (int i=0;i<nexthops.size();i++)
                     cout << " HOP["<< i <<"]="<< nexthops[i]<<"->";
+                LOG << " <<<< END HOPS ***" <<endl;
             }
 		}
 	}
