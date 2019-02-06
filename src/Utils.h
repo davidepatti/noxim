@@ -169,24 +169,24 @@ inline void sc_trace(sc_trace_file * &tf, const ChannelStatus & bs, string & nam
 // Misc common functions
 
 inline Coord id2Coord(int id)
-{   
-    Coord coord; 
+{
+    Coord coord;
     if (GlobalParams::topology == TOPOLOGY_MESH)
     {
-	coord.x = id % GlobalParams::mesh_dim_x;
-	coord.y = id / GlobalParams::mesh_dim_x;
+        coord.x = id % GlobalParams::mesh_dim_x;
+        coord.y = id / GlobalParams::mesh_dim_x;
 
-	assert(coord.x < GlobalParams::mesh_dim_x);
-	assert(coord.y < GlobalParams::mesh_dim_y);
+        assert(coord.x < GlobalParams::mesh_dim_x);
+        assert(coord.y < GlobalParams::mesh_dim_y);
     }
     else // other delta topologies
-    { 
-	id = id - GlobalParams::n_delta_tiles;
-	coord.x = id / (int)(GlobalParams::n_delta_tiles/2);
-	coord.y = id % (int)(GlobalParams::n_delta_tiles/2);
+    {
+        id = id - GlobalParams::n_delta_tiles;
+        coord.x = id / (int)(GlobalParams::n_delta_tiles/2);
+        coord.y = id % (int)(GlobalParams::n_delta_tiles/2);
 
-	assert(coord.x < log2(GlobalParams::n_delta_tiles));
-	assert(coord.y < (GlobalParams::n_delta_tiles/2));
+        assert(coord.x < log2(GlobalParams::n_delta_tiles));
+        assert(coord.y < (GlobalParams::n_delta_tiles/2));
 
     }
     return coord;
@@ -197,13 +197,13 @@ inline int coord2Id(const Coord & coord)
     int id;
     if (GlobalParams::topology == TOPOLOGY_MESH)
     {
-	id = (coord.y * GlobalParams::mesh_dim_x) + coord.x;
-	assert(id < GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y);
+        id = (coord.y * GlobalParams::mesh_dim_x) + coord.x;
+        assert(id < GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y);
     }
     else
     {   //use only for switch bloc in delta topologies
-	id = (coord.x * (GlobalParams::n_delta_tiles/2)) + coord.y + GlobalParams::n_delta_tiles;
-	assert(id > (GlobalParams::n_delta_tiles-1));
+        id = (coord.x * (GlobalParams::n_delta_tiles/2)) + coord.y + GlobalParams::n_delta_tiles;
+        assert(id > (GlobalParams::n_delta_tiles-1));
     }
 
     return id;
