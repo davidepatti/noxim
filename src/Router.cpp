@@ -311,8 +311,7 @@ void Router::perCycleUpdate()
     }
 }
 
-vector<int> Router::getNextHops(RouteData rd)
-{
+vector<int> Router::getNextHops(RouteData rd) {
 	// annotate the initial nodes
 	int src = rd.src_id;
 	int dst = rd.dst_id;
@@ -324,64 +323,48 @@ vector<int> Router::getNextHops(RouteData rd)
 	int sw = GlobalParams::n_delta_tiles/2; //sw: switch number in each stage
 	int stg = log2(GlobalParams::n_delta_tiles);
 
-	//**** Step 1 ****
-	//1-Find wich switch is connected to the source means from hops[0] to hops[1](switch id in the fisrt stage)
-	//EXPLE:if n_delta_tiles=8 and we have src id = 5->101 doing the shift to the left from the lower bit by 1 bit
-	//---> Result: 10 = 2.
-	//So core 5 is attached/connected to switch 02 --> id = 10 = hops[1]
-
 	int c =  (current_node >>1);
 
-	// DAV FIX1 - BEGIN
-	// Replaced:  int N = coord2Id(0,c);
 	Coord temp_coord;
 	temp_coord.x = 0;
 	temp_coord.y = c;
 	int N = coord2Id(temp_coord);
-	// DAV FIX1 END
 
 	next_hops.push_back(N);
 	current_node = N;
 
-	//**** Step 2 ****
-	//2-Follow the destination address
-	while (current_node!=dst)
+	int current_stage = 0;
+
+	while (current_stage<stg-1)
 	{
-		int currentStage = id2Coord(current_node).x;// starting from 0
+		Coord new_coord;
+		int y = id2Coord(current_node).y;
+
 		rd.current_id = current_node;
-
 		direction = routingAlgorithm->route(this, rd);
-		//current_src = next[0];
-		//rd.src_id = next[0];
-		currentStage ++;
-		for (int j=0; j<sw; j++)
-		{
-			int m = toggleKthBit(j, stg-currentStage);
-			// DAV FIX 2 - use temp_coord
-			temp_coord.x = currentStage-1;
-			temp_coord.y = j;
-			if (temp_coord==id2Coord(current_node) && direction[0]==0)
-			{
-				next_hops.push_back(coord2Id(temp_coord));
-				current_node = coord2Id(temp_coord);
-			}
-			else
-			{
-				// DAV FIX 3 - use temp_coord
-				temp_coord.x = currentStage-1;
-				temp_coord.y = m;
-				if (temp_coord==id2Coord(current_node) && direction[0]==1)
-				{
-					next_hops.push_back(coord2Id(temp_coord));
-					current_node = coord2Id(temp_coord);
-				}
-			}
-		}
 
+		int bit_to_check = stg - current_stage - 1;
+
+		int bit_checked = (y & (1 << (bit_to_check - 1)))>0 ? 1:0;
+
+		// computes next node coords
+		new_coord.x = current_stage + 1;
+		if (bit_checked ^ direction[0])
+			new_coord.y = toggleKthBit(y, bit_to_check);
+		else
+			new_coord.y = y;
+
+		current_node = coord2Id(new_coord);
+		next_hops.push_back(current_node);
+		current_stage = id2Coord(current_node).x;
 	}
 
+	next_hops.push_back(dst);
+
 	return next_hops;
+
 }
+ */
 /*
 vector<int> Router::getNextHops(RouteData rd)
 {
