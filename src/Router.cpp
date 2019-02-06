@@ -348,6 +348,8 @@ vector<int> Router::getNextHops(RouteData rd)
 	while (current_node!=dst)
 	{
 		int currentStage = id2Coord(current_node).x;// starting from 0
+		rd.current_id = current_node;
+
 		direction = routingAlgorithm->route(this, rd);
 		//current_src = next[0];
 		//rd.src_id = next[0];
