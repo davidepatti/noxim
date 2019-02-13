@@ -28,6 +28,7 @@ int Hub::route(Flit& f)
 		// ...or to a relay which is locally connected to the Hub
 		if (GlobalParams::hub_configuration[local_id].attachedNodes[i]==f.hub_relay_node)
 		{
+			assert(GlobalParams::winoc_dst_hops>0);
 			return tile2Port(f.hub_relay_node);
 		}
 
