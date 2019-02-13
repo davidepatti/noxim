@@ -37,7 +37,6 @@ void Router::rxProcess()
     } 
     else 
     { 
-	//if (local_id==16) LOG<<"*RX*****local_id= "__ack_rx[3]= "<<ack_rx[3].read()<<endl;
 	// This process simply sees a flow of incoming flits. All arbitration
 	// and wormhole related issues are addressed in the txProcess()
 	//assert(false);
@@ -46,8 +45,6 @@ void Router::rxProcess()
 	    // 1) there is an incoming request
 	    // 2) there is a free slot in the input buffer of direction i
 	    //LOG<<"****RX****DIRECTION ="<<i<<  endl;
-
-	    //if (local_id==16) LOG<<"_current_level_rx="<<current_level_rx[i]<<" req_rx= "<<req_rx[i].read()<<"_ack="<<ack_rx[i].read()<< endl;
 
 	    if (req_rx[i].read() == 1 - current_level_rx[i])
 	    { 
@@ -61,7 +58,6 @@ void Router::rxProcess()
 
 		    // Store the incoming flit in the circular buffer
 		    buffer[i][vc].Push(received_flit);
-		    //if (local_id==16) buffer[i][vc].Print();
 		    LOG << " Flit " << received_flit << " collected from Input[" << i << "][" << vc <<"]" << endl;
 
 		    power.bufferRouterPush();
@@ -85,8 +81,6 @@ void Router::rxProcess()
 
 	    }
 	    ack_rx[i].write(current_level_rx[i]);
-	    //if (local_id==10 && i==3) LOG<<"writing current_level "<< current_level_rx[i]<< " to ack_rx "<<endl;
-	    //LOG<<"END __cl_rx="<<current_level_rx[i]<<"_req_Rx="<<req_rx[i].read()<< " _ack= "<<ack_rx[i].read()<<  endl;
 	    // updates the mask of VCs to prevent incoming data on full buffers
 	    TBufferFullStatus bfs;
 	    for (int vc=0;vc<GlobalParams::n_virtual_channels;vc++)
@@ -141,6 +135,15 @@ void Router::txProcess()
 
 		      // TODO: see PER POSTERI (adaptive routing should not recompute route if already reserved)
 		      int o = route(route_data);
+
+		      // manage special case of target hub not directly connected to destination
+		      if (o>=DIRECTION_HUB_RELAY)
+			  {
+		      	Flit f = buffer[i][vc].Pop();
+		      	f.hub_relay_node = o-DIRECTION_HUB_RELAY;
+		      	buffer[i][vc].Push(f);
+		      	o = DIRECTION_HUB;
+			  }
 
 		      TReservation r;
 		      r.input = i;
@@ -311,7 +314,13 @@ void Router::perCycleUpdate()
     }
 }
 
-vector<int> Router::getNextHops(RouteData rd) {
+vector<int> Router::nextDeltaHops(RouteData rd) {
+
+	if (GlobalParams::topology == TOPOLOGY_MESH)
+	{
+		cout << "Mesh topologies are not supported for nextDeltaHops() ";
+		assert(false);
+	}
 	// annotate the initial nodes
 	int src = rd.src_id;
 	int dst = rd.dst_id;
@@ -371,7 +380,7 @@ vector < int > Router::routingFunction(const RouteData & route_data)
 	{
 		// - If the current node C and the destination D are connected to an radiohub, use wireless
 		// - If D is not directly connected to a radio hub, wireless
-		// communication could still  be used if some intermediate node "I" in the routing
+		// communication can still  be used if some intermediate node "I" in the routing
 		// path is reachable from current node C.
 		// - Since further wired hops will be required from I -> D, a threshold "winoc_dst_hops"
 		// can be specified (via command line) to determine the max distance from the intermediate
@@ -380,29 +389,40 @@ vector < int > Router::routingFunction(const RouteData & route_data)
 		// target radio hub
 		if (hasRadioHub(local_id))
 		{
-			// destination must be directly connected to a radio-hub
-            if (GlobalParams::winoc_dst_hops==0)
-            {
-                // The only chance is that destination is directly connected to an hub
-                if ( hasRadioHub(route_data.dst_id) &&
-                    !sameRadioHub(local_id,route_data.dst_id) )
-                {
-                    LOG << "Setting direction HUB to reach destination node " << route_data.dst_id << endl;
+			// Check if destination is directly connected to an hub
+			if ( hasRadioHub(route_data.dst_id) &&
+				 !sameRadioHub(local_id,route_data.dst_id) )
+			{
+				LOG << "Destination node " << route_data.dst_id << " is directly connected to a RadioHub" << endl;
 
-                    vector<int> dirv;
-                    dirv.push_back(DIRECTION_HUB);
-                    return dirv;
-                }
-            }
-            else // let's check whether some node in the route has an acceptable distance to the dst
+				vector<int> dirv;
+				dirv.push_back(DIRECTION_HUB);
+				return dirv;
+			}
+			// let's check whether some node in the route has an acceptable distance to the dst
+            if (GlobalParams::winoc_dst_hops>0)
             {
                 // TODO: for the moment, just print the set of nexts hops to check everything is ok
-                LOG << "NEXT_HOPS (from id " << route_data.src_id << " to " << route_data.dst_id << " >>>> :";
+                LOG << "NEXT_DELTA_HOPS (from id " << route_data.src_id << " to " << route_data.dst_id << " >>>> :";
                 vector<int> nexthops;
-                nexthops = getNextHops(route_data);
+                nexthops = nextDeltaHops(route_data);
                 for (int i=0;i<nexthops.size();i++)
-                    cout << " HOP["<< i <<"]="<< nexthops[i]<<"->";
-                LOG << " <<<< END HOPS ***" <<endl;
+                    cout << " nexthops["<< i <<"]="<< nexthops[i]<<"  ";
+                LOG <<endl;
+                for (int i=1;i<=GlobalParams::winoc_dst_hops;i++)
+				{
+                	int dest_position = nexthops.size()-1;
+                	int candidate_hop = nexthops[dest_position-i];
+					if ( hasRadioHub(candidate_hop) && !sameRadioHub(local_id,candidate_hop) ) {
+						LOG << "CHECKING CANDIDATE HOP " << candidate_hop << " ... It's OK!" << endl;
+						LOG << "Relaying to hub-connected node " << candidate_hop << endl;
+						vector<int> dirv;
+						dirv.push_back(DIRECTION_HUB_RELAY+candidate_hop);
+						return dirv;
+					}
+					else
+						LOG << "CHECKING CANDIDATE HOP " << candidate_hop << " ... NOT OK" << endl;
+				}
             }
 		}
 	}
