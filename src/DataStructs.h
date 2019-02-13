@@ -128,6 +128,8 @@ struct Flit {
     int hop_no;			// Current number of hops from source to destination
     bool use_low_voltage_path;
 
+    int hub_relay_node;
+
     inline bool operator ==(const Flit & flit) const {
 	return (flit.src_id == src_id && flit.dst_id == dst_id
 		&& flit.flit_type == flit_type
