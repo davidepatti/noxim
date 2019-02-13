@@ -71,6 +71,8 @@ Flit ProcessingElement::nextFlit()
     flit.hop_no = 0;
     //  flit.payload     = DEFAULT_PAYLOAD;
 
+    flit.hub_relay_node = NOT_VALID;
+
     if (packet.size == packet.flit_left)
 	flit.flit_type = FLIT_TYPE_HEAD;
     else if (packet.flit_left == 1)
