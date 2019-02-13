@@ -202,7 +202,7 @@ void showHelp(char selfname[])
          << "\t-buffer_antenna N\tSet the depth of hub antenna buffers (RX/TX) [flits]" << endl
 	 << "\t-vc N\t\t\tNumber of virtual channels" << endl
          << "\t-winoc\t\t\tEnable radio hub wireless transmission" << endl
-         << "\t-winoc_dst_hops\t\t\tNumbero of hops from the candidate target RadioHub and the final destination" << endl
+         << "\t-winoc_dst_hops\t\t\tNumber of hops from the candidate target RadioHub and the final destination" << endl
          << "\t-wirxsleep\t\tEnable radio hub wireless power manager" << endl
          << "\t-size Nmin Nmax\t\tSet the minimum and maximum packet size [flits]" << endl
          << "\t-flit N\t\t\tSet the flit size [bit]" << endl
@@ -279,25 +279,42 @@ void showConfig()
 
 void checkConfiguration()
 {
-    if (GlobalParams::topology==TOPOLOGY_MESH)
-    {
-	if (GlobalParams::mesh_dim_x <= 1) {
-	    cerr << "Error: dimx must be greater than 1" << endl;
-	    exit(1);
-	}
+	if (GlobalParams::topology==TOPOLOGY_MESH)
+	{
+		if (GlobalParams::mesh_dim_x <= 1) {
+			cerr << "Error: dimx must be greater than 1" << endl;
+			exit(1);
+		}
 
-	if (GlobalParams::mesh_dim_y <= 1) {
-	    cerr << "Error: dimy must be greater than 1" << endl;
-	    exit(1);
+		if (GlobalParams::mesh_dim_y <= 1) {
+			cerr << "Error: dimy must be greater than 1" << endl;
+			exit(1);
+		}
+		if (GlobalParams::winoc_dst_hops>0)
+		{
+			cerr << "Error: winoc_dst_hops currently supported only in delta topologies" << endl;
+			exit(1);
+		}
 	}
-    }
-    else // other delta topologies
-    {
-	if (GlobalParams::n_delta_tiles < 0) {
-	    cerr << "Error: n_delta_tiles must be >= 0 " << endl;
-	    exit(1);
+	else // other delta topologies
+	{
+		int x = GlobalParams::n_delta_tiles;
+		while( x != 1)
+		{
+			//checks whether a number is divisible by 2
+			if(x % 2 != 0)
+			{
+				cerr << "Error: n_delta_tiles must be a power of 2 " << endl;
+				exit(1);
+			}
+			x /= 2;
+		}
+		if (GlobalParams::routing_algorithm!="DELTA")
+		{
+			cerr << "Error: BUTTERFLY/OMEGA/BASELINE topologies only supported in DELTA routing algorithm " << endl;
+			exit(1);
+		}
 	}
-    }
 
     if (GlobalParams::buffer_depth < 1) {
 	cerr << "Error: buffer must be >= 1" << endl;
@@ -332,31 +349,6 @@ void checkConfiguration()
 	    "Error: packet injection rate mmust be in the interval ]0,1]"
 	    << endl;
 	exit(1);
-    }
-
-    if (GlobalParams::topology == TOPOLOGY_BUTTERFLY)
-    {
-	if (GlobalParams::routing_algorithm!="DELTA")
-	{
-	    cerr << "Error: BUTTERFLY topology only supported in DELTA routing algorithm " << endl;
-	    exit(1);
-	}
-    }
-    if (GlobalParams::topology == TOPOLOGY_OMEGA)
-    {
-	if (GlobalParams::routing_algorithm!="DELTA")
-	{
-	    cerr << "Error: OMEGA topology only supported in DELTA routing algorithm " << endl;
-	    exit(1);
-	}
-    }
-    if (GlobalParams::topology == TOPOLOGY_BASELINE)
-    {
-	if (GlobalParams::routing_algorithm!="DELTA")
-	{
-	    cerr << "Error: BASELINE topology only supported in DELTA routing algorithm " << endl;
-	    exit(1);
-	}
     }
 
     for (unsigned int i = 0; i < GlobalParams::hotspots.size(); i++) {
