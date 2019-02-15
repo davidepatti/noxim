@@ -12,7 +12,8 @@
 
 int Hub::tile2Port(int id)
 {
-	return tile2port_mapping[id];
+	// TODO: check all [..] map access to replace with at()
+	return tile2port_mapping.at(id);
 }
 
 int Hub::route(Flit& f)
@@ -334,7 +335,13 @@ void Hub::antennaToTileProcess()
 			// Check antenna buffer_rx making appropriate reservations
 			if (received_flit.flit_type==FLIT_TYPE_HEAD)
 			{
-				int dst_port = tile2Port(received_flit.dst_id);
+				int dst_port;
+
+				if (received_flit.hub_relay_node!=NOT_VALID)
+					dst_port = tile2Port(received_flit.hub_relay_node);
+				else
+                    dst_port = tile2Port(received_flit.dst_id);
+
 				TReservation r;
 				r.input = channel;
 				r.vc = received_flit.vc_id;
