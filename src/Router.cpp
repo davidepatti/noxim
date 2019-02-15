@@ -149,7 +149,7 @@ void Router::txProcess()
 		      r.input = i;
 		      r.vc = vc;
 
-		      LOG << " checking reservation availability of Output " << o << " Input[" << i << "][" << vc << "] for flit " << flit << endl;
+		      LOG << " checking availability of Output[" << o << "] for Input[" << i << "][" << vc << "] flit " << flit << endl;
 
 		      int rt_status = reservation_table.checkReservation(r,o);
 
@@ -252,7 +252,7 @@ void Router::txProcess()
 		  else
 		  {
 		      LOG << " Cannot forward Input[" << i << "][" << vc << "] to Output[" << o << "], flit: " << flit << endl;
-		      LOG << " **DEBUG APB: current_level_tx: " << current_level_tx[o] << " ack_tx: " << ack_tx[o].read() << endl;
+		      //LOG << " **DEBUG APB: current_level_tx: " << current_level_tx[o] << " ack_tx: " << ack_tx[o].read() << endl;
 		      LOG << " **DEBUG buffer_full_status_tx " << buffer_full_status_tx[o].read().mask[vc] << endl;
 
 		  	//LOG<<"END_NO_cl_tx="<<current_level_tx[o]<<"_req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
@@ -403,25 +403,25 @@ vector < int > Router::routingFunction(const RouteData & route_data)
             if (GlobalParams::winoc_dst_hops>0)
             {
                 // TODO: for the moment, just print the set of nexts hops to check everything is ok
-                LOG << "NEXT_DELTA_HOPS (from id " << route_data.src_id << " to " << route_data.dst_id << " >>>> :";
+                LOG << "NEXT_DELTA_HOPS (from node " << route_data.src_id << " to " << route_data.dst_id << ") >>>> :";
                 vector<int> nexthops;
                 nexthops = nextDeltaHops(route_data);
                 for (int i=0;i<nexthops.size();i++)
-                    cout << " nexthops["<< i <<"]="<< nexthops[i]<<"  ";
-                LOG <<endl;
+                    cout << "(" << nexthops[i] <<")-->";
+                cout << endl;
                 for (int i=1;i<=GlobalParams::winoc_dst_hops;i++)
 				{
                 	int dest_position = nexthops.size()-1;
                 	int candidate_hop = nexthops[dest_position-i];
 					if ( hasRadioHub(candidate_hop) && !sameRadioHub(local_id,candidate_hop) ) {
-						LOG << "CHECKING CANDIDATE HOP " << candidate_hop << " ... It's OK!" << endl;
-						LOG << "Relaying to hub-connected node " << candidate_hop << endl;
+						//LOG << "Checking candidate hop " << candidate_hop << " ... It's OK!" << endl;
+						LOG << "Relaying to hub-connected node " << candidate_hop << " to reach destination " << route_data.dst_id << endl;
 						vector<int> dirv;
 						dirv.push_back(DIRECTION_HUB_RELAY+candidate_hop);
 						return dirv;
 					}
-					else
-						LOG << "CHECKING CANDIDATE HOP " << candidate_hop << " ... NOT OK" << endl;
+					//else
+					// LOG << "Checking candidate hop " << candidate_hop << " ... NOT OK" << endl;
 				}
             }
 		}
