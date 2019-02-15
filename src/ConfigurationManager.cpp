@@ -202,7 +202,7 @@ void showHelp(char selfname[])
          << "\t-buffer_antenna N\tSet the depth of hub antenna buffers (RX/TX) [flits]" << endl
 	 << "\t-vc N\t\t\tNumber of virtual channels" << endl
          << "\t-winoc\t\t\tEnable radio hub wireless transmission" << endl
-         << "\t-winoc_dst_hops\t\t\tNumber of hops from the candidate target RadioHub and the final destination" << endl
+         << "\t-winoc_dst_hops\t\t\tMax number of hops between target RadioHub and destination node" << endl
          << "\t-wirxsleep\t\tEnable radio hub wireless power manager" << endl
          << "\t-size Nmin Nmax\t\tSet the minimum and maximum packet size [flits]" << endl
          << "\t-flit N\t\t\tSet the flit size [bit]" << endl
@@ -314,6 +314,12 @@ void checkConfiguration()
 			cerr << "Error: BUTTERFLY/OMEGA/BASELINE topologies only supported in DELTA routing algorithm " << endl;
 			exit(1);
 		}
+	}
+
+	if (GlobalParams::winoc_dst_hops>0 && GlobalParams::topology!=TOPOLOGY_BUTTERFLY)
+	{
+		cerr << "Error: winoc_dst_hops currently supported only in BUTTERFLY topology" << endl;
+		exit(1);
 	}
 
     if (GlobalParams::buffer_depth < 1) {
@@ -660,8 +666,10 @@ T readParam(YAML::Node node, string param, T default_value) {
    try {
        return node[param].as<T>();
    } catch(exception &e) {
+       /*
        cerr << "WARNING: parameter " << param << " not present in YAML configuration file." << endl;
-       cerr << "Command line value will be use (if specified), otherwise the default value " << default_value << " will be assumed." << endl;
+       cerr << "Using command line value or default value " << default_value << endl;
+        */
        return default_value;
    }
 }
