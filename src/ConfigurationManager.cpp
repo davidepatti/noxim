@@ -316,10 +316,17 @@ void checkConfiguration()
 		}
 	}
 
-	if (GlobalParams::winoc_dst_hops>0 && GlobalParams::topology!=TOPOLOGY_BUTTERFLY)
-	{
-		cerr << "Error: winoc_dst_hops currently supported only in BUTTERFLY topology" << endl;
-		exit(1);
+	if (GlobalParams::winoc_dst_hops>0) {
+		if (GlobalParams::topology != TOPOLOGY_BUTTERFLY)
+		{
+			cerr << "Error: winoc_dst_hops currently supported only in BUTTERFLY topology" << endl;
+            exit(1);
+        }
+		if (!GlobalParams::use_winoc)
+		{
+			cerr << "Error: winoc_dst_hops makes sense only when -winoc is enabled!" << endl;
+			exit(1);
+		}
 	}
 
     if (GlobalParams::buffer_depth < 1) {
