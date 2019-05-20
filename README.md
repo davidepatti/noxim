@@ -20,7 +20,7 @@ To receive information about new Noxim features, updates and events, please regi
 
 What's New ? 
 ------------
-**[March 2018]** Long awaited Virtual Channels and RadioHub with multiple transmission channels are now in master version
+**[March 2018]**
 
   * Support for virtual channels for improved traffic management
   * Support for multiple radio-frequency channels for each Radio-Hub
