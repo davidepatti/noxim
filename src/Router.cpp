@@ -406,9 +406,8 @@ vector < int > Router::routingFunction(const RouteData & route_data)
                 LOG << "NEXT_DELTA_HOPS (from node " << route_data.src_id << " to " << route_data.dst_id << ") >>>> :";
                 vector<int> nexthops;
                 nexthops = nextDeltaHops(route_data);
-                for (int i=0;i<nexthops.size();i++)
-                    cout << "(" << nexthops[i] <<")-->";
-                cout << endl;
+                //for (int i=0;i<nexthops.size();i++) cout << "(" << nexthops[i] <<")-->";
+                //cout << endl;
                 for (int i=1;i<=GlobalParams::winoc_dst_hops;i++)
 				{
                 	int dest_position = nexthops.size()-1;
