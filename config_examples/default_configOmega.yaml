@@ -1,9 +1,3 @@
-# Simple default config of a 4x4 mesh
-# Each parameter is overwritten when corresponding command line value is set
-#
-# NOC & WIRED CONFIGURATION
-#
-#
 # Topologies:
 #   MESH
 #   BUTTERFLY
@@ -11,10 +5,11 @@
 #   OMEGA
 #
 #   BUTTERFLY, BASELINE, and OMEGA are Delta Network topologies
-# topology: MESH
+topology: OMEGA
 # X and Y mesh sizes
 mesh_dim_x: 4
 mesh_dim_y: 4
+n_delta_tiles: 8
 # number of flits for each router buffer
 buffer_depth: 4
 # size of flits, in bits
@@ -27,7 +22,6 @@ n_virtual_channels: 1
 
 # Routing algorithms:
 #   XY
-#   DELTA
 #   WEST_FIRST
 #   NORTH_LAST
 #   NEGATIVE_FIRST
@@ -36,7 +30,7 @@ n_virtual_channels: 1
 #   TABLE_BASED
 # Each of the above labels should match a corresponding
 # implementation in the routingAlgorithms source code directory
-routing_algorithm: XY
+routing_algorithm: DELTA
 routing_table_filename: ""
 
 # Routing specific parameters
@@ -68,24 +62,17 @@ Hubs:
         rx_buffer_size: 4
         tx_buffer_size: 4
 
-# for each hub, the same parameters specified above can be customized
-# If not specified, the above default values will be used
-# What is usually needed to be customized specifically for each hub is
-# the set of nodes that are connected to it. In this simple topology
-# we have 4 hubs (0-3) connected to the four nodes of the 2x2
-# sub-meshes
+#    0:
+#      attached_nodes: [0,1,4,5]
 
-    0:
-      attached_nodes: [0,1,4,5]
+#    1:
+#      attached_nodes: [2,3,6,7]
 
-    1:
-      attached_nodes: [2,3,6,7]
+#    2:
+#      attached_nodes: [8,9,12,13]
 
-    2:
-      attached_nodes: [8,9,12,13]
-
-    3:
-      attached_nodes: [10,11,14,15]
+#    3:
+#      attached_nodes: [10,11,14,15]
 
 # Transmission channels configuration
 # each channel modelizes the transmission over a given frequency that

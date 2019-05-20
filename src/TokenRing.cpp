@@ -12,6 +12,7 @@
 
 void TokenRing::updateTokenPacket(int channel)
 {
+    //LOG << " called on channel " << channel << endl;
 	if (flag[channel][token_position[channel]]->read() == RELEASE_CHANNEL)
 	{
 	    // number of hubs of the ring

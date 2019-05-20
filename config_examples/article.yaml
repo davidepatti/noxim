@@ -1,0 +1,427 @@
+# Simple default config of a 4x4 mesh
+# Each parameter is overwritten when corresponding command line value is set
+#
+# NOC & WIRED CONFIGURATION
+#
+#
+# X and Y mesh sizes
+mesh_dim_x: 32
+mesh_dim_y: 32
+# number of flits for each router buffer
+buffer_depth: 4
+# size of flits, in bits
+flit_size: 32
+# lenght in mm of router to hub connection
+r2h_link_length: 2.0
+# lenght in mm of router to router connection
+r2r_link_length: 1.0
+n_virtual_channels: 3
+
+# Routing algorithms:
+#   XY
+#   WEST_FIRST
+#   NORTH_LAST
+#   NEGATIVE_FIRST
+#   ODD_EVEN
+#   DYAD
+#   TABLE_BASED
+# Each of the above labels should match a corresponding
+# implementation in the routingAlgorithms source code directory
+routing_algorithm: XY
+routing_table_filename: ""
+
+# Routing specific parameters
+#   dyad_threshold: double
+dyad_threshold: 0.6
+
+# Selection Strategies:
+#   RANDOM
+#   BUFFER_LEVEL
+#   NOP
+# Each of the above labels should match a corresponding
+# implementation in the selectionStrategies source code directory
+selection_strategy: RANDOM
+
+#
+# WIRELESS CONFIGURATION
+#
+Hubs:
+   
+
+# for each hub, the same parameters specified above can be customized
+# If not specified, the above default values will be used
+# What is usually needed to be customized specifically for each hub is
+# the set of nodes that are connected to it. In this simple topology
+# we have 4 hubs (0-3) connected to the four nodes of the 2x2
+# sub-meshes
+
+    0:  
+        attached_nodes: [97,98,129,130]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+
+    1:
+        attached_nodes: [101,102,133,134]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    2:
+        attached_nodes: [105,106,137,138]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+        
+    3:
+        attached_nodes: [109,110,141,142]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+   
+    4:
+        attached_nodes: [113,114,145,146]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+
+    5:
+        attached_nodes: [117,118,149,150]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    6:
+        attached_nodes: [121,122,153,154]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    7:
+        attached_nodes: [125,126,157,158]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    8:
+        attached_nodes: [353,354,385,386]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    9:
+        attached_nodes: [357,358,389,390]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    10:
+        attached_nodes: [361,362,393,394]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    11:
+        attached_nodes: [365,366,397,398]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    12:
+        attached_nodes: [369,370,401,402]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    13:
+        attached_nodes: [373,374,405,406]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    14:
+        attached_nodes: [377,378,409,410]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    15:
+        attached_nodes: [381,382,413,414]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    16:
+        attached_nodes: [609,610,641,642]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    17:
+        attached_nodes: [613,614,645,646]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    18:
+        attached_nodes: [617,618,649,650]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    19:
+        attached_nodes: [621,622,653,654]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    20:
+        attached_nodes: [625,626,657,658]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    21:
+        attached_nodes: [629,630,661,662]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    22:
+        attached_nodes: [633,634,665,666]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    23:
+        attached_nodes: [637,638,669,670]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    24:
+        attached_nodes: [865,866,897,898]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    25:
+        attached_nodes: [869,870,901,902]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    26:
+        attached_nodes: [873,874,905,906]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    27:
+        attached_nodes: [877,878,909,910]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    28:
+        attached_nodes: [881,882,913,914]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    29:
+        attached_nodes: [885,886,917,918]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    30:
+        attached_nodes: [889,890,921,922]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+    31:
+        attached_nodes: [893,894,925,926]
+        rx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        tx_radio_channels: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+        to_tile_buffer_size: 8
+        from_tile_buffer_size: 8
+    # size of antenna tx/rx
+        rx_buffer_size: 8
+        tx_buffer_size: 8
+
+# Transmission channels configuration
+# each channel modelizes the transmission over a given frequency that
+# can be used by a set of communicating hubs
+RadioChannels:
+    defaults:
+    # data rate in Gb/s affect the number of cycles required for a
+    # flit transmission
+        data_rate: 16
+    # bit error rate (CURRENTLY UNSUPPORTED)
+        ber: [0, 0]
+    # mac policies:
+
+    # who has the token releas only when a complete packet has
+    # been sent
+        #[TOKEN_PACKET]
+
+    # who has the token, release only after a fixed number of
+    # cycles, even no transmission is occurring
+        #[TOKEN_HOLD, num_hold_cycles]
+
+    # who has the token, holds the packet until needed for
+    # transmissions, until a max number of cycles is reached
+        #[TOKEN_MAX_HOLD, max_hold_cycles]
+        mac_policy: [TOKEN_PACKET]
+
+
+# SIMULATION PARAMETERS
+#
+clock_period_ps: 1000
+# duration of reset signal assertion, expressed in cycles
+reset_time: 1000
+# overal simulation lenght, expressed in cycles
+simulation_time: 10000
+# collect stats after a given number of cycles
+stats_warm_up_time: 1000
+# power breakdown, nodes communication details
+detailed: false
+# stop after a given amount of load has been processed
+max_volume_to_be_drained: 0
+show_buffer_stats: false
+
+# Winoc
+# enable wireless, when false, all wireless channel configuration is
+# ignored
+use_winoc: true
+# experimental power saving strategy
+use_wirxsleep: false
+
+# Verbosity level:
+#   VERBOSE_OFF
+#   VERBOSE_LOW
+#   VERBOSE_MEDIUM
+#   VERBOSE_HIGH
+verbose_mode: VERBOSE_HIGH
+
+# Trace
+trace_mode: false 
+trace_filename: "trace"
+
+min_packet_size: 8
+max_packet_size: 8
+packet_injection_rate: 0.1
+probability_of_retransmission: 0.01
+
+# Traffic distribution:
+#   TRAFFIC_RANDOM
+#   TRAFFIC_TRANSPOSE1
+#   TRAFFIC_TRANSPOSE2
+#   TRAFFIC_HOTSPOT
+#   TRAFFIC_TABLE_BASED
+#   TRAFFIC_BIT_REVERSAL
+#   TRAFFIC_SHUFFLE
+#   TRAFFIC_BUTTERFLY
+traffic_distribution: TRAFFIC_TABLE_BASED
+# when traffic table base specified, use the following
+# configuration file
+traffic_table_filename: "t.txt"

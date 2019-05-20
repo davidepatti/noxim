@@ -1,20 +1,9 @@
-# Simple default config of a 4x4 mesh
-# Each parameter is overwritten when corresponding command line value is set
+#Simple test file for testing delta with wireless
+# 2 radiohubs are connected to the code node 0 and 7
+
+topology: BUTTERFLY
 #
-# NOC & WIRED CONFIGURATION
-#
-#
-# Topologies:
-#   MESH
-#   BUTTERFLY
-#   BASELINE
-#   OMEGA
-#
-#   BUTTERFLY, BASELINE, and OMEGA are Delta Network topologies
-# topology: MESH
-# X and Y mesh sizes
-mesh_dim_x: 4
-mesh_dim_y: 4
+n_delta_tiles: 8
 # number of flits for each router buffer
 buffer_depth: 4
 # size of flits, in bits
@@ -25,30 +14,11 @@ r2h_link_length: 2.0
 r2r_link_length: 1.0
 n_virtual_channels: 1
 
-# Routing algorithms:
-#   XY
-#   DELTA
-#   WEST_FIRST
-#   NORTH_LAST
-#   NEGATIVE_FIRST
-#   ODD_EVEN
-#   DYAD
-#   TABLE_BASED
-# Each of the above labels should match a corresponding
-# implementation in the routingAlgorithms source code directory
-routing_algorithm: XY
+routing_algorithm: DELTA
 routing_table_filename: ""
 
-# Routing specific parameters
-#   dyad_threshold: double
 dyad_threshold: 0.6
 
-# Selection Strategies:
-#   RANDOM
-#   BUFFER_LEVEL
-#   NOP
-# Each of the above labels should match a corresponding
-# implementation in the selectionStrategies source code directory
 selection_strategy: RANDOM
 
 #
@@ -68,24 +38,19 @@ Hubs:
         rx_buffer_size: 4
         tx_buffer_size: 4
 
-# for each hub, the same parameters specified above can be customized
-# If not specified, the above default values will be used
-# What is usually needed to be customized specifically for each hub is
-# the set of nodes that are connected to it. In this simple topology
-# we have 4 hubs (0-3) connected to the four nodes of the 2x2
-# sub-meshes
 
+# Trivial example of core2core
     0:
-      attached_nodes: [0,1,4,5]
+      attached_nodes: [0]
 
     1:
-      attached_nodes: [2,3,6,7]
+      attached_nodes: [7]
 
-    2:
-      attached_nodes: [8,9,12,13]
+    #2:
+    #  attached_nodes: [6]
 
-    3:
-      attached_nodes: [10,11,14,15]
+    #3:
+      #attached_nodes: [7]
 
 # Transmission channels configuration
 # each channel modelizes the transmission over a given frequency that
@@ -99,17 +64,6 @@ RadioChannels:
         ber: [0, 0]
     # mac policies:
 
-    # who has the token releas only when a complete packet has
-    # been sent
-        #[TOKEN_PACKET]
-
-    # who has the token, release only after a fixed number of
-    # cycles, even no transmission is occurring
-        #[TOKEN_HOLD, num_hold_cycles]
-
-    # who has the token, holds the packet until needed for
-    # transmissions, until a max number of cycles is reached
-        #[TOKEN_MAX_HOLD, max_hold_cycles]
         mac_policy: [TOKEN_PACKET]
 
 
@@ -135,11 +89,6 @@ use_winoc: false
 # experimental power saving strategy
 use_wirxsleep: false
 
-# Verbosity level:
-#   VERBOSE_OFF
-#   VERBOSE_LOW
-#   VERBOSE_MEDIUM
-#   VERBOSE_HIGH
 verbose_mode: VERBOSE_OFF
 
 # Trace

@@ -71,6 +71,8 @@ Flit ProcessingElement::nextFlit()
     flit.hop_no = 0;
     //  flit.payload     = DEFAULT_PAYLOAD;
 
+    flit.hub_relay_node = NOT_VALID;
+
     if (packet.size == packet.flit_left)
 	flit.flit_type = FLIT_TYPE_HEAD;
     else if (packet.flit_left == 1)
@@ -87,6 +89,10 @@ Flit ProcessingElement::nextFlit()
 
 bool ProcessingElement::canShot(Packet & packet)
 {
+   // assert(false);
+    if(never_transmit) return false;
+   
+    //if(local_id!=16) return false;
     /* DEADLOCK TEST 
 	double current_time = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
 
@@ -141,8 +147,7 @@ bool ProcessingElement::canShot(Packet & packet)
 	bool use_pir = (transmittedAtPreviousCycle == false);
 	vector < pair < int, double > > dst_prob;
 	double threshold =
-	    traffic_table->getCumulativePirPor(local_id, (int) now,
-					       use_pir, dst_prob);
+	    traffic_table->getCumulativePirPor(local_id, (int) now, use_pir, dst_prob);
 
 	double prob = (double) rand() / RAND_MAX;
 	shot = (prob < threshold);
@@ -197,6 +202,8 @@ Packet ProcessingElement::trafficLocal()
 
 int ProcessingElement::findRandomDestination(int id, int hops)
 {
+    assert(GlobalParams::topology == TOPOLOGY_MESH);
+
     int inc_y = rand()%2?-1:1;
     int inc_x = rand()%2?-1:1;
     
@@ -269,8 +276,12 @@ Packet ProcessingElement::trafficRandom()
     p.src_id = local_id;
     double rnd = rand() / (double) RAND_MAX;
     double range_start = 0.0;
+    int max_id;
 
-    int max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) - 1;
+    if (GlobalParams::topology == TOPOLOGY_MESH)
+	max_id = (GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y) - 1; //Mesh 
+    else    // other delta topologies
+	max_id = GlobalParams::n_delta_tiles-1; 
 
     // Random destination distribution
     do {
@@ -288,6 +299,7 @@ Packet ProcessingElement::trafficRandom()
 		range_start += GlobalParams::hotspots[i].second;	// try next
 	}
 #ifdef DEADLOCK_AVOIDANCE
+	assert((GlobalParams::topology == TOPOLOGY_MESH));
 	if (p.dst_id%2!=0)
 	{
 	    p.dst_id = (p.dst_id+1)%256;
@@ -318,6 +330,7 @@ Packet ProcessingElement::trafficTest()
 
 Packet ProcessingElement::trafficTranspose1()
 {
+    assert(GlobalParams::topology == TOPOLOGY_MESH);
     Packet p;
     p.src_id = local_id;
     Coord src, dst;
@@ -339,6 +352,7 @@ Packet ProcessingElement::trafficTranspose1()
 
 Packet ProcessingElement::trafficTranspose2()
 {
+    assert(GlobalParams::topology == TOPOLOGY_MESH);
     Packet p;
     p.src_id = local_id;
     Coord src, dst;
@@ -429,9 +443,7 @@ Packet ProcessingElement::trafficShuffle()
 Packet ProcessingElement::trafficButterfly()
 {
 
-    int nbits =
-	(int)
-	log2ceil((double)
+    int nbits = (int) log2ceil((double)
 		 (GlobalParams::mesh_dim_x *
 		  GlobalParams::mesh_dim_y));
     int dnode = 0;
@@ -470,3 +482,9 @@ int ProcessingElement::getRandomSize()
     return randInt(GlobalParams::min_packet_size,
 		   GlobalParams::max_packet_size);
 }
+
+unsigned int ProcessingElement::getQueueSize() const
+{
+    return packet_queue.size();
+}
+

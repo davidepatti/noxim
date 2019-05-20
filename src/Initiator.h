@@ -45,6 +45,7 @@ struct Initiator: sc_module
       if (GlobalParams::use_winoc) SC_THREAD(thread_process);
       sscanf(nm,"init_%d",&c);
       _channel_id = c;
+      current_hub_relay = NOT_VALID;
   }
 
   void thread_process();
@@ -60,6 +61,7 @@ struct Initiator: sc_module
 
     private: 
   int _channel_id;
+  int current_hub_relay;
 };
 
 #endif

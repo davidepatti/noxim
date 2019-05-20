@@ -20,9 +20,13 @@ void loadConfiguration() {
     try {
         config = YAML::LoadFile(GlobalParams::config_filename);
         cout << " Done" << endl;
-    } catch (YAML::BadFile &e){
+    } catch (YAML::BadFile &e) {
         cout << " Failed" << endl;
         cerr << "The specified YAML configuration file was not found!" << endl;
+        exit(0);
+    } catch (YAML::ParserException &pe) {
+        cout << " Failed" << endl;
+        cerr << "ERROR at line " << pe.mark.line +1 << " column " << pe.mark.column + 1 << ": "<< pe.msg << ". Please check identation." << endl;
         exit(0);
     }
 
@@ -34,40 +38,60 @@ void loadConfiguration() {
         cout << " Failed" << endl;
         cerr << "The specified YAML power configurations file was not found!" << endl;
         exit(0);
+    } catch (YAML::ParserException &pe) {
+        cout << " Failed" << endl;
+        cerr << "ERROR at line " << pe.mark.line +1 << " column " << pe.mark.column + 1 << ": "<< pe.msg << ". Please check identation." << endl;
+        exit(0);
     }
 
     // Initialize global configuration parameters (can be overridden with command-line arguments)
-    GlobalParams::verbose_mode = config["verbose_mode"].as<string>();
-    GlobalParams::trace_mode = config["trace_mode"].as<bool>();
-    GlobalParams::trace_filename = config["trace_filename"].as<string>();
-    GlobalParams::mesh_dim_x = config["mesh_dim_x"].as<int>();
-    GlobalParams::mesh_dim_y = config["mesh_dim_y"].as<int>();
-    GlobalParams::r2r_link_length = config["r2r_link_length"].as<double>();
-    GlobalParams::r2h_link_length = config["r2h_link_length"].as<double>();
-    GlobalParams::buffer_depth = config["buffer_depth"].as<int>();
-    GlobalParams::flit_size = config["flit_size"].as<int>();
-    GlobalParams::min_packet_size = config["min_packet_size"].as<int>();
-    GlobalParams::max_packet_size = config["max_packet_size"].as<int>();
-    GlobalParams::routing_algorithm = config["routing_algorithm"].as<string>();
-    GlobalParams::routing_table_filename = config["routing_table_filename"].as<string>(); 
-    GlobalParams::selection_strategy = config["selection_strategy"].as<string>();
-    GlobalParams::packet_injection_rate = config["packet_injection_rate"].as<double>();
-    GlobalParams::probability_of_retransmission = config["probability_of_retransmission"].as<double>();
-    GlobalParams::traffic_distribution = config["traffic_distribution"].as<string>();
-    GlobalParams::traffic_table_filename = config["traffic_table_filename"].as<string>();
-    GlobalParams::clock_period_ps = config["clock_period_ps"].as<int>();
-    GlobalParams::simulation_time = config["simulation_time"].as<int>();
-    GlobalParams::n_virtual_channels = config["n_virtual_channels"].as<int>();
-    GlobalParams::reset_time = config["reset_time"].as<int>();
-    GlobalParams::stats_warm_up_time = config["stats_warm_up_time"].as<int>();
+    GlobalParams::verbose_mode = readParam<string>(config, "verbose_mode");
+    GlobalParams::trace_mode = readParam<bool>(config, "trace_mode");
+    GlobalParams::trace_filename = readParam<string>(config, "trace_filename");
+
+    GlobalParams::topology = readParam<string>(config, "topology", TOPOLOGY_MESH);
+
+    //Mesh network params
+    if (GlobalParams::topology == TOPOLOGY_MESH) {
+        GlobalParams::mesh_dim_x = readParam<int>(config, "mesh_dim_x");
+        GlobalParams::mesh_dim_y = readParam<int>(config, "mesh_dim_y");
+    }
+	//Delta network params
+    if (GlobalParams::topology == TOPOLOGY_BASELINE  ||
+        GlobalParams::topology == TOPOLOGY_BUTTERFLY ||
+        GlobalParams::topology == TOPOLOGY_OMEGA      ) {
+        //GlobalParams::mesh_dim_x = readParam<int>(config, "mesh_dim_x");
+        //GlobalParams::mesh_dim_y = readParam<int>(config, "mesh_dim_y");
+        GlobalParams::n_delta_tiles = readParam<int>(config, "n_delta_tiles");
+    }
+
+    GlobalParams::r2r_link_length = readParam<double>(config, "r2r_link_length");
+    GlobalParams::r2h_link_length = readParam<double>(config, "r2h_link_length");
+    GlobalParams::buffer_depth = readParam<int>(config, "buffer_depth");
+    GlobalParams::flit_size = readParam<int>(config, "flit_size");
+    GlobalParams::min_packet_size = readParam<int>(config, "min_packet_size");
+    GlobalParams::max_packet_size = readParam<int>(config, "max_packet_size");
+    GlobalParams::routing_algorithm = readParam<string>(config, "routing_algorithm");
+    GlobalParams::routing_table_filename = readParam<string>(config, "routing_table_filename"); 
+    GlobalParams::selection_strategy = readParam<string>(config, "selection_strategy");
+    GlobalParams::packet_injection_rate = readParam<double>(config, "packet_injection_rate");
+    GlobalParams::probability_of_retransmission = readParam<double>(config, "probability_of_retransmission");
+    GlobalParams::traffic_distribution = readParam<string>(config, "traffic_distribution");
+    GlobalParams::traffic_table_filename = readParam<string>(config, "traffic_table_filename");
+    GlobalParams::clock_period_ps = readParam<int>(config, "clock_period_ps");
+    GlobalParams::simulation_time = readParam<int>(config, "simulation_time");
+    GlobalParams::n_virtual_channels = readParam<int>(config, "n_virtual_channels");
+    GlobalParams::reset_time = readParam<int>(config, "reset_time");
+    GlobalParams::stats_warm_up_time = readParam<int>(config, "stats_warm_up_time");
     GlobalParams::rnd_generator_seed = time(NULL);
-    GlobalParams::detailed = config["detailed"].as<bool>();
-    GlobalParams::dyad_threshold = config["dyad_threshold"].as<double>();
-    GlobalParams::max_volume_to_be_drained = config["max_volume_to_be_drained"].as<unsigned int>();
+    GlobalParams::detailed = readParam<bool>(config, "detailed");
+    GlobalParams::dyad_threshold = readParam<double>(config, "dyad_threshold");
+    GlobalParams::max_volume_to_be_drained = readParam<unsigned int>(config, "max_volume_to_be_drained");
     //GlobalParams::hotspots;
-    GlobalParams::show_buffer_stats = config["show_buffer_stats"].as<bool>();
-    GlobalParams::use_winoc = config["use_winoc"].as<bool>();
-    GlobalParams::use_powermanager = config["use_wirxsleep"].as<bool>();
+    GlobalParams::show_buffer_stats = readParam<bool>(config, "show_buffer_stats");
+    GlobalParams::use_winoc = readParam<bool>(config, "use_winoc");
+    GlobalParams::winoc_dst_hops = readParam<int>(config, "winoc_dst_hops",0);
+    GlobalParams::use_powermanager = readParam<bool>(config, "use_wirxsleep");
     
 
     set<int> channelSet;
@@ -165,41 +189,46 @@ void showHelp(char selfname[])
 {
     cout << "Usage: " << selfname << " [options]" << endl
          << "Where [options] is one or more of the following ones:" << endl
-         << "\t-help\t\tShow this help and exit" << endl
-         << "\t-config\t\tLoad the specified configuration file" << endl
-         << "\t-power\t\tLoad the specified power configurations file" << endl
-         << "\t-verbose N\tVerbosity level (1=low, 2=medium, 3=high)" << endl
-         << "\t-trace FILENAME\tTrace signals to a VCD file named 'FILENAME.vcd'" << endl
-         << "\t-dimx N\t\tSet the mesh X dimension" << endl
-         << "\t-dimy N\t\tSet the mesh Y dimension" << endl
-         << "\t-buffer N\tSet the depth of router input buffers [flits]" << endl
-         << "\t-buffer_tt N\tSet the depth of hub buffers to tile [flits]" << endl
-         << "\t-buffer_ft N\tSet the depth of hub buffers to tile [flits]" << endl
+         << "\t-help\t\t\tShow this help and exit" << endl
+         << "\t-config\t\t\tLoad the specified configuration file" << endl
+         << "\t-power\t\t\tLoad the specified power configurations file" << endl
+         << "\t-verbose N\t\tVerbosity level (1=low, 2=medium, 3=high)" << endl
+         << "\t-trace FILENAME\t\tTrace signals to a VCD file named 'FILENAME.vcd'" << endl
+         << "\t-dimx N\t\t\tSet the mesh X dimension" << endl
+         << "\t-dimy N\t\t\tSet the mesh Y dimension" << endl
+         << "\t-buffer N\t\tSet the depth of router input buffers [flits]" << endl
+         << "\t-buffer_tt N\t\tSet the depth of hub buffers to tile [flits]" << endl
+         << "\t-buffer_ft N\t\tSet the depth of hub buffers to tile [flits]" << endl
          << "\t-buffer_antenna N\tSet the depth of hub antenna buffers (RX/TX) [flits]" << endl
-	 << "\t-vc N\tNumber of virtual channels" << endl
-         << "\t-winoc enable radio hub wireless transmission" << endl
-         << "\t-wirxsleep enable radio hub wireless power manager" << endl
-         << "\t-size Nmin Nmax\tSet the minimum and maximum packet size [flits]" << endl
-         << "\t-flit N\tSet the flit size [bit]" << endl
-         << "\t-routing TYPE\tSet the routing algorithm to one of the following:" << endl
+	 << "\t-vc N\t\t\tNumber of virtual channels" << endl
+         << "\t-winoc\t\t\tEnable radio hub wireless transmission" << endl
+         << "\t-winoc_dst_hops\t\t\tMax number of hops between target RadioHub and destination node" << endl
+         << "\t-wirxsleep\t\tEnable radio hub wireless power manager" << endl
+         << "\t-size Nmin Nmax\t\tSet the minimum and maximum packet size [flits]" << endl
+         << "\t-flit N\t\t\tSet the flit size [bit]" << endl
+         << "\t-topology TYPE\t\tSet the topology to one of the following:" << endl
+         << "\t\tMESH\t\t2D Mesh" << endl
+         << "\t\tBUTTERFLY\tDelta network Butterfly (radix 2)" << endl
+         << "\t\tBASELINE\tDelta network Baseline" << endl
+         << "\t\tOMEGA\t\tDelta network Omega" << endl
+         << "\t-routing TYPE\t\tSet the routing algorithm to one of the following:" << endl
          << "\t\tXY\t\tXY routing algorithm" << endl
          << "\t\tWEST_FIRST\tWest-First routing algorithm" << endl
          << "\t\tNORTH_LAST\tNorth-Last routing algorithm" << endl
          << "\t\tNEGATIVE_FIRST\tNegative-First routing algorithm" << endl
-         << "\t\tODD_EVEN\t\tOdd-Even routing algorithm" << endl
+         << "\t\tODD_EVEN\tOdd-Even routing algorithm" << endl
          << "\t\tDYAD T\t\tDyAD routing algorithm with threshold T" << endl
          << "\t\tTABLE_BASED FILENAME\tRouting Table Based routing algorithm with table in the specified file" << endl
-         << "\t-sel TYPE\tSet the selection strategy to one of the following:" << endl
+         << "\t-sel TYPE\t\tSet the selection strategy to one of the following:" << endl
          << "\t\tRANDOM\t\tRandom selection strategy" << endl
          << "\t\tBUFFER_LEVEL\tBuffer-Level Based selection strategy" << endl
          << "\t\tNOP\t\tNeighbors-on-Path selection strategy" << endl
-         <<	"\t-pir R TYPE\tSet the packet injection rate R [0..1] and the time distribution TYPE" << endl
-         << "\t\t\twhere TYPE is one of the following:" << endl
+         <<	"\t-pir R TYPE\t\tSet the packet injection rate R [0..1] and the time distribution TYPE where TYPE is one of the following:" << endl
          << "\t\tpoisson\t\tMemory-less Poisson distribution" << endl
          << "\t\tburst R\t\tBurst distribution with given real burstness" << endl
          << "\t\tpareto on off r\tSelf-similar Pareto distribution with given real parameters (alfa-on alfa-off r)" << endl
          << "\t\tcustom R\tCustom distribution with given real probability of retransmission" << endl
-         << "\t-traffic TYPE\tSet the spatial distribution of traffic to TYPE where TYPE is one of the following:" << endl
+         << "\t-traffic TYPE\t\tSet the spatial distribution of traffic to TYPE where TYPE is one of the following:" << endl
          << "\t\trandom\t\tRandom traffic distribution" << endl
          << "\t\tlocal L\t\tRandom traffic with a fraction L (0..1) of packets having a destination connected to the local hub, i.e. not using wireless" << endl
          << "\t\tulocal\t\tRandom traffic with locality smooth distribution" << endl
@@ -209,15 +238,15 @@ void showHelp(char selfname[])
          << "\t\tbutterfly\tButterfly traffic distribution" << endl
          << "\t\tshuffle\t\tShuffle traffic distribution" << endl
          <<	"\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file" << endl
-         << "\t-hs ID P\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)" << endl
-         << "\t-warmup N\tStart to collect statistics after N cycles" << endl
-         << "\t-seed N\t\tSet the seed of the random generator (default time())" << endl
-         << "\t-detailed\tShow detailed statistics" << endl
-         << "\t-show_buf_stats\tShow buffers statistics" << endl
-         << "\t-volume N\tStop the simulation when either the maximum number of cycles has been reached or N flits have" << endl
-         << "\t\t\tbeen delivered" << endl
-         << "\t-asciimonitor\tShow status of the network while running (experimental)" << endl
-         << "\t-sim N\t\tRun for the specified simulation time [cycles]" << endl
+         << "\t-hs ID P\t\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)" << endl
+         << "\t-warmup N\t\tStart to collect statistics after N cycles" << endl
+         << "\t-seed N\t\t\tSet the seed of the random generator (default time())" << endl
+         << "\t-detailed\t\tShow detailed statistics" << endl
+         << "\t-show_buf_stats\t\tShow buffers statistics" << endl
+         << "\t-volume N\t\tStop the simulation when either the maximum number of cycles has been reached or N flits have" << endl
+         << "\t\t\t\tbeen delivered" << endl
+         << "\t-asciimonitor\t\tShow status of the network while running (experimental)" << endl
+         << "\t-sim N\t\t\tRun for the specified simulation time [cycles]" << endl
          << endl
          << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <maurizio.palesi@unikore.it>" << endl
          <<	"If you find this program useless please feel free to complain with Davide Patti <davide.patti@dieei.unict.it>" << endl
@@ -250,15 +279,55 @@ void showConfig()
 
 void checkConfiguration()
 {
-    if (GlobalParams::mesh_dim_x <= 1) {
-	cerr << "Error: dimx must be greater than 1" << endl;
-	exit(1);
-    }
+	if (GlobalParams::topology==TOPOLOGY_MESH)
+	{
+		if (GlobalParams::mesh_dim_x <= 1) {
+			cerr << "Error: dimx must be greater than 1" << endl;
+			exit(1);
+		}
 
-    if (GlobalParams::mesh_dim_y <= 1) {
-	cerr << "Error: dimy must be greater than 1" << endl;
-	exit(1);
-    }
+		if (GlobalParams::mesh_dim_y <= 1) {
+			cerr << "Error: dimy must be greater than 1" << endl;
+			exit(1);
+		}
+		if (GlobalParams::winoc_dst_hops>0)
+		{
+			cerr << "Error: winoc_dst_hops currently supported only in delta topologies" << endl;
+			exit(1);
+		}
+	}
+	else // other delta topologies
+	{
+		int x = GlobalParams::n_delta_tiles;
+		while( x != 1)
+		{
+			//checks whether a number is divisible by 2
+			if(x % 2 != 0)
+			{
+				cerr << "Error: n_delta_tiles must be a power of 2 " << endl;
+				exit(1);
+			}
+			x /= 2;
+		}
+		if (GlobalParams::routing_algorithm!="DELTA")
+		{
+			cerr << "Error: BUTTERFLY/OMEGA/BASELINE topologies only supported in DELTA routing algorithm " << endl;
+			exit(1);
+		}
+	}
+
+	if (GlobalParams::winoc_dst_hops>0) {
+		if (GlobalParams::topology != TOPOLOGY_BUTTERFLY)
+		{
+			cerr << "Error: winoc_dst_hops currently supported only in BUTTERFLY topology" << endl;
+            exit(1);
+        }
+		if (!GlobalParams::use_winoc)
+		{
+			cerr << "Error: winoc_dst_hops makes sense only when -winoc is enabled!" << endl;
+			exit(1);
+		}
+	}
 
     if (GlobalParams::buffer_depth < 1) {
 	cerr << "Error: buffer must be >= 1" << endl;
@@ -294,7 +363,6 @@ void checkConfiguration()
 	    << endl;
 	exit(1);
     }
-
 
     for (unsigned int i = 0; i < GlobalParams::hotspots.size(); i++) {
 	if (GlobalParams::hotspots[i].first >=
@@ -395,6 +463,10 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::mesh_dim_x = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-dimy"))
 		GlobalParams::mesh_dim_y = atoi(arg_vet[++i]);
+
+	    else if (!strcmp(arg_vet[i], "-dtiles"))
+		GlobalParams::n_delta_tiles = atoi(arg_vet[++i]);
+
 	    else if (!strcmp(arg_vet[i], "-buffer"))
 		GlobalParams::buffer_depth = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-buffer_tt"))
@@ -409,6 +481,10 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::flit_size = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-winoc")) 
 		GlobalParams::use_winoc = true;
+	    else if (!strcmp(arg_vet[i], "-winoc_dst_hops")) 
+	    {
+            GlobalParams::winoc_dst_hops = atoi(arg_vet[++i]);
+	    }
 	    else if (!strcmp(arg_vet[i], "-wirxsleep")) 
 	    {
 		GlobalParams::use_powermanager = true;
@@ -418,6 +494,11 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::min_packet_size = atoi(arg_vet[++i]);
 		GlobalParams::max_packet_size = atoi(arg_vet[++i]);
 	    } 
+	    else if (!strcmp(arg_vet[i], "-topology")) 
+	    {
+		    GlobalParams::topology = arg_vet[++i];
+            cout << "Changing topology to " << GlobalParams::topology << endl;
+        }
 	    else if (!strcmp(arg_vet[i], "-routing")) 
 	    {
 		GlobalParams::routing_algorithm = arg_vet[++i];
@@ -585,4 +666,27 @@ void configure(int arg_num, char *arg_vet[]) {
     // Show configuration
     if (GlobalParams::verbose_mode > VERBOSE_OFF)
 	showConfig();
+}
+
+template <typename T> 
+T readParam(YAML::Node node, string param, T default_value) {
+   try {
+       return node[param].as<T>();
+   } catch(exception &e) {
+       /*
+       cerr << "WARNING: parameter " << param << " not present in YAML configuration file." << endl;
+       cerr << "Using command line value or default value " << default_value << endl;
+        */
+       return default_value;
+   }
+}
+
+template <typename T> 
+T readParam(YAML::Node node, string param) {
+   try {
+       return node[param].as<T>();
+   } catch(exception &e) {
+       cerr << "ERROR: Cannot read param " << param << ". " << endl;
+       exit(0);
+   }
 }

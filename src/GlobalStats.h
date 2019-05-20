@@ -88,6 +88,8 @@ class GlobalStats {
 
     void showPowerManagerStats(std::ostream & out);
 
+    double getReceivedIdealFlitRatio();
+
 
 
 #ifdef TESTING
