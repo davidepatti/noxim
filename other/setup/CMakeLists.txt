@@ -22,6 +22,8 @@ link_directories(
 add_definitions(-DSC_NO_WRITE_CHECK)
 
 add_executable(noxim
+        src/routingAlgorithms/Routing_DELTA.cpp
+        src/routingAlgorithms/Routing_DELTA.h
         src/routingAlgorithms/Routing_DYAD.cpp
         src/routingAlgorithms/Routing_DYAD.h
         src/routingAlgorithms/Routing_NEGATIVE_FIRST.cpp
