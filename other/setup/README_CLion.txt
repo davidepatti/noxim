@@ -9,3 +9,14 @@ make
 make install
 
 
+Of course, the binary of noxim will be in different directory:
+noxim/cmake-build-debug
+
+so will need to copy (or link) the power.yaml file from the same directory:
+
+ln -s ../bin/power.yaml
+
+Also, is suggested to create a link to the config_examples to it can be easily accessed:
+
+ln -s ../config_examples
+
