@@ -118,7 +118,10 @@ SC_MODULE(Hub)
         txChannels = GlobalParams::hub_configuration[local_id].txChannels;
 
 	antenna2tile_reservation_table.setSize(num_ports);
-	tile2antenna_reservation_table.setSize(txChannels.size());
+	// fix this
+	//tile2antenna_reservation_table.setSize(txChannels.size());
+#define STATIC_MAX_CHANNELS 10
+      tile2antenna_reservation_table.setSize(STATIC_MAX_CHANNELS);
 
         flit_rx = new sc_in<Flit>[num_ports];
         req_rx = new sc_in<bool>[num_ports];
