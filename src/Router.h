@@ -139,6 +139,8 @@ SC_MODULE(Router)
 
     bool inCongestion();
     void ShowBuffersStats(std::ostream & out);
+
+    bool connectedHubs(int src_hub, int dst_hub);
 };
 
 #endif
