@@ -663,7 +663,8 @@ int Hub::selectChannel(int src_hub, int dst_hub) const
 		}
 	}
 
-	if (intersection.size()==0) return NOT_VALID;
+	if (intersection.size()==0)
+	    return NOT_VALID;
 
 	if (GlobalParams::channel_selection==CHSEL_RANDOM)
 		return intersection[rand()%intersection.size()];
