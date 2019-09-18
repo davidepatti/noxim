@@ -1,6 +1,4 @@
 #include "Routing_DELTA.h"
-#include "../GlobalParams.h"
-#include "../Utils.h"
 
 RoutingAlgorithmsRegister Routing_DELTA::routingAlgorithmsRegister("DELTA", getInstance());
 
