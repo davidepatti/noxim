@@ -393,11 +393,16 @@ vector < int > Router::routingFunction(const RouteData & route_data)
 			if ( hasRadioHub(route_data.dst_id) &&
 				 !sameRadioHub(local_id,route_data.dst_id) )
 			{
-				LOG << "Destination node " << route_data.dst_id << " is directly connected to a RadioHub" << endl;
+                map<int, int>::iterator it1 = GlobalParams::hub_for_tile.find(route_data.dst_id);
+                map<int, int>::iterator it2 = GlobalParams::hub_for_tile.find(route_data.src_id);
 
-				vector<int> dirv;
-				dirv.push_back(DIRECTION_HUB);
-				return dirv;
+                if (connectedHubs(it1->second,it2->second))
+                {
+                    LOG << "Destination node " << route_data.dst_id << " is directly connected to a reachable RadioHub" << endl;
+                    vector<int> dirv;
+                    dirv.push_back(DIRECTION_HUB);
+                    return dirv;
+                }
 			}
 			// let's check whether some node in the route has an acceptable distance to the dst
             if (GlobalParams::winoc_dst_hops>0)
@@ -617,4 +622,24 @@ void Router::ShowBuffersStats(std::ostream & out)
   for (int i=0; i<DIRECTIONS+2; i++)
       for (int vc=0; vc<GlobalParams::n_virtual_channels;vc++)
 	    buffer[i][vc].ShowStats(out);
+}
+
+
+bool Router::connectedHubs(int src_hub, int dst_hub) {
+    vector<int> &first = GlobalParams::hub_configuration[src_hub].txChannels;
+    vector<int> &second = GlobalParams::hub_configuration[dst_hub].rxChannels;
+
+    vector<int> intersection;
+
+    for (unsigned int i = 0; i < first.size(); i++) {
+        for (unsigned int j = 0; j < second.size(); j++) {
+            if (first[i] == second[j])
+                intersection.push_back(first[i]);
+        }
+    }
+
+    if (intersection.size() == 0)
+        return false;
+    else
+        return true;
 }
