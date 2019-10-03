@@ -365,13 +365,22 @@ void checkConfiguration()
     }
 
     for (unsigned int i = 0; i < GlobalParams::hotspots.size(); i++) {
-	if (GlobalParams::hotspots[i].first >=
-	    GlobalParams::mesh_dim_x *
-	    GlobalParams::mesh_dim_y) {
-	    cerr << "Error: hotspot node " << GlobalParams::
-		hotspots[i].first << " is invalid (out of range)" << endl;
-	    exit(1);
+	if (GlobalParams::topology==TOPOLOGY_MESH){
+		if (GlobalParams::hotspots[i].first >=
+		    GlobalParams::mesh_dim_x *
+		    GlobalParams::mesh_dim_y) {
+		    cerr << "Error: hotspot node " << GlobalParams::
+			hotspots[i].first << " is invalid (out of range)" << endl;
+		    exit(1);
+		}
 	}
+	else {
+		if (GlobalParams::hotspots[i].first >= GlobalParams::n_delta_tiles){
+		    cerr << "Error: hotspot node " << GlobalParams::hotspots[i].first << " is invalid (out of range)" << endl;
+		    exit(1);
+		}
+	}
+
 	if (GlobalParams::hotspots[i].second < 0.0
 	    && GlobalParams::hotspots[i].second > 1.0) {
 	    cerr <<
