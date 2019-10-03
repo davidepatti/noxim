@@ -394,7 +394,7 @@ vector < int > Router::routingFunction(const RouteData & route_data)
 				 !sameRadioHub(local_id,route_data.dst_id) )
 			{
                 map<int, int>::iterator it1 = GlobalParams::hub_for_tile.find(route_data.dst_id);
-                map<int, int>::iterator it2 = GlobalParams::hub_for_tile.find(route_data.src_id);
+                map<int, int>::iterator it2 = GlobalParams::hub_for_tile.find(route_data.current_id);
 
                 if (connectedHubs(it1->second,it2->second))
                 {
