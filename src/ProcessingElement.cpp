@@ -38,8 +38,10 @@ void ProcessingElement::txProcess()
 	transmittedAtPreviousCycle = false;
     } else {
 	Packet packet;
-
+        
+	 
 	if (canShot(packet)) {
+            NB_Generated_Packets++;
 	    packet_queue.push(packet);
 	    transmittedAtPreviousCycle = true;
 	} else
@@ -56,6 +58,10 @@ void ProcessingElement::txProcess()
 	}
     }
 }
+//double ProcessingElement::NB_Generated_Packets()
+//{
+  //return NB_Generated_Packets; 
+//}  
 
 Flit ProcessingElement::nextFlit()
 {
@@ -282,6 +288,12 @@ Packet ProcessingElement::trafficRandom()
     // Random destination distribution
     do {
 	p.dst_id = randInt(0, max_id);
+//Modif :
+
+ 	//do
+        //p.dst_id = randInt(0, max_id);
+        //while ( p.dst_id == 97 or p.dst_id ==98 or p.dst_id ==129 or p.dst_id ==130);
+	
     p.intr_id = findIntrNode(p.dst_id);
 
 	// check for hotspot destination

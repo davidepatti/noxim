@@ -30,6 +30,8 @@ class Stats {
   public:
 
     Stats() {
+	NB_ReceivedPackets_Router=0;
+        //NB_Generated_packets=0;  //H.L : Generated Packets 
     } 
 
     void configure(const int node_id, const double _warm_up_time);
@@ -79,8 +81,13 @@ class Stats {
 		   std::cout, bool header = false);
 
 
-  private:
+    // New method by JL and HL to count the number of received packets by Router
+    double getTotalReceived_Packets_Habiba();
+    //double getTotalGeneratedPackets_Habiba();
 
+
+  private:
+	unsigned int NB_ReceivedPackets_Router;
     int id;
     vector < CommHistory > chist;
     double warm_up_time;

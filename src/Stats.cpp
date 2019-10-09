@@ -38,12 +38,21 @@ void Stats::receivedFlit(const double arrival_time,
 	i = chist.size() - 1;
     }
 
-    if (flit.flit_type == FLIT_TYPE_HEAD)
+    if (flit.flit_type == FLIT_TYPE_HEAD){
+	NB_ReceivedPackets_Router++;
 	chist[i].delays.push_back(arrival_time - flit.timestamp);
+	}
 
     chist[i].total_received_flits++;
     chist[i].last_received_flit_time = arrival_time - warm_up_time;
 }
+
+double Stats::getTotalReceived_Packets_Habiba(){
+	return (double) NB_ReceivedPackets_Router;
+}
+
+
+
 
 double Stats::getAverageDelay(const int src_id)
 {

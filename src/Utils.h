@@ -212,6 +212,7 @@ inline bool hasRadioHub(int id)
 inline int tile2Hub(int id)
 {
     map<int, int>::iterator it = GlobalParams::hub_for_tile.find(id); 
+    //cout<< "Tile2Hub : "<<id <<endl;
     assert( (it != GlobalParams::hub_for_tile.end()) && "Specified Tile is not connected to any Hub");
     return it->second;
 }
@@ -234,7 +235,7 @@ template<typename T> std::string i_to_string(const T& t){
 
 inline int getWiredDistanceC(Coord node1, Coord node2)
 {
-    return (abs (node1.x - node2.x) + abs (node1.y - node2.y));
+    return (abs (node1.x - node2.x) + abs (node1.y - node2.y) + 20);
 }
 
 inline int getWiredDistanceI(int node1_id, int  node2_id)

@@ -16,9 +16,24 @@ void NoC::buildMesh()
 {
 
 
-    token_ring = new TokenRing("tokenring");
-    token_ring->clock(clock);
-    token_ring->reset(reset);
+	// Allow the creation of NB_HUB token ring, one per radio channels
+	//Assume one HUB per Channel (wireless)
+	char tokenring_name[16];
+	for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();
+            it != GlobalParams::hub_configuration.end();
+            ++it)
+    {
+    	int token_id = it->first;
+    	sprintf(tokenring_name, "TokenRing_%d", token_id);
+        token_ring[token_id] = new TokenRing(tokenring_name, token_id);
+        token_ring[token_id]->clock(clock);
+    	token_ring[token_id]->reset(reset);
+    }
+    cout << "Noc.cpp : Finish token rings' creation"<<endl;
+
+    //token_ring = new TokenRing("tokenring");
+    //token_ring->clock(clock);
+    //token_ring->reset(reset);
 
 
     char channel_name[16];
@@ -41,7 +56,7 @@ void NoC::buildMesh()
         HubConfig hub_config = it->second;
 
         sprintf(hub_name, "Hub_%d", hub_id);
-        hub[hub_id] = new Hub(hub_name, hub_id,token_ring);
+        hub[hub_id] = new Hub(hub_name, hub_id,token_ring[hub_id]); // MODIF JL
         hub[hub_id]->clock(clock);
         hub[hub_id]->reset(reset);
 
@@ -105,7 +120,7 @@ void NoC::buildMesh()
 					data_rate_gbs);
     }
 
-
+    //cout << "Noc.cpp : Finish Hubs' creation"<<endl;
     // Check for routing table availability
     if (GlobalParams::routing_algorithm == ROUTING_TABLE_BASED)
 	assert(grtable.load(GlobalParams::routing_table_filename.c_str()));

@@ -27,7 +27,7 @@ void signalHandler( int signum )
     cout << "\b\b  " << endl;
     cout << endl;
     cout << "Current Statistics:" << endl;
-    cout << "(" << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " sim cycles executed)" << endl;
+    cout << "(" <<sc_time_stamp().to_double() / GlobalParams::clock_period_ps << " sim cycles executed)" << endl;
     GlobalStats gs(n);
     gs.showStats(std::cout, GlobalParams::detailed);
 }

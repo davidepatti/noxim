@@ -8,6 +8,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <sys/time.h>
+#include <string>
 
 using namespace std;
 
@@ -20,24 +21,27 @@ using namespace std;
 #define REPETITIONS_LABEL    "repetitions"
 #define TMP_DIR_LABEL        "tmp"
 
-#define DEF_SIMULATOR        "./noxim"
+#define DEF_SIMULATOR        "../bin/noxim"
 #define DEF_REPETITIONS      5
 #define DEF_TMP_DIR          "./"
 
-#define TMP_FILE_NAME        ".noxim_explorer.tmp"
+#define TMP_FILE_NAME        "noxim_explorer_tmp"
 
 #define RPACKETS_LABEL       "% Total received packets:"
 #define RFLITS_LABEL         "% Total received flits:"
 #define AVG_DELAY_LABEL      "% Global average delay (cycles):"
-#define AVG_THROUGHPUT_LABEL "% Global average throughput (flits/cycle):"
-#define THROUGHPUT_LABEL     "% Throughput (flits/cycle/IP):"
+#define AVG_THROUGHPUT_LABEL "% Network throughput (flits/cycle):" //Modified by JL
+#define THROUGHPUT_LABEL     "% Average IP throughput (flits/cycle/IP):" //Modified by JL
+#define AVG_WIRELESS_LABEL   "% Average wireless utilization:" //H.L
 #define MAX_DELAY_LABEL      "% Max delay (cycles):"
 #define TOTAL_ENERGY_LABEL   "% Total energy (J):"
 
 #define MATLAB_VAR_NAME      "data"
-#define MATRIX_COLUMN_WIDTH  15
+#define MATRIX_COLUMN_WIDTH  16
 
 //---------------------------------------------------------------------------
+
+bool MoveHubTextFile(string config_name);
 
 typedef unsigned int uint;
 
@@ -68,6 +72,7 @@ struct TSimulationResults
   double       total_energy;
   unsigned int rpackets;
   unsigned int rflits;
+  double  wirelessutilization;
 };
 
 //---------------------------------------------------------------------------
@@ -596,9 +601,18 @@ bool ReadResults(const string& fname,
 	  iss >> sres.total_energy;
 	  continue;
 	}
+///// Habiba/////
+	pos = line.find(AVG_WIRELESS_LABEL);
+      if (pos != string::npos) 
+	{
+	  nread++;
+	  istringstream iss(line.substr(pos + string(AVG_WIRELESS_LABEL).size()));
+	  iss >> sres.wirelessutilization;
+	  continue;
+	}
     }
 
-  if (nread != 7)
+  if (nread != 8)
     {
       error_msg = "Output file " + fname + " corrupted";
       return false;
@@ -616,8 +630,9 @@ bool RunSimulation(const string& cmd_base,
 {
   string tmp_fname = tmp_dir + TMP_FILE_NAME;
   //  string cmd = cmd_base + " >& " + tmp_fname; // this works only with csh and bash
-  string cmd = cmd_base + " >" + tmp_fname + " 2>&1"; // this works with sh, csh, and bash!
-
+  //string cmd = cmd_base + " >" + tmp_fname + " 2>&1"; // this works with sh, csh, and bash!
+  string cmd = cmd_base + " >" + tmp_fname;
+  // add "-power ../config_examples/power.yaml"+  to work
   cout << cmd << endl;
   system(cmd.c_str());
   if (!ReadResults(tmp_fname, sres, error_msg))
@@ -640,6 +655,50 @@ string ExtractFirstField(const string& s)
   iss >> sfirst;
 
   return sfirst;
+}
+
+//---------------------------------------------------------------------------
+//JL
+string TestParamValue2Cmd(const pair<string,string>& pv)
+{
+  string cmd;
+
+  cmd = pv.first+"_"+pv.second+"_";
+
+  return cmd;
+}
+
+
+string Test2CmdLine(const TConfiguration& conf, int rep)
+{
+  string cl("");
+  string cl_withoutspaces;
+  char nb_rep[10];
+ sprintf(nb_rep,"%d",rep+1);//std::string(rep+1);
+cout << "coucou" << endl;
+  for (uint i=0; i<conf.size(); i++) {
+    if(i==0){
+      cl = cl + conf[0].first+"_"+conf[0].second; 
+      //cout<< "plot cl[%d"<<i<<"]:"<<cl<< endl;
+      }
+    else
+      cl = cl +"_" +conf[0].first+"_"+conf[0].second; 
+      //cout<< "plot cl[%d"<<i<<"]:"<<cl<< endl;
+    
+  }
+  //cout<< "plot cl with spaces"<<cl<< endl;
+  for (int j=0; j<cl.length() ; j++)
+  { 
+    if (cl[j]==' ' || cl[j]=='.')
+	cl[j]='_';
+
+  }
+  //replace( cl.begin(), cl.end(), ' ', '_');
+  //cout<< "plot cl withoutspaces"<<cl<< endl;
+  //remove dot
+  //replace( cl.begin(), cl.end(), '.', '_');
+  cl=cl+"_"+nb_rep;
+  return cl;
 }
 
 //---------------------------------------------------------------------------
@@ -676,11 +735,25 @@ bool RunSimulations(double start_time,
       // Print results;
       fout << setw(MATRIX_COLUMN_WIDTH) << sres.avg_delay
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.throughput
+           << setw(MATRIX_COLUMN_WIDTH) << sres.avg_throughput
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.max_delay
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.total_energy
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.rpackets
 	   << setw(MATRIX_COLUMN_WIDTH) << sres.rflits 
+           << setw(MATRIX_COLUMN_WIDTH) << sres.wirelessutilization
 	   << endl;
+
+     //Add by J.L   
+    string test_line = Test2CmdLine(aggr_conf,i);//string("Sim_"+pir+"_"+nb_rep);
+
+    //string pir = to_string(aggr_conf_space.first());
+    
+    string cmd_dir = test_line;//string("Sim_"+pir+"_"+nb_rep);
+
+    if (!MoveHubTextFile(cmd_dir)) 
+    return false; // add by J.L
+
+
     }
 
   return true;
@@ -698,11 +771,14 @@ bool PrintMatlabVariableBegin(const TParametersSpace& aggragated_params_space,
     fout << setw(MATRIX_COLUMN_WIDTH) << i->first;
 
   fout << setw(MATRIX_COLUMN_WIDTH) << "avg_delay"
-       << setw(MATRIX_COLUMN_WIDTH) << "throughput"
+       << setw(MATRIX_COLUMN_WIDTH) << "Network throughput"
+       << setw(MATRIX_COLUMN_WIDTH) << "Average IP throughput"
        << setw(MATRIX_COLUMN_WIDTH) << "max_delay"
        << setw(MATRIX_COLUMN_WIDTH) << "total_energy"
        << setw(MATRIX_COLUMN_WIDTH) << "rpackets"
-       << setw(MATRIX_COLUMN_WIDTH) << "rflits";
+       << setw(MATRIX_COLUMN_WIDTH) << "rflits"
+       << setw(MATRIX_COLUMN_WIDTH) << "Average wireless";
+
 
   fout << endl;
 
@@ -847,12 +923,16 @@ bool RunSimulations(const TConfigurationSpace& conf_space,
             + aggr_cmd_line + " "
 	    + def_cmd_line + " "
 	    + conf_cmd_line;
+  
 
 	  if (!RunSimulations(start_time,
 			      sim_counter, cmd, eparams.tmp_dir, eparams.repetitions,
 			      aggr_conf_space[j], fout, error_msg))
 	    return false;
+
+   
 	}
+  
 
       if (!PrintMatlabVariableEnd(eparams.repetitions, fout, error_msg))
 	return false;
@@ -901,6 +981,20 @@ bool RunSimulations(const string& script_fname,
 }
 
 
+bool MoveHubTextFile(string config_name)
+{
+
+  // Create folder where moving hub result files according to simulation params.
+  string cmd = string("mkdir HUB_"+config_name);
+  system(cmd.c_str()); 
+  // Move files (starting with "HUB_")
+  cmd = string("mv Hub* ./HUB_"+config_name);
+  system(cmd.c_str()); 
+
+  return true;
+
+}
+
 //---------------------------------------------------------------------------
 
 int main(int argc, char **argv)
@@ -928,3 +1022,4 @@ int main(int argc, char **argv)
 }
 
 //---------------------------------------------------------------------------
+

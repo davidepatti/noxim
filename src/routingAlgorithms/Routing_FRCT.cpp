@@ -83,4 +83,3 @@ vector<int> Routing_FRCT::wirelessRouting(Coord current, Coord destination)
     
 
 }
-

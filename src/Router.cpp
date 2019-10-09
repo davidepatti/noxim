@@ -111,6 +111,7 @@ void Router::txProcess()
 
 		  if (flit.flit_type == FLIT_TYPE_HEAD) 
 		    {
+
 		      // prepare data for routing
 		      RouteData route_data;
 		      route_data.current_id = local_id;
@@ -119,6 +120,12 @@ void Router::txProcess()
 		      route_data.intr_id = flit.intr_id;
 		      route_data.dir_in = i;
 		      route_data.vc_id = flit.vc_id;
+    		      //////////////////////////////////////////
+		      // Habiba modif : Number of received flit
+                      //unsigned int NB_Received_flit_TxProcess =0;
+		      //NB_Received_flit_TxProcess++;
+                      //cout << " Router Id : " <<local_id <<"NB_Received_flit_TxProcess" << NB_Received_flit_TxProcess << endl;
+                      /////////////////////////////////////////
 
 		      // TODO: see PER POSTERI (adaptive routing should not recompute route if already reserved)
 		      int o = route(route_data);
@@ -207,6 +214,7 @@ void Router::txProcess()
 			  power.networkInterface();
 			  LOG << "Consumed flit " << flit << endl;
 			  stats.receivedFlit(sc_time_stamp().to_double() / GlobalParams::clock_period_ps, flit);
+
 			  if (GlobalParams:: max_volume_to_be_drained) 
 			  {
 			      if (drained_volume >= GlobalParams:: max_volume_to_be_drained)

@@ -147,6 +147,42 @@ double GlobalStats::getAverageThroughput()
     return avg_throughput;
 }
 */
+//Total Number of generated packets
+double GlobalStats ::getTotalPacketsPE()
+{ unsigned int n = 0;
+for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) 
+	  
+		 n += noc->t[x][y]->pe->NB_Generated_Packets;
+return n;
+}
+//Total Number of  packets DIRECTION_HUB
+double GlobalStats ::getPackets_HubToTile()
+{unsigned int packets = 0;
+
+    // Wireless noc
+    for (map<int, HubConfig>::iterator it = GlobalParams::hub_configuration.begin();
+            it != GlobalParams::hub_configuration.end();
+            ++it)
+    {
+	int hub_id = it->first;
+
+	map<int,Hub*>::const_iterator i = noc->hub.find(hub_id);
+	Hub * h = i->second;
+
+	packets+= h->NB_Packets_HubToTile;
+    }
+    return packets;
+}
+
+double GlobalStats ::getTotalCommunications()
+{ unsigned int n = 0;
+for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) 
+	  
+		 n += noc->t[x][y]->r->stats.getTotalCommunications();
+return n;
+}
 
 double GlobalStats::getAggregatedThroughput()
 {
@@ -154,6 +190,20 @@ double GlobalStats::getAggregatedThroughput()
 
     return (double)getReceivedFlits()/(double)(total_cycles);
 }
+
+//New method by JL and HL 
+double GlobalStats::getTotalReceived_Packets_Habiba(){
+   unsigned int n = 0;
+
+    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+	    n += noc->t[x][y]->r->stats.getTotalReceived_Packets_Habiba();
+
+    return (double)n;
+}
+
+//Total generated Packets
+
 
 unsigned int GlobalStats::getReceivedPackets()
 {
@@ -346,7 +396,13 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
     out << "% Total energy (J): " << getTotalPower() << endl;
     out << "% \tDynamic energy (J): " << getDynamicPower() << endl;
     out << "% \tStatic energy (J): " << getStaticPower() << endl;
-
+   //
+    out << " ----------------------------------------------------"<<endl; 
+    out << "% NB Total Received Packets by Habiba (Packets) " << getTotalReceived_Packets_Habiba()<< endl;
+    out << "% NB Total communication by Habiba " << getTotalCommunications()<< endl;
+    out << "% Total wireless Packets: " << getWirelessPackets() << endl; //H.L
+    out << "% Total Generated Packets : " << getTotalPacketsPE() << endl; //H.L
+    out << "% Packet Injection Rate : "<< GlobalParams::packet_injection_rate <<endl;//H.L 
     if (GlobalParams::show_buffer_stats)
       showBufferStats(out);
 

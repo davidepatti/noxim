@@ -64,7 +64,8 @@ SC_MODULE(NoC)
     map<int, Hub*> hub;
     map<int, Channel*> channel;
 
-    TokenRing* token_ring;
+    //TokenRing* token_ring; //Initial values
+    map<int, TokenRing*> token_ring;    // Modify by JL
 
     // Global tables
     GlobalRoutingTable grtable;

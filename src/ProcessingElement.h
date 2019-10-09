@@ -17,11 +17,13 @@
 #include "DataStructs.h"
 #include "GlobalTrafficTable.h"
 #include "Utils.h"
+#include "Stats.h"
 
 using namespace std;
 
 SC_MODULE(ProcessingElement)
 {
+
 
     // I/O Ports
     sc_in_clk clock;		// The input clock for the PE
@@ -61,6 +63,7 @@ SC_MODULE(ProcessingElement)
     Packet trafficLocal();	// Random with locality
     Packet trafficULocal();	// Random with locality
 
+    //double NB_Generated_Packets();
     GlobalTrafficTable *traffic_table;	// Reference to the Global traffic Table
     bool never_transmit;	// true if the PE does not transmit any packet 
     //  (valid only for the table based traffic)
@@ -72,12 +75,19 @@ SC_MODULE(ProcessingElement)
     void setBit(int &x, int w, int v);
     int getBit(int x, int w);
     double log2ceil(double x);
+    Stats stats;
 
     int roulett();
     int findRandomDestination(int local_id,int hops);
+//public:
+// appel du constructeur 
+//double NB_Generated_Packets();
+//NB_ReceivedPackets_Router=0;
+
 
     // Constructor
     SC_CTOR(ProcessingElement) {
+ NB_Generated_Packets=0;
 	SC_METHOD(rxProcess);
 	sensitive << reset;
 	sensitive << clock.pos();
@@ -86,6 +96,8 @@ SC_MODULE(ProcessingElement)
 	sensitive << reset;
 	sensitive << clock.pos();
     }
+
+double NB_Generated_Packets;
 
 };
 

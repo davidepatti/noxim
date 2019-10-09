@@ -26,6 +26,8 @@ int Hub::route(Flit& f)
 	{
 		if (GlobalParams::hub_configuration[local_id].attachedNodes[i]==f.dst_id)
 		{
+			//cout<<"Hup.cpp hub_id["<<local_id<<"] going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
+			
 			/*
 			if (f.flit_type == 0)
 			cout<<"**coucou*****hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
@@ -38,9 +40,13 @@ int Hub::route(Flit& f)
 			if (f.flit_type == 0)
 			cout<<"*****coucou******hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
 			//*/
+			//cout<<"Hup.cpp hub_id["<<local_id<<"] going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
+			
 			return tile2Port(f.intr_id);
 		}
 	}
+	//cout<<"Hup.cpp hub_id["<<local_id<<"] going to Wireless Direction, reaching "<< f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
+			
 	return DIRECTION_WIRELESS;
 
 }
@@ -166,7 +172,7 @@ void Hub::updateTxPower()
 			power.leakageBufferFromTile();
 }
 
-
+#if TOKEN_MULTIPLE==0
 void Hub::txRadioProcessTokenPacket(int channel)
 {
 	/*
@@ -256,6 +262,39 @@ void Hub::txRadioProcessTokenMaxHold(int channel)
 		}
 	}
 }
+
+#else
+
+void Hub::txRadioProcessNoToken()
+{
+	
+	if (flag->read()!=RELEASE_CHANNEL)
+{
+		//flag->write(HOLD_CHANNEL);
+	
+		if (!init[local_id]->buffer_tx.IsEmpty())
+		{
+			Flit flit = init[local_id]->buffer_tx.Front();
+
+			// TODO: check whether it would make sense to use transmission_in_progress to
+			// avoid multiple notify()
+			//cout << "*** [Ch"<<local_id<<"] Requesting transmission event of flit " << flit << endl;
+			init[local_id]->start_request_event.notify();
+		}
+	
+		
+		
+			if (!transmission_in_progress[local_id])
+			{
+				LOG << "*** [Ch"<<local_id<<"] Buffer_tx empty and no trasmission in progress !" << endl;
+				flag->write(RELEASE_CHANNEL);
+			}
+			else
+				LOG << "*** [Ch"<<local_id<<"] Buffer_tx empty, but trasmission in progress, holding token" << endl;
+		
+}	
+}
+#endif
 
 void Hub::antennaToTileProcess()
 {
@@ -396,8 +435,9 @@ void Hub::antennaToTileProcess()
 				{
 					target[channel]->buffer_rx.Pop();
 					power.antennaBufferPop();
-					LOG << "*** [Ch" << channel << "] Moving flit  " << received_flit << " from buffer_rx to buffer_to_tile[" << port <<"][" << vc << "]" << endl;
 
+					LOG << "*** [Ch" << channel << "] Moving flit  " << received_flit << " from buffer_rx to buffer_to_tile[" << port <<"][" << vc << "]" << endl;
+                                        NB_Packets_HubToTile++; //H.L
 					buffer_to_tile[port][vc].Push(received_flit);
 					power.bufferToTilePush();
 
@@ -439,7 +479,7 @@ void Hub::tileToAntennaProcess()
 	//         cout << endl;
 	//     }
 	// }
-
+#if TOKEN_MULTIPLE==0
 	if (reset.read())
 	{
 		for (unsigned int i =0 ;i<txChannels.size();i++)
@@ -458,22 +498,44 @@ void Hub::tileToAntennaProcess()
 		return;
 	}
 
+#else
+		if (reset.read())
+		{
+			flag->write(HOLD_CHANNEL);
+
+			TBufferFullStatus bfs;
+			for (int i = 0; i < num_ports; i++)
+			{
+				ack_rx[i]->write(0);
+				buffer_full_status_rx[i].write(bfs);
+				current_level_rx[i] = 0;
+			}
+			return;
+		}
+
+#endif
+
 	/////////////////////////////////modif/////////////////////////////////
-	for (unsigned int i =0 ;i<txChannels.size();i++)
-	{
-		int channel = txChannels[i];
+	#if TOKEN_MULTIPLE==0
+		for (unsigned int i =0 ;i<txChannels.size();i++)
+		{
+			int channel = txChannels[i];
 
-		string macPolicy = token_ring->getPolicy(channel).first;
+			string macPolicy = token_ring->getPolicy(channel).first;
 
-		if (macPolicy == TOKEN_PACKET)
-			txRadioProcessTokenPacket(channel);
-		else if (macPolicy == TOKEN_HOLD)
-			txRadioProcessTokenHold(channel);
-		else if (macPolicy == TOKEN_MAX_HOLD)
-			txRadioProcessTokenMaxHold(channel);
-		else
-			assert(false);
-	}
+			if (macPolicy == TOKEN_PACKET)
+				txRadioProcessTokenPacket(channel);
+			else if (macPolicy == TOKEN_HOLD)
+				txRadioProcessTokenHold(channel);
+			else if (macPolicy == TOKEN_MAX_HOLD)
+				txRadioProcessTokenMaxHold(channel);
+			else
+				assert(false);
+		}
+	#else
+
+		txRadioProcessNoToken();
+	#endif
 /////////////////////////////////////////////////////////////////////////////
 	int last_reserved = NOT_VALID;
 
@@ -505,7 +567,7 @@ void Hub::tileToAntennaProcess()
 
 			{
 
-				LOG << "Reservation: buffer_from_tile[" << i <<"][" << vc << "] not empty " << endl;
+				//fcout << "Hub.cpp Reservation: buffer_from_tile[" << i <<"][" << vc << "] not empty " << endl;
 
 				Flit flit = buffer_from_tile[i][vc].Front();
                                  //if (k == 0)
@@ -530,26 +592,26 @@ void Hub::tileToAntennaProcess()
 
 					assert(channel!=NOT_VALID && "hubs are not connected by any channel");
 
-					LOG << "Checking reservation availability of Channel " << channel << " by Hub port[" << i << "][" << vc << "] for flit " << flit << endl;
+					//cout << "Checking reservation availability of Channel " << channel << " by Hub port[" << i << "][" << vc << "] for flit " << flit << endl;
 
 					int rt_status = tile2antenna_reservation_table.checkReservation(r,txChannel_mapping.at(channel));
 
 					if (rt_status == RT_AVAILABLE)
 					{
-						LOG << "Reservation of channel " << channel << " from Hub port["<< i << "]["<<vc<<"] by flit " << flit << endl;
+						//cout << "Reservation of channel " << channel << " from Hub port["<< i << "]["<<vc<<"] by flit " << flit << endl;
 						tile2antenna_reservation_table.reserve(r, txChannel_mapping.at(channel));
 					}
 					else if (rt_status == RT_ALREADY_SAME)
 					{
-						LOG << "RT_ALREADY_SAME reserved channel " << channel << " for flit " << flit << endl;
+						//cout << "RT_ALREADY_SAME reserved channel " << channel << " for flit " << flit << endl;
 					}
 					else if (rt_status == RT_OUTVC_BUSY)
 					{
-						LOG << "RT_OUTVC_BUSY reservation for channel " << channel << " for flit " << flit << endl;
+						//cout << "RT_OUTVC_BUSY reservation for channel " << channel << " for flit " << flit << endl;
 					}
 					else if (rt_status == RT_ALREADY_OTHER_OUT)
 					{
-						LOG << "RT_ALREADY_OTHER_OUT a channel different from " << channel << " already reserved by Hub port["<< i << "]["<<vc<<"]" << endl;
+						//cout << "RT_ALREADY_OTHER_OUT a channel different from " << channel << " already reserved by Hub port["<< i << "]["<<vc<<"]" << endl;
 					}
 					else assert(false); // no meaningful status here
 				}
@@ -599,17 +661,17 @@ void Hub::tileToAntennaProcess()
 							tile2antenna_reservation_table.release(r,txChannel_mapping.at(channel));
 						}
 
-						LOG << "Flit " << flit << " moved from buffer_from_tile["<<i<<"]["<<vc<<"]  to buffer_tx["<<channel<<"] " << endl;
+						//cout << "Flit " << flit << " moved from buffer_from_tile["<<i<<"]["<<vc<<"]  to buffer_tx["<<channel<<"] " << endl;
 					}
 					else
 					{
-						LOG << "Buffer Full: Cannot move flit " << flit << " from buffer_from_tile["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
+						cout << "Buffer Full: Cannot move flit " << flit << " from buffer_from_tile["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
 						//init[channel]->buffer_tx.Print();
 					}
 				}
 				else
 				{
-					LOG << "Forwarding: No channel reserved for input port [" << i << "][" << vc << "], flit " << flit << endl;
+					//cout << "Forwarding: No channel reserved for input port [" << i << "][" << vc << "], flit " << flit << endl;
 				}
 			}
 
@@ -695,11 +757,11 @@ int Hub::selectChannel(int src_hub, int dst_hub) const
 
 				if (!transmission_in_progress[intersection[k]])
 				{
-					cout << "Found free channel " << intersection[k] << " on (src,dest) (" << src_hub << "," << dst_hub << ") " << endl;
+					//cout << "Found free channel " << intersection[k] << " on (src,dest) (" << src_hub << "," << dst_hub << ") " << endl;
 					return intersection[k];
 				}
 			}
-			cout << "All channel busy, applying random selection " << endl;
+			//cout << "All channel busy, applying random selection " << endl;
 			return intersection[rand()%intersection.size()];
 		}
 	return NOT_VALID;
@@ -715,7 +777,7 @@ void Hub::OpenFile()
 
 		if(!fp)
 		{
-			cout<<"unable to open file "<<ResultsFileName.c_str()<<endl;
+			//cout<<"unable to open file "<<ResultsFileName.c_str()<<endl;
 
 		}
 	}

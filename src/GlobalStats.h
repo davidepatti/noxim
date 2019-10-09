@@ -88,6 +88,11 @@ class GlobalStats {
 
     void showPowerManagerStats(std::ostream & out);
 
+    double getTotalReceived_Packets_Habiba();
+    //double NB_Generated_Packets();    
+    double getTotalCommunications();
+    double getTotalPacketsPE();
+    double getPackets_HubToTile();
 
 
 #ifdef TESTING

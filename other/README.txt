@@ -18,7 +18,3 @@ mapping2cg
 ----------
 - converts a communication trace to a mapped communication trace
 
-
-direction_test
-----------
-- contains all the switches direction interconnection

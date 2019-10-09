@@ -18,11 +18,13 @@
 
 using namespace std;
 
+#if TOKEN_MULTIPLE==0
+
 SC_MODULE(TokenRing)
 {
     SC_HAS_PROCESS(TokenRing);
 
-
+    int local_id; // Unique Id; modif by JL
     // I/O Ports
     sc_in_clk clock;	
     sc_in < bool > reset;
@@ -41,8 +43,9 @@ SC_MODULE(TokenRing)
 
     void updateTokens();
 
-    TokenRing(sc_module_name nm): sc_module(nm) {
+    TokenRing(sc_module_name nm, int id): sc_module(nm) {
 
+    local_id = id;
 
 	if (GlobalParams::use_winoc)
 	{
@@ -77,5 +80,57 @@ SC_MODULE(TokenRing)
     map<int,pair<string, vector<string> > >token_policy;
 
 };
+
+#else 
+
+SC_MODULE(TokenRing)
+{
+    SC_HAS_PROCESS(TokenRing);
+
+    int local_id; // Unique Id; modif by JL
+    // I/O Ports
+    sc_in_clk clock;    
+    sc_in < bool > reset;
+
+    sc_inout<int>* flag;
+
+    sc_signal<int>* flag_signals;
+
+
+
+    void attachHub(int hub, sc_inout<int>* hub_flag_port);
+
+    void updateTokens();
+
+    TokenRing(sc_module_name nm, int id): sc_module(nm) {
+
+    local_id = id;
+
+    if (GlobalParams::use_winoc)
+    {
+        SC_METHOD(updateTokens);
+        sensitive << reset;
+        sensitive << clock.pos();
+    }
+
+        
+    }
+
+    
+    private:
+
+    void updateTokenMaxHold();
+    void updateTokenHold();
+    void updateTokenPacket();
+    void updateTokenPacketNew();
+
+    // ring of a channel -> list of pairs < hubs , hold counts >
+    int rings_mapping;
+
+    map<int,pair<string, vector<string> > >token_policy;
+
+};
+
+#endif
 
 #endif

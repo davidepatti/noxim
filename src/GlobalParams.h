@@ -32,6 +32,8 @@ using namespace std;
 #define DIRECTION_HUB           5
 #define DIRECTION_WIRELESS    747
 
+#define TOKEN_MULTIPLE  1   // choice of 1 token ring per channel (and  hub)
+
 #define CLUSTER_WIDTH 4
 #define CLUSTER_HEIGHT 8
 
@@ -52,6 +54,7 @@ using namespace std;
 // Routing algorithms
 #define ROUTING_DYAD           "DYAD"
 #define ROUTING_TABLE_BASED    "TABLE_BASED"
+#define ROUTING_FRCT           "FRCT"
 
 
 // Channel selection 
