@@ -162,12 +162,10 @@ void Hub::updateTxPower()
 
 void Hub::txRadioProcessTokenPacket(int channel)
 {
-	/*
-    if (flag[channel]->read()==RELEASE_CHANNEL)
-    flag[channel]->write(HOLD_CHANNEL);
-    */
-	if (current_token_holder[channel]->read() == local_id
-		&& flag[channel]->read()!=RELEASE_CHANNEL)
+    int current_holder = current_token_holder[channel]->read();
+    int current_channel_flag =flag[channel]->read();
+
+	if ( current_holder == local_id && current_channel_flag !=RELEASE_CHANNEL)
 	{
 		if (!init[channel]->buffer_tx.IsEmpty())
 		{

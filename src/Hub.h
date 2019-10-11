@@ -146,30 +146,31 @@ SC_MODULE(Hub)
 
         for(int i = 0; i < num_ports; i++)
         {
-	    transmission_in_progress[i] = false;
-	    for (int vc = 0;vc<GlobalParams::n_virtual_channels; vc++)
-	    {
-		buffer_from_tile[i][vc].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].fromTileBufferSize);
-		buffer_to_tile[i][vc].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].toTileBufferSize);
-		buffer_from_tile[i][vc].setLabel(string(name())+"->bft["+i_to_string(i)+"]["+i_to_string(vc)+"]");
-		buffer_to_tile[i][vc].setLabel(string(name())+"->btt["+i_to_string(i)+"]["+i_to_string(vc)+"]");
-	    }
-	    start_from_vc[i] = 0;
+            transmission_in_progress[i] = false;
+            for (int vc = 0;vc<GlobalParams::n_virtual_channels; vc++)
+            {
+                buffer_from_tile[i][vc].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].fromTileBufferSize);
+                buffer_to_tile[i][vc].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].toTileBufferSize);
+                buffer_from_tile[i][vc].setLabel(string(name())+"->bft["+i_to_string(i)+"]["+i_to_string(vc)+"]");
+                buffer_to_tile[i][vc].setLabel(string(name())+"->btt["+i_to_string(i)+"]["+i_to_string(vc)+"]");
+            }
+            start_from_vc[i] = 0;
         }
 
         for (unsigned int i = 0; i < txChannels.size(); i++) {
             char txt[20];
-            sprintf(txt, "init_%d", txChannels[i]);
-            init[txChannels[i]] = new Initiator(txt,this);
-            init[txChannels[i]]->buffer_tx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].txBufferSize);
-            init[txChannels[i]]->buffer_tx.setLabel(string(name())+"->abtx["+i_to_string(i)+"]");
-	    current_token_holder[txChannels[i]] = new sc_in<int>();
-	    current_token_expiration[txChannels[i]] = new sc_in<int>();
-	    flag[txChannels[i]] = new sc_inout<int>();
-            token_ring->attachHub(txChannels[i],local_id, current_token_holder[txChannels[i]],current_token_expiration[txChannels[i]],flag[txChannels[i]]);
-	    // power manager currently assumes TOKEN_PACKET mac policy
-	    if (GlobalParams::use_powermanager)
-		assert(token_ring->getPolicy(txChannels[i]).first==TOKEN_PACKET);
+            int ch = txChannels[i];
+            sprintf(txt, "init_%d", ch);
+            init[ch] = new Initiator(txt,this);
+            init[ch]->buffer_tx.SetMaxBufferSize(GlobalParams::hub_configuration[local_id].txBufferSize);
+            init[ch]->buffer_tx.setLabel(string(name())+"->abtx["+i_to_string(i)+"]");
+            current_token_holder[ch] = new sc_in<int>();
+            current_token_expiration[ch] = new sc_in<int>();
+            flag[ch] = new sc_inout<int>();
+            token_ring->attachHub(ch,local_id, current_token_holder[ch],current_token_expiration[ch],flag[ch]);
+            // power manager currently assumes TOKEN_PACKET mac policy
+            if (GlobalParams::use_powermanager)
+                assert(token_ring->getPolicy(ch).first==TOKEN_PACKET);
         }
 
         for (unsigned int i = 0; i < rxChannels.size(); i++) {
