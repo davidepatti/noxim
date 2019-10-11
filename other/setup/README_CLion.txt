@@ -1,6 +1,8 @@
 To make it work on CLion with Linux
 --------------------------------------------
-- Create a new project importing source files 
+Tested on Ubuntu, other distro should be similar.
+Maybe also useful for creating a win version instructions (let me know I will add to the repository)
+- Create a new project importing source files selecting the noxim directory
 - Replace the CMakeLists.txt file in the project root directory with the one found in this directory
 - Enter in the noxim/bin/libs/systemc-2.3.1 and recompile it typing the following:
 
