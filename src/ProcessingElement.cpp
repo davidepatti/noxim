@@ -138,7 +138,8 @@ bool ProcessingElement::canShot(Packet & packet)
         else if (GlobalParams::traffic_distribution == TRAFFIC_ULOCAL)
 		    packet = trafficULocal();
         else
-		    assert(false);
+		cout << "Invalid traffic distribution: " << GlobalParams::traffic_distribution << endl;
+	        exit(-1);
 	}
     } else {			// Table based communication traffic
 	if (never_transmit)
