@@ -17,9 +17,9 @@ ReservationTable::ReservationTable()
 void ReservationTable::setSize(const int n_outputs)
 {
     this->n_outputs = n_outputs;
-    rtable = new TRTEntry[n_outputs];
+    rtable = new TRTEntry[this->n_outputs];
 
-    for (int i=0;i<n_outputs;i++)
+    for (int i=0;i<this->n_outputs;i++)
     {
 	rtable[i].index = 0;
 	rtable[i].reservations.clear();
@@ -70,7 +70,8 @@ int ReservationTable::checkReservation(const TReservation r, const int port_out)
      /* On a given output entry, reservations must differ by VC
      *  Motivation: they will be interleaved cycle-by-cycle as index moves */
 
-    for (int i=0;i<rtable[port_out].reservations.size(); i++)
+     int n_reservations = rtable[port_out].reservations.size();
+    for (int i=0;i< n_reservations; i++)
     {
 	// the reservation is already present
 	if (rtable[port_out].reservations[i] == r)

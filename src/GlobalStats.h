@@ -24,7 +24,7 @@ class GlobalStats {
 
     GlobalStats(const NoC * _noc);
 
-    // Returns the aggragated average delay (cycles)
+    // Returns the aggregated average delay (cycles)
     double getAverageDelay();
 
     // Returns the aggragated average delay (cycles) for communication src_id->dst_id
@@ -93,6 +93,8 @@ class GlobalStats {
     double getTotalCommunications();
     double getTotalPacketsPE();
     double getPackets_HubToTile();
+    double getReceivedIdealFlitRatio();
+
 
 
 #ifdef TESTING

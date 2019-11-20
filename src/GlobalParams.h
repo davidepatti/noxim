@@ -30,6 +30,7 @@ using namespace std;
 #define DIRECTION_WEST          3
 #define DIRECTION_LOCAL         4
 #define DIRECTION_HUB           5
+#define DIRECTION_HUB_RELAY     5000
 #define DIRECTION_WIRELESS    747
 
 #define TOKEN_MULTIPLE  1   // choice of 1 token ring per channel (and  hub)
@@ -50,6 +51,13 @@ using namespace std;
 
 // To mark invalid or non exhistent values
 #define NOT_VALID             -1
+
+//Topologies
+#define TOPOLOGY_MESH          "MESH"
+//Delta Networks Topologies
+#define TOPOLOGY_BASELINE      "BASELINE"
+#define TOPOLOGY_BUTTERFLY     "BUTTERFLY"
+#define TOPOLOGY_OMEGA         "OMEGA"
 
 // Routing algorithms
 #define ROUTING_DYAD           "DYAD"
@@ -140,8 +148,10 @@ struct GlobalParams {
     static string verbose_mode;
     static int trace_mode;
     static string trace_filename;
+    static string topology;
     static int mesh_dim_x;
     static int mesh_dim_y;
+    static int n_delta_tiles;
     static double r2r_link_length;
     static double r2h_link_length;
     static int buffer_depth;
@@ -170,6 +180,7 @@ struct GlobalParams {
     static unsigned int max_volume_to_be_drained;
     static bool show_buffer_stats;
     static bool use_winoc;
+    static int winoc_dst_hops;
     static bool use_powermanager;
     static ChannelConfig default_channel_configuration;
     static map<int, ChannelConfig> channel_configuration;

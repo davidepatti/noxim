@@ -20,7 +20,7 @@ To receive information about new Noxim features, updates and events, please regi
 
 What's New ? 
 ------------
-**[March 2018]** Long awaited Virtual Channels and RadioHub with multiple transmission channels are now in master version
+**[March 2018]**
 
   * Support for virtual channels for improved traffic management
   * Support for multiple radio-frequency channels for each Radio-Hub
@@ -41,7 +41,7 @@ Installation & Quick Start
 -----------
 
 If you are working on Ubuntu, you can install noxim and all the dependencies with the following command:
-(be sure of copying the entire line, i.e., ending with "ubuntu.sh)
+(**BE sure of copying the entire line, i.e., ending with "ubuntu.sh**)
 
     bash <(wget -qO- --no-check-certificate https://raw.githubusercontent.com/davidepatti/noxim/master/other/setup/ubuntu.sh)
 

@@ -10,6 +10,12 @@
 
 #include "Router.h"
 
+
+inline int toggleKthBit(int n, int k)
+{
+	return (n ^ (1 << (k-1)));
+}
+
 void Router::process()
 {
     txProcess();
@@ -30,44 +36,51 @@ void Router::rxProcess()
 	local_drained = 0;
     } 
     else 
-    {
+    { 
 	// This process simply sees a flow of incoming flits. All arbitration
 	// and wormhole related issues are addressed in the txProcess()
-
+	//assert(false);
 	for (int i = 0; i < DIRECTIONS + 2; i++) {
 	    // To accept a new flit, the following conditions must match:
 	    // 1) there is an incoming request
 	    // 2) there is a free slot in the input buffer of direction i
+	    //LOG<<"****RX****DIRECTION ="<<i<<  endl;
 
 	    if (req_rx[i].read() == 1 - current_level_rx[i])
-	    {
+	    { 
 		Flit received_flit = flit_rx[i].read();
+		//LOG<<"request opposite to the current_level, reading flit "<<received_flit<<endl;
+
 		int vc = received_flit.vc_id;
 
 		if (!buffer[i][vc].IsFull()) 
 		{
+
 		    // Store the incoming flit in the circular buffer
 		    buffer[i][vc].Push(received_flit);
-
 		    LOG << " Flit " << received_flit << " collected from Input[" << i << "][" << vc <<"]" << endl;
 
 		    power.bufferRouterPush();
 
 		    // Negate the old value for Alternating Bit Protocol (ABP)
+		    //LOG<<"INVERTING CL FROM "<< current_level_rx[i]<< " TO "<<  1 - current_level_rx[i]<<endl;
 		    current_level_rx[i] = 1 - current_level_rx[i];
 
 		    // if a new flit is injected from local PE
 		    if (received_flit.src_id == local_id)
-		      power.networkInterface();
+			power.networkInterface();
 		}
 
-		else 
-		    // should not happen with the new TBufferFullStatus control signals
+		else  // buffer full
+		{
+		    // should not happen with the new TBufferFullStatus control signals    
 		    // except for flit coming from local PE, which don't use it 
+		    LOG << " Flit " << received_flit << " buffer full Input[" << i << "][" << vc <<"]" << endl;
 		    assert(i== DIRECTION_LOCAL);
+		}
+
 	    }
 	    ack_rx[i].write(current_level_rx[i]);
-
 	    // updates the mask of VCs to prevent incoming data on full buffers
 	    TBufferFullStatus bfs;
 	    for (int vc=0;vc<GlobalParams::n_virtual_channels;vc++)
@@ -90,7 +103,7 @@ void Router::txProcess()
 	}
     } 
   else 
-    {
+    { 
       // 1st phase: Reservation
       for (int j = 0; j < DIRECTIONS + 2; j++) 
 	{
@@ -115,6 +128,7 @@ void Router::txProcess()
 		      // prepare data for routing
 		      RouteData route_data;
 		      route_data.current_id = local_id;
+		      //LOG<< "current_id= "<< route_data.current_id <<" for sending " << flit << endl;
 		      route_data.src_id = flit.src_id;
 		      route_data.dst_id = flit.dst_id;
 		      route_data.intr_id = flit.intr_id;
@@ -130,11 +144,20 @@ void Router::txProcess()
 		      // TODO: see PER POSTERI (adaptive routing should not recompute route if already reserved)
 		      int o = route(route_data);
 
+		      // manage special case of target hub not directly connected to destination
+		      if (o>=DIRECTION_HUB_RELAY)
+			  {
+		      	Flit f = buffer[i][vc].Pop();
+		      	f.hub_relay_node = o-DIRECTION_HUB_RELAY;
+		      	buffer[i][vc].Push(f);
+		      	o = DIRECTION_HUB;
+			  }
+
 		      TReservation r;
 		      r.input = i;
 		      r.vc = vc;
 
-		      LOG << " checking reservation availability of Output " << o << " Input[" << i << "][" << vc << "] for flit " << flit << endl;
+		      LOG << " checking availability of Output[" << o << "] for Input[" << i << "][" << vc << "] flit " << flit << endl;
 
 		      int rt_status = reservation_table.checkReservation(r,o);
 
@@ -165,23 +188,27 @@ void Router::txProcess()
       start_from_port = (start_from_port + 1) % (DIRECTIONS + 2);
 
       // 2nd phase: Forwarding
+      //if (local_id==6) LOG<<"*TX*****local_id="<<local_id<<"__ack_tx[0]= "<<ack_tx[0].read()<<endl;
       for (int i = 0; i < DIRECTIONS + 2; i++) 
-      {
+      { 
 	  vector<pair<int,int> > reservations = reservation_table.getReservations(i);
 	  
 	  if (reservations.size()!=0)
 	  {
+
 	      int rnd_idx = rand()%reservations.size();
 
 	      int o = reservations[rnd_idx].first;
 	      int vc = reservations[rnd_idx].second;
-
+	     // LOG<< "found reservation from input= " << i << "_to output= "<<o<<endl;
 	      // can happen
 	      if (!buffer[i][vc].IsEmpty())  
 	      {
 		  // power contribution already computed in 1st phase
 		  Flit flit = buffer[i][vc].Front();
-
+		  //LOG<< "*****TX***Direction= "<<i<< "************"<<endl;
+		  //LOG<<"_cl_tx="<<current_level_tx[o]<<"req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
+		  
 		  if ( (current_level_tx[o] == ack_tx[o].read()) &&
 		       (buffer_full_status_tx[o].read().mask[vc] == false) ) 
 		  {
@@ -229,17 +256,23 @@ void Router::txProcess()
 		      else if (i != DIRECTION_LOCAL) // not generated locally
 			  routed_flits++;
 		      /* End Power & Stats ------------------------------------------------- */
+			 //LOG<<"END_OK_cl_tx="<<current_level_tx[o]<<"_req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
 		  }
 		  else
 		  {
-		      LOG << " APB cannot forward Input[" << i << "][" << vc << "] forward to Output[" << o << "], flit: " << flit << endl;
+		      LOG << " Cannot forward Input[" << i << "][" << vc << "] to Output[" << o << "], flit: " << flit << endl;
+		      //LOG << " **DEBUG APB: current_level_tx: " << current_level_tx[o] << " ack_tx: " << ack_tx[o].read() << endl;
+		      LOG << " **DEBUG buffer_full_status_tx " << buffer_full_status_tx[o].read().mask[vc] << endl;
+
+		  	//LOG<<"END_NO_cl_tx="<<current_level_tx[o]<<"_req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
 		      /*
 		      if (flit.flit_type == FLIT_TYPE_HEAD)
 			  reservation_table.release(i,flit.vc_id,o);
 			  */
 		  }
 	      }
-	  } // if not reserved
+	  } // if not reserved 
+	 // else LOG<<"we have no reservation for direction "<<i<< endl;
       } // for loop directions
 
       if ((int)(sc_time_stamp().to_double() / GlobalParams::clock_period_ps)%2==0)
@@ -290,27 +323,130 @@ void Router::perCycleUpdate()
     }
 }
 
+vector<int> Router::nextDeltaHops(RouteData rd) {
+
+	if (GlobalParams::topology == TOPOLOGY_MESH)
+	{
+		cout << "Mesh topologies are not supported for nextDeltaHops() ";
+		assert(false);
+	}
+	// annotate the initial nodes
+	int src = rd.src_id;
+	int dst = rd.dst_id;
+
+	int current_node = src;
+	vector<int> direction; // initially is empty
+	vector<int> next_hops;
+
+	int sw = GlobalParams::n_delta_tiles/2; //sw: switch number in each stage
+	int stg = log2(GlobalParams::n_delta_tiles);
+
+	int c =  (current_node >>1);
+
+	Coord temp_coord;
+	temp_coord.x = 0;
+	temp_coord.y = c;
+	int N = coord2Id(temp_coord);
+
+	next_hops.push_back(N);
+	current_node = N;
+
+	int current_stage = 0;
+
+	while (current_stage<stg-1)
+	{
+		Coord new_coord;
+		int y = id2Coord(current_node).y;
+
+		rd.current_id = current_node;
+		direction = routingAlgorithm->route(this, rd);
+
+		int bit_to_check = stg - current_stage - 1;
+
+		int bit_checked = (y & (1 << (bit_to_check - 1)))>0 ? 1:0;
+
+		// computes next node coords
+		new_coord.x = current_stage + 1;
+		if (bit_checked ^ direction[0])
+			new_coord.y = toggleKthBit(y, bit_to_check);
+		else
+			new_coord.y = y;
+
+		current_node = coord2Id(new_coord);
+		next_hops.push_back(current_node);
+		current_stage = id2Coord(current_node).x;
+	}
+
+	next_hops.push_back(dst);
+
+	return next_hops;
+
+}
+
 vector < int > Router::routingFunction(const RouteData & route_data)
 {
-    if (GlobalParams::use_winoc)
-    {
-        if (hasRadioHub(local_id) &&
-                hasRadioHub(route_data.dst_id) &&
-                !sameRadioHub(local_id,route_data.dst_id)
-           )
-        {
-		if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-		    LOG << "Setting direction HUB to reach destination node " << route_data.dst_id << endl;
+	if (GlobalParams::use_winoc)
+	{
+		// - If the current node C and the destination D are connected to an radiohub, use wireless
+		// - If D is not directly connected to a radio hub, wireless
+		// communication can still  be used if some intermediate node "I" in the routing
+		// path is reachable from current node C.
+		// - Since further wired hops will be required from I -> D, a threshold "winoc_dst_hops"
+		// can be specified (via command line) to determine the max distance from the intermediate
+		// node I and the destination D.
+		// - NOTE: default threshold is 0, which means I=D, i.e., we explicitly ask the destination D to be connected to the
+		// target radio hub
+		if (hasRadioHub(local_id))
+		{
+			// Check if destination is directly connected to an hub
+			if ( hasRadioHub(route_data.dst_id) &&
+				 !sameRadioHub(local_id,route_data.dst_id) )
+			{
+                map<int, int>::iterator it1 = GlobalParams::hub_for_tile.find(route_data.dst_id);
+                map<int, int>::iterator it2 = GlobalParams::hub_for_tile.find(route_data.current_id);
 
-		vector<int> dirv;
-		dirv.push_back(DIRECTION_HUB);
-		return dirv;
-        }
-    }
-    if (GlobalParams::verbose_mode > VERBOSE_OFF) 
-	LOG << "Wired routing for dst = " << route_data.dst_id << endl;
+                if (connectedHubs(it1->second,it2->second))
+                {
+                    LOG << "Destination node " << route_data.dst_id << " is directly connected to a reachable RadioHub" << endl;
+                    vector<int> dirv;
+                    dirv.push_back(DIRECTION_HUB);
+                    return dirv;
+                }
+			}
+#if TOKEN_MULTIPLE ==0
+			// let's check whether some node in the route has an acceptable distance to the dst
+            if (GlobalParams::winoc_dst_hops>0)
+            {
+                // TODO: for the moment, just print the set of nexts hops to check everything is ok
+                LOG << "NEXT_DELTA_HOPS (from node " << route_data.src_id << " to " << route_data.dst_id << ") >>>> :";
+                vector<int> nexthops;
+                nexthops = nextDeltaHops(route_data);
+                //for (int i=0;i<nexthops.size();i++) cout << "(" << nexthops[i] <<")-->";
+                //cout << endl;
+                for (int i=1;i<=GlobalParams::winoc_dst_hops;i++)
+				{
+                	int dest_position = nexthops.size()-1;
+                	int candidate_hop = nexthops[dest_position-i];
+					if ( hasRadioHub(candidate_hop) && !sameRadioHub(local_id,candidate_hop) ) {
+						//LOG << "Checking candidate hop " << candidate_hop << " ... It's OK!" << endl;
+						LOG << "Relaying to hub-connected node " << candidate_hop << " to reach destination " << route_data.dst_id << endl;
+						vector<int> dirv;
+						dirv.push_back(DIRECTION_HUB_RELAY+candidate_hop);
+						return dirv;
+					}
+					//else
+					// LOG << "Checking candidate hop " << candidate_hop << " ... NOT OK" << endl;
+				}
+            }
+#endif
+		}
+	}
+	// TODO: fix all the deprecated verbose mode logs
+	if (GlobalParams::verbose_mode > VERBOSE_OFF)
+		LOG << "Wired routing for dst = " << route_data.dst_id << endl;
 
-    return routingAlgorithm->route(this, route_data);
+	// not wireless direction taken, apply normal routing
+	return routingAlgorithm->route(this, route_data);
 }
 
 int Router::route(const RouteData & route_data)
@@ -398,19 +534,23 @@ void Router::configure(const int _id,
 	start_from_vc[i] = 0;
     }
 
-    int row = _id / GlobalParams::mesh_dim_x;
-    int col = _id % GlobalParams::mesh_dim_x;
 
-    for (int vc = 0; vc<GlobalParams::n_virtual_channels; vc++)
+    if (GlobalParams::topology == TOPOLOGY_MESH)
     {
-	if (row == 0)
-	  buffer[DIRECTION_NORTH][vc].Disable();
-	if (row == GlobalParams::mesh_dim_y-1)
-	  buffer[DIRECTION_SOUTH][vc].Disable();
-	if (col == 0)
-	  buffer[DIRECTION_WEST][vc].Disable();
-	if (col == GlobalParams::mesh_dim_x-1)
-	  buffer[DIRECTION_EAST][vc].Disable();
+	int row = _id / GlobalParams::mesh_dim_x;
+	int col = _id % GlobalParams::mesh_dim_x;
+
+	for (int vc = 0; vc<GlobalParams::n_virtual_channels; vc++)
+	{
+	    if (row == 0)
+	      buffer[DIRECTION_NORTH][vc].Disable();
+	    if (row == GlobalParams::mesh_dim_y-1)
+	      buffer[DIRECTION_SOUTH][vc].Disable();
+	    if (col == 0)
+	      buffer[DIRECTION_WEST][vc].Disable();
+	    if (col == GlobalParams::mesh_dim_x-1)
+	      buffer[DIRECTION_EAST][vc].Disable();
+	}
     }
 
 }
@@ -439,7 +579,9 @@ int Router::reflexDirection(int direction) const
 
 int Router::getNeighborId(int _id, int direction) const
 {
-    Coord my_coord = id2Coord(_id);
+    assert(GlobalParams::topology == TOPOLOGY_MESH);
+
+    Coord my_coord = id2Coord(_id); 
 
     switch (direction) {
     case DIRECTION_NORTH:
@@ -491,4 +633,24 @@ void Router::ShowBuffersStats(std::ostream & out)
   for (int i=0; i<DIRECTIONS+2; i++)
       for (int vc=0; vc<GlobalParams::n_virtual_channels;vc++)
 	    buffer[i][vc].ShowStats(out);
+}
+
+
+bool Router::connectedHubs(int src_hub, int dst_hub) {
+    vector<int> &first = GlobalParams::hub_configuration[src_hub].txChannels;
+    vector<int> &second = GlobalParams::hub_configuration[dst_hub].rxChannels;
+
+    vector<int> intersection;
+
+    for (unsigned int i = 0; i < first.size(); i++) {
+        for (unsigned int j = 0; j < second.size(); j++) {
+            if (first[i] == second[j])
+                intersection.push_back(first[i]);
+        }
+    }
+
+    if (intersection.size() == 0)
+        return false;
+    else
+        return true;
 }

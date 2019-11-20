@@ -48,13 +48,14 @@ void Buffer::Print()
     char  t[] = "HBT";
 
     cout << sc_time_stamp().to_double() / GlobalParams::clock_period_ps << "\t";
-    cout << label << " | ";
+    cout << label << " QUEUE *[";
     while (!(m.empty()))
     {
 	Flit f = m.front();
 	m.pop();
 	cout << bstr << t[f.flit_type] << f.sequence_no <<  "(" << f.dst_id << ") | ";
     }
+    cout << "]*" << endl;
     cout << endl;
 }
 

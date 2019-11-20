@@ -24,7 +24,6 @@ using namespace std;
 SC_MODULE(ProcessingElement)
 {
 
-
     // I/O Ports
     sc_in_clk clock;		// The input clock for the PE
     sc_in < bool > reset;	// The reset signal for the PE
@@ -79,6 +78,7 @@ SC_MODULE(ProcessingElement)
 
     int roulett();
     int findRandomDestination(int local_id,int hops);
+    unsigned int getQueueSize() const;
 //public:
 // appel du constructeur 
 //double NB_Generated_Packets();

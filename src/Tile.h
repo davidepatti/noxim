@@ -20,6 +20,8 @@ SC_MODULE(Tile)
 {
     SC_HAS_PROCESS(Tile);
 
+    
+
     // I/O Ports
     sc_in_clk clock;		                // The input clock for the tile
     sc_in <bool> reset;	                        // The reset signal for the tile

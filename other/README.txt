@@ -18,3 +18,16 @@ mapping2cg
 ----------
 - converts a communication trace to a mapped communication trace
 
+
+direction_test
+----------
+- contains all the connections and directions related to the switchBloc (butterfly architecture)
+
+mapping_sw2sw
+----------
+- contains the mapping between swithes all over stages in butterfly architecture
+
+mapping_core2switch
+----------
+- contains the mapping between cores and switch in butterfly architecture
+

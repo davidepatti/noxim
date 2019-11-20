@@ -13,8 +13,14 @@
 string GlobalParams::verbose_mode;
 int GlobalParams::trace_mode;
 string GlobalParams::trace_filename;
+
+string GlobalParams::topology;
+
 int GlobalParams::mesh_dim_x;
 int GlobalParams::mesh_dim_y;
+
+int GlobalParams::n_delta_tiles;
+
 double GlobalParams::r2r_link_length;
 double GlobalParams::r2h_link_length;
 int GlobalParams::buffer_depth;
@@ -43,6 +49,7 @@ unsigned int GlobalParams::max_volume_to_be_drained;
 vector <pair <int, double> > GlobalParams::hotspots;
 bool GlobalParams::show_buffer_stats;
 bool GlobalParams::use_winoc;
+int GlobalParams::winoc_dst_hops;
 bool GlobalParams::use_powermanager;
 ChannelConfig GlobalParams::default_channel_configuration;
 map<int, ChannelConfig> GlobalParams::channel_configuration;

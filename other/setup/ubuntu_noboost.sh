@@ -23,7 +23,7 @@ cd libs
 
 git clone https://github.com/jbeder/yaml-cpp
 cd yaml-cpp/
-git checkout -b r0.5.3 release-0.5.3
+git checkout -b r0.6.0 yaml-cpp-0.6.0
 mkdir -p lib
 cd lib
 cmake ..
@@ -43,7 +43,6 @@ make install
 cd ..
 echo `pwd`/lib-* > systemc.conf
 sudo ln -s `pwd`/systemc.conf /etc/ld.so.conf.d/noxim_systemc.conf
-#sudo cat `pwd`/systemc.conf >> /etc/ld.so.conf.d/noxim_systemc.conf
 sudo ldconfig
 cd ../..
 

@@ -1,4 +1,3 @@
-
 /*
  * Noxim - the NoC Simulator
  *
@@ -13,39 +12,49 @@
 
 int Hub::tile2Port(int id)
 {
-	return tile2port_mapping[id];
+	// TODO: check all [..] map access to replace with at()
+	return tile2port_mapping.at(id);
 }
 
 int Hub::route(Flit& f)
 {
+	// check if it is a local delivery
 	/*
 	if (f.flit_type == 0)
-	cout <<"coucou hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
+	LOG <<"hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
 	//*/
 	for (vector<int>::size_type i=0; i< GlobalParams::hub_configuration[local_id].attachedNodes.size();i++)
 	{
+		// ...to a destination which is connected to the Hub
 		if (GlobalParams::hub_configuration[local_id].attachedNodes[i]==f.dst_id)
 		{
-			//cout<<"Hup.cpp hub_id["<<local_id<<"] going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
+			//LOG<<"Hup.cpp hub_id["<<local_id<<"] going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
 			
 			/*
 			if (f.flit_type == 0)
-			cout<<"**coucou*****hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
+			LOG<<"hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
 			//*/
 			return tile2Port(f.dst_id);
 		}
-		else if (GlobalParams::hub_configuration[local_id].attachedNodes[i]==f.intr_id)
+		// ...or to a relay which is locally connected to the Hub
+		if (GlobalParams::hub_configuration[local_id].attachedNodes[i]==f.intr_id)
 		{
 			/*
 			if (f.flit_type == 0)
-			cout<<"*****coucou******hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
+			LOG<<"hub_id : "<<local_id<<"going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
 			//*/
-			//cout<<"Hup.cpp hub_id["<<local_id<<"] going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
+			//LOG<<"Hup.cpp hub_id["<<local_id<<"] going to : "<<f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
 			
 			return tile2Port(f.intr_id);
 		}
+		if (GlobalParams::hub_configuration[local_id].attachedNodes[i]==f.hub_relay_node)
+		{
+			assert(GlobalParams::winoc_dst_hops>0);
+			return tile2Port(f.hub_relay_node);
+		}
+
 	}
-	//cout<<"Hup.cpp hub_id["<<local_id<<"] going to Wireless Direction, reaching "<< f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
+	//LOG<<"Hub.cpp hub_id["<<local_id<<"] going to Wireless Direction, reaching "<< f.intr_id<<" msg from "<<f.src_id<<" to dest : "<<f.dst_id<<endl;
 			
 	return DIRECTION_WIRELESS;
 
@@ -65,7 +74,7 @@ void Hub::rxPowerManager()
 	for (int port=0;port<num_ports;port++)
 	{
 		if (!buffer_to_tile[port][DEFAULT_VC].IsEmpty() ||
-				antenna2tile_reservation_table.isNotReserved(port))
+			antenna2tile_reservation_table.isNotReserved(port))
 			power.leakageBufferToTile();
 
 		else
@@ -127,7 +136,7 @@ void Hub::txPowerManager()
 	{
 		// check if not empty or reserved
 		if (!init[i]->buffer_tx.IsEmpty() ||
-				tile2antenna_reservation_table.isNotReserved(i) )
+			tile2antenna_reservation_table.isNotReserved(i) )
 		{
 			power.leakageAntennaBuffer();
 			// check the second condition for turning off analog tx
@@ -172,15 +181,13 @@ void Hub::updateTxPower()
 			power.leakageBufferFromTile();
 }
 
-#if TOKEN_MULTIPLE==0
+
 void Hub::txRadioProcessTokenPacket(int channel)
 {
-	/*
-    if (flag[channel]->read()==RELEASE_CHANNEL)
-	flag[channel]->write(HOLD_CHANNEL);
-	 */
-	if (current_token_holder[channel]->read() == local_id
-			&& flag[channel]->read()!=RELEASE_CHANNEL)
+    int current_holder = current_token_holder[channel]->read();
+    int current_channel_flag =flag[channel]->read();
+
+	if ( current_holder == local_id && current_channel_flag !=RELEASE_CHANNEL)
 	{
 		if (!init[channel]->buffer_tx.IsEmpty())
 		{
@@ -263,38 +270,35 @@ void Hub::txRadioProcessTokenMaxHold(int channel)
 	}
 }
 
-#else
-
 void Hub::txRadioProcessNoToken()
 {
-	
-	if (flag->read()!=RELEASE_CHANNEL)
+	int channel = local_id;
+	if (flag[channel]->read()!=RELEASE_CHANNEL)
 {
-		//flag->write(HOLD_CHANNEL);
+		flag[channel]->write(HOLD_CHANNEL);
 	
-		if (!init[local_id]->buffer_tx.IsEmpty())
+		if (!init[channel]->buffer_tx.IsEmpty())
 		{
-			Flit flit = init[local_id]->buffer_tx.Front();
+			Flit flit = init[channel]->buffer_tx.Front();
 
 			// TODO: check whether it would make sense to use transmission_in_progress to
 			// avoid multiple notify()
-			//cout << "*** [Ch"<<local_id<<"] Requesting transmission event of flit " << flit << endl;
-			init[local_id]->start_request_event.notify();
+			//cout << "*** [Ch"<<channel<<"] Requesting transmission event of flit " << flit << endl;
+			init[channel]->start_request_event.notify();
 		}
 	
 		
 		
 			if (!transmission_in_progress[local_id])
 			{
-				LOG << "*** [Ch"<<local_id<<"] Buffer_tx empty and no trasmission in progress !" << endl;
-				flag->write(RELEASE_CHANNEL);
+				LOG << "*** [Ch"<<channel<<"] Buffer_tx empty and no trasmission in progress !" << endl;
+				flag[channel]->write(RELEASE_CHANNEL);
 			}
 			else
-				LOG << "*** [Ch"<<local_id<<"] Buffer_tx empty, but trasmission in progress, holding token" << endl;
+				LOG << "*** [Ch"<<channel<<"] Buffer_tx empty, but trasmission in progress, holding token" << endl;
 		
 }	
 }
-#endif
 
 void Hub::antennaToTileProcess()
 {
@@ -317,11 +321,11 @@ void Hub::antennaToTileProcess()
 
       1) data received from a radio channel stored (if possible) to a specific buffer_rx
       2) data found on a buffer_rx moved to a buffer_to_tile
-      3) data found on a buffer_to_tile moved to signal_tx
+      3) data found on a buffer_to_tile moved to signal_tx 
 
       From a implementation perspective, they are performed in 3-2-1 order, to simulate
       a kind of pipelined sequence
-	 ***********************************************************************************/
+     ***********************************************************************************/
 
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -340,7 +344,7 @@ void Hub::antennaToTileProcess()
 
 				LOG << "Flit " << flit << " found on buffer_to_tile[" << i <<"][" << vc << "] " << endl;
 				if (current_level_tx[i] == ack_tx[i].read() &&
-						buffer_full_status_tx[i].read().mask[vc] == false)
+					buffer_full_status_tx[i].read().mask[vc] == false)
 				{
 					LOG << "Flit " << flit << " moved from buffer_to_tile[" << i <<"][" << vc << "] to signal flit_tx["<<i<<"] " << endl;
 
@@ -381,7 +385,17 @@ void Hub::antennaToTileProcess()
 			// Check antenna buffer_rx making appropriate reservations
 			if (received_flit.flit_type==FLIT_TYPE_HEAD)
 			{
+#if TOKEN_MULTIPLE==0
+
+				int dst_port;
+
+				if (received_flit.hub_relay_node!=NOT_VALID)
+					dst_port = tile2Port(received_flit.hub_relay_node);
+				else
+                    dst_port = tile2Port(received_flit.dst_id);
+#else
 				int dst_port = tile2Port(received_flit.intr_id);  //modif
+#endif
 				TReservation r;
 				r.input = channel;
 				r.vc = received_flit.vc_id;
@@ -435,6 +449,7 @@ void Hub::antennaToTileProcess()
 				{
 					target[channel]->buffer_rx.Pop();
 					power.antennaBufferPop();
+					LOG << "*** [Ch" << channel << "] Moving flit  " << received_flit << " from buffer_rx to buffer_to_tile[" << port <<"][" << vc << "]" << endl;
 
 					LOG << "*** [Ch" << channel << "] Moving flit  " << received_flit << " from buffer_rx to buffer_to_tile[" << port <<"][" << vc << "]" << endl;
                                         NB_Packets_HubToTile++; //H.L
@@ -457,9 +472,9 @@ void Hub::antennaToTileProcess()
 			{
 				// should be ok
 				/*
-		LOG << "WARNING: empty target["<<channel<<"] buffer_rx, but reservation still present, if correct, remove assertion below " << endl;
-		assert(false);
-				 */
+                LOG << "WARNING: empty target["<<channel<<"] buffer_rx, but reservation still present, if correct, remove assertion below " << endl;
+                assert(false);
+                */
 			}
 		}
 	}
@@ -479,14 +494,19 @@ void Hub::tileToAntennaProcess()
 	//         cout << endl;
 	//     }
 	// }
-#if TOKEN_MULTIPLE==0
 	if (reset.read())
 	{
+#if TOKEN_MULTIPLE==0
 		for (unsigned int i =0 ;i<txChannels.size();i++)
 		{
 			int channel = txChannels[i];
 			flag[channel]->write(HOLD_CHANNEL);
+
 		}
+#else
+		int channel = local_id;
+		flag[channel]->write(HOLD_CHANNEL);
+#endif
 
 		TBufferFullStatus bfs;
 		for (int i = 0; i < num_ports; i++)
@@ -498,79 +518,54 @@ void Hub::tileToAntennaProcess()
 		return;
 	}
 
+#if TOKEN_MULTIPLE==0
+	for (unsigned int i =0 ;i<txChannels.size();i++)
+	{
+		int channel = txChannels[i];
+
+		string macPolicy = token_ring->getPolicy(channel).first;
+
+		if (macPolicy == TOKEN_PACKET)
+			txRadioProcessTokenPacket(channel);
+		else if (macPolicy == TOKEN_HOLD)
+			txRadioProcessTokenHold(channel);
+		else if (macPolicy == TOKEN_MAX_HOLD)
+			txRadioProcessTokenMaxHold(channel);
+		else
+			assert(false);
+	}
 #else
-		if (reset.read())
-		{
-			flag->write(HOLD_CHANNEL);
-
-			TBufferFullStatus bfs;
-			for (int i = 0; i < num_ports; i++)
-			{
-				ack_rx[i]->write(0);
-				buffer_full_status_rx[i].write(bfs);
-				current_level_rx[i] = 0;
-			}
-			return;
-		}
-
+		txRadioProcessNoToken();
 #endif
 
-	/////////////////////////////////modif/////////////////////////////////
-	#if TOKEN_MULTIPLE==0
-		for (unsigned int i =0 ;i<txChannels.size();i++)
-		{
-			int channel = txChannels[i];
-
-			string macPolicy = token_ring->getPolicy(channel).first;
-
-			if (macPolicy == TOKEN_PACKET)
-				txRadioProcessTokenPacket(channel);
-			else if (macPolicy == TOKEN_HOLD)
-				txRadioProcessTokenHold(channel);
-			else if (macPolicy == TOKEN_MAX_HOLD)
-				txRadioProcessTokenMaxHold(channel);
-			else
-				assert(false);
-		}
-	#else
-
-		txRadioProcessNoToken();
-	#endif
-/////////////////////////////////////////////////////////////////////////////
 	int last_reserved = NOT_VALID;
 
 	// used to store routing decisions
 	int * r_from_tile[num_ports];
-       //cout<<"Hub : "<<local_id<< " num port : "<<num_ports<<endl;
+       //LOG<<"Hub : "<<local_id<< " num port : "<<num_ports<<endl;
 	for (int i=0;i<num_ports;i++)
 	{  
 		r_from_tile[i] = new int[GlobalParams::n_virtual_channels];
 		//cout<<"r reservation from tile [ "<<i<<" ] num vc :  "<<GlobalParams::n_virtual_channels<<endl;
-
 	}
 
 	// 1st phase: Reservation
 	for (int j = 0; j < num_ports; j++)
 	{
 		int i = (start_from_port + j) % (num_ports);
-	//cout<<"strat from port : "<<start_from_port<<endl;
+	//LOG<<"strat from port : "<<start_from_port<<endl;
 //////////////////////////////////////////////// a modif///////////////////////////////////////////////////////////////////
 //cout<<"Hub number : "<<local_id<<" coucou2"<<endl;
 		for (int k = 0;k < GlobalParams::n_virtual_channels; k++)
 		{
 			int vc = (start_from_vc[i]+k)%(GlobalParams::n_virtual_channels);
-                         //int vc = local_id;
-                        //cout<<" hub "<<local_id<<" vc : "<<vc<<endl;
-
 
 			if (!buffer_from_tile[i][vc].IsEmpty())
-
 			{
-
-				//fcout << "Hub.cpp Reservation: buffer_from_tile[" << i <<"][" << vc << "] not empty " << endl;
+				LOG << "Reservation: buffer_from_tile[" << i <<"][" << vc << "] not empty " << endl;
 
 				Flit flit = buffer_from_tile[i][vc].Front();
-                                 //if (k == 0)
+                               // if (k == 0)
                                // {
 				//print les paquets
 				//PrintInFile(flit,channel);
@@ -589,35 +584,39 @@ void Hub::tileToAntennaProcess()
 					assert(r_from_tile[i][vc]==DIRECTION_WIRELESS);
 					int channel = selectChannel(local_id,tile2Hub(flit.intr_id));
                                         PrintInFile(flit,channel);
+					/*if (flit.hub_relay_node==NOT_VALID)
+						channel = selectChannel(local_id, tile2Hub(flit.dst_id));
+					else
+						channel = selectChannel(local_id, tile2Hub(flit.hub_relay_node));
+					*/
 
 					assert(channel!=NOT_VALID && "hubs are not connected by any channel");
 
-					//cout << "Checking reservation availability of Channel " << channel << " by Hub port[" << i << "][" << vc << "] for flit " << flit << endl;
+					LOG << "Checking reservation availability of Channel " << channel << " by Hub port[" << i << "][" << vc << "] for flit " << flit << endl;
 
 					int rt_status = tile2antenna_reservation_table.checkReservation(r,txChannel_mapping.at(channel));
 
 					if (rt_status == RT_AVAILABLE)
 					{
-						//cout << "Reservation of channel " << channel << " from Hub port["<< i << "]["<<vc<<"] by flit " << flit << endl;
+						LOG << "Reservation of channel " << channel << " from Hub port["<< i << "]["<<vc<<"] by flit " << flit << endl;
 						tile2antenna_reservation_table.reserve(r, txChannel_mapping.at(channel));
 					}
 					else if (rt_status == RT_ALREADY_SAME)
 					{
-						//cout << "RT_ALREADY_SAME reserved channel " << channel << " for flit " << flit << endl;
+						LOG << "RT_ALREADY_SAME reserved channel " << channel << " for flit " << flit << endl;
 					}
 					else if (rt_status == RT_OUTVC_BUSY)
 					{
-						//cout << "RT_OUTVC_BUSY reservation for channel " << channel << " for flit " << flit << endl;
+						LOG << "RT_OUTVC_BUSY reservation for channel " << channel << " for flit " << flit << endl;
 					}
 					else if (rt_status == RT_ALREADY_OTHER_OUT)
 					{
-						//cout << "RT_ALREADY_OTHER_OUT a channel different from " << channel << " already reserved by Hub port["<< i << "]["<<vc<<"]" << endl;
+						LOG << "RT_ALREADY_OTHER_OUT a channel different from " << channel << " already reserved by Hub port["<< i << "]["<<vc<<"]" << endl;
 					}
 					else assert(false); // no meaningful status here
 				}
 			}
 		}
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		start_from_vc[i] = (start_from_vc[i]+1)%GlobalParams::n_virtual_channels;
 	} // for num_ports
 
@@ -661,17 +660,17 @@ void Hub::tileToAntennaProcess()
 							tile2antenna_reservation_table.release(r,txChannel_mapping.at(channel));
 						}
 
-						//cout << "Flit " << flit << " moved from buffer_from_tile["<<i<<"]["<<vc<<"]  to buffer_tx["<<channel<<"] " << endl;
+						LOG << "Flit " << flit << " moved from buffer_from_tile["<<i<<"]["<<vc<<"]  to buffer_tx["<<channel<<"] " << endl;
 					}
 					else
 					{
-						cout << "Buffer Full: Cannot move flit " << flit << " from buffer_from_tile["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
+						LOG << "Buffer Full: Cannot move flit " << flit << " from buffer_from_tile["<<i<<"] to buffer_tx["<<channel<<"] " << endl;
 						//init[channel]->buffer_tx.Print();
 					}
 				}
 				else
 				{
-					//cout << "Forwarding: No channel reserved for input port [" << i << "][" << vc << "], flit " << flit << endl;
+					LOG << "Forwarding: No channel reserved for input port [" << i << "][" << vc << "], flit " << flit << endl;
 				}
 			}
 
@@ -688,12 +687,12 @@ void Hub::tileToAntennaProcess()
 			LOG << "Reading " << received_flit << " from signal flit_rx[" << i << "]" << endl;
 
 			/*
-	    if (!buffer_from_tile[i][vc].deadlockFree())
-	    {
-		LOG << " deadlock on buffer " << i << endl;
-		buffer_from_tile[i][vc].Print();
-	    }
-			 */
+            if (!buffer_from_tile[i][vc].deadlockFree())
+            {
+            LOG << " deadlock on buffer " << i << endl;
+            buffer_from_tile[i][vc].Print();
+            }
+            */
 
 			if (!buffer_from_tile[i][vc].IsFull())
 			{
@@ -739,31 +738,33 @@ int Hub::selectChannel(int src_hub, int dst_hub) const
 		}
 	}
 
-	if (intersection.size()==0) return NOT_VALID;
+	if (intersection.size()==0)
+	    return NOT_VALID;
 
 	return src_hub;
 
 	if (GlobalParams::channel_selection==CHSEL_RANDOM)
 		return intersection[rand()%intersection.size()];
 	else
-		if (GlobalParams::channel_selection==CHSEL_FIRST_FREE)
+	if (GlobalParams::channel_selection==CHSEL_FIRST_FREE)
+	{
+		int start_channel = rand()%intersection.size();
+		int k;
+
+		for (int i=0;i<intersection.size();i++)
 		{
-			int start_channel = rand()%intersection.size();
-			int k;
+			k = (start_channel+i)%intersection.size();
 
-			for (int i=0;i<intersection.size();i++)
+			if (!transmission_in_progress[intersection[k]])
 			{
-				k = (start_channel+i)%intersection.size();
-
-				if (!transmission_in_progress[intersection[k]])
-				{
-					//cout << "Found free channel " << intersection[k] << " on (src,dest) (" << src_hub << "," << dst_hub << ") " << endl;
-					return intersection[k];
-				}
+				LOG << "Found free channel " << intersection[k] << " on (src,dest) (" << src_hub << "," << dst_hub << ") " << endl;
+				return intersection[k];
 			}
-			//cout << "All channel busy, applying random selection " << endl;
-			return intersection[rand()%intersection.size()];
 		}
+		LOG << "All channel busy, applying random selection " << endl;
+		return intersection[rand()%intersection.size()];
+	}
+
 	return NOT_VALID;
 }
 
@@ -812,6 +813,3 @@ void Hub::OpenFile()
 
 		fp.close();
 	}
-
-
-
