@@ -859,6 +859,8 @@ void NoC::buildBaseline()
 	    t[i][j]->clock(clock);
 	    t[i][j]->reset(reset);
 
+	    
+
 
 	    // BASELINE: hub connections work as usual
 	    t[i][j]->hub_req_rx(req[i][j].from_hub);
@@ -1252,6 +1254,20 @@ void NoC::buildBaseline()
     // instantiation of the Cores (we have only one row)
     core = new Tile*[n];
 
+    //signals instantiation for connecting Core2Hub (NEW feauture on Baseline)
+	flit_from_hub = new sc_signal<Flit>[n];
+	flit_to_hub = new sc_signal<Flit>[n];
+
+	req_from_hub = new sc_signal<bool>[n];
+	req_to_hub = new sc_signal<bool>[n];
+
+	ack_from_hub = new sc_signal<bool>[n];
+	ack_to_hub = new sc_signal<bool>[n];
+
+	buffer_full_status_from_hub = new sc_signal<TBufferFullStatus>[n];
+	buffer_full_status_to_hub = new sc_signal<TBufferFullStatus>[n];
+
+
     // Create the Core bloc 
     for (int i = 0; i < n; i++) 
     { 
@@ -1289,6 +1305,32 @@ void NoC::buildBaseline()
 	// Map clock and reset
 	core[i]->clock(clock);
 	core[i]->reset(reset);
+
+	//NEW feauture: Hub2tile 
+	    map<int, int>::iterator it = GlobalParams::hub_for_tile.find(core_id);
+		if (it != GlobalParams::hub_for_tile.end())
+		{
+			int hub_id = GlobalParams::hub_for_tile[core_id];
+
+
+			// The next time that the same HUB is considered, the next
+			// port will be connected
+			int port = hub_connected_ports[hub_id]++;
+			//LOG<<"I am hub "<<hub_id<<" connecting to core "<<core_id<<"using port "<<port<<endl;
+			hub[hub_id]->tile2port_mapping[core[i]->local_id] = port;
+
+			hub[hub_id]->req_rx[port](req_to_hub[core_id]);
+			hub[hub_id]->flit_rx[port](flit_to_hub[core_id]);
+			hub[hub_id]->ack_rx[port](ack_from_hub[core_id]);
+			hub[hub_id]->buffer_full_status_rx[port](buffer_full_status_from_hub[core_id]);
+
+			hub[hub_id]->flit_tx[port](flit_from_hub[core_id]);
+			hub[hub_id]->req_tx[port](req_from_hub[core_id]);
+			hub[hub_id]->ack_tx[port](ack_to_hub[core_id]);
+			hub[hub_id]->buffer_full_status_tx[port](buffer_full_status_to_hub[core_id]);
+
+		}
+
     } 
 
     // ---- Cores mapping ---- 
@@ -1832,6 +1874,20 @@ void NoC::buildOmega()
 
 	core = new Tile*[n];
 
+	//signals instantiation for connecting Core2Hub (NEW feature in Omega)
+	flit_from_hub = new sc_signal<Flit>[n];
+	flit_to_hub = new sc_signal<Flit>[n];
+
+	req_from_hub = new sc_signal<bool>[n];
+	req_to_hub = new sc_signal<bool>[n];
+
+	ack_from_hub = new sc_signal<bool>[n];
+	ack_to_hub = new sc_signal<bool>[n];
+
+	buffer_full_status_from_hub = new sc_signal<TBufferFullStatus>[n];
+	buffer_full_status_to_hub = new sc_signal<TBufferFullStatus>[n];
+
+
 	// Create the Core bloc
 
 	for (int i = 0; i < n; i++)
@@ -1870,6 +1926,32 @@ void NoC::buildOmega()
 		// Map clock and reset
 		core[i]->clock(clock);
 		core[i]->reset(reset);
+
+		//NEW feauture: Hub2tile 
+	    map<int, int>::iterator it = GlobalParams::hub_for_tile.find(core_id);
+		if (it != GlobalParams::hub_for_tile.end())
+		{
+			int hub_id = GlobalParams::hub_for_tile[core_id];
+
+
+			// The next time that the same HUB is considered, the next
+			// port will be connected
+			int port = hub_connected_ports[hub_id]++;
+			//LOG<<"I am hub "<<hub_id<<" connecting to core "<<core_id<<"using port "<<port<<endl;
+			hub[hub_id]->tile2port_mapping[core[i]->local_id] = port;
+
+			hub[hub_id]->req_rx[port](req_to_hub[core_id]);
+			hub[hub_id]->flit_rx[port](flit_to_hub[core_id]);
+			hub[hub_id]->ack_rx[port](ack_from_hub[core_id]);
+			hub[hub_id]->buffer_full_status_rx[port](buffer_full_status_from_hub[core_id]);
+
+			hub[hub_id]->flit_tx[port](flit_from_hub[core_id]);
+			hub[hub_id]->req_tx[port](req_from_hub[core_id]);
+			hub[hub_id]->ack_tx[port](ack_to_hub[core_id]);
+			hub[hub_id]->buffer_full_status_tx[port](buffer_full_status_to_hub[core_id]);
+
+		}
+		
 	} //-------------------------------------end core comment---------------------------------
 
 	// ---- Cores mapping ----
@@ -2074,7 +2156,7 @@ void NoC::buildMesh()
     for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
 	for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
 	    // Create the single Tile with a proper name
-	    char tile_name[20];
+	    char tile_name[30];
 	    Coord tile_coord;
 	    tile_coord.x = i;
 	    tile_coord.y = j;
