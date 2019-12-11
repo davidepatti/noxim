@@ -45,6 +45,7 @@ int GlobalParams::stats_warm_up_time;
 int GlobalParams::rnd_generator_seed;
 bool GlobalParams::detailed;
 double GlobalParams::dyad_threshold;
+double GlobalParams::frct_threshold;
 unsigned int GlobalParams::max_volume_to_be_drained;
 vector <pair <int, double> > GlobalParams::hotspots;
 bool GlobalParams::show_buffer_stats;

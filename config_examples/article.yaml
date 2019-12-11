@@ -32,7 +32,9 @@ routing_table_filename: ""
 
 # Routing specific parameters
 #   dyad_threshold: double
+#   frct_threshold: double
 dyad_threshold: 0.6
+frct_threshold: 20
 
 # Selection Strategies:
 #   RANDOM

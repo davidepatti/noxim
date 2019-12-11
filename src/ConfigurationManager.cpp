@@ -86,6 +86,9 @@ void loadConfiguration() {
     GlobalParams::rnd_generator_seed = time(NULL);
     GlobalParams::detailed = readParam<bool>(config, "detailed");
     GlobalParams::dyad_threshold = readParam<double>(config, "dyad_threshold");
+    if (GlobalParams::routing_algorithm == ROUTING_FRCT) {
+        GlobalParams::frct_threshold = readParam<double>(config, "frct_threshold");
+    }
     GlobalParams::max_volume_to_be_drained = readParam<unsigned int>(config, "max_volume_to_be_drained");
     //GlobalParams::hotspots;
     GlobalParams::show_buffer_stats = readParam<bool>(config, "show_buffer_stats");
@@ -218,6 +221,7 @@ void showHelp(char selfname[])
          << "\t\tNEGATIVE_FIRST\tNegative-First routing algorithm" << endl
          << "\t\tODD_EVEN\tOdd-Even routing algorithm" << endl
          << "\t\tDYAD T\t\tDyAD routing algorithm with threshold T" << endl
+         << "\t\tFRCT T\t\tFRCT routing algorithm with threshold T" << endl
          << "\t\tTABLE_BASED FILENAME\tRouting Table Based routing algorithm with table in the specified file" << endl
          << "\t-sel TYPE\t\tSet the selection strategy to one of the following:" << endl
          << "\t\tRANDOM\t\tRandom selection strategy" << endl
@@ -513,6 +517,8 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::routing_algorithm = arg_vet[++i];
 		if (GlobalParams::routing_algorithm == ROUTING_DYAD)
 		    GlobalParams::dyad_threshold = atof(arg_vet[++i]);
+		else if (GlobalParams::routing_algorithm == ROUTING_FRCT)
+		    GlobalParams::frct_threshold = atof(arg_vet[++i]);
 		else if (GlobalParams::routing_algorithm == ROUTING_TABLE_BASED) 
 		{
 		    GlobalParams::routing_table_filename = arg_vet[++i];

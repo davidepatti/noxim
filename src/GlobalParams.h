@@ -177,6 +177,7 @@ struct GlobalParams {
     static bool detailed;
     static vector <pair <int, double> > hotspots;
     static double dyad_threshold;
+    static double frct_threshold;
     static unsigned int max_volume_to_be_drained;
     static bool show_buffer_stats;
     static bool use_winoc;

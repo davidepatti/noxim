@@ -253,7 +253,8 @@ template<typename T> std::string i_to_string(const T& t){
 
 inline int getWiredDistanceC(Coord node1, Coord node2)
 {
-    return (abs (node1.x - node2.x) + abs (node1.y - node2.y) + 20);
+    // cout << "FRCT_THR: " << GlobalParams::frct_threshold << endl; 
+    return (abs (node1.x - node2.x) + abs (node1.y - node2.y) + GlobalParams::frct_threshold);
 }
 
 inline int getWiredDistanceI(int node1_id, int  node2_id)
