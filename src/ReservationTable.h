@@ -31,7 +31,7 @@ struct TReservation
 typedef struct RTEntry
 {
     vector<TReservation> reservations;
-    int index;
+    vector<TReservation>::size_type index;
 } TRTEntry;
 
 class ReservationTable {

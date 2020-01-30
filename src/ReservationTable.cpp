@@ -57,7 +57,7 @@ int ReservationTable::checkReservation(const TReservation r, const int port_out)
      * - same input/VC in a different output line */
     for (int o=0;o<n_outputs;o++)
     {
-	for (int i=0;i<rtable[o].reservations.size(); i++)
+	for (vector<TReservation>::size_type i=0;i<rtable[o].reservations.size(); i++)
 	{
 	    // In the current implementation this should never happen
 	    if (o!=port_out && rtable[o].reservations[i] == r)
@@ -90,7 +90,7 @@ void ReservationTable::print()
     for (int o=0;o<n_outputs;o++)
     {
 	cout << o << ": ";
-	for (int i=0;i<rtable[o].reservations.size();i++)
+	for (vector<TReservation>::size_type i=0;i<rtable[o].reservations.size();i++)
 	{
 	    cout << "<" << rtable[o].reservations[i].input << "," << rtable[o].reservations[i].vc << ">, ";
 	}
@@ -124,7 +124,7 @@ void ReservationTable::release(const TReservation r, const int port_out)
 	if (*i == r)
 	{
 	    rtable[port_out].reservations.erase(i);
-	    int removed_index = i - rtable[port_out].reservations.begin();
+	    vector<TReservation>::size_type removed_index = i - rtable[port_out].reservations.begin();
 
 	    if (removed_index < rtable[port_out].index)
 		rtable[port_out].index--;

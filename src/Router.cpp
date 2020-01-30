@@ -329,7 +329,7 @@ vector<int> Router::nextDeltaHops(RouteData rd) {
 	vector<int> direction; // initially is empty
 	vector<int> next_hops;
 
-	int sw = GlobalParams::n_delta_tiles/2; //sw: switch number in each stage
+	//int sw = GlobalParams::n_delta_tiles/2; //sw: switch number in each stage
 	int stg = log2(GlobalParams::n_delta_tiles);
 
 	int c =  (current_node >>1);
