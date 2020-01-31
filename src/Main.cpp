@@ -71,7 +71,7 @@ int sc_main(int arg_num, char *arg_vet[])
 
 	for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
 	    for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
-		char label[30];
+		char label[64];
 
 		sprintf(label, "req(%02d)(%02d).east", i, j);
 		sc_trace(tf, n->req[i][j].east, label);

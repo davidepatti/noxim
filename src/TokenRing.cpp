@@ -82,8 +82,8 @@ void TokenRing::updateTokens()
         for (map<int,ChannelConfig>::iterator i = GlobalParams::channel_configuration.begin(); i!=GlobalParams::channel_configuration.end(); i++)
         {
             int channel = i->first;
-            int channel_holder;
-            channel_holder = current_token_holder[channel]->read();
+            //int channel_holder;
+            //channel_holder = current_token_holder[channel]->read();
 
             string macPolicy = getPolicy(channel).first;
 

@@ -672,7 +672,7 @@ int Hub::selectChannel(int src_hub, int dst_hub) const
 		int start_channel = rand()%intersection.size();
 		int k;
 
-		for (int i=0;i<intersection.size();i++)
+		for (vector<int>::size_type i=0;i<intersection.size();i++)
 		{
 			k = (start_channel+i)%intersection.size();
 

@@ -179,7 +179,7 @@ void NoC::buildButterfly()
 			// Create the single Tile with a proper name
 
 			// cout  << j <<  " " << i <<   endl;
-			char tile_name[30];
+			char tile_name[64];
 			Coord tile_coord;
 			tile_coord.x = i;
 			tile_coord.y = j;
@@ -762,7 +762,10 @@ void NoC::buildButterfly()
 
 	//--- ---------------------------------- ---
 
-	// dummy NoP_data structure
+	/*
+     * dummy NoP_data structure
+     *
+
 	NoP_data tmp_NoP;
 
 	tmp_NoP.sender_id = NOT_VALID;
@@ -771,7 +774,7 @@ void NoC::buildButterfly()
 		tmp_NoP.channel_status_neighbor[i].free_slots = NOT_VALID;
 		tmp_NoP.channel_status_neighbor[i].available = false;
 	}
-
+    */
 }
 
 void NoC::buildBaseline()
@@ -829,7 +832,7 @@ void NoC::buildBaseline()
 	for (int i = 0; i < dimX; i++) 
 	{
 	    // Create the single Tile with a proper name
-	    char tile_name[30];
+	    char tile_name[64];
 	    Coord tile_coord;
 	    tile_coord.x = i;
 	    tile_coord.y = j;
@@ -1486,16 +1489,19 @@ void NoC::buildBaseline()
 
     //--- ---------------------------------- ---
 
-    // dummy NoP_data structure
+    /* 
+     * dummy NoP_data structure
+     *
+
     NoP_data tmp_NoP;
 
     tmp_NoP.sender_id = NOT_VALID;
 
     for (int i = 0; i < DIRECTIONS; i++) {
-	tmp_NoP.channel_status_neighbor[i].free_slots = NOT_VALID;
-	tmp_NoP.channel_status_neighbor[i].available = false;
+	    tmp_NoP.channel_status_neighbor[i].free_slots = NOT_VALID;
+	    tmp_NoP.channel_status_neighbor[i].available = false;
     }
-
+    */
 }
 
 void NoC::buildOmega()
@@ -1551,7 +1557,7 @@ void NoC::buildOmega()
 			// Create the single Tile with a proper name
 
 			// cout  << j <<  " " << i <<   endl;
-			char tile_name[30];
+			char tile_name[64];
 			Coord tile_coord;
 			tile_coord.x = i;
 			tile_coord.y = j;
@@ -2107,7 +2113,10 @@ void NoC::buildOmega()
 
 	//--- ---------------------------------- ---
 
-	// dummy NoP_data structure
+	/*
+     *  dummy NoP_data structure
+     *
+
 	NoP_data tmp_NoP;
 
 	tmp_NoP.sender_id = NOT_VALID;
@@ -2116,7 +2125,7 @@ void NoC::buildOmega()
 		tmp_NoP.channel_status_neighbor[i].free_slots = NOT_VALID;
 		tmp_NoP.channel_status_neighbor[i].available = false;
 	}
-
+    */
 }
 
 void NoC::buildMesh()
@@ -2156,7 +2165,7 @@ void NoC::buildMesh()
     for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
 	for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
 	    // Create the single Tile with a proper name
-	    char tile_name[30];
+	    char tile_name[64];
 	    Coord tile_coord;
 	    tile_coord.x = i;
 	    tile_coord.y = j;
