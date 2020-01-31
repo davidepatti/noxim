@@ -120,7 +120,7 @@ SC_MODULE(Hub)
 	antenna2tile_reservation_table.setSize(num_ports);
 	// fix this
 	//tile2antenna_reservation_table.setSize(txChannels.size());
-#define STATIC_MAX_CHANNELS 32
+#define STATIC_MAX_CHANNELS 100
       tile2antenna_reservation_table.setSize(STATIC_MAX_CHANNELS);
 
         flit_rx = new sc_in<Flit>[num_ports];
