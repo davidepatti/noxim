@@ -60,8 +60,18 @@ struct Channel: sc_module
     targ_socket.register_transport_dbg(     this, &Channel::transport_dbg);
 
     init_socket.register_invalidate_direct_mem_ptr(this, &Channel::invalidate_direct_mem_ptr);
-    // bit rate is Gb/s
-    int flit_transmission_delay_ps = 1000*GlobalParams::flit_size/GlobalParams::channel_configuration[local_id].dataRate;
+
+    int flit_transmission_delay_ps;
+
+    if (GlobalParams::use_ofdma) 
+    {
+        flit_transmission_delay_ps = 1000000 * GlobalParams::ofdma_Ns/GlobalParams::ofdma_W;
+    } else
+    {
+        // bit rate is Gb/s
+        flit_transmission_delay_ps = 1000*GlobalParams::flit_size/GlobalParams::channel_configuration[local_id].dataRate;
+    }
+    
     flit_transmission_cycles = ceil(((double)flit_transmission_delay_ps/GlobalParams::clock_period_ps));
 
     cc_flit_transmission_delay_ps = flit_transmission_cycles * GlobalParams::clock_period_ps;

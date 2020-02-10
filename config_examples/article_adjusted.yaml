@@ -193,7 +193,7 @@ clock_period_ps: 1000
 # duration of reset signal assertion, expressed in cycles
 reset_time: 1000
 # overal simulation lenght, expressed in cycles
-simulation_time: 50000
+simulation_time: 10000
 # collect stats after a given number of cycles
 stats_warm_up_time: 1000
 # power breakdown, nodes communication details
@@ -208,6 +208,11 @@ show_buffer_stats: false
 use_winoc: true
 # experimental power saving strategy
 use_wirxsleep: false
+
+use_ofdma: true
+ofdma_W: 20000
+ofdma_Ns: 1024
+ofdma_M: 2
 
 # Verbosity level:
 #   VERBOSE_OFF

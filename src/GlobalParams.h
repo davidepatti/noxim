@@ -182,6 +182,10 @@ struct GlobalParams {
     static bool show_buffer_stats;
     static bool use_winoc;
     static int winoc_dst_hops;
+    static bool use_ofdma;
+    static int ofdma_W;
+    static int ofdma_Ns;
+    static int ofdma_M;
     static bool use_powermanager;
     static ChannelConfig default_channel_configuration;
     static map<int, ChannelConfig> channel_configuration;

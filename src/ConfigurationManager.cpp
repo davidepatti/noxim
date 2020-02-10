@@ -94,6 +94,10 @@ void loadConfiguration() {
     GlobalParams::show_buffer_stats = readParam<bool>(config, "show_buffer_stats");
     GlobalParams::use_winoc = readParam<bool>(config, "use_winoc");
     GlobalParams::winoc_dst_hops = readParam<int>(config, "winoc_dst_hops",0);
+    GlobalParams::use_ofdma = readParam<bool>(config, "use_ofdma", false);
+    GlobalParams::ofdma_W = readParam<int>(config, "ofdma_W",0);
+    GlobalParams::ofdma_Ns = readParam<int>(config, "ofdma_Ns",0);
+    GlobalParams::ofdma_M = readParam<int>(config, "ofdma_M",0);
     GlobalParams::use_powermanager = readParam<bool>(config, "use_wirxsleep");
     
 
@@ -206,6 +210,7 @@ void showHelp(char selfname[])
 	 << "\t-vc N\t\t\tNumber of virtual channels" << endl
          << "\t-winoc\t\t\tEnable radio hub wireless transmission" << endl
          << "\t-winoc_dst_hops\t\t\tMax number of hops between target RadioHub and destination node" << endl
+         << "\t-ofdma W Ns M\t\tSet the Freq. bandwidth (MHz), FFT/IFFT size and Modulation order (bit)" << endl
          << "\t-wirxsleep\t\tEnable radio hub wireless power manager" << endl
          << "\t-size Nmin Nmax\t\tSet the minimum and maximum packet size [flits]" << endl
          << "\t-flit N\t\t\tSet the flit size [bit]" << endl
@@ -498,6 +503,13 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 	    {
             GlobalParams::winoc_dst_hops = atoi(arg_vet[++i]);
 	    }
+	    else if (!strcmp(arg_vet[i], "-ofdma")) 
+	    {
+		    GlobalParams::use_ofdma = true;
+		    GlobalParams::ofdma_W = atoi(arg_vet[++i]);
+		    GlobalParams::ofdma_Ns = atoi(arg_vet[++i]);
+		    GlobalParams::ofdma_M = atoi(arg_vet[++i]);
+	    } 
 	    else if (!strcmp(arg_vet[i], "-wirxsleep")) 
 	    {
 		GlobalParams::use_powermanager = true;
