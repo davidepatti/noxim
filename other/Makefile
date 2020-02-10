@@ -5,7 +5,7 @@ DEBUG  = -g
 CFLAGS = $(OPT) $(OTHER)
 
 
-all: apsra2noxim noxim_explorer mapping2cg
+all: apsra2noxim noxim_explorer mapping2cg hotspot_ttable
 
 apsra2noxim: apsra2noxim.o
 	$(CC) $(CFLAGS) apsra2noxim.o -o apsra2noxim
@@ -25,6 +25,12 @@ mapping2cg: mapping2cg.o
 mapping2cg.o: mapping2cg.cpp
 	$(CC) $(CFLAGS) -c mapping2cg.cpp -o mapping2cg.o
 
+hotspot_ttable: hotspot_ttable.o
+	$(CC) $(CFLAGS) hotspot_ttable.o -o hotspot_ttable
+
+hotspot_ttable.o: hotspot_ttable.cpp
+	$(CC) $(CFLAGS) -c hotspot_ttable.cpp -o hotspot_ttable.o
+
 clean:
-	rm -f *.o apsra2noxim noxim_explorer mapping2cg
+	rm -f *.o apsra2noxim noxim_explorer mapping2cg hotspot_ttable
 
