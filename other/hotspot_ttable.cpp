@@ -34,7 +34,7 @@ bool ParseCommandLine(int argc, char **argv, char **fname, int *dim_x, int *dim_
 
 void HelpMessage(char *fname)
 {
-    cout << "Usage: " << fname << "dim_x dim_y pairs_prob src dst pir" << endl
+    cout << "Usage: " << fname << " dim_x dim_y pairs_prob src dst pir" << endl
          << endl
          << "Where:" << endl
          << "\t\"dim_x\" and \"dim_y\" are the dimensions of the mesh taken into account;"<< endl
