@@ -1,7 +1,7 @@
 CC     = g++
-OPT    = -O2 # -O3
-DEBUG  = -g 
-# OTHER  = -Wall -Wno-deprecated
+OPT    = -std=c++11 -O2
+DEBUG  = -g
+#OTHER  = -Wall -Wno-deprecated
 CFLAGS = $(OPT) $(OTHER)
 
 
