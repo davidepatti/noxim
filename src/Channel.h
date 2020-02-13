@@ -68,11 +68,8 @@ struct Channel: sc_module
 
 
 
-    if (GlobalParams::detailed)
-    {
-	cout << "Channel " << local_id << " data rate " << GlobalParams::channel_configuration[local_id].dataRate << 
+	LOG << "Channel " << local_id << " data rate " << GlobalParams::channel_configuration[local_id].dataRate << 
 	    " Gbps, flit transmission delay " << flit_transmission_delay_ps << " ps, (aligned to " << cc_flit_transmission_delay_ps << " ps) " << flit_transmission_cycles << " cycles " << endl; 
-    }
 
     //LOG << "data rate " << GlobalParams::channel_configuration[local_id].dataRate << " Gbps, transmission delay " << flit_transmission_delay_ps << " ps, " << flit_transmission_cycles << " cycles " << endl; 
 
