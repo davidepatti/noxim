@@ -58,7 +58,7 @@ SC_MODULE(Hub)
     map<int, sc_in<int>* > current_token_holder;
     map<int, sc_in<int>* > current_token_expiration;
     map<int, sc_inout<int>* > flag;
-    bool * transmission_in_progress;
+    map<int, bool> transmission_in_progress;
 
     map<int, Initiator*> init;
     map<int, Target*> target;
@@ -137,7 +137,7 @@ SC_MODULE(Hub)
         buffer_to_tile = new BufferBank[num_ports];
         
 	start_from_vc = new int[num_ports];
-	transmission_in_progress = new bool[num_ports];
+
 
         current_level_rx = new bool[num_ports];
         current_level_tx = new bool[num_ports];
@@ -146,7 +146,6 @@ SC_MODULE(Hub)
 
         for(int i = 0; i < num_ports; i++)
         {
-            transmission_in_progress[i] = false;
             for (int vc = 0;vc<GlobalParams::n_virtual_channels; vc++)
             {
                 buffer_from_tile[i][vc].SetMaxBufferSize(GlobalParams::hub_configuration[local_id].fromTileBufferSize);
@@ -168,6 +167,7 @@ SC_MODULE(Hub)
             current_token_expiration[ch] = new sc_in<int>();
             flag[ch] = new sc_inout<int>();
             token_ring->attachHub(ch,local_id, current_token_holder[ch],current_token_expiration[ch],flag[ch]);
+            transmission_in_progress[ch] = false;
             // power manager currently assumes TOKEN_PACKET mac policy
             if (GlobalParams::use_powermanager)
                 assert(token_ring->getPolicy(ch).first==TOKEN_PACKET);

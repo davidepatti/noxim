@@ -178,7 +178,7 @@ void Hub::txRadioProcessTokenPacket(int channel)
 		}
 		else
 		{
-			if (!transmission_in_progress[channel])
+			if (!transmission_in_progress.at(channel))
 			{
 				LOG << "*** [Ch"<<channel<<"] Buffer_tx empty and no trasmission in progress, releasing token" << endl;
 				flag[channel]->write(RELEASE_CHANNEL);
@@ -676,7 +676,7 @@ int Hub::selectChannel(int src_hub, int dst_hub) const
 		{
 			k = (start_channel+i)%intersection.size();
 
-			if (!transmission_in_progress[intersection[k]])
+			if (!transmission_in_progress.at(intersection[k]))
 			{
 				cout << "Found free channel " << intersection[k] << " on (src,dest) (" << src_hub << "," << dst_hub << ") " << endl;
 				return intersection[k];

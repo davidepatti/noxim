@@ -79,14 +79,13 @@ void Initiator::thread_process()
 			hub->power.antennaBufferPop();
 
 			if (flit_payload.flit_type == FLIT_TYPE_HEAD)
-				hub->transmission_in_progress[_channel_id] = true;
+				hub->transmission_in_progress.at(_channel_id) = true;
 
 			if (flit_payload.flit_type == FLIT_TYPE_TAIL)
 			{
 				LOG << "*** [Ch"<< _channel_id <<"] tail flit sent " << flit_payload << ", releasing token" << endl;
 				hub->flag[_channel_id]->write(RELEASE_CHANNEL);
-				// TODO: vector for multiple channel
-				hub->transmission_in_progress[_channel_id] = false;
+				hub->transmission_in_progress.at(_channel_id) = false;
 			}
 		}
 		else
