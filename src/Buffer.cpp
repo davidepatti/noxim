@@ -240,3 +240,8 @@ void Buffer::ShowStats(std::ostream & out)
   else
     out << "\t\t";
 }
+
+queue<Flit> Buffer::GetFlitsQueue() const 
+{
+  return buffer;
+}

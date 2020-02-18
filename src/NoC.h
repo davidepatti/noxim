@@ -18,6 +18,7 @@
 #include "Hub.h"
 #include "Channel.h"
 #include "TokenRing.h"
+#include "NoCViewer.h"
 
 using namespace std;
 
@@ -87,6 +88,8 @@ SC_MODULE(NoC)
     GlobalRoutingTable grtable;
     GlobalTrafficTable gttable;
 
+    NoCViewer* noc_viewer;
+
 
     // Constructor
 
@@ -113,6 +116,7 @@ SC_MODULE(NoC)
 
 	if (GlobalParams::ascii_monitor)
 	{
+        noc_viewer = new NoCViewer(t);
 	    SC_METHOD(asciiMonitor);
 	    sensitive << clock.pos();
 	}

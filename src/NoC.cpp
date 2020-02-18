@@ -2374,6 +2374,10 @@ void NoC::asciiMonitor()
 		cout << "Delta topologies are not supported for asciimonitor option!";
 		assert(false);
 	}
+
+	noc_viewer->draw();
+	return;
+
 	for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
 	{
 		for (int s = 0; s<3; s++)

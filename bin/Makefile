@@ -31,7 +31,7 @@ CXXFLAGS := $(OPT) $(OTHER) $(DEBUG)
 INCDIR := -I$(SRCDIR) -isystem $(SYSTEMC)/include -I$(YAML)/include
 LIBDIR := -L$(SRCDIR) -L$(SYSTEMC_LIBS) -L$(YAML)/lib
 
-LIBS := -lsystemc -lm -lyaml-cpp 
+LIBS := -lsystemc -lm -lyaml-cpp -lsfml-graphics -lsfml-window -lsfml-system -pthread 
 
 SPACE := $(subst ,, )
 VPATH := $(SRCDIR):$(subst $(SPACE),:,$(SUBDIRS))
