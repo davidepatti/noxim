@@ -11,6 +11,8 @@
 
 using namespace sf;
 
+#define X_OFFSET 0.f
+#define Y_OFFSET -150.f
 #define DEFAULT_ROUTER_SIDE 30.0
 #define DEFAULT_LINK_LENGTH 40.0
 #define DEFAULT_SLOT_SIDE 10.0
@@ -28,6 +30,7 @@ class NoCViewer {
     private:
         Tile *** t;
         RenderWindow * window;
+        Text * cycle;
         vector<RectangleShape *> routers;
         vector<RectangleShape *> links;
         map<Buffer *, vector<RectangleShape *>> slots_map;

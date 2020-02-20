@@ -2365,7 +2365,7 @@ Tile *NoC::searchNode(const int id) const
 void NoC::asciiMonitor()
 {
 	//cout << sc_time_stamp().to_double()/GlobalParams::clock_period_ps << endl;
-	system("clear");
+	//system("clear");
 	//
 	// asciishow proof-of-concept #1 free slots
 

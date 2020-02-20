@@ -6,11 +6,19 @@ NoCViewer::NoCViewer(Tile ***_t) : t(_t), x_shift(0.f), y_shift(0.f), scale_fact
     
     window = new RenderWindow(VideoMode(VideoMode::getDesktopMode().width,VideoMode::getDesktopMode().height), "noxim");
 
+    Font * font = new Font();
+    font->loadFromFile("../other/FontFile.ttf");
+    cycle = new Text();
+    cycle->setFont(*font);
+    cycle->setCharacterSize(20);
+    cycle->setFillColor(Color::Red);
+
     RectangleShape * shape;
 
     for (int i = 0; i < GlobalParams::mesh_dim_x; i++)
         for(int j = 0; j < GlobalParams::mesh_dim_y; j++){
             shape = new RectangleShape(Vector2f(DEFAULT_ROUTER_SIDE,DEFAULT_ROUTER_SIDE));
+            shape->setOrigin(X_OFFSET,Y_OFFSET);
             shape->setOutlineColor(Color::Black);
             shape->setFillColor(Color(192,192,192));
             shape->setPosition(Vector2f(
@@ -26,6 +34,7 @@ NoCViewer::NoCViewer(Tile ***_t) : t(_t), x_shift(0.f), y_shift(0.f), scale_fact
 
             for(int z=0; z < GlobalParams::buffer_depth; z++){
                 shape = new RectangleShape(Vector2f(DEFAULT_SLOT_SIDE,DEFAULT_SLOT_SIDE));
+                shape->setOrigin(X_OFFSET,Y_OFFSET);
                 shape->setOutlineColor(Color::Black);
                 shape->setOutlineThickness(2);
                 shape->setPosition(Vector2f(
@@ -38,6 +47,7 @@ NoCViewer::NoCViewer(Tile ***_t) : t(_t), x_shift(0.f), y_shift(0.f), scale_fact
             //WEST LINE
             if(i > 0){
                 shape = new RectangleShape(sf::Vector2f(DEFAULT_LINK_LENGTH, DEFAULT_LINK_THICKNESS));
+                shape->setOrigin(X_OFFSET,Y_OFFSET);
                 shape->setFillColor(Color::Black);
                 shape->setPosition(Vector2f(
                     i*(GlobalParams::buffer_depth*DEFAULT_SLOT_SIDE + DEFAULT_ROUTER_SIDE + DEFAULT_LINK_LENGTH) + GlobalParams::buffer_depth*DEFAULT_SLOT_SIDE - DEFAULT_LINK_LENGTH,
@@ -52,6 +62,7 @@ NoCViewer::NoCViewer(Tile ***_t) : t(_t), x_shift(0.f), y_shift(0.f), scale_fact
 
             for(int z=0; z < GlobalParams::buffer_depth; z++){
                 shape = new RectangleShape(Vector2f(DEFAULT_SLOT_SIDE,DEFAULT_SLOT_SIDE));
+                shape->setOrigin(X_OFFSET,Y_OFFSET);
                 shape->setOutlineColor(Color::Black);
                 shape->setOutlineThickness(2);
                 shape->setPosition(Vector2f(
@@ -65,6 +76,7 @@ NoCViewer::NoCViewer(Tile ***_t) : t(_t), x_shift(0.f), y_shift(0.f), scale_fact
 
             if(i < GlobalParams::mesh_dim_x-1){
                 shape = new RectangleShape(sf::Vector2f(DEFAULT_LINK_LENGTH, DEFAULT_LINK_THICKNESS));
+                shape->setOrigin(X_OFFSET,Y_OFFSET);
                 shape->setFillColor(Color::Black);
                 shape->setPosition(Vector2f(
                     i*(GlobalParams::buffer_depth*DEFAULT_SLOT_SIDE + DEFAULT_ROUTER_SIDE + DEFAULT_LINK_LENGTH) + GlobalParams::buffer_depth*DEFAULT_SLOT_SIDE + DEFAULT_ROUTER_SIDE,
@@ -79,6 +91,7 @@ NoCViewer::NoCViewer(Tile ***_t) : t(_t), x_shift(0.f), y_shift(0.f), scale_fact
 
             for(int z=0; z < GlobalParams::buffer_depth; z++){
                 shape = new RectangleShape(Vector2f(DEFAULT_SLOT_SIDE,DEFAULT_SLOT_SIDE));
+                shape->setOrigin(X_OFFSET,Y_OFFSET);
                 shape->setOutlineColor(Color::Black);
                 shape->setOutlineThickness(2);
                 shape->setPosition(Vector2f(
@@ -91,6 +104,7 @@ NoCViewer::NoCViewer(Tile ***_t) : t(_t), x_shift(0.f), y_shift(0.f), scale_fact
             //SOUTH LINE
             if(j < GlobalParams::mesh_dim_y-1){
                 shape = new RectangleShape(sf::Vector2f(DEFAULT_LINK_THICKNESS,DEFAULT_LINK_LENGTH));
+                shape->setOrigin(X_OFFSET,Y_OFFSET);
                 shape->setFillColor(Color::Black);
                 shape->setPosition(Vector2f(
                     i*(GlobalParams::buffer_depth*DEFAULT_SLOT_SIDE + DEFAULT_ROUTER_SIDE + DEFAULT_LINK_LENGTH) + GlobalParams::buffer_depth*DEFAULT_SLOT_SIDE + DEFAULT_ROUTER_SIDE - DEFAULT_LINK_THICKNESS,
@@ -105,6 +119,7 @@ NoCViewer::NoCViewer(Tile ***_t) : t(_t), x_shift(0.f), y_shift(0.f), scale_fact
 
             for(int z=0; z < GlobalParams::buffer_depth; z++){
                 shape = new RectangleShape(Vector2f(DEFAULT_SLOT_SIDE,DEFAULT_SLOT_SIDE));
+                shape->setOrigin(X_OFFSET,Y_OFFSET);
                 shape->setOutlineColor(Color::Black);
                 shape->setOutlineThickness(2);
                 shape->setPosition(Vector2f(
@@ -119,6 +134,7 @@ NoCViewer::NoCViewer(Tile ***_t) : t(_t), x_shift(0.f), y_shift(0.f), scale_fact
             //NORTH LINE
             if(j > 0){
                 shape = new RectangleShape(sf::Vector2f(DEFAULT_LINK_THICKNESS,DEFAULT_LINK_LENGTH));
+                shape->setOrigin(X_OFFSET,Y_OFFSET);
                 shape->setFillColor(Color::Black);
                 shape->setPosition(Vector2f(
                     i*(GlobalParams::buffer_depth*DEFAULT_SLOT_SIDE + DEFAULT_ROUTER_SIDE + DEFAULT_LINK_LENGTH) + GlobalParams::buffer_depth*DEFAULT_SLOT_SIDE,
@@ -183,6 +199,9 @@ void NoCViewer::draw()
         return;
     
     window->clear(Color::White);
+
+    cycle->setString("Cycles Elapsed: " + to_string(int(sc_time_stamp().to_double() / GlobalParams::clock_period_ps)));
+    window->draw(*cycle);
 
     for(auto iterator : routers)
         window->draw(*iterator);
