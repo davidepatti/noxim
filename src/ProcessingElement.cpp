@@ -268,6 +268,7 @@ Packet ProcessingElement::trafficULocal()
 
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
+    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
 
     return p;
 }
@@ -412,6 +413,7 @@ Packet ProcessingElement::trafficBitReversal()
     p.src_id = local_id;
     p.dst_id = dnode;
 
+    p.vc_id = randInt(0,GlobalParams::n_virtual_channels-1);
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
     p.size = p.flit_left = getRandomSize();
 
