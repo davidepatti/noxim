@@ -51,6 +51,8 @@ class Buffer {
 
 
     void Print();
+
+    queue<Flit> GetFlitsQueue() const;
     
     bool deadlockFree();
     void deadlockCheck();

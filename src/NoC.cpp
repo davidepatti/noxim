@@ -2365,7 +2365,7 @@ Tile *NoC::searchNode(const int id) const
 void NoC::asciiMonitor()
 {
 	//cout << sc_time_stamp().to_double()/GlobalParams::clock_period_ps << endl;
-	system("clear");
+	//system("clear");
 	//
 	// asciishow proof-of-concept #1 free slots
 
@@ -2374,6 +2374,10 @@ void NoC::asciiMonitor()
 		cout << "Delta topologies are not supported for asciimonitor option!";
 		assert(false);
 	}
+
+	noc_viewer->draw();
+	return;
+
 	for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
 	{
 		for (int s = 0; s<3; s++)
