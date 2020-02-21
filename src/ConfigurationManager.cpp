@@ -95,9 +95,9 @@ void loadConfiguration() {
     GlobalParams::use_winoc = readParam<bool>(config, "use_winoc");
     GlobalParams::winoc_dst_hops = readParam<int>(config, "winoc_dst_hops",0);
     GlobalParams::use_ofdma = readParam<bool>(config, "use_ofdma", false);
-    GlobalParams::ofdma_W = readParam<int>(config, "ofdma_W",0);
+    GlobalParams::ofdma_W_MHz = readParam<int>(config, "ofdma_W_MHz",0);
     GlobalParams::ofdma_Ns = readParam<int>(config, "ofdma_Ns",0);
-    GlobalParams::ofdma_M = readParam<int>(config, "ofdma_M",0);
+    GlobalParams::ofdma_M_bit = readParam<int>(config, "ofdma_M_bit",0);
     GlobalParams::use_powermanager = readParam<bool>(config, "use_wirxsleep");
     
 
@@ -506,9 +506,9 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 	    else if (!strcmp(arg_vet[i], "-ofdma")) 
 	    {
 		    GlobalParams::use_ofdma = true;
-		    GlobalParams::ofdma_W = atoi(arg_vet[++i]);
+		    GlobalParams::ofdma_W_MHz = atoi(arg_vet[++i]);
 		    GlobalParams::ofdma_Ns = atoi(arg_vet[++i]);
-		    GlobalParams::ofdma_M = atoi(arg_vet[++i]);
+		    GlobalParams::ofdma_M_bit = atoi(arg_vet[++i]);
 	    } 
 	    else if (!strcmp(arg_vet[i], "-wirxsleep")) 
 	    {

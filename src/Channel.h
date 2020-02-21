@@ -65,7 +65,7 @@ struct Channel: sc_module
 
     if (GlobalParams::use_ofdma) 
     {
-        flit_transmission_delay_ps = 1000000 * GlobalParams::ofdma_Ns/GlobalParams::ofdma_W;
+        flit_transmission_delay_ps = 1000000 * GlobalParams::ofdma_Ns/GlobalParams::ofdma_W_MHz;
     } else
     {
         // bit rate is Gb/s

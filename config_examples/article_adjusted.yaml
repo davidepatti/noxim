@@ -210,9 +210,9 @@ use_winoc: true
 use_wirxsleep: false
 
 use_ofdma: true
-ofdma_W: 20000
+ofdma_W_MHz: 20000
 ofdma_Ns: 1024
-ofdma_M: 2
+ofdma_M_bit: 2
 
 # Verbosity level:
 #   VERBOSE_OFF
