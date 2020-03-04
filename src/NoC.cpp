@@ -179,7 +179,7 @@ void NoC::buildButterfly()
 			// Create the single Tile with a proper name
 
 			// cout  << j <<  " " << i <<   endl;
-			char tile_name[30];
+			char tile_name[64];
 			Coord tile_coord;
 			tile_coord.x = i;
 			tile_coord.y = j;
@@ -829,7 +829,7 @@ void NoC::buildBaseline()
 	for (int i = 0; i < dimX; i++) 
 	{
 	    // Create the single Tile with a proper name
-	    char tile_name[30];
+	    char tile_name[64];
 	    Coord tile_coord;
 	    tile_coord.x = i;
 	    tile_coord.y = j;
@@ -1560,7 +1560,7 @@ void NoC::buildOmega()
 			// Create the single Tile with a proper name
 
 			// cout  << j <<  " " << i <<   endl;
-			char tile_name[30];
+			char tile_name[64];
 			Coord tile_coord;
 			tile_coord.x = i;
 			tile_coord.y = j;
@@ -2177,7 +2177,7 @@ void NoC::buildMesh()
     for (int j = 0; j < GlobalParams::mesh_dim_y; j++) {
 	for (int i = 0; i < GlobalParams::mesh_dim_x; i++) {
 	    // Create the single Tile with a proper name
-	    char tile_name[20];
+	    char tile_name[64];
 	    Coord tile_coord;
 	    tile_coord.x = i;
 	    tile_coord.y = j;
