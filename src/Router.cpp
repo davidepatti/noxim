@@ -329,19 +329,34 @@ vector<int> Router::nextDeltaHops(RouteData rd) {
 	vector<int> direction; // initially is empty
 	vector<int> next_hops;
 
-	//int sw = GlobalParams::n_delta_tiles/2; //sw: switch number in each stage
+	int sw = GlobalParams::n_delta_tiles/2; //sw: switch number in each stage
 	int stg = log2(GlobalParams::n_delta_tiles);
+	int c;
+	//---From Source to stage 0 (return the sw attached to the source)---
+	//Topology omega 
+	if (GlobalParams::topology == TOPOLOGY_OMEGA) 	
+	{
+	if(current_node < (GlobalParams::n_delta_tiles/2))	
+		 c = current_node;
+	else if(current_node >= (GlobalParams::n_delta_tiles/2))	
+		 c = (current_node - (GlobalParams::n_delta_tiles/2));		
+	}
+	//Other delta topologies: Butterfly and baseline
+	else if ((GlobalParams::topology == TOPOLOGY_BUTTERFLY)||(GlobalParams::topology == TOPOLOGY_BASELINE))
+	{
+		 c =  (current_node >>1);
+	}
 
-	int c =  (current_node >>1);
+		Coord temp_coord;
+		temp_coord.x = 0;
+		temp_coord.y = c;
+		int N = coord2Id(temp_coord);
 
-	Coord temp_coord;
-	temp_coord.x = 0;
-	temp_coord.y = c;
-	int N = coord2Id(temp_coord);
-
-	next_hops.push_back(N);
-	current_node = N;
-
+		next_hops.push_back(N);
+		current_node = N;
+	
+	
+   //---From stage 0 to Destination---
 	int current_stage = 0;
 
 	while (current_stage<stg-1)
