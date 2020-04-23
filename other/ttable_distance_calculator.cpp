@@ -87,7 +87,7 @@ void HelpMessage(char *fname)
          << "Where:" << endl
          << "\t\"ttable\" is the file name of the traffic table to evaluate" << endl
          << "\t\"dim_x\" and \"dim_y\" are the dimensions of the mesh taken into account;" << endl
-         << "\t\"distance\" is # of hops to discriminate between short and long range conmmunications;" << endl
+         << "\t\"distance\" is # of hops to discriminate between short and long range communications;" << endl
          << endl
          << "Example:" << endl
          << fname << " ttable.txt 8 8 3" << endl;

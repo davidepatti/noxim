@@ -5,7 +5,7 @@ DEBUG  = -g
 CFLAGS = $(OPT) $(OTHER)
 
 
-all: apsra2noxim noxim_explorer mapping2cg hotspot_ttable distancebased_ttable ttable_distance_calculator
+all: apsra2noxim noxim_explorer mapping2cg hotspot_ttable distancebased_ttable ttable_distance_calculator ttable_from_hub
 
 apsra2noxim: apsra2noxim.o
 	$(CC) $(CFLAGS) apsra2noxim.o -o apsra2noxim
@@ -37,13 +37,18 @@ distancebased_ttable: distancebased_ttable.o
 distancebased_ttable.o: distancebased_ttable.cpp
 	$(CC) $(CFLAGS) -c distancebased_ttable.cpp -o distancebased_ttable.o
 
-
 ttable_distance_calculator: ttable_distance_calculator.o
 	$(CC) $(CFLAGS) ttable_distance_calculator.o -o ttable_distance_calculator
 
 ttable_distance_calculator.o: ttable_distance_calculator.cpp
 	$(CC) $(CFLAGS) -c ttable_distance_calculator.cpp -o ttable_distance_calculator.o
 
+ttable_from_hub: ttable_from_hub.o
+	$(CC) $(CFLAGS) ttable_from_hub.o -o ttable_from_hub
+
+ttable_from_hub.o: ttable_from_hub.cpp
+	$(CC) $(CFLAGS) -c ttable_from_hub.cpp -o ttable_from_hub.o
+
 
 clean:
-	rm -f *.o apsra2noxim noxim_explorer mapping2cg hotspot_ttable distancebased_ttable ttable_distance_calculator
+	rm -f *.o apsra2noxim noxim_explorer mapping2cg hotspot_ttable distancebased_ttable ttable_distance_calculator ttable_from_hub

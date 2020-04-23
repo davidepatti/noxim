@@ -38,3 +38,7 @@ noxim_explorer
 ttable_distance_calculator
 --------------------------
 - Determines short/long range wired communications (and their percentage) of a given traffic table
+
+ttable_from_hub
+---------------
+Generates a traffic table with node to node communications starting from a traffic table with hub to hub communications
