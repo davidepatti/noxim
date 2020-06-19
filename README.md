@@ -7,11 +7,8 @@ it can be downloaded under GPL license terms.
 
 **If you use Noxim in your research, we would appreciate the following citation in any publications to which it has contributed:**
 
-Catania, V., Mineo, A., Monteleone, S., Palesi, M., Patti, D.
-Improving energy efficiency in wireless network-on-chip architectures
-(2017) ACM Journal on Emerging Technologies in Computing Systems, 14 (1)
-
-[paper reference on Scopus](https://www.scopus.com/inward/record.uri?eid=2-s2.0-85040309279&doi=10.1145%2f3138807&partnerID=40&md5=1a9c807853329ad6985a1cdb1e68c223)
+V. Catania, A. Mineo, S. Monteleone, M. Palesi and D. Patti, "Energy efficient transceiver in wireless Network on Chip architectures," 2016 Design, Automation & Test in Europe Conference & Exhibition (DATE), Dresden, 2016, pp. 1321-1326.
+[Scopus reference](https://www.scopus.com/record/display.uri?eid=2-s2.0-84973661681&origin=resultslist&sort=plf-f&src=s&sid=4bd3ffce04cc0093a84655249383aefa&sot=autdocs&sdt=autdocs&sl=18&s=AU-ID%2835610853000%29&relpos=11&citeCnt=11&searchTerm=)
 
 Registration
 ------------
