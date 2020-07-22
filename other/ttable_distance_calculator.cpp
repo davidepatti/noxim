@@ -63,6 +63,11 @@ void ParseTrafficTable(ostream &os, char *ttable_name, int dim_x, int dim_y, int
     os << "# " << 100.0 * short_range_counter / (total_communications) << "% of the total communication entries are short range (i.e., require " << distance << " or less hops)" << endl;
     
     os << "# " << 100.0 * short_range_weighted_counter / (total_weighted_communications) << "% of the total communications are short range (i.e., require " << distance << " or less hops)" << endl;
+
+    os << "#"  << endl
+       << "# " << "Average PIR (pkts/cycle):" << endl 
+       << "# - Short communications: " << short_range_weighted_counter / float(short_range_counter) << endl
+       << "# - Long communications:  " << long_range_weighted_counter / float(long_range_counter) << endl;
 }
 
 bool ParseCommandLine(int argc, char **argv, char **fname, char **ttable_name, int *dim_x, int *dim_y, int *distance)
@@ -95,12 +100,12 @@ void HelpMessage(char *fname)
 
 void PrintParams(ostream &os, char *ttable_name, int dim_x, int dim_y, int distance)
 {
-    os  <<  "# Params"                      << endl
-        <<  "ttable_name: " << ttable_name  << endl
-        <<  "dim_x: "       << dim_x        << endl
-        <<  "dim_y: "       << dim_y        << endl
-        <<  "distance: "    << distance     << endl
-        <<  "# End of Params"               << endl;
+    os  <<  "# Params"                          << endl
+        <<  "#   ttable_name: " << ttable_name  << endl
+        <<  "#   dim_x: "       << dim_x        << endl
+        <<  "#   dim_y: "       << dim_y        << endl
+        <<  "#   distance: "    << distance     << endl
+        <<  "# End of Params"                   << endl;
 }
 
 int main(int argc, char **argv)
