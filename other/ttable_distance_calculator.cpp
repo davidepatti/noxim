@@ -67,7 +67,9 @@ void ParseTrafficTable(ostream &os, char *ttable_name, int dim_x, int dim_y, int
     os << "#"  << endl
        << "# " << "Average PIR (pkts/cycle):" << endl 
        << "# - Short communications: " << short_range_weighted_counter / float(short_range_counter) << endl
-       << "# - Long communications:  " << long_range_weighted_counter / float(long_range_counter) << endl;
+       << "# - Long communications:  " << long_range_weighted_counter / float(long_range_counter) << endl
+       << "# - Total:  " << total_weighted_communications / float(total_communications) << endl;
+
 }
 
 bool ParseCommandLine(int argc, char **argv, char **fname, char **ttable_name, int *dim_x, int *dim_y, int *distance)
