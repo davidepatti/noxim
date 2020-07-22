@@ -246,10 +246,11 @@ void Router::txProcess()
 			  {
 			      if (drained_volume >= GlobalParams:: max_volume_to_be_drained)
 				  sc_stop();
-			      else 
+			      else if (sc_time_stamp().to_double() / GlobalParams::clock_period_ps > GlobalParams::reset_time + GlobalParams::stats_warm_up_time)
 			      {
-				  drained_volume++;
-				  local_drained++;
+                      drained_volume++;
+                      local_drained++;
+                      LOG << "volume " << drained_volume << "flits (" << local_drained << " flits locally)" << endl;
 			      }
 			  }
 		      } 
