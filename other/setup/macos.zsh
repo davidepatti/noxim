@@ -1,5 +1,15 @@
 #!/bin/zsh
 
+###############################################################################
+#               :
+#   File        :   macos.zsh
+#               :
+#   Author(s)   :   Tim Brewis (@t-bre, tab1g19@soton.ac.uk)
+#               :
+#   Description :   macOS installer script for noxim
+#               :
+###############################################################################
+
 set -e
 
 # print colours
