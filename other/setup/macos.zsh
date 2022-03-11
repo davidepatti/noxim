@@ -49,7 +49,7 @@ if [[ $OSTYPE == 'darwin'* ]]; then
         git pull
         cd bin
     else 
-        git clone https://github.com/davidepatti/noxim > /dev/null
+        git clone https://github.com/davidepatti/noxim
         echo -e $GREEN"noxim downloaded."$RESET
         cd noxim/bin
     fi
@@ -94,7 +94,7 @@ if [[ $OSTYPE == 'darwin'* ]]; then
 
         # download archive
         if [ ! -f "./$SYSTEMC_VERSION$SYSTEMC_VERSION_SUFFIX.tar.gz" ]; then
-            curl -O https://www.accellera.org/images/downloads/standards/systemc/$SYSTEMC_VERSION$SYSTEMC_VERSION_SUFFIX.tar.gz &> /dev/null
+            curl -O https://www.accellera.org/images/downloads/standards/systemc/$SYSTEMC_VERSION$SYSTEMC_VERSION_SUFFIX.tar.gz
         fi
         
         # extract archive
