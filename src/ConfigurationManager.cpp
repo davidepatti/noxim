@@ -382,7 +382,7 @@ void checkConfiguration()
 	}
 
 	if (GlobalParams::hotspots[i].second < 0.0
-	    && GlobalParams::hotspots[i].second > 1.0) {
+	    || GlobalParams::hotspots[i].second > 1.0) {
 	    cerr <<
 		"Error: hotspot percentage must be in the interval [0,1]"
 		<< endl;
