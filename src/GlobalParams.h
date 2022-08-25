@@ -152,6 +152,9 @@ struct GlobalParams {
     static int flit_size;
     static int min_packet_size;
     static int max_packet_size;
+    static int processing_frequency;
+    static int processing_size;
+    static int pe_rx_buffer_size;
     static string routing_algorithm;
     static string routing_table_filename;
     static string selection_strategy;

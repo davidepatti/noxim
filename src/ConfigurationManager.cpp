@@ -87,6 +87,9 @@ void loadConfiguration() {
     GlobalParams::detailed = readParam<bool>(config, "detailed");
     GlobalParams::dyad_threshold = readParam<double>(config, "dyad_threshold");
     GlobalParams::max_volume_to_be_drained = readParam<unsigned int>(config, "max_volume_to_be_drained");
+    GlobalParams::processing_frequency = readParam<int>(config, "processing_frequency");
+    GlobalParams::pe_rx_buffer_size = readParam<int>(config, "pe_rx_buffer_size");
+    GlobalParams::processing_size = readParam<int>(config, "processing_size");
     //GlobalParams::hotspots;
     GlobalParams::show_buffer_stats = readParam<bool>(config, "show_buffer_stats");
     GlobalParams::use_winoc = readParam<bool>(config, "use_winoc");
@@ -247,6 +250,9 @@ void showHelp(char selfname[])
          << "\t\t\t\tbeen delivered" << endl
          << "\t-asciimonitor\t\tShow status of the network while running (experimental)" << endl
          << "\t-sim N\t\t\tRun for the specified simulation time [cycles]" << endl
+         << "\t-pe_rx_buffer_size N\t\t\tSets PE internal receive buffer size (default 1)" << endl
+         << "\t-processing_frequency N\t\t\tSets the frequency at which PEs consume packet(s) (default 1 - every cycle)" << endl
+         << "\t-processing_size N\t\t\tSets how many flits does a PE consume at a time (default 1 - one flit)" << endl
          << endl
          << "If you find this program useful please don't forget to mention in your paper Maurizio Palesi <maurizio.palesi@unikore.it>" << endl
          <<	"If you find this program useless please feel free to complain with Davide Patti <davide.patti@dieei.unict.it>" << endl
@@ -486,6 +492,14 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		setBufferAntenna(atoi(arg_vet[++i]));
 	    else if (!strcmp(arg_vet[i], "-vc"))
 		GlobalParams::n_virtual_channels = (atoi(arg_vet[++i]));
+	    //-----------------------EXTRA------------------------/
+	    else if (!strcmp(arg_vet[i], "-pe_rx_buffer_size"))
+		GlobalParams::pe_rx_buffer_size = (atoi(arg_vet[++i]));
+	    else if (!strcmp(arg_vet[i], "-processing_frequency"))
+		GlobalParams::processing_frequency = (atoi(arg_vet[++i]));
+	    else if (!strcmp(arg_vet[i], "-processing_size"))
+		GlobalParams::processing_size = (atoi(arg_vet[++i]));
+	    //-----------------------EXTRA------------------------/
 	    else if (!strcmp(arg_vet[i], "-flit"))
 		GlobalParams::flit_size = atoi(arg_vet[++i]);
 	    else if (!strcmp(arg_vet[i], "-winoc")) 
