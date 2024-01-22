@@ -10,6 +10,31 @@
 
 #include "ProcessingElement.h"
 
+
+void ProcessingElement::consume(){
+
+    //LOG << "PE BUFFER: " << rx_buffer.size() << endl;
+    
+    if(GlobalParams::processing_frequency > 1){ // Consumes `processing_size` flits every `processing_frequency` cycles
+
+        if((consume_counter % (GlobalParams::processing_frequency-1)) == 0){
+            consume_counter = 0;
+            for(int i = 0; i < GlobalParams::processing_size; i++)
+                if (rx_buffer.size() > 0)
+                    rx_buffer.pop();
+        
+            }
+            consume_counter++;
+
+    }else{  // Case processing_frequency = 1 (tries to consume `processing_size` flits every cycle)
+
+        for(int i = 0; i < GlobalParams::processing_size; i++)
+            if (rx_buffer.size() > 0)
+                rx_buffer.pop();
+
+    }
+}
+
 int ProcessingElement::randInt(int min, int max)
 {
     return min +
@@ -19,13 +44,33 @@ int ProcessingElement::randInt(int min, int max)
 void ProcessingElement::rxProcess()
 {
     if (reset.read()) {
+	TBufferFullStatus bfs;
 	ack_rx.write(0);
 	current_level_rx = 0;
+	buffer_full_status_rx.write(bfs);
     } else {
+	TBufferFullStatus bfs;
 	if (req_rx.read() == 1 - current_level_rx) {
 	    Flit flit_tmp = flit_rx.read();
-	    current_level_rx = 1 - current_level_rx;	// Negate the old value for Alternating Bit Protocol (ABP)
+	    int vc = flit_tmp.vc_id;
+
+		if(rx_buffer.size() >= GlobalParams::pe_rx_buffer_size){ // if pe buffer is full
+
+			for (int vcn = 0; vcn < GlobalParams::n_virtual_channels; vcn++) // set bfs flag to true for all VCs (PE is the endpoint, there are no VCs)
+				bfs.mask[vcn] = true;
+			LOG << " Flit " << flit_tmp << " PE buffer full, from vc = " << vc << endl;
+
+		}else{
+
+			rx_buffer.push(flit_tmp);
+		    	current_level_rx = 1 - current_level_rx;	// Negate the old value for Alternating Bit Protocol (ABP)
+			for (int vcn = 0; vcn < GlobalParams::n_virtual_channels; vcn++)
+				bfs.mask[vcn] = false;
+			//LOG << " Flit " << flit_tmp << " PE buffer NOT full, from vc = " << vc << endl;
+		}
+
 	}
+	buffer_full_status_rx.write(bfs);
 	ack_rx.write(current_level_rx);
     }
 }
