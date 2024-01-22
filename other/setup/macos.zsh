@@ -5,6 +5,7 @@
 #   File        :   macos.zsh
 #               :
 #   Author(s)   :   Tim Brewis (@t-bre, tab1g19@soton.ac.uk)
+#               :   George Peppard (@inventor02, gjp1g21@soton.ac.uk)
 #               :
 #   Description :   macOS installer script for noxim
 #               :
@@ -91,7 +92,7 @@ if [[ $OSTYPE == 'darwin'* ]]; then
     mkdir -p lib
     cd lib
     cmake ..
-    make
+    cmake --build .
     cd ../..
     echo -e $GREEN"Installed yaml-cpp successfully\n"$RESET
 
