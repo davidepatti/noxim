@@ -198,8 +198,7 @@ double GlobalStats::getAverageThroughput()
     avg_throughput /= (double) total_comms;
 
     return avg_throughput;
-}
-*/
+}*/
 
 double GlobalStats::getAggregatedThroughput()
 {
@@ -434,39 +433,53 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 {
     if (detailed) 
     {
-	assert (GlobalParams::topology == TOPOLOGY_MESH); 
-	out << endl << "detailed = [" << endl;
-
-	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
-		noc->t[x][y]->r->stats.showStats(y * GlobalParams:: mesh_dim_x + x, out, true);
-	out << "];" << endl;
-
-	// show MaxDelay matrix
-	vector < vector < double > > md_mtx = getMaxDelayMtx();
-
-	out << endl << "max_delay = [" << endl;
-	for (unsigned int y = 0; y < md_mtx.size(); y++) 
+	if (GlobalParams::topology == TOPOLOGY_MESH) 
 	{
-	    out << "   ";
-	    for (unsigned int x = 0; x < md_mtx[y].size(); x++)
-		out << setw(6) << md_mtx[y][x];
-	    out << endl;
+	    out << endl << "detailed = [" << endl;
+
+	    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
+		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+		    noc->t[x][y]->r->stats.showStats(y * GlobalParams:: mesh_dim_x + x, out, true);
+	    out << "];" << endl;
+
+	    // show MaxDelay matrix
+	    vector < vector < double > > md_mtx = getMaxDelayMtx();
+
+	    out << endl << "max_delay = [" << endl;
+	    for (unsigned int y = 0; y < md_mtx.size(); y++) 
+	    {
+		out << "   ";
+		for (unsigned int x = 0; x < md_mtx[y].size(); x++)
+		    out << setw(6) << md_mtx[y][x];
+		out << endl;
+	    }
+	    out << "];" << endl;
+
+	    // show RoutedFlits matrix
+	    vector < vector < unsigned long > > rf_mtx = getRoutedFlitsMtx();
+
+	    out << endl << "routed_flits = [" << endl;
+	    for (unsigned int y = 0; y < rf_mtx.size(); y++) 
+	    {
+		out << "   ";
+		for (unsigned int x = 0; x < rf_mtx[y].size(); x++)
+		    out << setw(10) << rf_mtx[y][x];
+		out << endl;
+	    }
+	    out << "];" << endl;
 	}
-	out << "];" << endl;
-
-	// show RoutedFlits matrix
-	vector < vector < unsigned long > > rf_mtx = getRoutedFlitsMtx();
-
-	out << endl << "routed_flits = [" << endl;
-	for (unsigned int y = 0; y < rf_mtx.size(); y++) 
+	else // other delta topologies
 	{
-	    out << "   ";
-	    for (unsigned int x = 0; x < rf_mtx[y].size(); x++)
-		out << setw(10) << rf_mtx[y][x];
-	    out << endl;
+	    out << endl << "detailed = [" << endl;
+
+	    for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
+		noc->core[y]->r->stats.showStats(y, out, true);
+	    out << "];" << endl;
+
+	    // For delta topologies, we can't show matrix format stats
+	    // since they don't have a 2D structure
+	    out << endl << "% Note: Matrix format stats not available for delta topologies" << endl;
 	}
-	out << "];" << endl;
 
 	showPowerBreakDown(out);
 	showPowerManagerStats(out);
