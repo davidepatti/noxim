@@ -117,7 +117,11 @@ probability_of_retransmission: 0.01
 #   TRAFFIC_BIT_REVERSAL
 #   TRAFFIC_SHUFFLE
 #   TRAFFIC_BUTTERFLY
+#   TRAFFIC_HARDCODED
 traffic_distribution: TRAFFIC_RANDOM
 # when traffic table based is specified, use the following
 # configuration file
 traffic_table_filename: "t.txt"
+# when hardcoded traffic pattern is specified, use the following
+# configuration file
+traffic_hardcoded_filename: "t.txt

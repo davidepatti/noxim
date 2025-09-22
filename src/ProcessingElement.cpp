@@ -53,7 +53,6 @@ void ProcessingElement::txProcess()
 		for (HardcodedTrafficEntry const& expected_packet
 			   : traffic_hardcoded->traffic_at_cycle(traffic_cycle)) {
 		  if(expected_packet.src == local_id) {
-			std::cout << "[txProcess] Firing spike " << expected_packet.src << "->" << expected_packet.dst << " at cycle " << traffic_cycle << "/" << traffic_hardcoded->num_cycles() << std::endl;
 			Packet packet;
 			int vc = randInt(0,GlobalParams::n_virtual_channels-1);
 		    packet.make(local_id, expected_packet.dst, vc, now, getRandomSize());
