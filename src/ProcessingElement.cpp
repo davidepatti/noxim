@@ -46,8 +46,26 @@ void ProcessingElement::txProcess()
 		} else {
 		  transmittedAtPreviousCycle = false;
 		}
-      } else {
-		std::cout << "[txProcess] check for ID " << local_id << " at cycle " << traffic_cycle << std::endl;
+      } else if(traffic_cycle < traffic_hardcoded->num_cycles()) {
+		double now = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+		
+		bool any = false;
+		for (HardcodedTrafficEntry const& expected_packet
+			   : traffic_hardcoded->traffic_at_cycle(traffic_cycle)) {
+		  if(expected_packet.src == local_id) {
+			std::cout << "[txProcess] Firing spike " << expected_packet.src << "->" << expected_packet.dst << " at cycle " << traffic_cycle << "/" << traffic_hardcoded->num_cycles() << std::endl;
+			Packet packet;
+			int vc = randInt(0,GlobalParams::n_virtual_channels-1);
+		    packet.make(local_id, expected_packet.dst, vc, now, getRandomSize());
+			packet_queue.push(packet);
+			any = true;
+		  }
+		}
+
+		if(any)
+		  transmittedAtPreviousCycle = true;
+		else
+		  transmittedAtPreviousCycle = false;
 		
 		traffic_cycle += 1;
       }

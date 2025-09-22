@@ -71,3 +71,11 @@ bool GlobalTrafficHardcoding::load(const char *fname)
 
   return true;
 }
+
+vector < HardcodedTrafficEntry > const& GlobalTrafficHardcoding::traffic_at_cycle(int cycle) const {
+  return traffic_list[cycle];
+}
+
+size_t GlobalTrafficHardcoding::num_cycles() const {
+  return traffic_list.size();
+}

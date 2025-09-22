@@ -38,6 +38,12 @@ class GlobalTrafficHardcoding {
   // Outer vector: Which cycle the traffic occurs at
   // Inner vector: Attempted packets at given cycle
   vector < vector < HardcodedTrafficEntry > > traffic_list;
+
+  public:
+
+  vector < HardcodedTrafficEntry > const& traffic_at_cycle(int cycle) const;
+
+  size_t num_cycles() const;
 };
 
 #endif
