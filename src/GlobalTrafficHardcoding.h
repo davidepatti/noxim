@@ -33,17 +33,15 @@ class GlobalTrafficHardcoding {
     // Load traffic table from file. Returns true if ok, false otherwise
     bool load(const char *fname);
 
+    vector < HardcodedTrafficEntry > const& traffic_at_cycle(int cycle) const;
+
+    size_t num_cycles() const;
+
   private:
 
-  // Outer vector: Which cycle the traffic occurs at
-  // Inner vector: Attempted packets at given cycle
-  vector < vector < HardcodedTrafficEntry > > traffic_list;
-
-  public:
-
-  vector < HardcodedTrafficEntry > const& traffic_at_cycle(int cycle) const;
-
-  size_t num_cycles() const;
+    // Outer vector: Which cycle the traffic occurs at
+    // Inner vector: Attempted packets at given cycle
+    vector < vector < HardcodedTrafficEntry > > traffic_list;
 };
 
 #endif

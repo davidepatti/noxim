@@ -38,36 +38,36 @@ void ProcessingElement::txProcess()
 	transmittedAtPreviousCycle = false;
     } else {
 
-      if(GlobalParams::traffic_distribution != TRAFFIC_HARDCODED) {
+    if(GlobalParams::traffic_distribution != TRAFFIC_HARDCODED) {
 		Packet packet;
 		if (canShot(packet)) {
-		  packet_queue.push(packet);
-		  transmittedAtPreviousCycle = true;
+			packet_queue.push(packet);
+			transmittedAtPreviousCycle = true;
 		} else {
-		  transmittedAtPreviousCycle = false;
+			transmittedAtPreviousCycle = false;
 		}
-      } else if(traffic_cycle < traffic_hardcoded->num_cycles()) {
+    } else if(traffic_cycle < traffic_hardcoded->num_cycles()) {
 		double now = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
 		
 		bool any = false;
 		for (HardcodedTrafficEntry const& expected_packet
 			   : traffic_hardcoded->traffic_at_cycle(traffic_cycle)) {
-		  if(expected_packet.src == local_id) {
-			Packet packet;
-			int vc = randInt(0,GlobalParams::n_virtual_channels-1);
-		    packet.make(local_id, expected_packet.dst, vc, now, getRandomSize());
-			packet_queue.push(packet);
-			any = true;
-		  }
+			if(expected_packet.src == local_id) {
+		    	Packet packet;
+				int vc = randInt(0,GlobalParams::n_virtual_channels-1);
+				packet.make(local_id, expected_packet.dst, vc, now, getRandomSize());
+				packet_queue.push(packet);
+				any = true;
+			}
 		}
 
 		if(any)
-		  transmittedAtPreviousCycle = true;
+			transmittedAtPreviousCycle = true;
 		else
-		  transmittedAtPreviousCycle = false;
+			transmittedAtPreviousCycle = false;
 		
 		traffic_cycle += 1;
-      }
+    }
 
 
 	if (ack_tx.read() == current_level_tx) {
