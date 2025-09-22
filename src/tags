@@ -190,6 +190,7 @@ TRAFFIC_BUTTERFLY	GlobalParams.h	/^#define TRAFFIC_BUTTERFLY /;"	d
 TRAFFIC_HOTSPOT	GlobalParams.h	/^#define TRAFFIC_HOTSPOT /;"	d
 TRAFFIC_LOCAL	GlobalParams.h	/^#define TRAFFIC_LOCAL	/;"	d
 TRAFFIC_RANDOM	GlobalParams.h	/^#define TRAFFIC_RANDOM /;"	d
+TRAFFIC_HARDCODED	GlobalParams.h	/^#define TRAFFIC_HARDCODED /;"	d
 TRAFFIC_SHUFFLE	GlobalParams.h	/^#define TRAFFIC_SHUFFLE /;"	d
 TRAFFIC_TABLE_BASED	GlobalParams.h	/^#define TRAFFIC_TABLE_BASED /;"	d
 TRAFFIC_TRANSPOSE1	GlobalParams.h	/^#define TRAFFIC_TRANSPOSE1 /;"	d
@@ -766,6 +767,8 @@ traffic_distribution	GlobalParams.h	/^    static string traffic_distribution;$/;
 traffic_table	GlobalTrafficTable.h	/^     vector < Communication > traffic_table;$/;"	m	class:GlobalTrafficTable
 traffic_table_filename	GlobalParams.cpp	/^string GlobalParams::traffic_table_filename;$/;"	m	class:GlobalParams	file:
 traffic_table_filename	GlobalParams.h	/^    static string traffic_table_filename;$/;"	m	struct:GlobalParams
+traffic_hardcoded_filename	GlobalParams.cpp	/^string GlobalParams::traffic_hardcoded_filename;$/;"	m	class:GlobalParams	file:
+traffic_hardcoded_filename	GlobalParams.h	/^    static string traffic_hardcoded_filename;$/;"	m	struct:GlobalParams
 trans	MM.h	/^    gp_t* trans;$/;"	m	struct:mm::access
 transceiver_biasing	GlobalParams.h	/^    pair<double, double> transceiver_biasing;$/;"	m	struct:__anon5
 transceiver_leakage	GlobalParams.h	/^    pair<double, double> transceiver_leakage;$/;"	m	struct:__anon5

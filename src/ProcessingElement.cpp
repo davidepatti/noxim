@@ -37,13 +37,20 @@ void ProcessingElement::txProcess()
 	current_level_tx = 0;
 	transmittedAtPreviousCycle = false;
     } else {
-	Packet packet;
 
-	if (canShot(packet)) {
-	    packet_queue.push(packet);
-	    transmittedAtPreviousCycle = true;
-	} else
-	    transmittedAtPreviousCycle = false;
+      if(GlobalParams::traffic_distribution != TRAFFIC_HARDCODED) {
+		Packet packet;
+		if (canShot(packet)) {
+		  packet_queue.push(packet);
+		  transmittedAtPreviousCycle = true;
+		} else {
+		  transmittedAtPreviousCycle = false;
+		}
+      } else {
+		std::cout << "[txProcess] check for ID " << local_id << " at cycle " << traffic_cycle << std::endl;
+		
+		traffic_cycle += 1;
+      }
 
 
 	if (ack_tx.read() == current_level_tx) {

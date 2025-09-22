@@ -74,6 +74,7 @@ using namespace std;
 #define TRAFFIC_BUTTERFLY      "TRAFFIC_BUTTERFLY"
 #define TRAFFIC_LOCAL	       "TRAFFIC_LOCAL"
 #define TRAFFIC_ULOCAL	       "TRAFFIC_ULOCAL"
+#define TRAFFIC_HARDCODED      "TRAFFIC_HARDCODED"
 
 // Verbosity levels
 #define VERBOSE_OFF            "VERBOSE_OFF"
@@ -160,6 +161,7 @@ struct GlobalParams {
     static double locality;
     static string traffic_distribution;
     static string traffic_table_filename;
+    static string traffic_hardcoded_filename;
     static string config_filename;
     static string power_config_filename;
     static int clock_period_ps;
