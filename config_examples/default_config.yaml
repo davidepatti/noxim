@@ -167,4 +167,4 @@ traffic_distribution: TRAFFIC_RANDOM
 traffic_table_filename: "t.txt"
 # when hardcoded traffic pattern is specified, use the following
 # configuration file
-traffic_hardcoded_filename: "t.txt
+traffic_hardcoded_filename: "t.txt"
