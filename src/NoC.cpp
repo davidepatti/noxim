@@ -762,10 +762,7 @@ void NoC::buildButterfly()
 
 	//--- ---------------------------------- ---
 
-	/*
-     * dummy NoP_data structure
-     *
-
+	// dummy NoP_data structure
 	NoP_data tmp_NoP;
 
 	tmp_NoP.sender_id = NOT_VALID;
@@ -774,7 +771,7 @@ void NoC::buildButterfly()
 		tmp_NoP.channel_status_neighbor[i].free_slots = NOT_VALID;
 		tmp_NoP.channel_status_neighbor[i].available = false;
 	}
-    */
+
 }
 
 void NoC::buildBaseline()
@@ -1458,7 +1455,16 @@ void NoC::buildBaseline()
 	    core[c]->ack_rx[k](*bool_dummy_signal);
 	    core[c]->buffer_full_status_rx[k](*tbufferfullstatus_dummy_signal);
 	}
+		core[c]->hub_flit_rx(flit_from_hub[c]);
+		core[c]->hub_req_rx(req_from_hub[c]);
+		core[c]->hub_ack_rx(ack_to_hub[c]);
+		core[c]->hub_buffer_full_status_rx(buffer_full_status_to_hub[c]);
 
+		core[c]->hub_flit_tx(flit_to_hub[c]);
+		core[c]->hub_req_tx(req_to_hub[c]);
+		core[c]->hub_ack_tx(ack_from_hub[c]);
+		core[c]->hub_buffer_full_status_tx(buffer_full_status_from_hub[c]);
+	/*
 	core[c]->hub_flit_tx(*flit_dummy_signal);
 	core[c]->hub_req_tx(*bool_dummy_signal);
 	core[c]->hub_ack_tx(*bool_dummy_signal);
@@ -1467,7 +1473,7 @@ void NoC::buildBaseline()
 	core[c]->hub_flit_rx(*flit_dummy_signal);
 	core[c]->hub_req_rx(*bool_dummy_signal);
 	core[c]->hub_ack_rx(*bool_dummy_signal);
-	core[c]->hub_buffer_full_status_rx(*tbufferfullstatus_dummy_signal);
+	core[c]->hub_buffer_full_status_rx(*tbufferfullstatus_dummy_signal);*/
     }
 
     // ... and for switches
@@ -1489,19 +1495,16 @@ void NoC::buildBaseline()
 
     //--- ---------------------------------- ---
 
-    /* 
-     * dummy NoP_data structure
-     *
-
+    // dummy NoP_data structure
     NoP_data tmp_NoP;
 
     tmp_NoP.sender_id = NOT_VALID;
 
     for (int i = 0; i < DIRECTIONS; i++) {
-	    tmp_NoP.channel_status_neighbor[i].free_slots = NOT_VALID;
-	    tmp_NoP.channel_status_neighbor[i].available = false;
+	tmp_NoP.channel_status_neighbor[i].free_slots = NOT_VALID;
+	tmp_NoP.channel_status_neighbor[i].available = false;
     }
-    */
+
 }
 
 void NoC::buildOmega()
@@ -2084,6 +2087,17 @@ void NoC::buildOmega()
 			core[c]->buffer_full_status_rx[k](*tbufferfullstatus_dummy_signal);
 		}
 
+		core[c]->hub_flit_rx(flit_from_hub[c]);
+		core[c]->hub_req_rx(req_from_hub[c]);
+		core[c]->hub_ack_rx(ack_to_hub[c]);
+		core[c]->hub_buffer_full_status_rx(buffer_full_status_to_hub[c]);
+
+		core[c]->hub_flit_tx(flit_to_hub[c]);
+		core[c]->hub_req_tx(req_to_hub[c]);
+		core[c]->hub_ack_tx(ack_from_hub[c]);
+		core[c]->hub_buffer_full_status_tx(buffer_full_status_from_hub[c]);
+
+		/*
 		core[c]->hub_flit_tx(*flit_dummy_signal);
 		core[c]->hub_req_tx(*bool_dummy_signal);
 		core[c]->hub_ack_tx(*bool_dummy_signal);
@@ -2093,6 +2107,7 @@ void NoC::buildOmega()
 		core[c]->hub_req_rx(*bool_dummy_signal);
 		core[c]->hub_ack_rx(*bool_dummy_signal);
 		core[c]->hub_buffer_full_status_rx(*tbufferfullstatus_dummy_signal);
+		*/
 	}
 
 	// ... and for switches
@@ -2113,10 +2128,7 @@ void NoC::buildOmega()
 
 	//--- ---------------------------------- ---
 
-	/*
-     *  dummy NoP_data structure
-     *
-
+	// dummy NoP_data structure
 	NoP_data tmp_NoP;
 
 	tmp_NoP.sender_id = NOT_VALID;
@@ -2125,7 +2137,7 @@ void NoC::buildOmega()
 		tmp_NoP.channel_status_neighbor[i].free_slots = NOT_VALID;
 		tmp_NoP.channel_status_neighbor[i].available = false;
 	}
-    */
+
 }
 
 void NoC::buildMesh()

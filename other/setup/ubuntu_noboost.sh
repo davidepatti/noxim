@@ -42,7 +42,7 @@ make
 make install
 cd ..
 echo `pwd`/lib-* > systemc.conf
-sudo ln -s `pwd`/systemc.conf /etc/ld.so.conf.d/noxim_systemc.conf
+sudo ln -sf `pwd`/systemc.conf /etc/ld.so.conf.d/noxim_systemc.conf
 sudo ldconfig
 cd ../..
 

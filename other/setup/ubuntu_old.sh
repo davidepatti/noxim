@@ -5,7 +5,7 @@ set -e
 export GIT_SSL_NO_VERIFY=1
 
 sudo apt-get update
-sudo apt-get -y install build-essential linux-headers-generic wget tar libboost-dev cmake libsfml-dev
+sudo apt-get -y install build-essential linux-headers-generic wget tar libboost-dev cmake
 
 if [ $(dpkg -s git 2>/dev/null | grep "ok installed" | wc -l) -eq 0 ]
 then 
@@ -23,7 +23,7 @@ cd libs
 
 git clone https://github.com/jbeder/yaml-cpp
 cd yaml-cpp/
-git checkout -b r0.6.0 yaml-cpp-0.6.0
+git checkout -b r0.5.3 release-0.5.3
 mkdir -p lib
 cd lib
 cmake ..
@@ -42,7 +42,8 @@ make
 make install
 cd ..
 echo `pwd`/lib-* > systemc.conf
-sudo ln -sf `pwd`/systemc.conf /etc/ld.so.conf.d/noxim_systemc.conf
+sudo ln -s `pwd`/systemc.conf /etc/ld.so.conf.d/noxim_systemc.conf
+#sudo cat `pwd`/systemc.conf >> /etc/ld.so.conf.d/noxim_systemc.conf
 sudo ldconfig
 cd ../..
 

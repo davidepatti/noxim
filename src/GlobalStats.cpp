@@ -434,7 +434,8 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 {
     if (detailed) 
     {
-	assert (GlobalParams::topology == TOPOLOGY_MESH); 
+	if (GlobalParams::topology == TOPOLOGY_MESH)
+    { 
 	out << endl << "detailed = [" << endl;
 
 	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
@@ -467,7 +468,20 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 	    out << endl;
 	}
 	out << "];" << endl;
+    }
+    else //other delta topologies
+    {
+    out << endl << "detailed = [" << endl;
+    
+    for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
+    noc->core[y]->r->stats.showStats(y, out, true);
+    out << "];" << endl;
 
+    // For delta topologies, we can't show matrix format stats
+    // since they don't have a 2D structure
+    out << endl << "% Note: Matrix format stats not available for delta topologies" << endl;
+       
+    }
 	showPowerBreakDown(out);
 	showPowerManagerStats(out);
     }

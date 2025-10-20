@@ -7,11 +7,11 @@ it can be downloaded under GPL license terms.
 
 **If you use Noxim in your research, we would appreciate the following citation in any publications to which it has contributed:**
 
-Catania, V., Mineo, A., Monteleone, S., Palesi, M., Patti, D.
-Improving energy efficiency in wireless network-on-chip architectures
-(2017) ACM Journal on Emerging Technologies in Computing Systems, 14 (1)
+V. Catania, A. Mineo, S. Monteleone, M. Palesi and D. Patti, "Improving the energy efficiency of wireless Network on Chip architectures through online selective buffers and receivers shutdown," 2016 13th IEEE Annual Consumer Communications & Networking Conference (CCNC), Las Vegas, NV, 2016, pp. 668-673, doi: 10.1109/CCNC.2016.7444860.
+[Scopus reference](https://www.scopus.com/record/display.uri?eid=2-s2.0-84966659566&origin=resultslist&sort=plf-f&src=s&sid=b531296d946a78b05f463c35c681a44c&sot=autdocs&sdt=autdocs&sl=18&s=AU-ID%2835610853000%29&relpos=14&citeCnt=6&searchTerm=)
 
-[paper reference on Scopus](https://www.scopus.com/inward/record.uri?eid=2-s2.0-85040309279&doi=10.1145%2f3138807&partnerID=40&md5=1a9c807853329ad6985a1cdb1e68c223)
+V. Catania, A. Mineo, S. Monteleone, M. Palesi and D. Patti, "Energy efficient transceiver in wireless Network on Chip architectures," 2016 Design, Automation & Test in Europe Conference & Exhibition (DATE), Dresden, 2016, pp. 1321-1326.
+[Scopus reference](https://www.scopus.com/record/display.uri?eid=2-s2.0-84973661681&origin=resultslist&sort=plf-f&src=s&sid=4bd3ffce04cc0093a84655249383aefa&sot=autdocs&sdt=autdocs&sl=18&s=AU-ID%2835610853000%29&relpos=11&citeCnt=11&searchTerm=)
 
 Registration
 ------------
@@ -44,6 +44,10 @@ If you are working on Ubuntu, you can install noxim and all the dependencies wit
 (**BE sure of copying the entire line, i.e., ending with "ubuntu.sh**)
 
     bash <(wget -qO- --no-check-certificate https://raw.githubusercontent.com/davidepatti/noxim/master/other/setup/ubuntu.sh)
+
+Similarly for macOS:
+
+    /bin/zsh -c "$(curl -fsSL https://raw.githubusercontent.com/davidepatti/noxim/master/other/setup/macos.zsh)"
 
 Or, to get just the latest master sources, you can run:
 

@@ -6,6 +6,11 @@ Installation instructions
 
 This guide will show you how to install Noxim on your computer.
 
+IMPORTANT:
+
+If you have not tried yet, use the automatic installation script found on the Noxim homepage and
+just skip all the instructions below.
+
 
 Supported Platforms
 -------------------
@@ -15,6 +20,8 @@ any platform for which SystemC is supported: please refer to their (SystemC) doc
 know which they are. Just to let you know, we usually work under GNU/Linux (mainly Ubuntu)
 but SystemC is known to run under other platforms including Apple Mac OS X and Sun Solaris
 with GCC and Microsoft Windows with Visual C++ (but Cygwin with GCC is also known to work).
+
+On latest Windows version, you may try also the Windows Linux Subsystem (WSL).
 
 This document will then detail the steps required to build Noxim from the sources, including
 all prerequisites.
@@ -69,8 +76,10 @@ YAML    := /opt/local/
 SystemC installation
 ----------------------------------
 
-- Download SystemC (currently at version 2.3.1) from 
-  http://www.accellera.org/downloads/standards/systemc (a free registration is required).
+- Download SystemC (currently at version 2.3.1) from:
+
+http://www.accellera.org/images/downloads/standards/systemc/systemc-2.3.1.tgz
+
 - Unpack it:
     tar -xzf systemc-2.3.1.tgz
 

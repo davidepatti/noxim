@@ -89,10 +89,13 @@ void PrintPairs(ostream &os, int dim_x, int dim_y, traffic *traffic_data)
         {
             if ((float)rand() / RAND_MAX < traffic_data->pairs_prob)
             {
-                os  << src_region[s] << "\t" 
-                    << dst_region[d] << "\t" 
-                    << (float)rand() / RAND_MAX * (traffic_data->pir_max - traffic_data->pir_min) + traffic_data->pir_min << endl;  
-            }    
+                if (src_region[s] != dst_region[d])
+                {
+                    os  << src_region[s] << "\t"
+                        << dst_region[d] << "\t"
+                        << (float)rand() / RAND_MAX * (traffic_data->pir_max - traffic_data->pir_min) + traffic_data->pir_min << endl;
+                }
+            }
         }
     } 
 
