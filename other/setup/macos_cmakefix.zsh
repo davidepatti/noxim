@@ -90,7 +90,7 @@ if [[ $OSTYPE == 'darwin'* ]]; then
     fi
 
     mkdir -p lib
-    cp ../../../other/setup/CMakeLists_fix3.5_for_yaml.txt lib/CMakeLists.txt
+    cp ../../../other/setup/CMakeLists_fix3.5_for_yaml.txt CMakeLists.txt
     cd lib
     cmake .. -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     cmake --build .
