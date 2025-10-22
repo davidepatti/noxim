@@ -60,13 +60,14 @@ where [options] is one or more of the following ones:
 		pareto on off r	Self-similar Pareto distribution with given real parameters (alfa-on alfa-off r)
 		custom R	Custom distribution with given real probability of retransmission
 	-traffic TYPE	Set the spatial distribution of traffic to TYPE where TYPE is one of the following (default 0'):
-		random		Random traffic distribution
-		transpose1	Transpose matrix 1 traffic distribution
-		transpose2	Transpose matrix 2 traffic distribution
-		bitreversal	Bit-reversal traffic distribution
-		butterfly	Butterfly traffic distribution
-		shuffle		Shuffle traffic distribution
-		table FILENAME	Traffic Table Based traffic distribution with table in the specified file
+                random             Random traffic distribution
+                transpose1         Transpose matrix 1 traffic distribution
+                transpose2         Transpose matrix 2 traffic distribution
+                bitreversal        Bit-reversal traffic distribution
+                butterfly          Butterfly traffic distribution
+                shuffle            Shuffle traffic distribution
+                table FILENAME     Traffic Table Based traffic distribution with table in the specified file
+                hardcoded FILENAME Hardcoded traffic patterns with individual packets in the specified file
 	-hs ID P	Add node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)
 	-pwr FILENAME	Router and link power data (default default_router.pwr)
 	-lpls		Enable low power link strategy (default 0)

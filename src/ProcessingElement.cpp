@@ -37,13 +37,37 @@ void ProcessingElement::txProcess()
 	current_level_tx = 0;
 	transmittedAtPreviousCycle = false;
     } else {
-	Packet packet;
 
-	if (canShot(packet)) {
-	    packet_queue.push(packet);
-	    transmittedAtPreviousCycle = true;
-	} else
-	    transmittedAtPreviousCycle = false;
+    if(GlobalParams::traffic_distribution != TRAFFIC_HARDCODED) {
+		Packet packet;
+		if (canShot(packet)) {
+			packet_queue.push(packet);
+			transmittedAtPreviousCycle = true;
+		} else {
+			transmittedAtPreviousCycle = false;
+		}
+    } else if(traffic_cycle < traffic_hardcoded->num_cycles()) {
+		double now = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+		
+		bool any = false;
+		for (HardcodedTrafficEntry const& expected_packet
+			   : traffic_hardcoded->traffic_at_cycle(traffic_cycle)) {
+			if(expected_packet.src == local_id) {
+		    	Packet packet;
+				int vc = randInt(0,GlobalParams::n_virtual_channels-1);
+				packet.make(local_id, expected_packet.dst, vc, now, getRandomSize());
+				packet_queue.push(packet);
+				any = true;
+			}
+		}
+
+		if(any)
+			transmittedAtPreviousCycle = true;
+		else
+			transmittedAtPreviousCycle = false;
+		
+		traffic_cycle += 1;
+    }
 
 
 	if (ack_tx.read() == current_level_tx) {

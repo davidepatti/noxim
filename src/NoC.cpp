@@ -120,6 +120,10 @@ void NoC::buildCommon()
 	if (GlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED)
 		assert(gttable.load(GlobalParams::traffic_table_filename.c_str()));
 
+	// Check for traffic hardcoded availability	
+	if (GlobalParams::traffic_distribution == TRAFFIC_HARDCODED)
+		assert(ghtable.load(GlobalParams::traffic_hardcoded_filename.c_str()));
+
 	// Var to track Hub connected ports
 	hub_connected_ports = (int *) calloc(GlobalParams::hub_configuration.size(), sizeof(int));
 
@@ -204,6 +208,7 @@ void NoC::buildButterfly()
 			// Tell to the PE its coordinates
 			t[i][j]->pe->local_id = tile_id;
 			t[i][j]->pe->traffic_table = &gttable;	// Needed to choose destination
+			t[i][j]->pe->traffic_hardcoded = &ghtable;
 			t[i][j]->pe->never_transmit = true;
 
 			// Map clock and reset
@@ -538,6 +543,9 @@ void NoC::buildButterfly()
 		}
 		else
 			core[i]->pe->never_transmit = false;
+		
+		if (GlobalParams::traffic_distribution == TRAFFIC_HARDCODED)
+		  core[i]->pe->traffic_hardcoded = &ghtable;
 
 		// Map clock and reset
 		core[i]->clock(clock);
@@ -853,6 +861,7 @@ void NoC::buildBaseline()
 	    // Tell to the PE its coordinates
 	    t[i][j]->pe->local_id = tile_id;
 	    t[i][j]->pe->traffic_table = &gttable;	// Needed to choose destination
+	    t[i][j]->pe->traffic_hardcoded = &ghtable;
 	    t[i][j]->pe->never_transmit = true;
 
 	    // Map clock and reset
@@ -1301,6 +1310,9 @@ void NoC::buildBaseline()
 	}
 	else
 	    core[i]->pe->never_transmit = false;
+		
+	if (GlobalParams::traffic_distribution == TRAFFIC_HARDCODED)
+	  core[i]->pe->traffic_hardcoded = &ghtable;
 
 	// Map clock and reset
 	core[i]->clock(clock);
@@ -1585,6 +1597,7 @@ void NoC::buildOmega()
 			// Tell to the PE its coordinates
 			t[i][j]->pe->local_id = tile_id;
 			t[i][j]->pe->traffic_table = &gttable;	// Needed to choose destination
+			t[i][j]->pe->traffic_hardcoded = &ghtable;	// Needed to choose destination
 			t[i][j]->pe->never_transmit = true;
 
 			// Map clock and reset
@@ -1931,6 +1944,9 @@ void NoC::buildOmega()
 		}
 		else
 			core[i]->pe->never_transmit = false;
+		
+		if (GlobalParams::traffic_distribution == TRAFFIC_HARDCODED)
+		  core[i]->pe->traffic_hardcoded = &ghtable;
 
 		// Map clock and reset
 		core[i]->clock(clock);
@@ -2209,6 +2225,9 @@ void NoC::buildMesh()
 		}
 		else
 			t[i][j]->pe->never_transmit = false;
+		
+		if (GlobalParams::traffic_distribution == TRAFFIC_HARDCODED)
+		  t[i][j]->pe->traffic_hardcoded = &ghtable;
 
 	    // Map clock and reset
 	    t[i][j]->clock(clock);

@@ -15,6 +15,7 @@
 #include "Tile.h"
 #include "GlobalRoutingTable.h"
 #include "GlobalTrafficTable.h"
+#include "GlobalTrafficHardcoding.h"
 #include "Hub.h"
 #include "Channel.h"
 #include "TokenRing.h"
@@ -86,6 +87,7 @@ SC_MODULE(NoC)
     // Global tables
     GlobalRoutingTable grtable;
     GlobalTrafficTable gttable;
+    GlobalTrafficHardcoding ghtable;
 
 
     // Constructor
