@@ -6,9 +6,9 @@ Installation instructions
 
 This guide will show you how to install Noxim on your computer.
 
-IMPORTANT:
+*****IMPORTANT*****:
 
-If you have not tried yet, use the automatic installation script found on the Noxim homepage and
+If you are using Ubuntu Linux or MacOS, try the automatic installation script found on the Noxim homepage and
 just skip all the instructions below.
 
 
