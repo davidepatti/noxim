@@ -20,6 +20,12 @@ To receive information about new Noxim features, updates and events, please regi
 
 What's New ? 
 ------------
+
+**[October 2025]**
+ * Harcoded traffic for specifying what happens at each cycle
+ * Fedora Linux script for installing
+ * Many other stuff, sorry we don't update this readme often...
+   
 **[March 2018]**
 
   * Support for virtual channels for improved traffic management
