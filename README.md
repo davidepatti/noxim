@@ -21,6 +21,10 @@ To receive information about new Noxim features, updates and events, please regi
 What's New ? 
 ------------
 
+**COMING SOON**
+
+A tool for visualizing what's happening in the NoC. Not just numbers, but a way to grasp visually what traffic flows are doing...
+
 **[October 2025]**
  * Harcoded traffic for specifying what happens at each cycle
  * Fedora Linux script for installing
