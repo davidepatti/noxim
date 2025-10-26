@@ -45,9 +45,15 @@ If you are working on Ubuntu, you can install noxim and all the dependencies wit
 
     bash <(wget -qO- --no-check-certificate https://raw.githubusercontent.com/davidepatti/noxim/master/other/setup/ubuntu.sh)
 
+If you are on Fedora, use this command:
+
+    bash <(wget -qO- --no-check-certificate https://raw.githubusercontent.com/davidepatti/noxim/master/other/setup/fedora.sh)
+
 Similarly for macOS:
 
     /bin/zsh -c "$(curl -fsSL https://raw.githubusercontent.com/davidepatti/noxim/master/other/setup/macos.zsh)"
+
+(when having issues with cmake, see https://github.com/davidepatti/noxim/issues/160)
 
 Or, to get just the latest master sources, you can run:
 
