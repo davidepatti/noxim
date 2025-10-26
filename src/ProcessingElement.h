@@ -16,6 +16,7 @@
 
 #include "DataStructs.h"
 #include "GlobalTrafficTable.h"
+#include "GlobalTrafficHardcoding.h"
 #include "Utils.h"
 
 using namespace std;
@@ -61,7 +62,9 @@ SC_MODULE(ProcessingElement)
     Packet trafficLocal();	// Random with locality
     Packet trafficULocal();	// Random with locality
 
+    size_t traffic_cycle = 0;
     GlobalTrafficTable *traffic_table;	// Reference to the Global traffic Table
+    GlobalTrafficHardcoding *traffic_hardcoded;	// Reference to the Global traffic Hardcoding
     bool never_transmit;	// true if the PE does not transmit any packet 
     //  (valid only for the table based traffic)
 
