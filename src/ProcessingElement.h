@@ -42,9 +42,11 @@ SC_MODULE(ProcessingElement)
 
     // Registers
     int local_id;		// Unique identification number
+    int consume_counter;
     bool current_level_rx;	// Current level for Alternating Bit Protocol (ABP)
     bool current_level_tx;	// Current level for Alternating Bit Protocol (ABP)
     queue < Packet > packet_queue;	// Local queue of packets
+    queue < Flit > rx_buffer;           // Used to simulate finite processing speed/buffer space
     bool transmittedAtPreviousCycle;	// Used for distributions with memory
 
     // Functions
@@ -79,6 +81,8 @@ SC_MODULE(ProcessingElement)
     int findRandomDestination(int local_id,int hops);
     unsigned int getQueueSize() const;
 
+    void consume();
+
     // Constructor
     SC_CTOR(ProcessingElement) {
 	SC_METHOD(rxProcess);
@@ -88,6 +92,12 @@ SC_MODULE(ProcessingElement)
 	SC_METHOD(txProcess);
 	sensitive << reset;
 	sensitive << clock.pos();
+
+    SC_METHOD(consume);
+	sensitive << reset;
+	sensitive << clock.pos();
+
+    consume_counter = 0;
     }
 
 };
