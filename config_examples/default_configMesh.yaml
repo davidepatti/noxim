@@ -25,6 +25,14 @@ r2h_link_length: 2.0
 r2r_link_length: 1.0
 n_virtual_channels: 1
 
+# pe input buffer size
+pe_rx_buffer_size: 1
+# how often does PE process a batch of flits (eg. 4 = once
+# every four cycles)
+processing_frequency: 1
+# how many flits are processed in a batch
+processing_size: 1
+
 # Routing algorithms:
 #   XY
 #   WEST_FIRST
