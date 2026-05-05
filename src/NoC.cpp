@@ -2379,6 +2379,298 @@ void NoC::buildMesh()
 
 }
 
+namespace {
+
+int deftLayoutY(const DeftTopology::RouterInfo &info)
+{
+    if (info.layer == DeftTopology::ROUTER_LAYER_INTERPOSER)
+        return info.footprint_y + DeftTopology::FootprintHeight;
+
+    return info.footprint_y;
+}
+
+NoP_data invalidNoPData()
+{
+    NoP_data tmp_NoP;
+    tmp_NoP.sender_id = NOT_VALID;
+
+    for (int i = 0; i < DIRECTIONS; i++) {
+        tmp_NoP.channel_status_neighbor[i].free_slots = NOT_VALID;
+        tmp_NoP.channel_status_neighbor[i].available = false;
+    }
+
+    return tmp_NoP;
+}
+
+} // namespace
+
+void NoC::bindDeftCardinalLink(Tile *a, int direction_a, Tile *b, int direction_b)
+{
+    sc_signal_deft_link *link = new sc_signal_deft_link;
+    deft_links.push_back(link);
+
+    a->req_tx[direction_a](link->req_ab);
+    a->flit_tx[direction_a](link->flit_ab);
+    a->ack_tx[direction_a](link->ack_ab);
+    a->buffer_full_status_tx[direction_a](link->buffer_full_status_ab);
+    b->req_rx[direction_b](link->req_ab);
+    b->flit_rx[direction_b](link->flit_ab);
+    b->ack_rx[direction_b](link->ack_ab);
+    b->buffer_full_status_rx[direction_b](link->buffer_full_status_ab);
+
+    b->req_tx[direction_b](link->req_ba);
+    b->flit_tx[direction_b](link->flit_ba);
+    b->ack_tx[direction_b](link->ack_ba);
+    b->buffer_full_status_tx[direction_b](link->buffer_full_status_ba);
+    a->req_rx[direction_a](link->req_ba);
+    a->flit_rx[direction_a](link->flit_ba);
+    a->ack_rx[direction_a](link->ack_ba);
+    a->buffer_full_status_rx[direction_a](link->buffer_full_status_ba);
+
+    a->free_slots[direction_a](link->free_slots_ab);
+    b->free_slots_neighbor[direction_b](link->free_slots_ab);
+    b->free_slots[direction_b](link->free_slots_ba);
+    a->free_slots_neighbor[direction_a](link->free_slots_ba);
+
+    a->NoP_data_out[direction_a](link->nop_ab);
+    b->NoP_data_in[direction_b](link->nop_ab);
+    b->NoP_data_out[direction_b](link->nop_ba);
+    a->NoP_data_in[direction_a](link->nop_ba);
+}
+
+void NoC::bindDeftVerticalLink(Tile *a, Tile *b)
+{
+    sc_signal_deft_link *link = new sc_signal_deft_link;
+    deft_links.push_back(link);
+
+    a->hub_req_tx(link->req_ab);
+    a->hub_flit_tx(link->flit_ab);
+    a->hub_ack_tx(link->ack_ab);
+    a->hub_buffer_full_status_tx(link->buffer_full_status_ab);
+    b->hub_req_rx(link->req_ab);
+    b->hub_flit_rx(link->flit_ab);
+    b->hub_ack_rx(link->ack_ab);
+    b->hub_buffer_full_status_rx(link->buffer_full_status_ab);
+
+    b->hub_req_tx(link->req_ba);
+    b->hub_flit_tx(link->flit_ba);
+    b->hub_ack_tx(link->ack_ba);
+    b->hub_buffer_full_status_tx(link->buffer_full_status_ba);
+    a->hub_req_rx(link->req_ba);
+    a->hub_flit_rx(link->flit_ba);
+    a->hub_ack_rx(link->ack_ba);
+    a->hub_buffer_full_status_rx(link->buffer_full_status_ba);
+}
+
+void NoC::bindDeftIdlePort(Tile *tile, int direction)
+{
+    sc_signal_deft_idle_port *idle = new sc_signal_deft_idle_port;
+    deft_idle_ports.push_back(idle);
+
+    idle->req_rx.write(0);
+    idle->req_tx.write(0);
+    idle->ack_rx.write(0);
+    idle->ack_tx.write(0);
+    idle->buffer_full_status_rx.write(TBufferFullStatus());
+    idle->buffer_full_status_tx.write(TBufferFullStatus());
+    idle->free_slots.write(NOT_VALID);
+    idle->free_slots_neighbor.write(NOT_VALID);
+    idle->nop_data_out.write(invalidNoPData());
+    idle->nop_data_in.write(invalidNoPData());
+
+    if (direction == DIRECTION_HUB) {
+        tile->hub_req_rx(idle->req_rx);
+        tile->hub_flit_rx(idle->flit_rx);
+        tile->hub_ack_rx(idle->ack_rx);
+        tile->hub_buffer_full_status_rx(idle->buffer_full_status_rx);
+
+        tile->hub_req_tx(idle->req_tx);
+        tile->hub_flit_tx(idle->flit_tx);
+        tile->hub_ack_tx(idle->ack_tx);
+        tile->hub_buffer_full_status_tx(idle->buffer_full_status_tx);
+        return;
+    }
+
+    tile->req_rx[direction](idle->req_rx);
+    tile->flit_rx[direction](idle->flit_rx);
+    tile->ack_rx[direction](idle->ack_rx);
+    tile->buffer_full_status_rx[direction](idle->buffer_full_status_rx);
+
+    tile->req_tx[direction](idle->req_tx);
+    tile->flit_tx[direction](idle->flit_tx);
+    tile->ack_tx[direction](idle->ack_tx);
+    tile->buffer_full_status_tx[direction](idle->buffer_full_status_tx);
+
+    tile->free_slots[direction](idle->free_slots);
+    tile->free_slots_neighbor[direction](idle->free_slots_neighbor);
+    tile->NoP_data_out[direction](idle->nop_data_out);
+    tile->NoP_data_in[direction](idle->nop_data_in);
+}
+
+void NoC::buildDeft2D()
+{
+    buildCommon();
+
+    const int dimX = DeftTopology::LayoutWidth;
+    const int dimY = DeftTopology::LayoutHeight;
+
+    req = new sc_signal_NSWEH<bool>*[dimX];
+    ack = new sc_signal_NSWEH<bool>*[dimX];
+    buffer_full_status = new sc_signal_NSWEH<TBufferFullStatus>*[dimX];
+    flit = new sc_signal_NSWEH<Flit>*[dimX];
+    free_slots = new sc_signal_NSWE<int>*[dimX];
+    nop_data = new sc_signal_NSWE<NoP_data>*[dimX];
+
+    for (int i = 0; i < dimX; i++) {
+        req[i] = new sc_signal_NSWEH<bool>[dimY];
+        ack[i] = new sc_signal_NSWEH<bool>[dimY];
+        buffer_full_status[i] = new sc_signal_NSWEH<TBufferFullStatus>[dimY];
+        flit[i] = new sc_signal_NSWEH<Flit>[dimY];
+        free_slots[i] = new sc_signal_NSWE<int>[dimY];
+        nop_data[i] = new sc_signal_NSWE<NoP_data>[dimY];
+    }
+
+    t = new Tile**[dimX];
+    for (int i = 0; i < dimX; i++)
+        t[i] = new Tile*[dimY];
+
+    core = new Tile*[DeftTopology::TotalRouters];
+
+    for (int id = 0; id < DeftTopology::TotalRouters; id++) {
+        DeftTopology::RouterInfo info = DeftTopology::decodeRouterId(id);
+        int layout_x = info.footprint_x;
+        int layout_y = deftLayoutY(info);
+
+        char tile_name[96];
+        sprintf(tile_name, "Tile_DEFT_2_5D[%02d][%02d]_(#%d)", layout_x, layout_y, id);
+        Tile *tile = new Tile(tile_name, id);
+        core[id] = tile;
+        t[layout_x][layout_y] = tile;
+
+        tile->r->configure(id,
+                           GlobalParams::stats_warm_up_time,
+                           GlobalParams::buffer_depth,
+                           grtable);
+        tile->r->power.configureRouter(GlobalParams::flit_size,
+                                       GlobalParams::buffer_depth,
+                                       GlobalParams::flit_size,
+                                       string(GlobalParams::routing_algorithm),
+                                       "default");
+
+        tile->pe->local_id = id;
+        if (DeftTopology::isInterposerRouter(id))
+            tile->pe->never_transmit = true;
+        else if (GlobalParams::traffic_distribution == TRAFFIC_TABLE_BASED) {
+            tile->pe->traffic_table = &gttable;
+            tile->pe->never_transmit = (gttable.occurrencesAsSource(id) == 0);
+        } else
+            tile->pe->never_transmit = false;
+
+        if (GlobalParams::traffic_distribution == TRAFFIC_HARDCODED)
+            tile->pe->traffic_hardcoded = &ghtable;
+
+        tile->clock(clock);
+        tile->reset(reset);
+    }
+
+    vector<vector<bool> > port_bound(
+        DeftTopology::TotalRouters,
+        vector<bool>(DIRECTIONS + 2, false));
+
+    int chiplet_cardinal_links = 0;
+    for (int chiplet_id = 0;
+         chiplet_id < DeftTopology::ChipletGridWidth * DeftTopology::ChipletGridHeight;
+         chiplet_id++) {
+        for (int local_y = 0; local_y < DeftTopology::ChipletLocalHeight; local_y++) {
+            for (int local_x = 0; local_x < DeftTopology::ChipletLocalWidth; local_x++) {
+                int id = DeftTopology::chipletRouterId(chiplet_id, local_x, local_y);
+
+                if (local_x + 1 < DeftTopology::ChipletLocalWidth) {
+                    int east_id = DeftTopology::chipletRouterId(chiplet_id, local_x + 1, local_y);
+                    bindDeftCardinalLink(core[id], DIRECTION_EAST, core[east_id], DIRECTION_WEST);
+                    port_bound[id][DIRECTION_EAST] = true;
+                    port_bound[east_id][DIRECTION_WEST] = true;
+                    chiplet_cardinal_links++;
+                }
+
+                if (local_y + 1 < DeftTopology::ChipletLocalHeight) {
+                    int south_id = DeftTopology::chipletRouterId(chiplet_id, local_x, local_y + 1);
+                    bindDeftCardinalLink(core[id], DIRECTION_SOUTH, core[south_id], DIRECTION_NORTH);
+                    port_bound[id][DIRECTION_SOUTH] = true;
+                    port_bound[south_id][DIRECTION_NORTH] = true;
+                    chiplet_cardinal_links++;
+                }
+            }
+        }
+    }
+
+    int interposer_cardinal_links = 0;
+    for (int y = 0; y < DeftTopology::FootprintHeight; y++) {
+        for (int x = 0; x < DeftTopology::FootprintWidth; x++) {
+            int id = DeftTopology::interposerRouterId(x, y);
+
+            if (x + 1 < DeftTopology::FootprintWidth) {
+                int east_id = DeftTopology::interposerRouterId(x + 1, y);
+                bindDeftCardinalLink(core[id], DIRECTION_EAST, core[east_id], DIRECTION_WEST);
+                port_bound[id][DIRECTION_EAST] = true;
+                port_bound[east_id][DIRECTION_WEST] = true;
+                interposer_cardinal_links++;
+            }
+
+            if (y + 1 < DeftTopology::FootprintHeight) {
+                int south_id = DeftTopology::interposerRouterId(x, y + 1);
+                bindDeftCardinalLink(core[id], DIRECTION_SOUTH, core[south_id], DIRECTION_NORTH);
+                port_bound[id][DIRECTION_SOUTH] = true;
+                port_bound[south_id][DIRECTION_NORTH] = true;
+                interposer_cardinal_links++;
+            }
+        }
+    }
+
+    const vector<DeftTopology::VerticalLinkInfo> &vertical_links =
+        DeftTopology::verticalLinks();
+    for (vector<DeftTopology::VerticalLinkInfo>::const_iterator it = vertical_links.begin();
+         it != vertical_links.end();
+         ++it) {
+        bindDeftVerticalLink(core[it->chiplet_endpoint_router_id],
+                             core[it->interposer_endpoint_router_id]);
+        port_bound[it->chiplet_endpoint_router_id][DIRECTION_HUB] = true;
+        port_bound[it->interposer_endpoint_router_id][DIRECTION_HUB] = true;
+    }
+
+    for (int id = 0; id < DeftTopology::TotalRouters; id++) {
+        for (int direction = 0; direction < DIRECTIONS; direction++) {
+            if (!port_bound[id][direction])
+                bindDeftIdlePort(core[id], direction);
+        }
+
+        if (!port_bound[id][DIRECTION_HUB])
+            bindDeftIdlePort(core[id], DIRECTION_HUB);
+    }
+
+    cout << "DEFT_2_5D topology constructed: "
+         << "chiplet_routers=" << DeftTopology::ChipletRouterCount
+         << ", interposer_routers=" << DeftTopology::InterposerRouterCount
+         << ", total_routers=" << DeftTopology::TotalRouters
+         << ", chiplet_cardinal_links=" << chiplet_cardinal_links
+         << ", interposer_cardinal_links=" << interposer_cardinal_links
+         << ", vertical_links=" << vertical_links.size()
+         << endl;
+
+    cout << "DEFT_2_5D vertical link endpoints:" << endl;
+    for (vector<DeftTopology::VerticalLinkInfo>::const_iterator it = vertical_links.begin();
+         it != vertical_links.end();
+         ++it) {
+        cout << "  vl_id=" << it->vl_id
+             << " chiplet=" << it->owner_chiplet_id
+             << " slot=" << DeftTopology::slotName(it->slot)
+             << " chiplet_endpoint=" << it->chiplet_endpoint_router_id
+             << " interposer_endpoint=" << it->interposer_endpoint_router_id
+             << " footprint=(" << it->footprint_x << "," << it->footprint_y << ")"
+             << endl;
+    }
+}
+
 Tile *NoC::searchNode(const int id) const
 {
     if (GlobalParams::topology == TOPOLOGY_MESH) 
@@ -2387,6 +2679,11 @@ Tile *NoC::searchNode(const int id) const
 	    for (int j = 0; j < GlobalParams::mesh_dim_y; j++)
 		if (t[i][j]->r->local_id == id)
 		    return t[i][j];
+    }
+    else if (GlobalParams::topology == TOPOLOGY_DEFT_2_5D)
+    {
+        if (id >= 0 && id < DeftTopology::TotalRouters)
+            return core[id];
     }
     else // in delta topologies id equals to the vector index
 	    return core[id];

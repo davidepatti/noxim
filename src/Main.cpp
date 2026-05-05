@@ -12,6 +12,7 @@
 #include "NoC.h"
 #include "GlobalStats.h"
 #include "DataStructs.h"
+#include "DeftTopology.h"
 #include "GlobalParams.h"
 #include "Logger.h"
 
@@ -42,6 +43,8 @@ int getSwitchDimX()
 {
     if (GlobalParams::topology == TOPOLOGY_MESH)
         return GlobalParams::mesh_dim_x + 1;
+    if (GlobalParams::topology == TOPOLOGY_DEFT_2_5D)
+        return DeftTopology::LayoutWidth;
 
     return getDeltaStages();
 }
@@ -50,6 +53,8 @@ int getSwitchDimY()
 {
     if (GlobalParams::topology == TOPOLOGY_MESH)
         return GlobalParams::mesh_dim_y + 1;
+    if (GlobalParams::topology == TOPOLOGY_DEFT_2_5D)
+        return DeftTopology::LayoutHeight;
 
     return GlobalParams::n_delta_tiles / 2;
 }
@@ -58,6 +63,8 @@ int getCoreCount()
 {
     if (GlobalParams::topology == TOPOLOGY_MESH)
         return GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y;
+    if (GlobalParams::topology == TOPOLOGY_DEFT_2_5D)
+        return DeftTopology::TotalRouters;
 
     return GlobalParams::n_delta_tiles;
 }

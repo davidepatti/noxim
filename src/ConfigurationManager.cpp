@@ -9,6 +9,7 @@
  */
 
 #include "ConfigurationManager.h"
+#include "DeftTopology.h"
 #include <systemc.h> //Included for the function time() 
 #include <algorithm>
 #include <cctype>
@@ -173,6 +174,11 @@ void loadConfiguration() {
         GlobalParams::mesh_dim_x = readParam<int>(config, "mesh_dim_x");
         GlobalParams::mesh_dim_y = readParam<int>(config, "mesh_dim_y");
     }
+    if (GlobalParams::topology == TOPOLOGY_DEFT_2_5D) {
+        GlobalParams::mesh_dim_x = DeftTopology::FootprintWidth;
+        GlobalParams::mesh_dim_y = DeftTopology::FootprintHeight;
+        GlobalParams::n_delta_tiles = DeftTopology::ChipletRouterCount;
+    }
 	//Delta network params
     if (GlobalParams::topology == TOPOLOGY_BASELINE  ||
         GlobalParams::topology == TOPOLOGY_BUTTERFLY ||
@@ -333,6 +339,7 @@ void showHelp(char selfname[])
          << "\t-flit N\t\t\tSet the flit size [bit]" << endl
          << "\t-topology TYPE\t\tSet the topology to one of the following:" << endl
          << "\t\tMESH\t\t2D Mesh" << endl
+         << "\t\tDEFT_2_5D\tFour 4x4 chiplets on an 8x8 active interposer" << endl
          << "\t\tBUTTERFLY\tDelta network Butterfly (radix 2)" << endl
          << "\t\tBASELINE\tDelta network Baseline" << endl
          << "\t\tOMEGA\t\tDelta network Omega" << endl
@@ -425,6 +432,14 @@ void checkConfiguration()
 		if (GlobalParams::winoc_dst_hops>0)
 		{
 			cerr << "Error: winoc_dst_hops currently supported only in delta topologies" << endl;
+			exit(1);
+		}
+	}
+	else if (GlobalParams::topology==TOPOLOGY_DEFT_2_5D)
+	{
+		if (GlobalParams::use_winoc)
+		{
+			cerr << "Error: DEFT_2_5D topology does not support Winoc hub mode in T0007" << endl;
 			exit(1);
 		}
 	}

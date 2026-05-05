@@ -578,6 +578,42 @@ void Router::configure(const int _id,
 	      buffer[DIRECTION_EAST][vc].Disable();
 	}
     }
+    else if (GlobalParams::topology == TOPOLOGY_DEFT_2_5D)
+    {
+        DeftTopology::RouterInfo router_info = DeftTopology::decodeRouterId(_id);
+        const bool has_vertical_link =
+            DeftTopology::verticalLinkForBoundaryRouter(_id) != 0 ||
+            DeftTopology::verticalLinkForInterposerRouter(_id) != 0;
+
+        for (int vc = 0; vc<GlobalParams::n_virtual_channels; vc++)
+        {
+            if (router_info.layer == DeftTopology::ROUTER_LAYER_CHIPLET)
+            {
+                if (router_info.local_y == 0)
+                    buffer[DIRECTION_NORTH][vc].Disable();
+                if (router_info.local_y == DeftTopology::ChipletLocalHeight - 1)
+                    buffer[DIRECTION_SOUTH][vc].Disable();
+                if (router_info.local_x == 0)
+                    buffer[DIRECTION_WEST][vc].Disable();
+                if (router_info.local_x == DeftTopology::ChipletLocalWidth - 1)
+                    buffer[DIRECTION_EAST][vc].Disable();
+            }
+            else if (router_info.layer == DeftTopology::ROUTER_LAYER_INTERPOSER)
+            {
+                if (router_info.footprint_y == 0)
+                    buffer[DIRECTION_NORTH][vc].Disable();
+                if (router_info.footprint_y == DeftTopology::FootprintHeight - 1)
+                    buffer[DIRECTION_SOUTH][vc].Disable();
+                if (router_info.footprint_x == 0)
+                    buffer[DIRECTION_WEST][vc].Disable();
+                if (router_info.footprint_x == DeftTopology::FootprintWidth - 1)
+                    buffer[DIRECTION_EAST][vc].Disable();
+            }
+
+            if (!has_vertical_link)
+                buffer[DIRECTION_HUB][vc].Disable();
+        }
+    }
 
 }
 

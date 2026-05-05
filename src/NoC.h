@@ -19,6 +19,8 @@
 #include "Hub.h"
 #include "Channel.h"
 #include "TokenRing.h"
+#include "DeftTopology.h"
+#include <vector>
 
 using namespace std;
 
@@ -40,6 +42,38 @@ struct sc_signal_NSWEH
     sc_signal<T> north;
     sc_signal<T> to_hub;
     sc_signal<T> from_hub;
+};
+
+struct sc_signal_deft_link
+{
+    sc_signal<bool> req_ab;
+    sc_signal<bool> req_ba;
+    sc_signal<bool> ack_ab;
+    sc_signal<bool> ack_ba;
+    sc_signal<TBufferFullStatus> buffer_full_status_ab;
+    sc_signal<TBufferFullStatus> buffer_full_status_ba;
+    sc_signal<Flit> flit_ab;
+    sc_signal<Flit> flit_ba;
+    sc_signal<int> free_slots_ab;
+    sc_signal<int> free_slots_ba;
+    sc_signal<NoP_data> nop_ab;
+    sc_signal<NoP_data> nop_ba;
+};
+
+struct sc_signal_deft_idle_port
+{
+    sc_signal<bool> req_rx;
+    sc_signal<bool> req_tx;
+    sc_signal<bool> ack_rx;
+    sc_signal<bool> ack_tx;
+    sc_signal<TBufferFullStatus> buffer_full_status_rx;
+    sc_signal<TBufferFullStatus> buffer_full_status_tx;
+    sc_signal<Flit> flit_rx;
+    sc_signal<Flit> flit_tx;
+    sc_signal<int> free_slots;
+    sc_signal<int> free_slots_neighbor;
+    sc_signal<NoP_data> nop_data_out;
+    sc_signal<NoP_data> nop_data_in;
 };
 
 
@@ -99,6 +133,8 @@ SC_MODULE(NoC)
 	if (GlobalParams::topology == TOPOLOGY_MESH)
 	    // Build the Mesh
 	    buildMesh();
+	else if (GlobalParams::topology == TOPOLOGY_DEFT_2_5D)
+	    buildDeft2D();
 	else if (GlobalParams::topology == TOPOLOGY_BUTTERFLY)
         buildButterfly(); 
 	else if (GlobalParams::topology == TOPOLOGY_BASELINE)
@@ -127,12 +163,18 @@ SC_MODULE(NoC)
   private:
 
     void buildMesh();
+    void buildDeft2D();
     void buildButterfly();
     void buildBaseline();
     void buildOmega();
     void buildCommon();
     void asciiMonitor();
+    void bindDeftCardinalLink(Tile *a, int direction_a, Tile *b, int direction_b);
+    void bindDeftVerticalLink(Tile *a, Tile *b);
+    void bindDeftIdlePort(Tile *tile, int direction);
     int * hub_connected_ports;
+    vector<sc_signal_deft_link *> deft_links;
+    vector<sc_signal_deft_idle_port *> deft_idle_ports;
 };
 
 //Hub * dd;

@@ -1,0 +1,2 @@
+% One empty hardcoded traffic cycle for construction-only topology smoke runs.
+-1

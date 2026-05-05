@@ -1,0 +1,62 @@
+# Minimal construction-only configuration for the DeFT 2.5D topology.
+
+topology: DEFT_2_5D
+buffer_depth: 4
+flit_size: 32
+r2h_link_length: 2.0
+r2r_link_length: 1.0
+n_virtual_channels: 1
+
+routing_algorithm: XY
+routing_table_filename: ""
+dyad_threshold: 0.6
+selection_strategy: RANDOM
+
+Hubs:
+    defaults:
+        rx_radio_channels: [0]
+        tx_radio_channels: [0]
+        attached_nodes: []
+        to_tile_buffer_size: 4
+        from_tile_buffer_size: 4
+        rx_buffer_size: 4
+        tx_buffer_size: 4
+
+RadioChannels:
+    defaults:
+        data_rate: 16
+        ber: [0, 0]
+        mac_policy: [TOKEN_PACKET]
+
+clock_period_ps: 1000
+reset_time: 1000
+simulation_time: 20
+stats_warm_up_time: 0
+detailed: false
+max_volume_to_be_drained: 0
+show_buffer_stats: false
+
+use_winoc: false
+use_wirxsleep: false
+
+verbose_mode: VERBOSE_OFF
+log_level: OFF
+log_file: ""
+log_to_stderr: true
+log_components: []
+
+stats_format: text
+stats_file: ""
+
+trace_mode: false
+trace_filename: ""
+trace_scope: basic
+
+min_packet_size: 8
+max_packet_size: 8
+packet_injection_rate: 0.01
+probability_of_retransmission: 0.01
+
+traffic_distribution: TRAFFIC_HARDCODED
+traffic_table_filename: "t.txt"
+traffic_hardcoded_filename: "../config_examples/deft_2_5d_no_traffic.txt"

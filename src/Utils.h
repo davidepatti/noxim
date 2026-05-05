@@ -15,6 +15,7 @@
 #include <tlm>
 
 #include "DataStructs.h"
+#include "DeftTopology.h"
 #include "Logger.h"
 #include <iomanip>
 #include <sstream>
@@ -156,6 +157,13 @@ inline Coord id2Coord(int id)
         assert(coord.x < GlobalParams::mesh_dim_x);
         assert(coord.y < GlobalParams::mesh_dim_y);
     }
+    else if (GlobalParams::topology == TOPOLOGY_DEFT_2_5D)
+    {
+        DeftTopology::RouterInfo info = DeftTopology::decodeRouterId(id);
+        assert(info.layer != DeftTopology::ROUTER_LAYER_INVALID);
+        coord.x = info.footprint_x;
+        coord.y = info.footprint_y;
+    }
     else // other delta topologies
     {
         id = id - GlobalParams::n_delta_tiles;
@@ -176,6 +184,12 @@ inline int coord2Id(const Coord & coord)
     {
         id = (coord.y * GlobalParams::mesh_dim_x) + coord.x;
         assert(id < GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y);
+    }
+    else if (GlobalParams::topology == TOPOLOGY_DEFT_2_5D)
+    {
+        assert(coord.x >= 0 && coord.x < DeftTopology::FootprintWidth);
+        assert(coord.y >= 0 && coord.y < DeftTopology::FootprintHeight);
+        id = (coord.y * DeftTopology::FootprintWidth) + coord.x;
     }
     else
     {   //use only for switch bloc in delta topologies

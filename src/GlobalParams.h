@@ -49,6 +49,7 @@ using namespace std;
 
 //Topologies
 #define TOPOLOGY_MESH          "MESH"
+#define TOPOLOGY_DEFT_2_5D     "DEFT_2_5D"
 //Delta Networks Topologies
 #define TOPOLOGY_BASELINE      "BASELINE"
 #define TOPOLOGY_BUTTERFLY     "BUTTERFLY"

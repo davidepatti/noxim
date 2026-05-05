@@ -9,6 +9,7 @@
  */
 
 #include "GlobalStats.h"
+#include "DeftTopology.h"
 
 #include <cmath>
 #include <fstream>
@@ -18,6 +19,36 @@
 using namespace std;
 
 namespace {
+
+bool isMeshStatsTopology()
+{
+    return GlobalParams::topology == TOPOLOGY_MESH ||
+           GlobalParams::topology == TOPOLOGY_DEFT_2_5D;
+}
+
+int statsDimX()
+{
+    if (GlobalParams::topology == TOPOLOGY_DEFT_2_5D)
+        return DeftTopology::LayoutWidth;
+
+    return GlobalParams::mesh_dim_x;
+}
+
+int statsDimY()
+{
+    if (GlobalParams::topology == TOPOLOGY_DEFT_2_5D)
+        return DeftTopology::LayoutHeight;
+
+    return GlobalParams::mesh_dim_y;
+}
+
+int statsIpCount()
+{
+    if (GlobalParams::topology == TOPOLOGY_DEFT_2_5D)
+        return DeftTopology::ChipletRouterCount;
+
+    return GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y;
+}
 
 struct SummaryMetrics {
     unsigned int total_received_packets;
@@ -199,15 +230,15 @@ double GlobalStats::getAverageDelay()
     unsigned int total_packets = 0;
     double avg_delay = 0.0;
 
-    if (GlobalParams::topology == TOPOLOGY_MESH)
+    if (isMeshStatsTopology())
     {
-	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++) 
+	for (int y = 0; y < statsDimY(); y++)
+	    for (int x = 0; x < statsDimX(); x++)
 	    {
 		unsigned int received_packets =
 		    noc->t[x][y]->r->stats.getReceivedPackets();
 
-		if (received_packets) 
+		if (received_packets)
 		{
 		    avg_delay +=
 			received_packets *
@@ -217,13 +248,13 @@ double GlobalStats::getAverageDelay()
 	    }
     }
     else // other delta topologies
-    { 
+    {
 	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 	{
 	    unsigned int received_packets =
 		noc->core[y]->r->stats.getReceivedPackets();
 
-	    if (received_packets) 
+	    if (received_packets)
 	    {
 		avg_delay +=
 		    received_packets *
@@ -256,22 +287,19 @@ double GlobalStats::getMaxDelay()
 {
     double maxd = -1.0;
 
-    if (GlobalParams::topology == TOPOLOGY_MESH) 
+    if (isMeshStatsTopology())
     {
-	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++) 
+	for (int y = 0; y < statsDimY(); y++)
+	    for (int x = 0; x < statsDimX(); x++)
 	    {
-		Coord coord;
-		coord.x = x;
-		coord.y = y;
-		int node_id = coord2Id(coord);
+		int node_id = noc->t[x][y]->r->local_id;
 		double d = getMaxDelay(node_id);
 		if (d > maxd)
 		    maxd = d;
 	    }
 
     }
-    else  // other delta topologies 
+    else  // other delta topologies
     {
 	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 	{
@@ -286,15 +314,16 @@ double GlobalStats::getMaxDelay()
 
 double GlobalStats::getMaxDelay(const int node_id)
 {
-    if (GlobalParams::topology == TOPOLOGY_MESH) 
+    if (isMeshStatsTopology())
     {
-	Coord coord = id2Coord(node_id);
+	Tile *tile = noc->searchNode(node_id);
+	assert(tile != NULL);
 
 	unsigned int received_packets =
-	    noc->t[coord.x][coord.y]->r->stats.getReceivedPackets();
+	    tile->r->stats.getReceivedPackets();
 
 	if (received_packets)
-	    return noc->t[coord.x][coord.y]->r->stats.getMaxDelay();
+	    return tile->r->stats.getMaxDelay();
 	else
 	    return -1.0;
     }
@@ -323,19 +352,16 @@ vector < vector < double > > GlobalStats::getMaxDelayMtx()
 {
     vector < vector < double > > mtx;
 
-    assert(GlobalParams::topology == TOPOLOGY_MESH); 
+    assert(isMeshStatsTopology());
 
-    mtx.resize(GlobalParams::mesh_dim_y);
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	mtx[y].resize(GlobalParams::mesh_dim_x);
+    mtx.resize(statsDimY());
+    for (int y = 0; y < statsDimY(); y++)
+	mtx[y].resize(statsDimX());
 
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < GlobalParams::mesh_dim_x; x++) 
+    for (int y = 0; y < statsDimY(); y++)
+	for (int x = 0; x < statsDimX(); x++)
 	{
-	    Coord coord;
-	    coord.x = x;
-	    coord.y = y;
-	    int id = coord2Id(coord);
+	    int id = noc->t[x][y]->r->local_id;
 	    mtx[y][x] = getMaxDelay(id);
 	}
 
@@ -386,15 +412,15 @@ unsigned int GlobalStats::getReceivedPackets()
 {
     unsigned int n = 0;
 
-    if (GlobalParams::topology == TOPOLOGY_MESH) 
+    if (isMeshStatsTopology())
     {
-    	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+	for (int y = 0; y < statsDimY(); y++)
+		for (int x = 0; x < statsDimX(); x++)
 	    n += noc->t[x][y]->r->stats.getReceivedPackets();
     }
     else // other delta topologies
     {
-    	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
+	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 	    n += noc->core[y]->r->stats.getReceivedPackets();
     }
 
@@ -404,10 +430,10 @@ unsigned int GlobalStats::getReceivedPackets()
 unsigned int GlobalStats::getReceivedFlits()
 {
     unsigned int n = 0;
-    if (GlobalParams::topology == TOPOLOGY_MESH) 
+    if (isMeshStatsTopology())
     {
-	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++) {
+	for (int y = 0; y < statsDimY(); y++)
+	    for (int x = 0; x < statsDimX(); x++) {
 		n += noc->t[x][y]->r->stats.getReceivedFlits();
 #ifdef TESTING
 		drained_total += noc->t[x][y]->r->local_drained;
@@ -430,9 +456,9 @@ unsigned int GlobalStats::getReceivedFlits()
 
 double GlobalStats::getThroughput()
 {
-    if (GlobalParams::topology == TOPOLOGY_MESH) 
+    if (isMeshStatsTopology())
     {
-	int number_of_ip = GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y;
+	int number_of_ip = statsIpCount();
 	return (double)getAggregatedThroughput()/(double)(number_of_ip);
     }
     else // other delta topologies
@@ -451,10 +477,10 @@ double GlobalStats::getActiveThroughput()
     unsigned int n = 0;
     unsigned int trf = 0;
     unsigned int rf ;
-    if (GlobalParams::topology == TOPOLOGY_MESH) 
+    if (isMeshStatsTopology())
     {
-	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++) 
+	for (int y = 0; y < statsDimY(); y++)
+	    for (int x = 0; x < statsDimX(); x++)
 	    {
 		rf = noc->t[x][y]->r->stats.getReceivedFlits();
 
@@ -485,14 +511,14 @@ vector < vector < unsigned long > > GlobalStats::getRoutedFlitsMtx()
 {
 
     vector < vector < unsigned long > > mtx;
-    assert (GlobalParams::topology == TOPOLOGY_MESH); 
+    assert (isMeshStatsTopology());
 
-    mtx.resize(GlobalParams::mesh_dim_y);
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	mtx[y].resize(GlobalParams::mesh_dim_x);
+    mtx.resize(statsDimY());
+    for (int y = 0; y < statsDimY(); y++)
+	mtx[y].resize(statsDimX());
 
-    for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+    for (int y = 0; y < statsDimY(); y++)
+	for (int x = 0; x < statsDimX(); x++)
 	    mtx[y][x] = noc->t[x][y]->r->getRoutedFlits();
 
 
@@ -523,10 +549,10 @@ double GlobalStats::getDynamicPower()
     double power = 0.0;
 
     // Electric noc
-    if (GlobalParams::topology == TOPOLOGY_MESH) 
+    if (isMeshStatsTopology())
     {
-	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+	for (int y = 0; y < statsDimY(); y++)
+	    for (int x = 0; x < statsDimX(); x++)
 		power += noc->t[x][y]->r->power.getDynamicPower();
     }
     else // other delta topologies
@@ -541,7 +567,7 @@ double GlobalStats::getDynamicPower()
 	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 	    power += noc->core[y]->r->power.getDynamicPower();
 
-	// power for delta topologies switches 
+	// power for delta topologies switches
 	for (int y = 0; y < dimY; y++)
 	    for (int x = 0; x < dimX; x++)
 		power += noc->t[x][y]->r->power.getDynamicPower();
@@ -566,10 +592,10 @@ double GlobalStats::getStaticPower()
 {
     double power = 0.0;
 
-    if (GlobalParams::topology == TOPOLOGY_MESH) 
+    if (isMeshStatsTopology())
     {
-    	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-		for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+	for (int y = 0; y < statsDimY(); y++)
+		for (int x = 0; x < statsDimX(); x++)
 	    power += noc->t[x][y]->r->power.getStaticPower();
     }
     else // other delta topologies
@@ -579,13 +605,13 @@ double GlobalStats::getStaticPower()
 	// Dimensions of the delta switch block network
 	int dimX = stg;
 	int dimY = sw;
-	// power for delta topologies switches 
+	// power for delta topologies switches
 	for (int y = 0; y < dimY; y++)
 	    for (int x = 0; x < dimX; x++)
 		power += noc->t[x][y]->r->power.getDynamicPower();
 
 	// delta cores
-    	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
+	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
 	    power += noc->core[y]->r->power.getStaticPower();
     }
 
@@ -606,22 +632,22 @@ double GlobalStats::getStaticPower()
 
 void GlobalStats::showStats(std::ostream & out, bool detailed)
 {
-    if (detailed) 
+    if (detailed)
     {
-	if (GlobalParams::topology == TOPOLOGY_MESH)
-    { 
+	if (isMeshStatsTopology())
+    {
 	out << endl << "detailed = [" << endl;
 
-	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
-		noc->t[x][y]->r->stats.showStats(y * GlobalParams:: mesh_dim_x + x, out, true);
+	for (int y = 0; y < statsDimY(); y++)
+	    for (int x = 0; x < statsDimX(); x++)
+		noc->t[x][y]->r->stats.showStats(noc->t[x][y]->r->local_id, out, true);
 	out << "];" << endl;
 
 	// show MaxDelay matrix
 	vector < vector < double > > md_mtx = getMaxDelayMtx();
 
 	out << endl << "max_delay = [" << endl;
-	for (unsigned int y = 0; y < md_mtx.size(); y++) 
+	for (unsigned int y = 0; y < md_mtx.size(); y++)
 	{
 	    out << "   ";
 	    for (unsigned int x = 0; x < md_mtx[y].size(); x++)
@@ -634,7 +660,7 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 	vector < vector < unsigned long > > rf_mtx = getRoutedFlitsMtx();
 
 	out << endl << "routed_flits = [" << endl;
-	for (unsigned int y = 0; y < rf_mtx.size(); y++) 
+	for (unsigned int y = 0; y < rf_mtx.size(); y++)
 	{
 	    out << "   ";
 	    for (unsigned int x = 0; x < rf_mtx[y].size(); x++)
@@ -646,7 +672,7 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
     else //other delta topologies
     {
     out << endl << "detailed = [" << endl;
-    
+
     for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
     noc->core[y]->r->stats.showStats(y, out, true);
     out << "];" << endl;
@@ -654,7 +680,7 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
     // For delta topologies, we can't show matrix format stats
     // since they don't have a 2D structure
     out << endl << "% Note: Matrix format stats not available for delta topologies" << endl;
-       
+
     }
 	showPowerBreakDown(out);
 	showPowerManagerStats(out);
@@ -662,10 +688,10 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 
 #ifdef DEBUG
 
-    if (GlobalParams::topology == TOPOLOGY_MESH)
+    if (isMeshStatsTopology())
     {
-	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+	for (int y = 0; y < statsDimY(); y++)
+	    for (int x = 0; x < statsDimX(); x++)
 		out << "PE["<<x << "," << y<< "]" << noc->t[x][y]->pe->getQueueSize()<< ",";
     }
     else // other delta topologies
@@ -675,7 +701,7 @@ void GlobalStats::showStats(std::ostream & out, bool detailed)
 		out << "PE"<<i << ": " << noc->core[i]->pe->getQueueSize()<< ",";
 	out << endl;
     }
-	
+
     out << endl;
 #endif
 
@@ -805,9 +831,9 @@ void GlobalStats::showPowerManagerStats(std::ostream & out)
 		    bttoff_str+="o";
 	    else if (bttoff_fraction<0.90)
 		    bttoff_str+="O";
-	    else 
+	    else
 		bttoff_str+="0";
-	    
+
 
 	}
 	out << (double)s/h->buffer_to_tile_poweroff_cycles.size()/total_cycles << "\t" << bttoff_str << endl;
@@ -826,10 +852,10 @@ void GlobalStats::showPowerBreakDown(std::ostream & out)
     map<string,double> power_dynamic;
     map<string,double> power_static;
 
-    if (GlobalParams::topology == TOPOLOGY_MESH) 
+    if (isMeshStatsTopology())
     {
-	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-	    for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
+	for (int y = 0; y < statsDimY(); y++)
+	    for (int x = 0; x < statsDimX(); x++)
 	    {
 		updatePowerBreakDown(power_dynamic, noc->t[x][y]->r->power.getDynamicPowerBreakDown());
 		updatePowerBreakDown(power_static, noc->t[x][y]->r->power.getStaticPowerBreakDown());
@@ -853,10 +879,10 @@ void GlobalStats::showPowerBreakDown(std::ostream & out)
 	map<int,Hub*>::const_iterator i = noc->hub.find(hub_id);
 	Hub * h = i->second;
 
-	updatePowerBreakDown(power_dynamic, 
+	updatePowerBreakDown(power_dynamic,
 		h->power.getDynamicPowerBreakDown());
 
-	updatePowerBreakDown(power_static, 
+	updatePowerBreakDown(power_static,
 		h->power.getStaticPowerBreakDown());
     }
 
@@ -871,25 +897,25 @@ void GlobalStats::showBufferStats(std::ostream & out)
 {
   out << "Router id\tBuffer N\t\tBuffer E\t\tBuffer S\t\tBuffer W\t\tBuffer L" << endl;
   out << "         \tMean\tMax\tMean\tMax\tMean\tMax\tMean\tMax\tMean\tMax" << endl;
-  
-  if (GlobalParams::topology == TOPOLOGY_MESH) 
+
+  if (isMeshStatsTopology())
     {
-    	for (int y = 0; y < GlobalParams::mesh_dim_y; y++)
-    	for (int x = 0; x < GlobalParams::mesh_dim_x; x++)
-      	{
+	for (int y = 0; y < statsDimY(); y++)
+	for (int x = 0; x < statsDimX(); x++)
+	{
 			out << noc->t[x][y]->r->local_id;
 			noc->t[x][y]->r->ShowBuffersStats(out);
 			out << endl;
-     	}
+	}
     }
     else // other delta topologies
     {
-    	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
-    	{
+	for (int y = 0; y < GlobalParams::n_delta_tiles; y++)
+	{
 			out << noc->core[y]->r->local_id;
 			noc->core[y]->r->ShowBuffersStats(out);
 			out << endl;
-     	}
+	}
     }
 
 }
@@ -899,10 +925,10 @@ double GlobalStats::getReceivedIdealFlitRatio()
     int total_cycles;
     total_cycles= GlobalParams::simulation_time - GlobalParams::stats_warm_up_time;
     double ratio;
-    if (GlobalParams::topology == TOPOLOGY_MESH) 
+    if (isMeshStatsTopology())
     {
 	ratio = getReceivedFlits() /(GlobalParams::packet_injection_rate * (GlobalParams::min_packet_size +
-		    GlobalParams::max_packet_size)/2 * total_cycles * GlobalParams::mesh_dim_y * GlobalParams::mesh_dim_x);
+		    GlobalParams::max_packet_size)/2 * total_cycles * statsIpCount());
     }
     else // other delta topologies
     {
