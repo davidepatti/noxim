@@ -5,6 +5,7 @@
 #include "DeftTopology.h"
 
 #include <cassert>
+#include <sstream>
 
 namespace DeftTopology {
 
@@ -43,6 +44,29 @@ std::vector<VerticalLinkInfo> buildVerticalLinks()
 bool validFootprint(int x, int y)
 {
     return x >= 0 && x < FootprintWidth && y >= 0 && y < FootprintHeight;
+}
+
+bool validChipletId(int chiplet_id)
+{
+    return chiplet_id >= 0 && chiplet_id < ChipletCount;
+}
+
+bool validVerticalLinkSlot(VerticalLinkSlot slot)
+{
+    return slot >= VL_SLOT_NORTH && slot <= VL_SLOT_WEST;
+}
+
+std::vector<VerticalLinkInfo> &mutableVerticalLinks()
+{
+    static std::vector<VerticalLinkInfo> links = buildVerticalLinks();
+    return links;
+}
+
+bool failValidation(std::string *error_message, const std::string &message)
+{
+    if (error_message != 0)
+        *error_message = message;
+    return false;
 }
 
 } // namespace
@@ -127,8 +151,7 @@ bool isBoundaryRouter(int id)
 
 const std::vector<VerticalLinkInfo> &verticalLinks()
 {
-    static std::vector<VerticalLinkInfo> links = buildVerticalLinks();
-    return links;
+    return mutableVerticalLinks();
 }
 
 std::vector<VerticalLinkInfo> verticalLinksForChiplet(int chiplet_id)
@@ -140,6 +163,21 @@ std::vector<VerticalLinkInfo> verticalLinksForChiplet(int chiplet_id)
          it != links.end();
          ++it) {
         if (it->owner_chiplet_id == chiplet_id)
+            result.push_back(*it);
+    }
+
+    return result;
+}
+
+std::vector<VerticalLinkInfo> functionalVerticalLinksForChiplet(int chiplet_id)
+{
+    std::vector<VerticalLinkInfo> result;
+    const std::vector<VerticalLinkInfo> &links = verticalLinks();
+
+    for (std::vector<VerticalLinkInfo>::const_iterator it = links.begin();
+         it != links.end();
+         ++it) {
+        if (it->owner_chiplet_id == chiplet_id && it->is_functional)
             result.push_back(*it);
     }
 
@@ -189,6 +227,208 @@ const VerticalLinkInfo *verticalLinkForInterposerRouter(int id)
     }
 
     return 0;
+}
+
+const VerticalLinkInfo *verticalLinkBetweenRouters(int router_a_id, int router_b_id)
+{
+    const std::vector<VerticalLinkInfo> &links = verticalLinks();
+    for (std::vector<VerticalLinkInfo>::const_iterator it = links.begin();
+         it != links.end();
+         ++it) {
+        const bool forward =
+            it->chiplet_endpoint_router_id == router_a_id &&
+            it->interposer_endpoint_router_id == router_b_id;
+        const bool reverse =
+            it->chiplet_endpoint_router_id == router_b_id &&
+            it->interposer_endpoint_router_id == router_a_id;
+
+        if (forward || reverse)
+            return &(*it);
+    }
+
+    return 0;
+}
+
+bool isVerticalLinkFunctional(int vl_id)
+{
+    const VerticalLinkInfo *link = verticalLinkById(vl_id);
+    return link != 0 && link->is_functional;
+}
+
+bool setVerticalLinkFunctional(int vl_id, bool is_functional)
+{
+    std::vector<VerticalLinkInfo> &links = mutableVerticalLinks();
+    for (std::vector<VerticalLinkInfo>::iterator it = links.begin();
+         it != links.end();
+         ++it) {
+        if (it->vl_id == vl_id) {
+            it->is_functional = is_functional;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void resetVerticalLinkStates()
+{
+    std::vector<VerticalLinkInfo> &links = mutableVerticalLinks();
+    for (std::vector<VerticalLinkInfo>::iterator it = links.begin();
+         it != links.end();
+         ++it) {
+        it->is_functional = true;
+    }
+}
+
+bool hasFunctionalVerticalLinkForChiplet(int chiplet_id)
+{
+    if (!validChipletId(chiplet_id))
+        return false;
+
+    const std::vector<VerticalLinkInfo> &links = verticalLinks();
+    for (std::vector<VerticalLinkInfo>::const_iterator it = links.begin();
+         it != links.end();
+         ++it) {
+        if (it->owner_chiplet_id == chiplet_id && it->is_functional)
+            return true;
+    }
+
+    return false;
+}
+
+bool validateVerticalLinkModel(std::string *error_message)
+{
+    const std::vector<VerticalLinkInfo> &links = verticalLinks();
+    if (links.size() != VerticalLinkCount) {
+        std::ostringstream message;
+        message << "expected " << VerticalLinkCount << " vertical links, found "
+                << links.size();
+        return failValidation(error_message, message.str());
+    }
+
+    std::vector<bool> seen_ids(VerticalLinkCount, false);
+    std::vector<bool> seen_chiplet_endpoints(ChipletRouterCount, false);
+    std::vector<bool> seen_interposer_endpoints(InterposerRouterCount, false);
+    std::vector<int> links_per_chiplet(ChipletCount, 0);
+
+    for (std::vector<VerticalLinkInfo>::const_iterator it = links.begin();
+         it != links.end();
+         ++it) {
+        if (it->vl_id < 0 || it->vl_id >= VerticalLinkCount) {
+            std::ostringstream message;
+            message << "vertical link id out of range: " << it->vl_id;
+            return failValidation(error_message, message.str());
+        }
+
+        if (seen_ids[it->vl_id]) {
+            std::ostringstream message;
+            message << "duplicate vertical link id: " << it->vl_id;
+            return failValidation(error_message, message.str());
+        }
+        seen_ids[it->vl_id] = true;
+
+        if (!validChipletId(it->owner_chiplet_id)) {
+            std::ostringstream message;
+            message << "vertical link " << it->vl_id
+                    << " has invalid owner chiplet " << it->owner_chiplet_id;
+            return failValidation(error_message, message.str());
+        }
+
+        if (!validVerticalLinkSlot(it->slot)) {
+            std::ostringstream message;
+            message << "vertical link " << it->vl_id << " has invalid slot";
+            return failValidation(error_message, message.str());
+        }
+
+        const int slot = static_cast<int>(it->slot);
+        const int expected_vl_id =
+            it->owner_chiplet_id * VerticalLinksPerChiplet + slot;
+        if (it->vl_id != expected_vl_id) {
+            std::ostringstream message;
+            message << "vertical link " << it->vl_id
+                    << " does not match owner chiplet and slot";
+            return failValidation(error_message, message.str());
+        }
+
+        const int expected_chiplet_endpoint =
+            chipletRouterId(it->owner_chiplet_id, SLOT_LOCAL_X[slot], SLOT_LOCAL_Y[slot]);
+        if (it->chiplet_endpoint_router_id != expected_chiplet_endpoint) {
+            std::ostringstream message;
+            message << "vertical link " << it->vl_id
+                    << " has unexpected chiplet endpoint";
+            return failValidation(error_message, message.str());
+        }
+
+        if (!isChipletRouter(it->chiplet_endpoint_router_id)) {
+            std::ostringstream message;
+            message << "vertical link " << it->vl_id
+                    << " chiplet endpoint is not a chiplet router";
+            return failValidation(error_message, message.str());
+        }
+
+        const int footprint_x = it->chiplet_endpoint_router_id % FootprintWidth;
+        const int footprint_y = it->chiplet_endpoint_router_id / FootprintWidth;
+        if (it->footprint_x != footprint_x || it->footprint_y != footprint_y) {
+            std::ostringstream message;
+            message << "vertical link " << it->vl_id
+                    << " footprint does not match its chiplet endpoint";
+            return failValidation(error_message, message.str());
+        }
+
+        const int expected_interposer_endpoint =
+            interposerRouterId(footprint_x, footprint_y);
+        if (it->interposer_endpoint_router_id != expected_interposer_endpoint) {
+            std::ostringstream message;
+            message << "vertical link " << it->vl_id
+                    << " has unexpected interposer endpoint";
+            return failValidation(error_message, message.str());
+        }
+
+        const int interposer_index =
+            it->interposer_endpoint_router_id - ChipletRouterCount;
+        if (interposer_index < 0 || interposer_index >= InterposerRouterCount) {
+            std::ostringstream message;
+            message << "vertical link " << it->vl_id
+                    << " interposer endpoint is not an interposer router";
+            return failValidation(error_message, message.str());
+        }
+
+        if (seen_chiplet_endpoints[it->chiplet_endpoint_router_id]) {
+            std::ostringstream message;
+            message << "duplicate chiplet endpoint for vertical link " << it->vl_id;
+            return failValidation(error_message, message.str());
+        }
+        seen_chiplet_endpoints[it->chiplet_endpoint_router_id] = true;
+
+        if (seen_interposer_endpoints[interposer_index]) {
+            std::ostringstream message;
+            message << "duplicate interposer endpoint for vertical link " << it->vl_id;
+            return failValidation(error_message, message.str());
+        }
+        seen_interposer_endpoints[interposer_index] = true;
+
+        links_per_chiplet[it->owner_chiplet_id]++;
+    }
+
+    for (int chiplet_id = 0; chiplet_id < ChipletCount; chiplet_id++) {
+        if (links_per_chiplet[chiplet_id] != VerticalLinksPerChiplet) {
+            std::ostringstream message;
+            message << "chiplet " << chiplet_id << " has "
+                    << links_per_chiplet[chiplet_id]
+                    << " vertical links";
+            return failValidation(error_message, message.str());
+        }
+    }
+
+    if (error_message != 0)
+        error_message->clear();
+    return true;
+}
+
+int chipletEndpointForVerticalLink(int vl_id)
+{
+    const VerticalLinkInfo *link = verticalLinkById(vl_id);
+    return link == 0 ? -1 : link->chiplet_endpoint_router_id;
 }
 
 int interposerEndpointForVerticalLink(int vl_id)

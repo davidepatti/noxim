@@ -2627,6 +2627,13 @@ void NoC::buildDeft2D()
         }
     }
 
+    string vertical_link_error;
+    if (!DeftTopology::validateVerticalLinkModel(&vertical_link_error)) {
+        cerr << "Invalid DEFT_2_5D vertical link model: "
+             << vertical_link_error << endl;
+        assert(false);
+    }
+
     const vector<DeftTopology::VerticalLinkInfo> &vertical_links =
         DeftTopology::verticalLinks();
     for (vector<DeftTopology::VerticalLinkInfo>::const_iterator it = vertical_links.begin();
@@ -2667,6 +2674,7 @@ void NoC::buildDeft2D()
              << " chiplet_endpoint=" << it->chiplet_endpoint_router_id
              << " interposer_endpoint=" << it->interposer_endpoint_router_id
              << " footprint=(" << it->footprint_x << "," << it->footprint_y << ")"
+             << " functional=" << (it->is_functional ? "true" : "false")
              << endl;
     }
 }

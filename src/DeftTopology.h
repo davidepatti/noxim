@@ -12,6 +12,7 @@ namespace DeftTopology {
 
 static const int ChipletGridWidth = 2;
 static const int ChipletGridHeight = 2;
+static const int ChipletCount = ChipletGridWidth * ChipletGridHeight;
 static const int ChipletLocalWidth = 4;
 static const int ChipletLocalHeight = 4;
 static const int FootprintWidth = ChipletGridWidth * ChipletLocalWidth;
@@ -69,9 +70,17 @@ int interposerRouterId(int footprint_x, int footprint_y);
 bool isBoundaryRouter(int id);
 const std::vector<VerticalLinkInfo> &verticalLinks();
 std::vector<VerticalLinkInfo> verticalLinksForChiplet(int chiplet_id);
+std::vector<VerticalLinkInfo> functionalVerticalLinksForChiplet(int chiplet_id);
 const VerticalLinkInfo *verticalLinkById(int vl_id);
 const VerticalLinkInfo *verticalLinkForBoundaryRouter(int id);
 const VerticalLinkInfo *verticalLinkForInterposerRouter(int id);
+const VerticalLinkInfo *verticalLinkBetweenRouters(int router_a_id, int router_b_id);
+bool isVerticalLinkFunctional(int vl_id);
+bool setVerticalLinkFunctional(int vl_id, bool is_functional);
+void resetVerticalLinkStates();
+bool hasFunctionalVerticalLinkForChiplet(int chiplet_id);
+bool validateVerticalLinkModel(std::string *error_message = 0);
+int chipletEndpointForVerticalLink(int vl_id);
 int interposerEndpointForVerticalLink(int vl_id);
 std::string layerName(RouterLayer layer);
 std::string slotName(VerticalLinkSlot slot);
