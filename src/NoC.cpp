@@ -11,6 +11,8 @@
 #include "NoC.h"
 #include "DeftFaultInjectionManager.h"
 
+#include <cstdlib>
+
 using namespace std;
 
 inline int toggleKthBit(int n, int k) 
@@ -2648,7 +2650,7 @@ void NoC::buildDeft2D()
                                                &fault_error)) {
         cerr << "Invalid DEFT_2_5D vertical link fault configuration: "
              << fault_error << endl;
-        assert(false);
+        exit(1);
     }
 
     string boundary_router_error;
@@ -2702,6 +2704,28 @@ void NoC::buildDeft2D()
          << DeftFaultInjection::formatVerticalLinkList(
                 fault_report.faulty_vertical_links)
          << endl;
+
+    cout << "DEFT_2_5D VL fault mask validation: "
+         << "physical_faults="
+         << fault_report.mask_validation.physical_fault_count
+         << "/"
+         << fault_report.mask_validation.physical_vertical_link_count
+         << ", current_physical_25_percent_target="
+         << (fault_report.mask_validation
+                     .matches_current_physical_25_percent_target
+                 ? "true"
+                 : "false")
+         << endl;
+
+    cout << "DEFT_2_5D faulty vertical links per chiplet:";
+    for (int chiplet_id = 0;
+         chiplet_id < DeftTopology::ChipletCount;
+         chiplet_id++) {
+        cout << " chiplet_" << chiplet_id << "="
+             << fault_report.mask_validation
+                    .faulty_vertical_links_per_chiplet[chiplet_id];
+    }
+    cout << endl;
 
     cout << "DEFT_2_5D functional vertical links per chiplet:";
     for (int chiplet_id = 0;
