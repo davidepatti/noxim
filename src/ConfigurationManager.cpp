@@ -13,6 +13,7 @@
 #include <systemc.h> //Included for the function time() 
 #include <algorithm>
 #include <cctype>
+#include <cstdlib>
 #include <sstream>
 
 YAML::Node config;
@@ -125,6 +126,45 @@ static vector<string> parseLogComponents(const char *value)
     return components;
 }
 
+static vector<int> parseIntList(const char *value)
+{
+    vector<int> values;
+    stringstream ss(value ? value : "");
+    string token;
+
+    while (getline(ss, token, ',')) {
+        const size_t begin = token.find_first_not_of(" \t");
+        if (begin == string::npos)
+            continue;
+        const size_t end = token.find_last_not_of(" \t");
+        string trimmed = token.substr(begin, end - begin + 1);
+
+        char *parse_end = 0;
+        long parsed = strtol(trimmed.c_str(), &parse_end, 10);
+        if (parse_end == trimmed.c_str() || *parse_end != '\0') {
+            cerr << "Error: Invalid integer list value: " << trimmed << endl;
+            exit(1);
+        }
+
+        values.push_back(static_cast<int>(parsed));
+    }
+
+    return values;
+}
+
+static string formatIntList(const vector<int> &values)
+{
+    stringstream out;
+    out << "[";
+    for (size_t i = 0; i < values.size(); i++) {
+        if (i != 0)
+            out << ",";
+        out << values[i];
+    }
+    out << "]";
+    return out.str();
+}
+
 void loadConfiguration() {
 
     cout << "Loading configuration from file \"" << GlobalParams::config_filename << "\"...";
@@ -168,6 +208,12 @@ void loadConfiguration() {
     GlobalParams::trace_scope = normalizeTraceScope(readParam<string>(config, "trace_scope", "basic").c_str());
 
     GlobalParams::topology = readParam<string>(config, "topology", TOPOLOGY_MESH);
+    GlobalParams::deft_faulty_vertical_links =
+        readParam<vector<int> >(config,
+                                "deft_faulty_vertical_links",
+                                vector<int>());
+    GlobalParams::deft_vl_fault_count =
+        readParam<int>(config, "deft_vl_fault_count", 0);
 
     //Mesh network params
     if (GlobalParams::topology == TOPOLOGY_MESH) {
@@ -373,6 +419,8 @@ void showHelp(char selfname[])
          << "\t-hs ID P\t\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random' traffic)" << endl
          << "\t-warmup N\t\tStart to collect statistics after N cycles" << endl
          << "\t-seed N\t\t\tSet the seed of the random generator (default time())" << endl
+         << "\t-deft_vl_fault_count N\tRandomly mark N physical DEFT_2_5D VLs faulty" << endl
+         << "\t-deft_faulty_vls LIST\tComma-separated explicit DEFT_2_5D VL fault IDs" << endl
          << "\t-detailed\t\tShow detailed statistics" << endl
          << "\t-show_buf_stats\t\tShow buffers statistics" << endl
          << "\t-volume N\t\tStop the simulation when either the maximum number of cycles has been reached or N flits have" << endl
@@ -410,6 +458,9 @@ void showConfig()
          << "- packet_injection_rate = " << GlobalParams::packet_injection_rate << endl
          << "- probability_of_retransmission = " << GlobalParams::probability_of_retransmission << endl
          << "- traffic_distribution = " << GlobalParams::traffic_distribution << endl
+         << "- deft_vl_fault_count = " << GlobalParams::deft_vl_fault_count << endl
+         << "- deft_faulty_vertical_links = "
+         << formatIntList(GlobalParams::deft_faulty_vertical_links) << endl
          << "- clock_period = " << GlobalParams::clock_period_ps << "ps" << endl
          << "- simulation_time = " << GlobalParams::simulation_time << endl
          << "- warm_up_time = " << GlobalParams::stats_warm_up_time << endl
@@ -439,9 +490,27 @@ void checkConfiguration()
 	{
 		if (GlobalParams::use_winoc)
 		{
-			cerr << "Error: DEFT_2_5D topology does not support Winoc hub mode in T0007" << endl;
+			cerr << "Error: DEFT_2_5D topology does not support Winoc hub mode" << endl;
 			exit(1);
 		}
+        if (GlobalParams::deft_vl_fault_count < 0)
+        {
+            cerr << "Error: deft_vl_fault_count must be >= 0" << endl;
+            exit(1);
+        }
+        if (GlobalParams::deft_vl_fault_count >
+            DeftTopology::VerticalLinkCount - DeftTopology::ChipletCount)
+        {
+            cerr << "Error: deft_vl_fault_count cannot disconnect any chiplet" << endl;
+            exit(1);
+        }
+        if (GlobalParams::deft_vl_fault_count > 0 &&
+            !GlobalParams::deft_faulty_vertical_links.empty())
+        {
+            cerr << "Error: Use either deft_vl_fault_count or "
+                 << "deft_faulty_vertical_links, not both" << endl;
+            exit(1);
+        }
 	}
 	else // other delta topologies
 	{
@@ -475,6 +544,14 @@ void checkConfiguration()
 			exit(1);
 		}
 	}
+
+    if (GlobalParams::topology != TOPOLOGY_DEFT_2_5D &&
+        (GlobalParams::deft_vl_fault_count > 0 ||
+         !GlobalParams::deft_faulty_vertical_links.empty()))
+    {
+        cerr << "Error: DeFT VL fault injection options require DEFT_2_5D topology" << endl;
+        exit(1);
+    }
 
     if (GlobalParams::buffer_depth < 1) {
 	cerr << "Error: buffer must be >= 1" << endl;
@@ -763,6 +840,12 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		GlobalParams::stats_warm_up_time = atoi(requireOptionValue(i, arg_num, arg_vet, "-warmup"));
 	    else if (!strcmp(arg_vet[i], "-seed"))
 		GlobalParams::rnd_generator_seed = atoi(requireOptionValue(i, arg_num, arg_vet, "-seed"));
+        else if (!strcmp(arg_vet[i], "-deft_vl_fault_count"))
+            GlobalParams::deft_vl_fault_count =
+                atoi(requireOptionValue(i, arg_num, arg_vet, "-deft_vl_fault_count"));
+        else if (!strcmp(arg_vet[i], "-deft_faulty_vls"))
+            GlobalParams::deft_faulty_vertical_links =
+                parseIntList(requireOptionValue(i, arg_num, arg_vet, "-deft_faulty_vls"));
 	    else if (!strcmp(arg_vet[i], "-detailed"))
 		GlobalParams::detailed = true;
 	    else if (!strcmp(arg_vet[i], "-show_buf_stats"))

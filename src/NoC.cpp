@@ -9,6 +9,7 @@
  */
 
 #include "NoC.h"
+#include "DeftFaultInjectionManager.h"
 
 using namespace std;
 
@@ -2634,6 +2635,22 @@ void NoC::buildDeft2D()
         assert(false);
     }
 
+    DeftFaultInjection::StartupFaultConfig fault_config;
+    fault_config.explicit_faulty_vertical_links =
+        GlobalParams::deft_faulty_vertical_links;
+    fault_config.random_fault_count = GlobalParams::deft_vl_fault_count;
+    fault_config.random_seed = GlobalParams::rnd_generator_seed;
+
+    DeftFaultInjection::StartupFaultReport fault_report;
+    string fault_error;
+    if (!DeftFaultInjection::applyStartupFaults(fault_config,
+                                               &fault_report,
+                                               &fault_error)) {
+        cerr << "Invalid DEFT_2_5D vertical link fault configuration: "
+             << fault_error << endl;
+        assert(false);
+    }
+
     string boundary_router_error;
     if (!DeftTopology::validateBoundaryRouterModel(&boundary_router_error)) {
         cerr << "Invalid DEFT_2_5D boundary router model: "
@@ -2673,6 +2690,28 @@ void NoC::buildDeft2D()
          << ", vertical_links=" << vertical_links.size()
          << ", boundary_routers=" << boundary_routers.size()
          << endl;
+
+    cout << "DEFT_2_5D VL fault injection: "
+         << "mode="
+         << (!GlobalParams::deft_faulty_vertical_links.empty()
+                 ? "explicit"
+                 : (GlobalParams::deft_vl_fault_count > 0 ? "random" : "none"))
+         << ", seed=" << GlobalParams::rnd_generator_seed
+         << ", requested_fault_count=" << fault_report.requested_fault_count
+         << ", faulty_vertical_links="
+         << DeftFaultInjection::formatVerticalLinkList(
+                fault_report.faulty_vertical_links)
+         << endl;
+
+    cout << "DEFT_2_5D functional vertical links per chiplet:";
+    for (int chiplet_id = 0;
+         chiplet_id < DeftTopology::ChipletCount;
+         chiplet_id++) {
+        cout << " chiplet_" << chiplet_id << "="
+             << DeftFaultInjection::functionalVerticalLinkCountForChiplet(
+                    chiplet_id);
+    }
+    cout << endl;
 
     cout << "DEFT_2_5D boundary routers:" << endl;
     for (vector<DeftTopology::BoundaryRouterInfo>::const_iterator it =

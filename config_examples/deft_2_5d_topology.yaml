@@ -7,6 +7,11 @@ r2h_link_length: 2.0
 r2r_link_length: 1.0
 n_virtual_channels: 1
 
+# T0010 startup fault-state setup. Use either an explicit VL ID list or
+# a seed-controlled random physical-VL fault count.
+deft_faulty_vertical_links: []
+deft_vl_fault_count: 0
+
 routing_algorithm: XY
 routing_table_filename: ""
 dyad_threshold: 0.6
