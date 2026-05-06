@@ -62,12 +62,27 @@ struct VerticalLinkInfo {
     bool is_functional;
 };
 
+struct BoundaryRouterInfo {
+    int router_id;
+    int owner_chiplet_id;
+    int local_x;
+    int local_y;
+    VerticalLinkSlot slot;
+    int vertical_link_id;
+    int interposer_endpoint_router_id;
+};
+
 bool isChipletRouter(int id);
 bool isInterposerRouter(int id);
 RouterInfo decodeRouterId(int id);
 int chipletRouterId(int chiplet_id, int local_x, int local_y);
 int interposerRouterId(int footprint_x, int footprint_y);
 bool isBoundaryRouter(int id);
+std::vector<BoundaryRouterInfo> boundaryRouters();
+std::vector<BoundaryRouterInfo> boundaryRoutersForChiplet(int chiplet_id);
+bool boundaryRouterById(int router_id, BoundaryRouterInfo *boundary_router);
+bool boundaryRouterForVerticalLink(int vl_id, BoundaryRouterInfo *boundary_router);
+bool validateBoundaryRouterModel(std::string *error_message = 0);
 const std::vector<VerticalLinkInfo> &verticalLinks();
 std::vector<VerticalLinkInfo> verticalLinksForChiplet(int chiplet_id);
 std::vector<VerticalLinkInfo> functionalVerticalLinksForChiplet(int chiplet_id);

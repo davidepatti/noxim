@@ -69,6 +69,21 @@ bool failValidation(std::string *error_message, const std::string &message)
     return false;
 }
 
+BoundaryRouterInfo boundaryRouterFromVerticalLink(const VerticalLinkInfo &link)
+{
+    RouterInfo router = decodeRouterId(link.chiplet_endpoint_router_id);
+
+    BoundaryRouterInfo boundary_router;
+    boundary_router.router_id = link.chiplet_endpoint_router_id;
+    boundary_router.owner_chiplet_id = link.owner_chiplet_id;
+    boundary_router.local_x = router.local_x;
+    boundary_router.local_y = router.local_y;
+    boundary_router.slot = link.slot;
+    boundary_router.vertical_link_id = link.vl_id;
+    boundary_router.interposer_endpoint_router_id = link.interposer_endpoint_router_id;
+    return boundary_router;
+}
+
 } // namespace
 
 bool isChipletRouter(int id)
@@ -147,6 +162,58 @@ int interposerRouterId(int footprint_x, int footprint_y)
 bool isBoundaryRouter(int id)
 {
     return verticalLinkForBoundaryRouter(id) != 0;
+}
+
+std::vector<BoundaryRouterInfo> boundaryRouters()
+{
+    std::vector<BoundaryRouterInfo> result;
+    const std::vector<VerticalLinkInfo> &links = verticalLinks();
+    result.reserve(links.size());
+
+    for (std::vector<VerticalLinkInfo>::const_iterator it = links.begin();
+         it != links.end();
+         ++it) {
+        result.push_back(boundaryRouterFromVerticalLink(*it));
+    }
+
+    return result;
+}
+
+std::vector<BoundaryRouterInfo> boundaryRoutersForChiplet(int chiplet_id)
+{
+    std::vector<BoundaryRouterInfo> result;
+    const std::vector<VerticalLinkInfo> &links = verticalLinks();
+
+    for (std::vector<VerticalLinkInfo>::const_iterator it = links.begin();
+         it != links.end();
+         ++it) {
+        if (it->owner_chiplet_id == chiplet_id)
+            result.push_back(boundaryRouterFromVerticalLink(*it));
+    }
+
+    return result;
+}
+
+bool boundaryRouterById(int router_id, BoundaryRouterInfo *boundary_router)
+{
+    const VerticalLinkInfo *link = verticalLinkForBoundaryRouter(router_id);
+    if (link == 0)
+        return false;
+
+    if (boundary_router != 0)
+        *boundary_router = boundaryRouterFromVerticalLink(*link);
+    return true;
+}
+
+bool boundaryRouterForVerticalLink(int vl_id, BoundaryRouterInfo *boundary_router)
+{
+    const VerticalLinkInfo *link = verticalLinkById(vl_id);
+    if (link == 0)
+        return false;
+
+    if (boundary_router != 0)
+        *boundary_router = boundaryRouterFromVerticalLink(*link);
+    return true;
 }
 
 const std::vector<VerticalLinkInfo> &verticalLinks()
@@ -416,6 +483,160 @@ bool validateVerticalLinkModel(std::string *error_message)
             message << "chiplet " << chiplet_id << " has "
                     << links_per_chiplet[chiplet_id]
                     << " vertical links";
+            return failValidation(error_message, message.str());
+        }
+    }
+
+    if (error_message != 0)
+        error_message->clear();
+    return true;
+}
+
+bool validateBoundaryRouterModel(std::string *error_message)
+{
+    std::string vertical_link_error;
+    if (!validateVerticalLinkModel(&vertical_link_error)) {
+        std::ostringstream message;
+        message << "vertical link model invalid: " << vertical_link_error;
+        return failValidation(error_message, message.str());
+    }
+
+    const std::vector<BoundaryRouterInfo> boundary_routers = boundaryRouters();
+    if (boundary_routers.size() != VerticalLinkCount) {
+        std::ostringstream message;
+        message << "expected " << VerticalLinkCount
+                << " boundary routers, found " << boundary_routers.size();
+        return failValidation(error_message, message.str());
+    }
+
+    std::vector<bool> seen_router_ids(ChipletRouterCount, false);
+    std::vector<bool> seen_vertical_link_ids(VerticalLinkCount, false);
+    std::vector<int> boundary_routers_per_chiplet(ChipletCount, 0);
+
+    for (std::vector<BoundaryRouterInfo>::const_iterator it = boundary_routers.begin();
+         it != boundary_routers.end();
+         ++it) {
+        if (!isChipletRouter(it->router_id)) {
+            std::ostringstream message;
+            message << "boundary router " << it->router_id
+                    << " is not a chiplet router";
+            return failValidation(error_message, message.str());
+        }
+
+        if (seen_router_ids[it->router_id]) {
+            std::ostringstream message;
+            message << "duplicate boundary router id: " << it->router_id;
+            return failValidation(error_message, message.str());
+        }
+        seen_router_ids[it->router_id] = true;
+
+        if (!validChipletId(it->owner_chiplet_id)) {
+            std::ostringstream message;
+            message << "boundary router " << it->router_id
+                    << " has invalid owner chiplet " << it->owner_chiplet_id;
+            return failValidation(error_message, message.str());
+        }
+
+        if (it->local_x < 0 || it->local_x >= ChipletLocalWidth ||
+            it->local_y < 0 || it->local_y >= ChipletLocalHeight) {
+            std::ostringstream message;
+            message << "boundary router " << it->router_id
+                    << " has invalid local coordinate";
+            return failValidation(error_message, message.str());
+        }
+
+        RouterInfo router = decodeRouterId(it->router_id);
+        if (router.layer != ROUTER_LAYER_CHIPLET ||
+            router.chiplet_id != it->owner_chiplet_id ||
+            router.local_x != it->local_x ||
+            router.local_y != it->local_y ||
+            !router.boundary_router) {
+            std::ostringstream message;
+            message << "boundary router " << it->router_id
+                    << " does not match decoded router metadata";
+            return failValidation(error_message, message.str());
+        }
+
+        if (!validVerticalLinkSlot(it->slot)) {
+            std::ostringstream message;
+            message << "boundary router " << it->router_id
+                    << " has invalid vertical link slot";
+            return failValidation(error_message, message.str());
+        }
+
+        if (it->vertical_link_id < 0 || it->vertical_link_id >= VerticalLinkCount) {
+            std::ostringstream message;
+            message << "boundary router " << it->router_id
+                    << " has invalid vertical link id " << it->vertical_link_id;
+            return failValidation(error_message, message.str());
+        }
+
+        if (seen_vertical_link_ids[it->vertical_link_id]) {
+            std::ostringstream message;
+            message << "duplicate boundary vertical link id: "
+                    << it->vertical_link_id;
+            return failValidation(error_message, message.str());
+        }
+        seen_vertical_link_ids[it->vertical_link_id] = true;
+
+        const VerticalLinkInfo *link = verticalLinkById(it->vertical_link_id);
+        if (link == 0) {
+            std::ostringstream message;
+            message << "boundary router " << it->router_id
+                    << " references missing vertical link "
+                    << it->vertical_link_id;
+            return failValidation(error_message, message.str());
+        }
+
+        if (link->owner_chiplet_id != it->owner_chiplet_id ||
+            link->slot != it->slot ||
+            link->chiplet_endpoint_router_id != it->router_id ||
+            link->interposer_endpoint_router_id != it->interposer_endpoint_router_id) {
+            std::ostringstream message;
+            message << "boundary router " << it->router_id
+                    << " does not match attached vertical link metadata";
+            return failValidation(error_message, message.str());
+        }
+
+        RouterInfo interposer_endpoint =
+            decodeRouterId(it->interposer_endpoint_router_id);
+        if (interposer_endpoint.layer != ROUTER_LAYER_INTERPOSER ||
+            interposer_endpoint.footprint_x != router.footprint_x ||
+            interposer_endpoint.footprint_y != router.footprint_y) {
+            std::ostringstream message;
+            message << "boundary router " << it->router_id
+                    << " has invalid attached interposer endpoint";
+            return failValidation(error_message, message.str());
+        }
+
+        BoundaryRouterInfo boundary_router_by_id;
+        if (!boundaryRouterById(it->router_id, &boundary_router_by_id) ||
+            boundary_router_by_id.vertical_link_id != it->vertical_link_id) {
+            std::ostringstream message;
+            message << "boundary router " << it->router_id
+                    << " is not queryable by router id";
+            return failValidation(error_message, message.str());
+        }
+
+        BoundaryRouterInfo boundary_router_by_vl;
+        if (!boundaryRouterForVerticalLink(it->vertical_link_id,
+                                           &boundary_router_by_vl) ||
+            boundary_router_by_vl.router_id != it->router_id) {
+            std::ostringstream message;
+            message << "boundary router " << it->router_id
+                    << " is not queryable by vertical link id";
+            return failValidation(error_message, message.str());
+        }
+
+        boundary_routers_per_chiplet[it->owner_chiplet_id]++;
+    }
+
+    for (int chiplet_id = 0; chiplet_id < ChipletCount; chiplet_id++) {
+        if (boundary_routers_per_chiplet[chiplet_id] != VerticalLinksPerChiplet) {
+            std::ostringstream message;
+            message << "chiplet " << chiplet_id << " has "
+                    << boundary_routers_per_chiplet[chiplet_id]
+                    << " boundary routers";
             return failValidation(error_message, message.str());
         }
     }

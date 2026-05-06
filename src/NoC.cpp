@@ -2634,6 +2634,15 @@ void NoC::buildDeft2D()
         assert(false);
     }
 
+    string boundary_router_error;
+    if (!DeftTopology::validateBoundaryRouterModel(&boundary_router_error)) {
+        cerr << "Invalid DEFT_2_5D boundary router model: "
+             << boundary_router_error << endl;
+        assert(false);
+    }
+
+    const vector<DeftTopology::BoundaryRouterInfo> boundary_routers =
+        DeftTopology::boundaryRouters();
     const vector<DeftTopology::VerticalLinkInfo> &vertical_links =
         DeftTopology::verticalLinks();
     for (vector<DeftTopology::VerticalLinkInfo>::const_iterator it = vertical_links.begin();
@@ -2662,7 +2671,22 @@ void NoC::buildDeft2D()
          << ", chiplet_cardinal_links=" << chiplet_cardinal_links
          << ", interposer_cardinal_links=" << interposer_cardinal_links
          << ", vertical_links=" << vertical_links.size()
+         << ", boundary_routers=" << boundary_routers.size()
          << endl;
+
+    cout << "DEFT_2_5D boundary routers:" << endl;
+    for (vector<DeftTopology::BoundaryRouterInfo>::const_iterator it =
+             boundary_routers.begin();
+         it != boundary_routers.end();
+         ++it) {
+        cout << "  router_id=" << it->router_id
+             << " chiplet=" << it->owner_chiplet_id
+             << " local=(" << it->local_x << "," << it->local_y << ")"
+             << " slot=" << DeftTopology::slotName(it->slot)
+             << " vl_id=" << it->vertical_link_id
+             << " interposer_endpoint=" << it->interposer_endpoint_router_id
+             << endl;
+    }
 
     cout << "DEFT_2_5D vertical link endpoints:" << endl;
     for (vector<DeftTopology::VerticalLinkInfo>::const_iterator it = vertical_links.begin();
@@ -2728,4 +2752,3 @@ void NoC::asciiMonitor()
 		}
 	}
 }
-
