@@ -215,6 +215,8 @@ void loadConfiguration() {
                                 vector<int>());
     GlobalParams::deft_vl_fault_count =
         readParam<int>(config, "deft_vl_fault_count", 0);
+    GlobalParams::deft_vl_lut_filename =
+        readParam<string>(config, "deft_vl_lut_filename", "");
 
     //Mesh network params
     if (GlobalParams::topology == TOPOLOGY_MESH) {
@@ -392,6 +394,7 @@ void showHelp(char selfname[])
          << "\t\tOMEGA\t\tDelta network Omega" << endl
          << "\t-routing TYPE\t\tSet the routing algorithm to one of the following:" << endl
          << "\t\tXY\t\tXY routing algorithm" << endl
+         << "\t\tDEFT\t\tDeFT fault-aware VL LUT routing algorithm" << endl
          << "\t\tWEST_FIRST\tWest-First routing algorithm" << endl
          << "\t\tNORTH_LAST\tNorth-Last routing algorithm" << endl
          << "\t\tNEGATIVE_FIRST\tNegative-First routing algorithm" << endl
@@ -422,6 +425,7 @@ void showHelp(char selfname[])
          << "\t-seed N\t\t\tSet the seed of the random generator (default time())" << endl
          << "\t-deft_vl_fault_count N\tRandomly mark N physical DEFT_2_5D VLs faulty" << endl
          << "\t-deft_faulty_vls LIST\tComma-separated explicit DEFT_2_5D VL fault IDs" << endl
+         << "\t-deft_vl_lut FILE\tLoad a deft_vl_lut.v1 routing table" << endl
          << "\t-detailed\t\tShow detailed statistics" << endl
          << "\t-show_buf_stats\t\tShow buffers statistics" << endl
          << "\t-volume N\t\tStop the simulation when either the maximum number of cycles has been reached or N flits have" << endl
@@ -462,6 +466,8 @@ void showConfig()
          << "- deft_vl_fault_count = " << GlobalParams::deft_vl_fault_count << endl
          << "- deft_faulty_vertical_links = "
          << formatIntList(GlobalParams::deft_faulty_vertical_links) << endl
+         << "- deft_vl_lut_filename = "
+         << GlobalParams::deft_vl_lut_filename << endl
          << "- clock_period = " << GlobalParams::clock_period_ps << "ps" << endl
          << "- simulation_time = " << GlobalParams::simulation_time << endl
          << "- warm_up_time = " << GlobalParams::stats_warm_up_time << endl
@@ -556,9 +562,10 @@ void checkConfiguration()
 
     if (GlobalParams::topology != TOPOLOGY_DEFT_2_5D &&
         (GlobalParams::deft_vl_fault_count > 0 ||
-         !GlobalParams::deft_faulty_vertical_links.empty()))
+         !GlobalParams::deft_faulty_vertical_links.empty() ||
+         !GlobalParams::deft_vl_lut_filename.empty()))
     {
-        cerr << "Error: DeFT VL fault injection options require DEFT_2_5D topology" << endl;
+        cerr << "Error: DeFT VL options require DEFT_2_5D topology" << endl;
         exit(1);
     }
 
@@ -855,6 +862,9 @@ void parseCmdLine(int arg_num, char *arg_vet[])
         else if (!strcmp(arg_vet[i], "-deft_faulty_vls"))
             GlobalParams::deft_faulty_vertical_links =
                 parseIntList(requireOptionValue(i, arg_num, arg_vet, "-deft_faulty_vls"));
+        else if (!strcmp(arg_vet[i], "-deft_vl_lut"))
+            GlobalParams::deft_vl_lut_filename =
+                requireOptionValue(i, arg_num, arg_vet, "-deft_vl_lut");
 	    else if (!strcmp(arg_vet[i], "-detailed"))
 		GlobalParams::detailed = true;
 	    else if (!strcmp(arg_vet[i], "-show_buf_stats"))

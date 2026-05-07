@@ -24,6 +24,7 @@ string GlobalParams::trace_scope;
 string GlobalParams::topology;
 vector<int> GlobalParams::deft_faulty_vertical_links;
 int GlobalParams::deft_vl_fault_count;
+string GlobalParams::deft_vl_lut_filename;
 
 int GlobalParams::mesh_dim_x;
 int GlobalParams::mesh_dim_y;

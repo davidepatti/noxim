@@ -10,6 +10,7 @@
 
 #include "NoC.h"
 #include "DeftFaultInjectionManager.h"
+#include "DeftVerticalLinkLut.h"
 
 #include <cstdlib>
 
@@ -2653,6 +2654,15 @@ void NoC::buildDeft2D()
         exit(1);
     }
 
+    string lut_error;
+    if (!DeftVerticalLinkLut::loadFromFile(
+            GlobalParams::deft_vl_lut_filename,
+            &lut_error)) {
+        cerr << "Invalid DEFT_2_5D VL LUT configuration: "
+             << lut_error << endl;
+        exit(1);
+    }
+
     string boundary_router_error;
     if (!DeftTopology::validateBoundaryRouterModel(&boundary_router_error)) {
         cerr << "Invalid DEFT_2_5D boundary router model: "
@@ -2703,6 +2713,19 @@ void NoC::buildDeft2D()
          << ", faulty_vertical_links="
          << DeftFaultInjection::formatVerticalLinkList(
                 fault_report.faulty_vertical_links)
+         << endl;
+
+    cout << "DEFT_2_5D VL LUT: "
+         << (DeftVerticalLinkLut::isLoaded() ? "loaded" : "disabled")
+         << ", file="
+         << (DeftVerticalLinkLut::isLoaded()
+                 ? DeftVerticalLinkLut::loadedFilename()
+                 : "")
+         << ", active_fault_mask="
+         << DeftVerticalLinkLut::currentFaultMaskId()
+         << ", entries=" << DeftVerticalLinkLut::entryCount()
+         << ", active_entries="
+         << DeftVerticalLinkLut::activeFaultMaskEntryCount()
          << endl;
 
     cout << "DEFT_2_5D VL fault mask validation: "

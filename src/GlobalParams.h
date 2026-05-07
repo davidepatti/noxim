@@ -154,6 +154,7 @@ struct GlobalParams {
     static string topology;
     static vector<int> deft_faulty_vertical_links;
     static int deft_vl_fault_count;
+    static string deft_vl_lut_filename;
     static int mesh_dim_x;
     static int mesh_dim_y;
     static int n_delta_tiles;

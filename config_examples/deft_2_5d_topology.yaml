@@ -11,6 +11,7 @@ n_virtual_channels: 2
 # a seed-controlled random physical-VL fault count.
 deft_faulty_vertical_links: []
 deft_vl_fault_count: 0
+deft_vl_lut_filename: ""
 
 routing_algorithm: XY
 routing_table_filename: ""
