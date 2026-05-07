@@ -10,6 +10,17 @@
 
 #include "ReservationTable.h"
 
+namespace {
+
+int effectiveOutputVc(const TReservation &reservation)
+{
+    return reservation.output_vc == NOT_VALID ?
+           reservation.vc :
+           reservation.output_vc;
+}
+
+} // namespace
+
 ReservationTable::ReservationTable()
 {
 }
@@ -51,6 +62,22 @@ vector<pair<int,int> > ReservationTable::getReservations(const int port_in)
     return reservations;
 }
 
+vector<pair<int,TReservation> > ReservationTable::getReservationEntries(const int port_in)
+{
+    vector<pair<int,TReservation> > reservations;
+
+    for (int o = 0;o<n_outputs;o++)
+    {
+	if (rtable[o].reservations.size()>0)
+	{
+	    int current_index = rtable[o].index;
+	    if (rtable[o].reservations[current_index].input == port_in)
+		reservations.push_back(pair<int,TReservation>(o,rtable[o].reservations[current_index]));
+	}
+    }
+    return reservations;
+}
+
 int ReservationTable::checkReservation(const TReservation r, const int port_out)
 {
     /* Sanity Check for forbidden table status:
@@ -77,9 +104,9 @@ int ReservationTable::checkReservation(const TReservation r, const int port_out)
 	if (rtable[port_out].reservations[i] == r)
 	    return RT_ALREADY_SAME;
 
-	// the same VC for that output has been reserved by another input
+	// the same output VC for that output has been reserved by another input
 	if (rtable[port_out].reservations[i].input != r.input &&
-	    rtable[port_out].reservations[i].vc == r.vc)
+	    effectiveOutputVc(rtable[port_out].reservations[i]) == effectiveOutputVc(r))
 	    return RT_OUTVC_BUSY;
     }
     return RT_AVAILABLE;
@@ -92,7 +119,9 @@ void ReservationTable::print()
 	cout << o << ": ";
 	for (vector<TReservation>::size_type i=0;i<rtable[o].reservations.size();i++)
 	{
-	    cout << "<" << rtable[o].reservations[i].input << "," << rtable[o].reservations[i].vc << ">, ";
+	    cout << "<" << rtable[o].reservations[i].input
+                 << "," << rtable[o].reservations[i].vc
+                 << "->" << effectiveOutputVc(rtable[o].reservations[i]) << ">, ";
 	}
 	cout << " | " << rtable[o].index;
 	cout << endl;
@@ -110,7 +139,11 @@ void ReservationTable::reserve(const TReservation r, const int port_out)
 
     // TODO: a better policy could insert in a specific position as far a possible
     // from the current index
-    rtable[port_out].reservations.push_back(r);
+    TReservation stored_reservation = r;
+    if (stored_reservation.output_vc == NOT_VALID)
+        stored_reservation.output_vc = stored_reservation.vc;
+
+    rtable[port_out].reservations.push_back(stored_reservation);
 
 }
 
@@ -146,5 +179,4 @@ void ReservationTable::updateIndex()
 	    rtable[o].index = (rtable[o].index+1)%(rtable[o].reservations.size());
     }
 }
-
 

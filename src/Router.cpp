@@ -9,6 +9,7 @@
  */
 
 #include "Router.h"
+#include "DeftVirtualNetwork.h"
 
 
 inline int toggleKthBit(int n, int k)
@@ -148,8 +149,16 @@ void Router::txProcess()
 		      TReservation r;
 		      r.input = i;
 		      r.vc = vc;
+                      bool uses_deft_round_robin_reassignment = false;
+                      r.output_vc =
+                          DeftVirtualNetwork::selectOutputVirtualNetwork(
+                              route_data,
+                              o,
+                              &uses_deft_round_robin_reassignment);
 
-		      LOG << " checking availability of Output[" << o << "] for Input[" << i << "][" << vc << "] flit " << flit << endl;
+		      LOG << " checking availability of Output[" << o << "]"
+                          << "[" << r.output_vc << "] for Input[" << i
+                          << "][" << vc << "] flit " << flit << endl;
 
 		      int rt_status = reservation_table.checkReservation(r,o);
 
@@ -157,6 +166,8 @@ void Router::txProcess()
 		      {
 			  LOG << " reserving direction " << o << " for flit " << flit << endl;
 			  reservation_table.reserve(r, o);
+                          if (uses_deft_round_robin_reassignment)
+                              DeftVirtualNetwork::commitBoundaryReassignmentRoundRobin();
 		      }
 		      else if (rt_status == RT_ALREADY_SAME)
 		      {
@@ -183,7 +194,7 @@ void Router::txProcess()
       //if (local_id==6) LOG<<"*TX*****local_id="<<local_id<<"__ack_tx[0]= "<<ack_tx[0].read()<<endl;
       for (int i = 0; i < DIRECTIONS + 2; i++) 
       { 
-	  vector<pair<int,int> > reservations = reservation_table.getReservations(i);
+	  vector<pair<int,TReservation> > reservations = reservation_table.getReservationEntries(i);
 	  
 	  if (reservations.size()!=0)
 	  {
@@ -191,7 +202,8 @@ void Router::txProcess()
 	      int rnd_idx = rand()%reservations.size();
 
 	      int o = reservations[rnd_idx].first;
-	      int vc = reservations[rnd_idx].second;
+	      int vc = reservations[rnd_idx].second.vc;
+              int output_vc = reservations[rnd_idx].second.output_vc;
 	     // LOG<< "found reservation from input= " << i << "_to output= "<<o<<endl;
 	      // can happen
 	      if (!buffer[i][vc].IsEmpty())  
@@ -202,11 +214,12 @@ void Router::txProcess()
 		  //LOG<<"_cl_tx="<<current_level_tx[o]<<"req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
 		  
 		  if ( (current_level_tx[o] == ack_tx[o].read()) &&
-		       (buffer_full_status_tx[o].read().mask[vc] == false) ) 
+		       (buffer_full_status_tx[o].read().mask[output_vc] == false) )
 		  {
 		      //if (GlobalParams::verbose_mode > VERBOSE_OFF) 
 		      LOG << "Input[" << i << "][" << vc << "] forwarded to Output[" << o << "], flit: " << flit << endl;
 
+                      flit.vc_id = output_vc;
 		      flit_tx[o].write(flit);
 		      current_level_tx[o] = 1 - current_level_tx[o];
 		      req_tx[o].write(current_level_tx[o]);
@@ -217,6 +230,7 @@ void Router::txProcess()
 			  TReservation r;
 			  r.input = i;
 			  r.vc = vc;
+                          r.output_vc = output_vc;
 			  reservation_table.release(r,o);
 		      }
 
@@ -253,7 +267,7 @@ void Router::txProcess()
 		  {
 		      LOG << " Cannot forward Input[" << i << "][" << vc << "] to Output[" << o << "], flit: " << flit << endl;
 		      //LOG << " **DEBUG APB: current_level_tx: " << current_level_tx[o] << " ack_tx: " << ack_tx[o].read() << endl;
-		      LOG << " **DEBUG buffer_full_status_tx " << buffer_full_status_tx[o].read().mask[vc] << endl;
+		      LOG << " **DEBUG buffer_full_status_tx " << buffer_full_status_tx[o].read().mask[output_vc] << endl;
 
 		  	//LOG<<"END_NO_cl_tx="<<current_level_tx[o]<<"_req_tx="<<req_tx[o].read()<<" _ack= "<<ack_tx[o].read()<< endl;
 		      /*

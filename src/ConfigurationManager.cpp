@@ -10,6 +10,7 @@
 
 #include "ConfigurationManager.h"
 #include "DeftTopology.h"
+#include "DeftVirtualNetwork.h"
 #include <systemc.h> //Included for the function time() 
 #include <algorithm>
 #include <cctype>
@@ -509,6 +510,14 @@ void checkConfiguration()
         {
             cerr << "Error: Use either deft_vl_fault_count or "
                  << "deft_faulty_vertical_links, not both" << endl;
+            exit(1);
+        }
+        if (GlobalParams::n_virtual_channels !=
+            DeftVirtualNetwork::VirtualNetworkCount)
+        {
+            cerr << "Error: DEFT_2_5D topology requires exactly "
+                 << DeftVirtualNetwork::VirtualNetworkCount
+                 << " virtual channels for VN.0 and VN.1" << endl;
             exit(1);
         }
 	}

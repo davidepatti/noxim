@@ -20,8 +20,10 @@ using namespace std;
 
 struct TReservation
 {
+    TReservation() : input(NOT_VALID), vc(DEFAULT_VC), output_vc(NOT_VALID) { }
     int input;
     int vc;
+    int output_vc;
     inline bool operator ==(const TReservation & r) const
     {
 	return (r.input==input && r.vc == vc);
@@ -51,8 +53,11 @@ class ReservationTable {
     // Asserts if port_out is not reserved or not valid
     void release(const TReservation r, const int port_out);
 
-    // Returns the pairs of output port and virtual channel reserved by port_in
+    // Returns the pairs of output port and input virtual channel reserved by port_in
     vector<pair<int,int> > getReservations(const int port_int);
+
+    // Returns output ports with full input/output VC reservation metadata
+    vector<pair<int,TReservation> > getReservationEntries(const int port_int);
 
     // update the index of the reservation having highest priority in the current cycle
     void updateIndex();

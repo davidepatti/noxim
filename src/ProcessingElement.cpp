@@ -9,6 +9,7 @@
  */
 
 #include "ProcessingElement.h"
+#include "DeftVirtualNetwork.h"
 
 int ProcessingElement::randInt(int min, int max)
 {
@@ -56,6 +57,11 @@ void ProcessingElement::txProcess()
 		    	Packet packet;
 				int vc = randInt(0,GlobalParams::n_virtual_channels-1);
 				packet.make(local_id, expected_packet.dst, vc, now, getRandomSize());
+                                if (DeftVirtualNetwork::isEnabled())
+                                    packet.vc_id =
+                                        DeftVirtualNetwork::assignSourceVirtualNetwork(
+                                            packet.src_id,
+                                            packet.dst_id);
 				packet_queue.push(packet);
 				any = true;
 			}
@@ -187,6 +193,11 @@ bool ProcessingElement::canShot(Packet & packet)
 	    }
 	}
     }
+
+    if (shot && DeftVirtualNetwork::isEnabled())
+        packet.vc_id =
+            DeftVirtualNetwork::assignSourceVirtualNetwork(packet.src_id,
+                                                           packet.dst_id);
 
     return shot;
 }
