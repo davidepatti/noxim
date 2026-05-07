@@ -66,10 +66,26 @@ bool sourceCanUseEitherVirtualNetwork(int src_id, int dst_id)
     return !isInterChipletTraffic(src_id, dst_id);
 }
 
+int physicalOutputDirection(int output_direction)
+{
+    if (output_direction >= DIRECTION_HUB_RELAY)
+        return DIRECTION_HUB;
+
+    return output_direction;
+}
+
+bool isHorizontalDirection(int direction)
+{
+    return direction == DIRECTION_NORTH ||
+           direction == DIRECTION_EAST ||
+           direction == DIRECTION_SOUTH ||
+           direction == DIRECTION_WEST;
+}
+
 bool isChipletBoundaryToInterposer(const RouteData &route_data,
                                    int output_direction)
 {
-    if (output_direction != DIRECTION_HUB)
+    if (physicalOutputDirection(output_direction) != DIRECTION_HUB)
         return false;
 
     DeftTopology::RouterInfo current =
@@ -83,7 +99,7 @@ bool isChipletBoundaryToInterposer(const RouteData &route_data,
 bool isInterposerToChiplet(const RouteData &route_data,
                            int output_direction)
 {
-    if (output_direction != DIRECTION_HUB)
+    if (physicalOutputDirection(output_direction) != DIRECTION_HUB)
         return false;
 
     DeftTopology::RouterInfo current =
@@ -101,6 +117,28 @@ bool isFromInterposerInsideChiplet(const RouteData &route_data)
     return current.layer == DeftTopology::ROUTER_LAYER_CHIPLET &&
            current.boundary_router &&
            route_data.dir_in == DIRECTION_HUB;
+}
+
+bool isUpToHorizontal(const RouteData &route_data, int output_direction)
+{
+    DeftTopology::RouterInfo current =
+        DeftTopology::decodeRouterId(route_data.current_id);
+
+    return current.layer == DeftTopology::ROUTER_LAYER_CHIPLET &&
+           current.boundary_router &&
+           route_data.dir_in == DIRECTION_HUB &&
+           isHorizontalDirection(physicalOutputDirection(output_direction));
+}
+
+bool isHorizontalToDown(const RouteData &route_data, int output_direction)
+{
+    DeftTopology::RouterInfo current =
+        DeftTopology::decodeRouterId(route_data.current_id);
+
+    return current.layer == DeftTopology::ROUTER_LAYER_CHIPLET &&
+           current.boundary_router &&
+           isHorizontalDirection(route_data.dir_in) &&
+           physicalOutputDirection(output_direction) == DIRECTION_HUB;
 }
 
 } // namespace
@@ -124,6 +162,35 @@ bool canTransition(int from_vn, int to_vn)
         return false;
 
     return from_vn == to_vn || (from_vn == VN0 && to_vn == VN1);
+}
+
+bool isOutputDirectionAllowed(const RouteData &route_data,
+                              int output_direction)
+{
+    if (!isEnabled())
+        return true;
+
+    const int input_vn = route_data.vc_id;
+    if (!isValidVirtualNetwork(input_vn))
+        return false;
+
+    const int output_vn =
+        selectOutputVirtualNetwork(route_data,
+                                   physicalOutputDirection(output_direction),
+                                   0);
+
+    if (!canTransition(input_vn, output_vn))
+        return false;
+
+    if (isUpToHorizontal(route_data, output_direction) &&
+        output_vn == VN0)
+        return false;
+
+    if (isHorizontalToDown(route_data, output_direction) &&
+        output_vn == VN1)
+        return false;
+
+    return true;
 }
 
 int assignSourceVirtualNetwork(int src_id, int dst_id)
@@ -150,7 +217,11 @@ int selectOutputVirtualNetwork(const RouteData &route_data,
 
     int output_vn = input_vn;
 
-    if (isChipletBoundaryToInterposer(route_data, output_direction))
+    if (isHorizontalToDown(route_data, output_direction))
+    {
+        output_vn = input_vn;
+    }
+    else if (isChipletBoundaryToInterposer(route_data, output_direction))
     {
         if (input_vn == VN0)
         {

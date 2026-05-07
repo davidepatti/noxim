@@ -136,6 +136,12 @@ void Router::txProcess()
 
 		      // TODO: see PER POSTERI (adaptive routing should not recompute route if already reserved)
 		      int o = route(route_data);
+                      if (o == NOT_VALID)
+                      {
+                          LOG << "No legal output direction for flit "
+                              << flit << endl;
+                          continue;
+                      }
 
 		      // manage special case of target hub not directly connected to destination
 		      if (o>=DIRECTION_HUB_RELAY)
@@ -497,6 +503,8 @@ int Router::route(const RouteData & route_data)
 
     power.routing();
     vector < int >candidate_channels = routingFunction(route_data);
+    if (candidate_channels.empty())
+        return NOT_VALID;
 
     power.selection();
     return selectionFunction(candidate_channels, route_data);
@@ -541,11 +549,28 @@ int Router::NoPScore(const NoP_data & nop_data,
 int Router::selectionFunction(const vector < int >&directions,
 				   const RouteData & route_data)
 {
-    // not so elegant but fast escape ;)
-    if (directions.size() == 1)
-	return directions[0];
+    vector<int> legal_directions = directions;
+    if (DeftVirtualNetwork::isEnabled())
+    {
+        legal_directions.clear();
+        for (vector<int>::const_iterator direction = directions.begin();
+             direction != directions.end();
+             ++direction)
+        {
+            if (DeftVirtualNetwork::isOutputDirectionAllowed(route_data,
+                                                             *direction))
+                legal_directions.push_back(*direction);
+        }
+    }
 
-    return selectionStrategy->apply(this, directions, route_data);
+    if (legal_directions.empty())
+        return NOT_VALID;
+
+    // not so elegant but fast escape ;)
+    if (legal_directions.size() == 1)
+	return legal_directions[0];
+
+    return selectionStrategy->apply(this, legal_directions, route_data);
 }
 
 void Router::configure(const int _id,

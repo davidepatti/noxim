@@ -18,6 +18,8 @@ enum {
 bool isEnabled();
 bool isValidVirtualNetwork(int vc_id);
 bool canTransition(int from_vn, int to_vn);
+bool isOutputDirectionAllowed(const RouteData &route_data,
+                              int output_direction);
 
 int assignSourceVirtualNetwork(int src_id, int dst_id);
 int selectOutputVirtualNetwork(const RouteData &route_data,
