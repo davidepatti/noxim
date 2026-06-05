@@ -154,6 +154,18 @@ void loadConfiguration() {
         exit(0);
     }
 
+    if (config["dnn_layer"]) {
+        YAML::Node d = config["dnn_layer"];
+        GlobalParams::dnn_config.input_channels  = d["input_channels"].as<int>();
+        GlobalParams::dnn_config.output_channels = d["output_channels"].as<int>();
+        GlobalParams::dnn_config.input_h         = d["input_h"].as<int>();
+        GlobalParams::dnn_config.input_w         = d["input_w"].as<int>();
+        GlobalParams::dnn_config.kernel_size     = d["kernel_size"].as<int>();
+        GlobalParams::dnn_config.stride          = d["stride"].as<int>();
+        if (d["dataflow"])
+            GlobalParams::dnn_config.dataflow = d["dataflow"].as<string>();
+    }
+
     // Initialize global configuration parameters (can be overridden with command-line arguments)
     GlobalParams::verbose_mode = readParam<string>(config, "verbose_mode");
     GlobalParams::log_level = readParam<string>(config, "log_level", "OFF");
@@ -363,6 +375,7 @@ void showHelp(char selfname[])
          << "\t\tbutterfly\tButterfly traffic distribution" << endl
          << "\t\tshuffle\t\tShuffle traffic distribution" << endl
          << "\t\thotspot\t\tHotspot traffic distribution" << endl
+         << "\t\tdnn_layer\tDNN layer traffic distribution (output-stationary Conv2D)" << endl
          <<	"\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file" << endl
          << "\t-hs ID P\t\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random'/'hotspot' traffic)" << endl
          << "\t-warmup N\t\tStart to collect statistics after N cycles" << endl
@@ -737,6 +750,8 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		    GlobalParams::locality = atof(requireOptionValue(i, arg_num, arg_vet, "-traffic"));
 		} else if (!strcmp(traffic, "hotspot")) {
     GlobalParams::traffic_distribution = TRAFFIC_HOTSPOT;
+} else if (!strcmp(traffic, "dnn_layer")) {
+    GlobalParams::traffic_distribution = TRAFFIC_DNN_LAYER;
 }
 		else assert(false);
 	    } 
