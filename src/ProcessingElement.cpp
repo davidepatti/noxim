@@ -113,6 +113,18 @@ Flit ProcessingElement::nextFlit()
 
 bool ProcessingElement::canShot(Packet & packet)
 {
+    // DNN traffic: stop injecting once this PE's schedule is exhausted
+    if (GlobalParams::traffic_distribution == TRAFFIC_DNN_LAYER) {
+        if (!dnn_schedule_built)
+            generateDNNSchedule();
+        // advance past consumed entries
+        while (dnn_sched_index < dnn_schedule.size() &&
+               dnn_schedule[dnn_sched_index].second <= 0)
+            dnn_sched_index++;
+        if (dnn_sched_index >= dnn_schedule.size())
+            return false;   // schedule done — this PE is silent
+    }
+
    // assert(false);
     if(never_transmit) return false;
    
@@ -163,6 +175,8 @@ bool ProcessingElement::canShot(Packet & packet)
 		    packet = trafficULocal();
          else if (GlobalParams::traffic_distribution == TRAFFIC_HOTSPOT)
                     packet = trafficRandom();
+        else if (GlobalParams::traffic_distribution == TRAFFIC_DNN_LAYER)
+            packet = trafficDNNLayer();
         else {
             cout << "Invalid traffic distribution: " << GlobalParams::traffic_distribution << endl;
             exit(-1);
