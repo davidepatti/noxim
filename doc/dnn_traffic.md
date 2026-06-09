@@ -15,8 +15,7 @@ The mesh is partitioned into two roles:
 - Node 0 acts as the DRAM / memory interface.
 - All other nodes act as compute processing elements (PEs).
 
-Traffic flows in three logical phases, collapsed into a per-source
-schedule:
+The logical data volumes exchanged correspond to three computational steps:
 
 1. Weight distribution: the memory node sends filter weights to every
    compute PE.
@@ -25,8 +24,12 @@ schedule:
 3. Output collection: each compute PE sends its partial-sum outputs
    back to the memory node.
 
-Each PE computes its own injection schedule based on its node id, so
-the model is fully distributed with no central scheduler.
+Each PE computes its own injection schedule based on its node id. The volumes
+are injected as concurrent traffic without strict phase ordering (compute PEs
+may begin returning outputs before all weights or activations have arrived).
+This models the aggregate communication volume and the resulting many-to-one
+bottleneck, not a cycle-ordered phase execution. The model is fully
+distributed with no central scheduler.
 
 ## Configuration
 
