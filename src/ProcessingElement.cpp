@@ -612,7 +612,8 @@ Packet ProcessingElement::trafficDNNLayer()
     dnn_schedule[dnn_sched_index].second--;   // consume one packet
 
     p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
-    p.size = p.flit_left = getRandomSize();
+    // DNN uses fixed max_packet_size to accurately match the schedule's values-per-packet assumption
+    p.size = p.flit_left = GlobalParams::max_packet_size;
     p.vc_id = randInt(0, GlobalParams::n_virtual_channels - 1);
     return p;
 }

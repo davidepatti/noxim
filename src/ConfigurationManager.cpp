@@ -604,6 +604,42 @@ void checkConfiguration()
         exit(1);
     }
 
+    if (GlobalParams::traffic_distribution == TRAFFIC_DNN_LAYER) {
+        if (GlobalParams::dnn_config.input_channels == 0 &&
+            GlobalParams::dnn_config.output_channels == 0 &&
+            GlobalParams::dnn_config.input_h == 0 &&
+            GlobalParams::dnn_config.input_w == 0 &&
+            GlobalParams::dnn_config.kernel_size == 0) {
+            cerr << "Error: DNN traffic selected but no valid dnn_layer block configured" << endl;
+            exit(-1);
+        }
+        if (GlobalParams::dnn_config.input_channels <= 0 ||
+            GlobalParams::dnn_config.output_channels <= 0 ||
+            GlobalParams::dnn_config.input_h <= 0 ||
+            GlobalParams::dnn_config.input_w <= 0 ||
+            GlobalParams::dnn_config.kernel_size <= 0) {
+            cerr << "Error: DNN layer dimensions (channels, height, width, kernel) must be > 0" << endl;
+            exit(-1);
+        }
+        if (GlobalParams::dnn_config.stride <= 0) {
+            cerr << "Error: DNN layer stride must be > 0" << endl;
+            exit(-1);
+        }
+        if (GlobalParams::dnn_config.kernel_size > GlobalParams::dnn_config.input_h ||
+            GlobalParams::dnn_config.kernel_size > GlobalParams::dnn_config.input_w) {
+            cerr << "Error: DNN layer kernel_size must fit within input_h and input_w" << endl;
+            exit(-1);
+        }
+        if (GlobalParams::dnn_config.dataflow != "output_stationary") {
+            cerr << "Error: DNN traffic unsupported dataflow: " << GlobalParams::dnn_config.dataflow << endl;
+            exit(-1);
+        }
+        if (GlobalParams::topology != TOPOLOGY_MESH) {
+            cerr << "Error: DNN traffic currently supports only the MESH topology" << endl;
+            exit(-1);
+        }
+    }
+
     GlobalParams::trace_scope = normalizeTraceScope(GlobalParams::trace_scope.c_str());
 }
 
