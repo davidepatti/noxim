@@ -542,9 +542,14 @@ void ProcessingElement::generateDNNSchedule()
 
     const DNNConfig &cfg = GlobalParams::dnn_config;
 
+    // Defensive: schedule is only meaningful for a validated layer.
+    // checkConfiguration() enforces this earlier; guard here too so the
+    // function is safe on its own and never divides by zero.
+    int stride = cfg.stride > 0 ? cfg.stride : 1;
+
     // Derived layer dimensions
-    int out_h = (cfg.input_h - cfg.kernel_size) / cfg.stride + 1;
-    int out_w = (cfg.input_w - cfg.kernel_size) / cfg.stride + 1;
+    int out_h = (cfg.input_h - cfg.kernel_size) / stride + 1;
+    int out_w = (cfg.input_w - cfg.kernel_size) / stride + 1;
     if (out_h < 1) out_h = 1;
     if (out_w < 1) out_w = 1;
 
@@ -599,8 +604,9 @@ Packet ProcessingElement::trafficDNNLayer()
         dnn_sched_index++;
 
     if (dnn_sched_index >= dnn_schedule.size()) {
-        // Schedule exhausted: send a harmless self-targeted minimal packet
-        // (caller-level guard in Stage 3 will prevent injection instead).
+        // Schedule exhausted. canShot() already returns false for an
+        // exhausted DNN schedule, so this path is normally unreachable.
+        // Return a minimal, well-formed packet as a safe fallback.
         p.dst_id = local_id;
         p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
         p.size = p.flit_left = GlobalParams::min_packet_size;
