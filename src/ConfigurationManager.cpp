@@ -156,12 +156,20 @@ void loadConfiguration() {
 
     if (config["dnn_layer"]) {
         YAML::Node d = config["dnn_layer"];
-        GlobalParams::dnn_config.input_channels  = d["input_channels"].as<int>();
-        GlobalParams::dnn_config.output_channels = d["output_channels"].as<int>();
-        GlobalParams::dnn_config.input_h         = d["input_h"].as<int>();
-        GlobalParams::dnn_config.input_w         = d["input_w"].as<int>();
-        GlobalParams::dnn_config.kernel_size     = d["kernel_size"].as<int>();
-        GlobalParams::dnn_config.stride          = d["stride"].as<int>();
+        auto requireDNNField = [&](const char* fieldName) -> int {
+            if (!d[fieldName]) {
+                cerr << "Error: DNN layer config is missing required field '"
+                     << fieldName << "'" << endl;
+                exit(-1);
+            }
+            return d[fieldName].as<int>();
+        };
+        GlobalParams::dnn_config.input_channels  = requireDNNField("input_channels");
+        GlobalParams::dnn_config.output_channels = requireDNNField("output_channels");
+        GlobalParams::dnn_config.input_h         = requireDNNField("input_h");
+        GlobalParams::dnn_config.input_w         = requireDNNField("input_w");
+        GlobalParams::dnn_config.kernel_size     = requireDNNField("kernel_size");
+        GlobalParams::dnn_config.stride          = requireDNNField("stride");
         if (d["dataflow"])
             GlobalParams::dnn_config.dataflow = d["dataflow"].as<string>();
     }
