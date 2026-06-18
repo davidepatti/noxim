@@ -154,6 +154,26 @@ void loadConfiguration() {
         exit(0);
     }
 
+    if (config["dnn_layer"]) {
+        YAML::Node d = config["dnn_layer"];
+        auto requireDNNField = [&](const char* fieldName) -> int {
+            if (!d[fieldName]) {
+                cerr << "Error: DNN layer config is missing required field '"
+                     << fieldName << "'" << endl;
+                exit(-1);
+            }
+            return d[fieldName].as<int>();
+        };
+        GlobalParams::dnn_config.input_channels  = requireDNNField("input_channels");
+        GlobalParams::dnn_config.output_channels = requireDNNField("output_channels");
+        GlobalParams::dnn_config.input_h         = requireDNNField("input_h");
+        GlobalParams::dnn_config.input_w         = requireDNNField("input_w");
+        GlobalParams::dnn_config.kernel_size     = requireDNNField("kernel_size");
+        GlobalParams::dnn_config.stride          = requireDNNField("stride");
+        if (d["dataflow"])
+            GlobalParams::dnn_config.dataflow = d["dataflow"].as<string>();
+    }
+
     // Initialize global configuration parameters (can be overridden with command-line arguments)
     GlobalParams::verbose_mode = readParam<string>(config, "verbose_mode");
     GlobalParams::log_level = readParam<string>(config, "log_level", "OFF");
@@ -363,6 +383,7 @@ void showHelp(char selfname[])
          << "\t\tbutterfly\tButterfly traffic distribution" << endl
          << "\t\tshuffle\t\tShuffle traffic distribution" << endl
          << "\t\thotspot\t\tHotspot traffic distribution" << endl
+         << "\t\tdnn_layer\tDNN layer traffic distribution (output-stationary Conv2D)" << endl
          <<	"\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file" << endl
          << "\t-hs ID P\t\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random'/'hotspot' traffic)" << endl
          << "\t-warmup N\t\tStart to collect statistics after N cycles" << endl
@@ -591,6 +612,42 @@ void checkConfiguration()
         exit(1);
     }
 
+    if (GlobalParams::traffic_distribution == TRAFFIC_DNN_LAYER) {
+        if (GlobalParams::dnn_config.input_channels == 0 &&
+            GlobalParams::dnn_config.output_channels == 0 &&
+            GlobalParams::dnn_config.input_h == 0 &&
+            GlobalParams::dnn_config.input_w == 0 &&
+            GlobalParams::dnn_config.kernel_size == 0) {
+            cerr << "Error: DNN traffic selected but no valid dnn_layer block configured" << endl;
+            exit(-1);
+        }
+        if (GlobalParams::dnn_config.input_channels <= 0 ||
+            GlobalParams::dnn_config.output_channels <= 0 ||
+            GlobalParams::dnn_config.input_h <= 0 ||
+            GlobalParams::dnn_config.input_w <= 0 ||
+            GlobalParams::dnn_config.kernel_size <= 0) {
+            cerr << "Error: DNN layer dimensions (channels, height, width, kernel) must be > 0" << endl;
+            exit(-1);
+        }
+        if (GlobalParams::dnn_config.stride <= 0) {
+            cerr << "Error: DNN layer stride must be > 0" << endl;
+            exit(-1);
+        }
+        if (GlobalParams::dnn_config.kernel_size > GlobalParams::dnn_config.input_h ||
+            GlobalParams::dnn_config.kernel_size > GlobalParams::dnn_config.input_w) {
+            cerr << "Error: DNN layer kernel_size must fit within input_h and input_w" << endl;
+            exit(-1);
+        }
+        if (GlobalParams::dnn_config.dataflow != "output_stationary") {
+            cerr << "Error: DNN traffic unsupported dataflow: " << GlobalParams::dnn_config.dataflow << endl;
+            exit(-1);
+        }
+        if (GlobalParams::topology != TOPOLOGY_MESH) {
+            cerr << "Error: DNN traffic currently supports only the MESH topology" << endl;
+            exit(-1);
+        }
+    }
+
     GlobalParams::trace_scope = normalizeTraceScope(GlobalParams::trace_scope.c_str());
 }
 
@@ -737,6 +794,8 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		    GlobalParams::locality = atof(requireOptionValue(i, arg_num, arg_vet, "-traffic"));
 		} else if (!strcmp(traffic, "hotspot")) {
     GlobalParams::traffic_distribution = TRAFFIC_HOTSPOT;
+} else if (!strcmp(traffic, "dnn_layer")) {
+    GlobalParams::traffic_distribution = TRAFFIC_DNN_LAYER;
 }
 		else assert(false);
 	    } 
