@@ -59,8 +59,37 @@ Given a Conv2D layer, the module computes:
 
 where out_h = (H - R) / stride + 1 and out_w = (W - S) / stride + 1.
 
-These values are distributed evenly across the compute PEs and
-converted into packets using the configured packet size.
+Each volume is split in values across the N compute PEs (node k + 1 gets
+share k). The split is exact: every PE gets floor(V / N) values and the first
+V mod N PEs get one more, so the shares always add up to the full volume V.
+Only then is each PE's share rounded up to whole packets, using
+max_packet_size as values per packet (every DNN packet is emitted at exactly
+that size). Rounding therefore adds at most one partially filled packet per
+PE and never drops data. A PE whose share is zero sends nothing.
+
+The weights and inputs are split separately and summed per destination, so
+the memory node's stream to PE k carries share k of each.
+
+other/regression/dnn_volume_test.cpp checks this volume conservation over a
+sweep of layer shapes, mesh sizes and packet sizes; ./regression.sh builds and
+runs it before the simulation cases.
+
+## Configuration Errors
+
+When TRAFFIC_DNN_LAYER is selected, the dnn_layer block is validated before
+the simulation starts, and any problem stops Noxim with a message naming the
+field, for example:
+
+    Error: dnn_layer is missing required field 'stride'
+    Error: dnn_layer field 'stride' must be an integer, got 'abc'
+    Error: dnn_layer field 'stride' must be an integer, got an empty value
+    Error: dnn_layer field 'stride' must be an integer, got a list
+    Error: dnn_layer has unknown field 'strides'
+
+The checked conditions are: the block is a mapping with only known fields;
+the six integer fields are present and integer; all dimensions and the
+stride are positive; the kernel fits the input; the dataflow is
+output_stationary; and the topology is MESH.
 
 ## Validation
 
