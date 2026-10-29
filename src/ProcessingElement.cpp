@@ -9,6 +9,7 @@
  */
 
 #include "ProcessingElement.h"
+#include "DNNTraffic.h"
 
 int ProcessingElement::randInt(int min, int max)
 {
@@ -541,50 +542,40 @@ void ProcessingElement::generateDNNSchedule()
     int memory_node = 0;   // node 0 acts as DRAM interface
 
     const DNNConfig &cfg = GlobalParams::dnn_config;
-
-    // Defensive: schedule is only meaningful for a validated layer.
-    // checkConfiguration() enforces this earlier; guard here too so the
-    // function is safe on its own and never divides by zero.
-    int stride = cfg.stride > 0 ? cfg.stride : 1;
-
-    // Derived layer dimensions
-    int out_h = (cfg.input_h - cfg.kernel_size) / stride + 1;
-    int out_w = (cfg.input_w - cfg.kernel_size) / stride + 1;
-    if (out_h < 1) out_h = 1;
-    if (out_w < 1) out_w = 1;
-
-    // Total data volumes (in "values"); convert to packets via flit-based size.
-    // weights  = K * C * R * S
-    // inputs   = C * H * W
-    // outputs  = K * out_h * out_w
-    long weights = (long)cfg.output_channels * cfg.input_channels *
-                   cfg.kernel_size * cfg.kernel_size;
-    long inputs  = (long)cfg.input_channels * cfg.input_h * cfg.input_w;
-    long outputs = (long)cfg.output_channels * out_h * out_w;
+    const DNNLayerVolumes vol = dnnLayerVolumes(cfg.input_channels, cfg.output_channels,
+                                                cfg.input_h, cfg.input_w,
+                                                cfg.kernel_size, cfg.stride);
 
     int num_compute = mesh_size - 1;          // all nodes except memory
     if (num_compute < 1) num_compute = 1;
 
-    // Values are spread evenly across compute PEs. Convert values->packets.
-    // Use max_packet_size as values-per-packet proxy (keeps it simple + bounded).
-    int vpp = GlobalParams::max_packet_size;  // values per packet
+    // max_packet_size is used as values-per-packet; trafficDNNLayer() emits
+    // every DNN packet at exactly that size, so the two stay consistent.
+    int vpp = GlobalParams::max_packet_size;
     if (vpp < 1) vpp = 1;
 
+    // Each volume is split in values across the compute PEs first, with the
+    // remainder spread one value at a time over the first PEs, and only then
+    // rounded up to whole packets. The per-PE shares therefore add up to the
+    // full layer volume; rounding only adds padding inside each PE's last
+    // packet. Compute PE k is node k + 1 (node 0 is the memory node).
     if (local_id == memory_node) {
-        // Memory node feeds weights+inputs to each compute PE.
-        long per_pe_values = (weights + inputs) / num_compute;
-        int per_pe_packets = (int)((per_pe_values + vpp - 1) / vpp);
-        if (per_pe_packets < 1) per_pe_packets = 1;
+        // Memory node streams weights and input activations to each compute PE.
         for (int dst = 0; dst < mesh_size; dst++) {
             if (dst == memory_node) continue;
-            dnn_schedule.push_back(make_pair(dst, per_pe_packets));
+            int k = dst - 1;
+            long long values = dnnShare(vol.weights, num_compute, k) +
+                               dnnShare(vol.inputs,  num_compute, k);
+            int packets = (int)dnnPackets(values, vpp);
+            if (packets > 0)
+                dnn_schedule.push_back(make_pair(dst, packets));
         }
     } else {
-        // Compute PE sends its share of outputs back to memory node.
-        long per_pe_outputs = outputs / num_compute;
-        int per_pe_packets = (int)((per_pe_outputs + vpp - 1) / vpp);
-        if (per_pe_packets < 1) per_pe_packets = 1;
-        dnn_schedule.push_back(make_pair(memory_node, per_pe_packets));
+        // Compute PE sends its share of the outputs back to the memory node.
+        int k = local_id - 1;
+        int packets = (int)dnnPackets(dnnShare(vol.outputs, num_compute, k), vpp);
+        if (packets > 0)
+            dnn_schedule.push_back(make_pair(memory_node, packets));
     }
 
     dnn_schedule_built = true;
