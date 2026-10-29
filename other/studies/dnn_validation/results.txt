@@ -1,0 +1,85 @@
+Noxim DNN Layer Traffic — Validation Study
+Generated: Thu Jun  4 02:28:35 IST 2026
+
+=================================================
+Experiment 1: AlexNet CONV2 (8x8 mesh, output-stationary)
+Layer: C=48 K=128 H=W=27 R=S=5 (Eyeriss ISCA 2016)
+=================================================
+% Total received packets: 660
+% Total received flits: 5276
+% Received/Ideal flits Ratio: 0.114497
+% Average wireless utilization: 0
+% Global average delay (cycles): 312.805
+% Max delay (cycles): 3524
+% Network throughput (flits/cycle): 0.586222
+% Average IP throughput (flits/cycle/IP): 0.00915972
+% Total energy (J): 8.07058e-06
+% 	Dynamic energy (J): 1.69573e-07
+% 	Static energy (J): 7.901e-06
+
+=================================================
+Experiment 2: Random baseline (8x8 mesh, same topology)
+=================================================
+% Total received packets: 5815
+% Total received flits: 46510
+% Received/Ideal flits Ratio: 1.00933
+% Average wireless utilization: 0
+% Global average delay (cycles): 24.8794
+% Max delay (cycles): 176
+% Network throughput (flits/cycle): 5.16778
+% Average IP throughput (flits/cycle/IP): 0.0807465
+% Total energy (J): 8.90972e-06
+% 	Dynamic energy (J): 1.00872e-06
+% 	Static energy (J): 7.901e-06
+
+=================================================
+Experiment 3: Small DNN layer (4x4 mesh) — DNN vs Random
+=================================================
+--- DNN ---
+% Total received packets: 197
+% Total received flits: 1576
+% Received/Ideal flits Ratio: 0.136806
+% Average wireless utilization: 0
+% Global average delay (cycles): 455.685
+% Max delay (cycles): 1828
+% Network throughput (flits/cycle): 0.175111
+% Average IP throughput (flits/cycle/IP): 0.0109444
+% Total energy (J): 2.00107e-06
+% 	Dynamic energy (J): 2.58221e-08
+% 	Static energy (J): 1.97525e-06
+--- Random ---
+% Total received packets: 1444
+% Total received flits: 11571
+% Received/Ideal flits Ratio: 1.00443
+% Average wireless utilization: 0
+% Global average delay (cycles): 12.3179
+% Max delay (cycles): 61
+% Network throughput (flits/cycle): 1.28567
+% Average IP throughput (flits/cycle/IP): 0.0803542
+% Total energy (J): 2.12005e-06
+% 	Dynamic energy (J): 1.44801e-07
+% 	Static energy (J): 1.97525e-06
+
+=================================================
+Experiment 4: AlexNet CONV2 seed stability (5 seeds)
+=================================================
+--- seed 1 ---
+% Total received packets: 659
+% Global average delay (cycles): 422.914
+% Network throughput (flits/cycle): 0.586222
+--- seed 2 ---
+% Total received packets: 650
+% Global average delay (cycles): 669.732
+% Network throughput (flits/cycle): 0.578222
+--- seed 3 ---
+% Total received packets: 659
+% Global average delay (cycles): 558.068
+% Network throughput (flits/cycle): 0.586111
+--- seed 4 ---
+% Total received packets: 653
+% Global average delay (cycles): 601.899
+% Network throughput (flits/cycle): 0.58
+--- seed 5 ---
+% Total received packets: 672
+% Global average delay (cycles): 490.393
+% Network throughput (flits/cycle): 0.596889

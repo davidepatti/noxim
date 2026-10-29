@@ -12,6 +12,8 @@
 #define __NOXIMPROCESSINGELEMENT_H__
 
 #include <queue>
+#include <vector>
+#include <utility>
 #include <systemc.h>
 
 #include "DataStructs.h"
@@ -61,6 +63,11 @@ SC_MODULE(ProcessingElement)
     Packet trafficButterfly();	// Butterfly destination distribution
     Packet trafficLocal();	// Random with locality
     Packet trafficULocal();	// Random with locality
+    void generateDNNSchedule();           // builds dnn_schedule for this PE
+    Packet trafficDNNLayer();             // pops next packet from dnn_schedule
+    vector<pair<int,int>> dnn_schedule;   // list of (dst_id, packets_remaining)
+    size_t dnn_sched_index = 0;               // current position in schedule
+    bool dnn_schedule_built = false;              // lazy-init guard
 
     size_t traffic_cycle = 0;
     GlobalTrafficTable *traffic_table;	// Reference to the Global traffic Table

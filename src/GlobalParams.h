@@ -75,6 +75,7 @@ using namespace std;
 #define TRAFFIC_LOCAL	       "TRAFFIC_LOCAL"
 #define TRAFFIC_ULOCAL	       "TRAFFIC_ULOCAL"
 #define TRAFFIC_HARDCODED      "TRAFFIC_HARDCODED"
+#define TRAFFIC_DNN_LAYER      "TRAFFIC_DNN_LAYER"
 
 // Verbosity levels
 #define VERBOSE_OFF            "VERBOSE_OFF"
@@ -139,6 +140,19 @@ typedef struct {
     HubPowerConfig hubPowerConfig;
 } PowerConfig;
 
+struct DNNConfig {
+    int input_channels;    // C
+    int output_channels;   // K
+    int input_h;           // H
+    int input_w;           // W
+    int kernel_size;       // R = S
+    int stride;
+    string dataflow;       // "output_stationary" for now
+    DNNConfig() : input_channels(0), output_channels(0), input_h(0),
+                  input_w(0), kernel_size(0), stride(1),
+                  dataflow("output_stationary") {}
+};
+
 struct GlobalParams {
     static string verbose_mode;
     static string log_level;
@@ -169,6 +183,7 @@ struct GlobalParams {
     static string traffic_distribution;
     static string traffic_table_filename;
     static string traffic_hardcoded_filename;
+    static DNNConfig dnn_config;
     static string config_filename;
     static string power_config_filename;
     static int clock_period_ps;

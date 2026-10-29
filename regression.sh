@@ -232,6 +232,23 @@ run_case() {
     return 1
 }
 
+run_unit_tests() {
+    local test_bin="$GENERATED_DIR/dnn_volume_test"
+
+    echo "[regression] dnn_volume_test"
+    if ! "${CXX:-g++}" -std=c++11 -Wall -I "$ROOT_DIR/src" \
+            "$ROOT_DIR/other/regression/dnn_volume_test.cpp" \
+            "$ROOT_DIR/src/DNNTraffic.cpp" -o "$test_bin"; then
+        echo "  FAIL: could not build dnn_volume_test" >&2
+        return 1
+    fi
+    if ! "$test_bin"; then
+        echo "  FAIL: dnn_volume_test" >&2
+        return 1
+    fi
+    echo "  ok"
+}
+
 load_cases() {
     grep -v '^[[:space:]]*#' "$CASES_FILE" | sed '/^[[:space:]]*$/d'
 }
@@ -261,6 +278,12 @@ main() {
 
     if ((SKIP_BUILD == 0)); then
         "$ROOT_DIR/build.sh"
+    fi
+
+    if [[ -z "$CASE_FILTER" ]] && ((UPDATE_BASELINES == 0)); then
+        if ! run_unit_tests; then
+            failed=$((failed + 1))
+        fi
     fi
 
     while read -r config_name mode routing selection; do
