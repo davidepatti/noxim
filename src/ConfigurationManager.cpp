@@ -27,6 +27,87 @@ static char *requireOptionValue(int &index, int arg_num, char *arg_vet[], const 
     return arg_vet[++index];
 }
 
+// Human-readable YAML node kind, for configuration diagnostics.
+static const char *yamlNodeKind(const YAML::Node &node)
+{
+    switch (node.Type()) {
+    case YAML::NodeType::Null:      return "an empty value";
+    case YAML::NodeType::Scalar:    return "a scalar";
+    case YAML::NodeType::Sequence:  return "a list";
+    case YAML::NodeType::Map:       return "a mapping";
+    default:                        return "an undefined value";
+    }
+}
+
+// Reads the dnn_layer block. Every field is checked for presence and type
+// before conversion, so a malformed block (missing field, null, a list, or a
+// non-integer string) stops with a message naming the field instead of an
+// uncaught yaml-cpp exception.
+static void loadDNNLayerConfig(const YAML::Node &d)
+{
+    if (!d.IsMap()) {
+        cerr << "Error: dnn_layer must be a mapping of fields, got "
+             << yamlNodeKind(d) << endl;
+        exit(-1);
+    }
+
+    static const char *intFields[] = {
+        "input_channels", "output_channels", "input_h",
+        "input_w", "kernel_size", "stride"
+    };
+    static const char *optionalFields[] = { "dataflow" };
+
+    // Catch typos such as "strides" early; they would otherwise surface as
+    // a confusing "missing field" error for the correctly spelled one.
+    for (YAML::const_iterator it = d.begin(); it != d.end(); ++it) {
+        const string key = it->first.Scalar();
+        bool known = false;
+        for (const char *f : intFields)      known = known || key == f;
+        for (const char *f : optionalFields) known = known || key == f;
+        if (!known) {
+            cerr << "Error: dnn_layer has unknown field '" << key << "'" << endl;
+            exit(-1);
+        }
+    }
+
+    auto requireInt = [&](const char *field) -> int {
+        const YAML::Node v = d[field];
+        if (!v) {
+            cerr << "Error: dnn_layer is missing required field '" << field << "'" << endl;
+            exit(-1);
+        }
+        if (!v.IsScalar()) {
+            cerr << "Error: dnn_layer field '" << field << "' must be an integer, got "
+                 << yamlNodeKind(v) << endl;
+            exit(-1);
+        }
+        try {
+            return v.as<int>();
+        } catch (const YAML::Exception &) {
+            cerr << "Error: dnn_layer field '" << field << "' must be an integer, got '"
+                 << v.Scalar() << "'" << endl;
+            exit(-1);
+        }
+    };
+
+    GlobalParams::dnn_config.input_channels  = requireInt("input_channels");
+    GlobalParams::dnn_config.output_channels = requireInt("output_channels");
+    GlobalParams::dnn_config.input_h         = requireInt("input_h");
+    GlobalParams::dnn_config.input_w         = requireInt("input_w");
+    GlobalParams::dnn_config.kernel_size     = requireInt("kernel_size");
+    GlobalParams::dnn_config.stride          = requireInt("stride");
+
+    const YAML::Node dataflow = d["dataflow"];
+    if (dataflow) {
+        if (!dataflow.IsScalar()) {
+            cerr << "Error: dnn_layer field 'dataflow' must be a string, got "
+                 << yamlNodeKind(dataflow) << endl;
+            exit(-1);
+        }
+        GlobalParams::dnn_config.dataflow = dataflow.Scalar();
+    }
+}
+
 static string parseVerboseMode(const char *value)
 {
     if (!strcmp(value, "0") || !strcmp(value, VERBOSE_OFF))
@@ -155,23 +236,7 @@ void loadConfiguration() {
     }
 
     if (config["dnn_layer"]) {
-        YAML::Node d = config["dnn_layer"];
-        auto requireDNNField = [&](const char* fieldName) -> int {
-            if (!d[fieldName]) {
-                cerr << "Error: DNN layer config is missing required field '"
-                     << fieldName << "'" << endl;
-                exit(-1);
-            }
-            return d[fieldName].as<int>();
-        };
-        GlobalParams::dnn_config.input_channels  = requireDNNField("input_channels");
-        GlobalParams::dnn_config.output_channels = requireDNNField("output_channels");
-        GlobalParams::dnn_config.input_h         = requireDNNField("input_h");
-        GlobalParams::dnn_config.input_w         = requireDNNField("input_w");
-        GlobalParams::dnn_config.kernel_size     = requireDNNField("kernel_size");
-        GlobalParams::dnn_config.stride          = requireDNNField("stride");
-        if (d["dataflow"])
-            GlobalParams::dnn_config.dataflow = d["dataflow"].as<string>();
+        loadDNNLayerConfig(config["dnn_layer"]);
     }
 
     // Initialize global configuration parameters (can be overridden with command-line arguments)
