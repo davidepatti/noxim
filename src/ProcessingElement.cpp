@@ -9,6 +9,7 @@
  */
 
 #include "ProcessingElement.h"
+#include "DNNTraffic.h"
 
 int ProcessingElement::randInt(int min, int max)
 {
@@ -113,6 +114,18 @@ Flit ProcessingElement::nextFlit()
 
 bool ProcessingElement::canShot(Packet & packet)
 {
+    // DNN traffic: stop injecting once this PE's schedule is exhausted
+    if (GlobalParams::traffic_distribution == TRAFFIC_DNN_LAYER) {
+        if (!dnn_schedule_built)
+            generateDNNSchedule();
+        // advance past consumed entries
+        while (dnn_sched_index < dnn_schedule.size() &&
+               dnn_schedule[dnn_sched_index].second <= 0)
+            dnn_sched_index++;
+        if (dnn_sched_index >= dnn_schedule.size())
+            return false;   // schedule done — this PE is silent
+    }
+
    // assert(false);
     if(never_transmit) return false;
    
@@ -163,6 +176,8 @@ bool ProcessingElement::canShot(Packet & packet)
 		    packet = trafficULocal();
          else if (GlobalParams::traffic_distribution == TRAFFIC_HOTSPOT)
                     packet = trafficRandom();
+        else if (GlobalParams::traffic_distribution == TRAFFIC_DNN_LAYER)
+            packet = trafficDNNLayer();
         else {
             cout << "Invalid traffic distribution: " << GlobalParams::traffic_distribution << endl;
             exit(-1);
@@ -516,5 +531,87 @@ int ProcessingElement::getRandomSize()
 unsigned int ProcessingElement::getQueueSize() const
 {
     return packet_queue.size();
+}
+
+void ProcessingElement::generateDNNSchedule()
+{
+    dnn_schedule.clear();
+    dnn_sched_index = 0;
+
+    int mesh_size = GlobalParams::mesh_dim_x * GlobalParams::mesh_dim_y;
+    int memory_node = 0;   // node 0 acts as DRAM interface
+
+    const DNNConfig &cfg = GlobalParams::dnn_config;
+    const DNNLayerVolumes vol = dnnLayerVolumes(cfg.input_channels, cfg.output_channels,
+                                                cfg.input_h, cfg.input_w,
+                                                cfg.kernel_size, cfg.stride);
+
+    int num_compute = mesh_size - 1;          // all nodes except memory
+    if (num_compute < 1) num_compute = 1;
+
+    // max_packet_size is used as values-per-packet; trafficDNNLayer() emits
+    // every DNN packet at exactly that size, so the two stay consistent.
+    int vpp = GlobalParams::max_packet_size;
+    if (vpp < 1) vpp = 1;
+
+    // Each volume is split in values across the compute PEs first, with the
+    // remainder spread one value at a time over the first PEs, and only then
+    // rounded up to whole packets. The per-PE shares therefore add up to the
+    // full layer volume; rounding only adds padding inside each PE's last
+    // packet. Compute PE k is node k + 1 (node 0 is the memory node).
+    if (local_id == memory_node) {
+        // Memory node streams weights and input activations to each compute PE.
+        for (int dst = 0; dst < mesh_size; dst++) {
+            if (dst == memory_node) continue;
+            int k = dst - 1;
+            long long values = dnnShare(vol.weights, num_compute, k) +
+                               dnnShare(vol.inputs,  num_compute, k);
+            int packets = (int)dnnPackets(values, vpp);
+            if (packets > 0)
+                dnn_schedule.push_back(make_pair(dst, packets));
+        }
+    } else {
+        // Compute PE sends its share of the outputs back to the memory node.
+        int k = local_id - 1;
+        int packets = (int)dnnPackets(dnnShare(vol.outputs, num_compute, k), vpp);
+        if (packets > 0)
+            dnn_schedule.push_back(make_pair(memory_node, packets));
+    }
+
+    dnn_schedule_built = true;
+}
+
+Packet ProcessingElement::trafficDNNLayer()
+{
+    Packet p;
+    p.src_id = local_id;
+
+    if (!dnn_schedule_built)
+        generateDNNSchedule();
+
+    // Find next schedule entry with packets remaining
+    while (dnn_sched_index < dnn_schedule.size() &&
+           dnn_schedule[dnn_sched_index].second <= 0)
+        dnn_sched_index++;
+
+    if (dnn_sched_index >= dnn_schedule.size()) {
+        // Schedule exhausted. canShot() already returns false for an
+        // exhausted DNN schedule, so this path is normally unreachable.
+        // Return a minimal, well-formed packet as a safe fallback.
+        p.dst_id = local_id;
+        p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+        p.size = p.flit_left = GlobalParams::min_packet_size;
+        p.vc_id = 0;
+        return p;
+    }
+
+    p.dst_id = dnn_schedule[dnn_sched_index].first;
+    dnn_schedule[dnn_sched_index].second--;   // consume one packet
+
+    p.timestamp = sc_time_stamp().to_double() / GlobalParams::clock_period_ps;
+    // DNN uses fixed max_packet_size to accurately match the schedule's values-per-packet assumption
+    p.size = p.flit_left = GlobalParams::max_packet_size;
+    p.vc_id = randInt(0, GlobalParams::n_virtual_channels - 1);
+    return p;
 }
 

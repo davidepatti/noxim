@@ -55,3 +55,4 @@ butterfly_16_buf4 wired DELTA RANDOM
 butterfly_16_buf4 wireless DELTA RANDOM
 butterfly_8_buf4_relay wireless DELTA RANDOM
 butterfly_16_buf4_relay wireless DELTA RANDOM
+mesh_4x4_dnn wired XY RANDOM

@@ -27,6 +27,87 @@ static char *requireOptionValue(int &index, int arg_num, char *arg_vet[], const 
     return arg_vet[++index];
 }
 
+// Human-readable YAML node kind, for configuration diagnostics.
+static const char *yamlNodeKind(const YAML::Node &node)
+{
+    switch (node.Type()) {
+    case YAML::NodeType::Null:      return "an empty value";
+    case YAML::NodeType::Scalar:    return "a scalar";
+    case YAML::NodeType::Sequence:  return "a list";
+    case YAML::NodeType::Map:       return "a mapping";
+    default:                        return "an undefined value";
+    }
+}
+
+// Reads the dnn_layer block. Every field is checked for presence and type
+// before conversion, so a malformed block (missing field, null, a list, or a
+// non-integer string) stops with a message naming the field instead of an
+// uncaught yaml-cpp exception.
+static void loadDNNLayerConfig(const YAML::Node &d)
+{
+    if (!d.IsMap()) {
+        cerr << "Error: dnn_layer must be a mapping of fields, got "
+             << yamlNodeKind(d) << endl;
+        exit(-1);
+    }
+
+    static const char *intFields[] = {
+        "input_channels", "output_channels", "input_h",
+        "input_w", "kernel_size", "stride"
+    };
+    static const char *optionalFields[] = { "dataflow" };
+
+    // Catch typos such as "strides" early; they would otherwise surface as
+    // a confusing "missing field" error for the correctly spelled one.
+    for (YAML::const_iterator it = d.begin(); it != d.end(); ++it) {
+        const string key = it->first.Scalar();
+        bool known = false;
+        for (const char *f : intFields)      known = known || key == f;
+        for (const char *f : optionalFields) known = known || key == f;
+        if (!known) {
+            cerr << "Error: dnn_layer has unknown field '" << key << "'" << endl;
+            exit(-1);
+        }
+    }
+
+    auto requireInt = [&](const char *field) -> int {
+        const YAML::Node v = d[field];
+        if (!v) {
+            cerr << "Error: dnn_layer is missing required field '" << field << "'" << endl;
+            exit(-1);
+        }
+        if (!v.IsScalar()) {
+            cerr << "Error: dnn_layer field '" << field << "' must be an integer, got "
+                 << yamlNodeKind(v) << endl;
+            exit(-1);
+        }
+        try {
+            return v.as<int>();
+        } catch (const YAML::Exception &) {
+            cerr << "Error: dnn_layer field '" << field << "' must be an integer, got '"
+                 << v.Scalar() << "'" << endl;
+            exit(-1);
+        }
+    };
+
+    GlobalParams::dnn_config.input_channels  = requireInt("input_channels");
+    GlobalParams::dnn_config.output_channels = requireInt("output_channels");
+    GlobalParams::dnn_config.input_h         = requireInt("input_h");
+    GlobalParams::dnn_config.input_w         = requireInt("input_w");
+    GlobalParams::dnn_config.kernel_size     = requireInt("kernel_size");
+    GlobalParams::dnn_config.stride          = requireInt("stride");
+
+    const YAML::Node dataflow = d["dataflow"];
+    if (dataflow) {
+        if (!dataflow.IsScalar()) {
+            cerr << "Error: dnn_layer field 'dataflow' must be a string, got "
+                 << yamlNodeKind(dataflow) << endl;
+            exit(-1);
+        }
+        GlobalParams::dnn_config.dataflow = dataflow.Scalar();
+    }
+}
+
 static string parseVerboseMode(const char *value)
 {
     if (!strcmp(value, "0") || !strcmp(value, VERBOSE_OFF))
@@ -152,6 +233,10 @@ void loadConfiguration() {
         cout << " Failed" << endl;
         cerr << "ERROR at line " << pe.mark.line +1 << " column " << pe.mark.column + 1 << ": "<< pe.msg << ". Please check identation." << endl;
         exit(0);
+    }
+
+    if (config["dnn_layer"]) {
+        loadDNNLayerConfig(config["dnn_layer"]);
     }
 
     // Initialize global configuration parameters (can be overridden with command-line arguments)
@@ -363,6 +448,7 @@ void showHelp(char selfname[])
          << "\t\tbutterfly\tButterfly traffic distribution" << endl
          << "\t\tshuffle\t\tShuffle traffic distribution" << endl
          << "\t\thotspot\t\tHotspot traffic distribution" << endl
+         << "\t\tdnn_layer\tDNN layer traffic distribution (output-stationary Conv2D)" << endl
          <<	"\t\ttable FILENAME\tTraffic Table Based traffic distribution with table in the specified file" << endl
          << "\t-hs ID P\t\tAdd node ID to hotspot nodes, with percentage P (0..1) (Only for 'random'/'hotspot' traffic)" << endl
          << "\t-warmup N\t\tStart to collect statistics after N cycles" << endl
@@ -591,6 +677,42 @@ void checkConfiguration()
         exit(1);
     }
 
+    if (GlobalParams::traffic_distribution == TRAFFIC_DNN_LAYER) {
+        if (GlobalParams::dnn_config.input_channels == 0 &&
+            GlobalParams::dnn_config.output_channels == 0 &&
+            GlobalParams::dnn_config.input_h == 0 &&
+            GlobalParams::dnn_config.input_w == 0 &&
+            GlobalParams::dnn_config.kernel_size == 0) {
+            cerr << "Error: DNN traffic selected but no valid dnn_layer block configured" << endl;
+            exit(-1);
+        }
+        if (GlobalParams::dnn_config.input_channels <= 0 ||
+            GlobalParams::dnn_config.output_channels <= 0 ||
+            GlobalParams::dnn_config.input_h <= 0 ||
+            GlobalParams::dnn_config.input_w <= 0 ||
+            GlobalParams::dnn_config.kernel_size <= 0) {
+            cerr << "Error: DNN layer dimensions (channels, height, width, kernel) must be > 0" << endl;
+            exit(-1);
+        }
+        if (GlobalParams::dnn_config.stride <= 0) {
+            cerr << "Error: DNN layer stride must be > 0" << endl;
+            exit(-1);
+        }
+        if (GlobalParams::dnn_config.kernel_size > GlobalParams::dnn_config.input_h ||
+            GlobalParams::dnn_config.kernel_size > GlobalParams::dnn_config.input_w) {
+            cerr << "Error: DNN layer kernel_size must fit within input_h and input_w" << endl;
+            exit(-1);
+        }
+        if (GlobalParams::dnn_config.dataflow != "output_stationary") {
+            cerr << "Error: DNN traffic unsupported dataflow: " << GlobalParams::dnn_config.dataflow << endl;
+            exit(-1);
+        }
+        if (GlobalParams::topology != TOPOLOGY_MESH) {
+            cerr << "Error: DNN traffic currently supports only the MESH topology" << endl;
+            exit(-1);
+        }
+    }
+
     GlobalParams::trace_scope = normalizeTraceScope(GlobalParams::trace_scope.c_str());
 }
 
@@ -737,6 +859,8 @@ void parseCmdLine(int arg_num, char *arg_vet[])
 		    GlobalParams::locality = atof(requireOptionValue(i, arg_num, arg_vet, "-traffic"));
 		} else if (!strcmp(traffic, "hotspot")) {
     GlobalParams::traffic_distribution = TRAFFIC_HOTSPOT;
+} else if (!strcmp(traffic, "dnn_layer")) {
+    GlobalParams::traffic_distribution = TRAFFIC_DNN_LAYER;
 }
 		else assert(false);
 	    } 
